@@ -10,16 +10,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uuid')->unique();
-            $table->string('username');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
+        Schema::table('users', function (Blueprint $table) {
             $table->uuid('area_uuid')->nullable();
-            $table->timestamps();
-
             $table->foreign('area_uuid')->references('uuid')->on('areas')->onDelete('cascade');
         });
     }
@@ -29,6 +21,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign('area_uuid');
+            $table->dropColumn('area_uuid');
+        });
     }
 };
