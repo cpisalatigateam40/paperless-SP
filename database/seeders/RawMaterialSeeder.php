@@ -16,11 +16,13 @@ class RawMaterialSeeder extends Seeder
     {
         $areaUuids = \App\Models\Area::pluck('uuid')->toArray();
 
+        $suppliers = ['PT Indofood', 'PT Mayora', 'PT Wings', 'PT Unilever', 'PT Garudafood'];
+
         for ($i = 1; $i <= 10; $i++) {
             RawMaterial::create([
                 'uuid' => Str::uuid(),
                 'material_name' => 'Material ' . $i,
-                'production_code' => 'PRD-' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'supplier' => $suppliers[array_rand($suppliers)],
                 'area_uuid' => $areaUuids[array_rand($areaUuids)] ?? null,
             ]);
         }

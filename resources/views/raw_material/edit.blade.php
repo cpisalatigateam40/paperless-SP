@@ -16,8 +16,8 @@
                     <input type="text" name="material_name" id="material_name" class="form-control" value="{{ $rawMaterial->material_name }}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="production_code" class="form-label">Kode Produksi</label>
-                    <input type="text" name="production_code" id="production_code" class="form-control" value="{{ $rawMaterial->production_code }}">
+                    <label for="supplier" class="form-label">Produsen</label>
+                    <input type="text" name="supplier" id="supplier" class="form-control" value="{{ $rawMaterial->supplier }}">
                 </div>
                 <div class="mb-3">
                     <label for="area_uuid" class="form-label">Area</label>

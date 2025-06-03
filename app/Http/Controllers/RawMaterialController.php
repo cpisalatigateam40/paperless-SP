@@ -24,7 +24,7 @@ class RawMaterialController extends Controller
     {
         $request->validate([
             'material_name' => 'required|string|max:255',
-            'production_code' => 'nullable|string|max:255',
+            'supplier' => 'nullable|string|max:255',
             'area_uuid' => 'nullable|exists:areas,uuid',
         ]);
 
@@ -43,7 +43,7 @@ class RawMaterialController extends Controller
     {
         $request->validate([
             'material_name' => 'required|string|max:255',
-            'production_code' => 'nullable|string|max:255',
+            'supplier' => 'nullable|string|max:255',
             'area_uuid' => 'nullable|exists:areas,uuid',
         ]);
 

@@ -32,7 +32,7 @@
                         <tr>
                             <th>No</th>
                             <th>Material</th>
-                            <th>Kode Produksi</th>
+                            <th>Produsen</th>
                             <th>Area</th>
                             <th>Aksi</th>
                         </tr>
@@ -42,7 +42,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $material->material_name }}</td>
-                            <td>{{ $material->production_code }}</td>
+                            <td>{{ $material->supplier }}</td>
                             <td>{{ $material->area->name ?? '-' }}</td>
                             <td>
                                 <a href="{{ route('raw-materials.edit', $material->uuid) }}" class="btn btn-warning btn-sm">Edit</a>
