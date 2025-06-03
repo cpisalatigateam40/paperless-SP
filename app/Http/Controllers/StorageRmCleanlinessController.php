@@ -7,10 +7,18 @@ use Illuminate\Support\Str;
 use App\Models\ReportStorageRmCleanliness;
 use App\Models\DetailStorageRmCleanliness;
 use App\Models\ItemStorageRmCleanliness;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class StorageRmCleanlinessController extends Controller
 {
+
+    public function index()
+    {
+        $reports = ReportStorageRmCleanliness::with('details.items')->latest()->paginate(10);
+        return view('cleanliness.index', compact('reports'));
+    }
+
     public function create()
     {
         return view('cleanliness.form');
@@ -26,7 +34,7 @@ class StorageRmCleanlinessController extends Controller
                 'date' => $request->date,
                 'shift' => $request->shift,
                 'room_name' => $request->room_name,
-                'created_by' => $request->created_by,
+                'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,
                 'approved_by' => $request->approved_by,
             ]);
@@ -53,7 +61,7 @@ class StorageRmCleanlinessController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Data berhasil disimpan.');
+            return redirect()->route('cleanliness.index')->with('success', 'Data berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());

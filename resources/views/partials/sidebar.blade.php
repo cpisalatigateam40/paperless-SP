@@ -80,8 +80,7 @@
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route ('cleanliness.create') }}">Report</a>
-                {{-- <a class="collapse-item" href="#">Chillroom</a> --}}
+                <a class="collapse-item" href="{{ route ('cleanliness.index') }}">Report</a>
             </div>
         </div>
     </li>

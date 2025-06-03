@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{uuid}', [RawMaterialController::class, 'destroy'])->name('destroy');
     });
 
+    Route::get('/storage-rm-cleanliness', [StorageRmCleanlinessController::class, 'index'])->name('cleanliness.index');
     Route::get('/cleanliness-form', [StorageRmCleanlinessController::class, 'create'])->name('cleanliness.create');
     Route::post('/cleanliness-form', [StorageRmCleanlinessController::class, 'store'])->name('cleanliness.store');
 

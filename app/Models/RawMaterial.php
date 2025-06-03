@@ -13,7 +13,7 @@ class RawMaterial extends Model
     protected $fillable = [
         'uuid',
         'material_name',
-        'production_code',
+        'supplier',
         'area_uuid',
     ];
 
