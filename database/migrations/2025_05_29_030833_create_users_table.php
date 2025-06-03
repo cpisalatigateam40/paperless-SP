@@ -11,6 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->uuid('uuid')->after('id')->unique();
+            $table->string('username')->after('uuid');
             $table->uuid('area_uuid')->nullable();
             $table->foreign('area_uuid')->references('uuid')->on('areas')->onDelete('cascade');
         });
@@ -22,6 +24,8 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('uuid');
+            $table->dropColumn('username');
             $table->dropForeign('area_uuid');
             $table->dropColumn('area_uuid');
         });

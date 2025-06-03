@@ -20,7 +20,6 @@ class UserSeeder extends Seeder
         $area = Area::first();
 
         $admin = User::firstOrCreate([
-            'uuid' => (string) Str::uuid(),
             'username' => 'admin',
             'name' => 'Administrator',
             'email' => 'admin@example.com',
@@ -30,7 +29,6 @@ class UserSeeder extends Seeder
         $admin->assignRole($adminRole);
 
         $user = User::firstOrCreate([
-            'uuid' => (string) Str::uuid(),
             'username' => 'user',
             'name' => 'User One',
             'email' => 'user@example.com',
