@@ -37,4 +37,9 @@ class Area extends Model
     {
         return $this->hasMany(RawMaterial::class, 'area_uuid', 'uuid');
     }
+
+    public function reportStorageRM()
+    {
+        return $this->hasMany(ReportStorageRmCleanliness::class, 'area_uuid', 'uuid');
+    }
 }

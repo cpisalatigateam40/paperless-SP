@@ -12,6 +12,7 @@ class ReportStorageRmCleanliness extends Model
     protected $table = 'report_storage_rm_cleanliness';
     protected $fillable = [
         'uuid',
+        'area_uuid',
         'date',
         'shift',
         'room_name',
@@ -23,5 +24,10 @@ class ReportStorageRmCleanliness extends Model
     public function details()
     {
         return $this->hasMany(DetailStorageRmCleanliness::class, 'report_uuid', 'uuid');
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 }

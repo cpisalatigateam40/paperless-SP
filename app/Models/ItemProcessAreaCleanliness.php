@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class ItemProcessAreaCleanliness extends Model
+{
+    use HasFactory;
+
+    protected $table = 'item_process_area_cleanliness';
+
+    protected $fillable = [
+        'detail_uuid',
+        'item',
+        'condition',
+        'notes',
+        'corrective_action',
+        'verification',
+    ];
+
+    public function detail()
+    {
+        return $this->belongsTo(DetailProcessAreaCleanliness::class, 'detail_uuid', 'uuid');
+    }
+}

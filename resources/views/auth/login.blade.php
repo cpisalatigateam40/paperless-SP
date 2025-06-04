@@ -72,18 +72,14 @@
                                     Login
                                 </button>
                             </form>
-
                             <hr>
-                            {{-- <div class="text-center">
-                                <a class="small" href="#">Lupa password?</a>
-                            </div> --}}
                         </div>
                     </div>
 
                 </div>
             </div>
         </div>
-    </div>
+</div>
 
 <!-- Scripts -->
 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>

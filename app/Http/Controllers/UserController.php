@@ -29,7 +29,7 @@ class UserController extends Controller
             'username' => 'required|unique:users,username',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:6',
             'area_uuid' => 'required|exists:areas,uuid',
             'role' => 'required|exists:roles,name',
         ]);

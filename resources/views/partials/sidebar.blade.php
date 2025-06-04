@@ -1,3 +1,16 @@
+<style>
+    .collapse-item {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .collapse-inner {
+        overflow: hidden !important;
+        padding: 0.5rem !important;
+    }
+</style>
+
 <!-- Sidebar -->
 <ul class="navbar-nav bg-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -76,11 +89,17 @@
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
             aria-expanded="true" aria-controls="collapsePages">
             <i class="fas fa-fw fa-folder"></i>
-            <span>Kondisi penyimpanan bahan</span>
+            <span>Pemeriksaan Kondisi Area, GMP Karyawan, dan Kontrol Sanitasi</span>
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route ('cleanliness.index') }}">Report</a>
+           <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('cleanliness.index') }}">
+                    Report kebersihan area penyimpanan bahan
+                </a>
+
+                <a class="collapse-item" href="{{ route('process-area-cleanliness.index') }}">
+                    Report kebersihan area proses
+                </a>
             </div>
         </div>
     </li>
