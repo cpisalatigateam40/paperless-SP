@@ -3,6 +3,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="card shadow mb-4">
+        <div class="card-header">
+            <h5>Form Kondisi Ruang Penyimpanan Bahan Baku dan Penunjang</h5>
+        </div>
         <div class="card-body">
             <form action="{{ route('cleanliness.store') }}" method="POST">
                 @csrf
@@ -10,34 +13,35 @@
                 <!-- Header -->
                 <div class="mb-4">
                     <label>Tanggal:</label>
-                    <input type="date" name="date" class="form-control">
+                    <input type="date" name="date" class="form-control col-md-5 mb-3" value="{{ \Carbon\Carbon::today()->toDateString() }}">
 
                     <label>Shift:</label>
-                    <input type="text" name="shift" class="form-control">
+                    <input type="text" name="shift" class="form-control col-md-5 mb-3">
 
                     <label>Area (Room Name):</label>
-                    <select name="room_name" class="form-control" required>
+                    <select name="room_name" class="form-control col-md-5 mb-5" required>
                         <option value="">-- Pilih Area --</option>
                         <option value="Seasoning">Seasoning</option>
                         <option value="Chillroom">Chillroom</option>
                     </select>
-
-                    {{-- <label>Dibuat oleh:</label>
-                    <input type="text" name="created_by" class="form-control">
-
-                    <label>Diketahui oleh:</label>
-                    <input type="text" name="known_by" class="form-control">
-
-                    <label>Disetujui oleh:</label>
-                    <input type="text" name="approved_by" class="form-control"> --}}
                 </div>
 
                 <!-- Detail Jam Inspeksi dan Items -->
                 <div id="inspection-details">
-                    <h5>Detail Inspeksi</h5>
-                    <div class="inspection-block">
+                    <h5 class="mb-3">Detail Inspeksi</h5>
+                </div>
+
+                <button type="button" id="add-inspection" class="btn btn-secondary mr-2">+ Tambah Detail Inspeksi</button>
+
+                <button type="submit" class="btn btn-primary">Simpan</button>
+
+                <!-- Template untuk form detail inspeksi -->
+                <template id="inspection-template">
+                    <div class="inspection-block border rounded p-3 mb-3 position-relative">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection" style="z-index: 1; right: 0; top: 0; margin-top: .5rem; margin-right: .5rem;" aria-label="Close">x</button>
+                        
                         <label>Jam Inspeksi:</label>
-                        <input type="time" name="details[0][inspection_hour]" class="form-control">
+                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5">
 
                         <table class="table">
                             <thead>
@@ -51,27 +55,40 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach(['Kondisi dan penempatan barang', 'Pelabelan', 'Kebersihan Ruangan', 'Suhu ruang (℃) / RH (%)'] as $i => $item)
+                                @php
+                                    $items = ['Kondisi dan penempatan barang', 'Pelabelan', 'Kebersihan Ruangan', 'Suhu ruang (℃) / RH (%)'];
+                                @endphp
+
+                                @foreach($items as $i => $item)
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
-                                    <td><input type="hidden" name="details[0][items][{{ $i }}][item]" value="{{ $item }}">{{ $item }}</td>
+                                    <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}">{{ $item }}</td>
+
                                     <td>
-                                        <select name="details[0][items][{{ $i }}][condition]" class="form-control">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="1">1. Tertata rapi</option>
-                                            <option value="2">2. Sesuai tagging dan jenis allergen</option>
-                                            <option value="3">3. Bersih dan bebas kontaminan</option>
-                                            <option value="4">4. Tidak tertata rapi</option>
-                                            <option value="5">5. Penempatan tidak sesuai</option>
-                                            <option value="6">6. Tidak bersih / ada kontaminan</option>
-                                        </select>
+                                        @if($item === 'Suhu ruang (℃) / RH (%)')
+                                            <div class="d-flex gap-1" style="gap: 1rem;">
+                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control">
+                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][humidity]" placeholder="RH%" class="form-control">
+                                            </div>
+                                        @else
+                                            <select name="details[__index__][items][{{ $i }}][condition]" class="form-control">
+                                                <option value="">-- Pilih --</option>
+                                                <option value="1">1. Tertata rapi</option>
+                                                <option value="2">2. Sesuai tagging dan jenis allergen</option>
+                                                <option value="3">3. Bersih dan bebas kontaminan</option>
+                                                <option value="4">4. Tidak tertata rapi</option>
+                                                <option value="5">5. Penempatan tidak sesuai</option>
+                                                <option value="6">6. Tidak bersih / ada kontaminan</option>
+                                            </select>
+                                        @endif
                                     </td>
-                                    <td><input type="text" name="details[0][items][{{ $i }}][notes]" class="form-control"></td>
-                                    <td><input type="text" name="details[0][items][{{ $i }}][corrective_action]" class="form-control"></td>
+
+                                    <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control"></td>
+                                    <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control"></td>
                                     <td>
-                                        <select name="details[0][items][{{ $i }}][verification]" class="form-control">
-                                            <option value="0">Belum</option>
-                                            <option value="1">Sudah</option>
+                                        <select name="details[__index__][items][{{ $i }}][verification]" class="form-control">
+                                            <option value="0">Tidak OK</option>
+                                            <option value="1">OK</option>
                                         </select>
                                     </td>
                                 </tr>
@@ -79,12 +96,31 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <!-- Submit -->
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                </template>
             </form>
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    let inspectionIndex = 0;
+
+    document.getElementById('add-inspection').addEventListener('click', function () {
+        const template = document.getElementById('inspection-template').innerHTML;
+        const rendered = template.replace(/__index__/g, inspectionIndex);
+        document.getElementById('inspection-details').insertAdjacentHTML('beforeend', rendered);
+        inspectionIndex++;
+    });
+
+    // Trigger sekali di awal agar form pertama muncul
+    document.getElementById('add-inspection').click();
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-inspection')) {
+            e.target.closest('.inspection-block').remove();
+        }
+    });
+</script>
 @endsection
