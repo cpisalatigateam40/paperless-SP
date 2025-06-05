@@ -4,10 +4,10 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Form Kondisi Ruang Penyimpanan Bahan Baku dan Penunjang</h5>
+            <h5>Form Pemeriksaan Kondisi Kebersihan Area Proses</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('cleanliness.store') }}" method="POST">
+            <form action="{{ route('process-area-cleanliness.store') }}" method="POST">
                 @csrf
 
                 <!-- Header -->
@@ -15,19 +15,25 @@
                     <div class="d-flex" style="gap: 1rem;">
                         <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Tanggal:</label>
-                            <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}">
+                            <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                         </div>
+
                         <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control">
+                            <input type="text" name="shift" class="form-control" required>
                         </div>
                     </div>
+                    
 
-                    <label>Area (Room Name):</label>
-                    <select name="room_name" class="form-control col-md-5 mb-5" required>
+                    
+
+                    <label>Area:</label>
+                    <select name="section_name" class="form-control col-md-5 mb-5" required>
                         <option value="">-- Pilih Area --</option>
-                        <option value="Seasoning">Seasoning</option>
-                        <option value="Chillroom">Chillroom</option>
+                        <option value="MP">MP</option>
+                        <option value="Cooking">Cooking</option>
+                        <option value="Packing">Packing</option>
+                        <option value="Cartoning">Cartoning</option>
                     </select>
                 </div>
 
@@ -61,37 +67,32 @@
                             </thead>
                             <tbody>
                                 @php
-                                    $items = ['Kondisi dan penempatan barang', 'Pelabelan', 'Kebersihan Ruangan', 'Suhu ruang (℃) / RH (%)'];
+                                    $items = ['Kondisi dan penempatan barang', 'Pelabelan', 'Kebersihan Ruangan', 'Suhu ruang (℃)'];
                                 @endphp
 
                                 @foreach($items as $i => $item)
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
-                                    <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}">{{ $item }}</td>
+                                    <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}" required>{{ $item }}</td>
 
                                     <td>
-                                        @if($item === 'Suhu ruang (℃) / RH (%)')
+                                        @if($item === 'Suhu ruang (℃)')
                                             <div class="d-flex gap-1" style="gap: 1rem;">
-                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control">
-                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][humidity]" placeholder="RH%" class="form-control">
+                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control" required>
                                             </div>
                                         @else
-                                            <select name="details[__index__][items][{{ $i }}][condition]" class="form-control">
+                                            <select name="details[__index__][items][{{ $i }}][condition]" class="form-control" required>
                                                 <option value="">-- Pilih --</option>
-                                                <option value="1">1. Tertata rapi</option>
-                                                <option value="2">2. Sesuai tagging dan jenis allergen</option>
-                                                <option value="3">3. Bersih dan bebas kontaminan</option>
-                                                <option value="4">4. Tidak tertata rapi</option>
-                                                <option value="5">5. Penempatan tidak sesuai</option>
-                                                <option value="6">6. Tidak bersih / ada kontaminan</option>
+                                                <option value="Bersih">1. Bersih</option>
+                                                <option value="Kotor">2. Kotor</option>
                                             </select>
                                         @endif
                                     </td>
 
-                                    <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control"></td>
-                                    <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control"></td>
+                                    <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control" required></td>
+                                    <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control" required></td>
                                     <td>
-                                        <select name="details[__index__][items][{{ $i }}][verification]" class="form-control">
+                                        <select name="details[__index__][items][{{ $i }}][verification]" class="form-control" required>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>

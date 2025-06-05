@@ -27,7 +27,7 @@ class ReportProcessAreaCleanliness extends Model
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 
-    public function detail()
+    public function details()
     {
         return $this->hasMany(DetailProcessAreaCleanliness::class, 'report_uuid', 'uuid');
     }
