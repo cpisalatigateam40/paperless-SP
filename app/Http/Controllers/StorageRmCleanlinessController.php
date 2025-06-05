@@ -24,7 +24,7 @@ class StorageRmCleanlinessController extends Controller
                 $query->where('area_uuid', Auth::user()->area_uuid);
             })
             ->latest()
-            ->paginate(10);
+            ->get();
 
         return view('cleanliness.index', compact('reports'));
     }
@@ -99,7 +99,6 @@ class StorageRmCleanlinessController extends Controller
         $report = ReportStorageRmCleanliness::findOrFail($id);
         $user = Auth::user();
 
-        // Cek apakah sudah approved sebelumnya
         if ($report->approved_by) {
             return redirect()->back()->with('error', 'Laporan sudah disetujui.');
         }
@@ -152,9 +151,9 @@ class StorageRmCleanlinessController extends Controller
         }
     }
 
-    public function exportPdf($id)
+    public function exportPdf($uuid)
     {
-        $report = ReportStorageRmCleanliness::with('area', 'details.items')->findOrFail($id);
+        $report = ReportStorageRmCleanliness::with('area', 'details.items')->where('uuid', $uuid)->firstOrFail();
 
         $pdf = Pdf::loadView('cleanliness.pdf', compact('report'));
 

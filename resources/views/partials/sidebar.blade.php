@@ -3,6 +3,7 @@
         white-space: normal !important;
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
+        margin-bottom: .2rem !important;
     }
 
     .collapse-inner {
@@ -53,7 +54,7 @@
                     <a class="collapse-item" href="{{ route('users.index') }}">User</a>
                 @endcan
                 <a class="collapse-item" href="{{ route('areas.index') }}">Area</a>
-                <a class="collapse-item" href="{{ route('sections.index') }}">Section</a>
+                {{-- <a class="collapse-item" href="{{ route('sections.index') }}">Section</a> --}}
                 <a class="collapse-item" href="{{ route('raw-materials.index') }}">Raw Material</a>
             </div>
         </div>
@@ -88,7 +89,7 @@
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
             aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-folder"></i>
+            <i class="fas fa-fw fa-recycle"></i>
             <span>Pemeriksaan Kondisi Area, GMP Karyawan, dan Kontrol Sanitasi</span>
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
@@ -99,6 +100,10 @@
 
                 <a class="collapse-item" href="{{ route('process-area-cleanliness.index') }}">
                     Report kebersihan area proses
+                </a>
+
+                <a class="collapse-item" href="{{ route('gmp-employee.index') }}">
+                    Report GMP karyawan
                 </a>
             </div>
         </div>
