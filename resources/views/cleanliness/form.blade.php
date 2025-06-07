@@ -15,11 +15,11 @@
                     <div class="d-flex" style="gap: 1rem;">
                         <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Tanggal:</label>
-                            <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}">
+                            <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                         </div>
                         <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control">
+                            <input type="text" name="shift" class="form-control" required>
                         </div>
                     </div>
 
@@ -46,7 +46,7 @@
                         <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection" style="z-index: 1; right: 0; top: 0; margin-top: .5rem; margin-right: .5rem;" aria-label="Close">x</button>
                         
                         <label>Jam Inspeksi:</label>
-                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5">
+                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5" required>
 
                         <table class="table">
                             <thead>
@@ -67,16 +67,16 @@
                                 @foreach($items as $i => $item)
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
-                                    <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}">{{ $item }}</td>
+                                    <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}" required>{{ $item }}</td>
 
                                     <td>
                                         @if($item === 'Suhu ruang (℃) / RH (%)')
                                             <div class="d-flex gap-1" style="gap: 1rem;">
-                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control">
-                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][humidity]" placeholder="RH%" class="form-control">
+                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control" required>
+                                                <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][humidity]" placeholder="RH%" class="form-control" required>
                                             </div>
                                         @else
-                                            <select name="details[__index__][items][{{ $i }}][condition]" class="form-control">
+                                            <select name="details[__index__][items][{{ $i }}][condition]" class="form-control" required>
                                                 <option value="">-- Pilih --</option>
                                                 <option value="1">1. Tertata rapi</option>
                                                 <option value="2">2. Sesuai tagging dan jenis allergen</option>
@@ -88,10 +88,10 @@
                                         @endif
                                     </td>
 
-                                    <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control"></td>
-                                    <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control"></td>
+                                    <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control" required></td>
+                                    <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control" required></td>
                                     <td>
-                                        <select name="details[__index__][items][{{ $i }}][verification]" class="form-control">
+                                        <select name="details[__index__][items][{{ $i }}][verification]" class="form-control" required>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>

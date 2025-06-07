@@ -9,7 +9,7 @@
                 <div class="border rounded p-3 mb-3 position-relative">
                 
                 <label>Jam Inspeksi:</label>
-                <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5">
+                <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5" required>
 
                 <table class="table">
                     <thead>
@@ -30,15 +30,15 @@
                         @foreach($items as $i => $item)
                         <tr>
                             <td>{{ $i + 1 }}</td>
-                            <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}">{{ $item }}</td>
+                            <td><input type="hidden" name="details[__index__][items][{{ $i }}][item]" value="{{ $item }}" required>{{ $item }}</td>
 
                             <td>
                                 @if($item === 'Suhu ruang (℃)')
                                     <div class="d-flex gap-1" style="gap: 1rem;">
-                                        <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control">
+                                        <input type="number" step="0.1" name="details[__index__][items][{{ $i }}][temperature]" placeholder="℃" class="form-control" required>
                                     </div>  
                                 @else
-                                    <select name="details[__index__][items][{{ $i }}][condition]" class="form-control">
+                                    <select name="details[__index__][items][{{ $i }}][condition]" class="form-control" required>
                                         <option value="">-- Pilih --</option>
                                         <option value="Bersih">1. Bersih</option>
                                         <option value="Kotor">2. Kotor</option>
@@ -46,10 +46,10 @@
                                 @endif
                             </td>
 
-                            <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control"></td>
-                            <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control"></td>
+                            <td><input type="text" name="details[__index__][items][{{ $i }}][notes]" class="form-control" required></td>
+                            <td><input type="text" name="details[__index__][items][{{ $i }}][corrective_action]" class="form-control" required></td>
                             <td>
-                                <select name="details[__index__][items][{{ $i }}][verification]" class="form-control">
+                                <select name="details[__index__][items][{{ $i }}][verification]" class="form-control" required>
                                     <option value="0">Tidak OK</option>
                                     <option value="1">OK</option>
                                 </select>
