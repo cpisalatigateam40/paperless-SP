@@ -57,8 +57,6 @@
             gap: .5rem;
         }
 
-
-
     </style>
 </head>
 <body id="page-top">

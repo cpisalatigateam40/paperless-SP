@@ -42,4 +42,9 @@ class Area extends Model
     {
         return $this->hasMany(ReportStorageRmCleanliness::class, 'area_uuid', 'uuid');
     }
+
+    public function reportProcessArea()
+    {
+        return $this->hasMany(ReportProcessAreaCleanliness::class, 'area_uuid', 'uuid');
+    }
 }

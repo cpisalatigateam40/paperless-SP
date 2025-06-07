@@ -140,6 +140,11 @@ Route::middleware(['auth'])->group(function () {
         ->controller(GmpController::class)
         ->group(function () {
             Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::get('{report}/detail/create', 'createDetail')->name('detail.create');
+            Route::post('{report}/detail/store', 'storeDetail')->name('detail.store');
         });
 
 });

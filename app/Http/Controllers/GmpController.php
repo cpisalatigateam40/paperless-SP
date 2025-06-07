@@ -3,11 +3,185 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Models\Area;
+use App\Models\ReportGmpEmployee;
+use App\Models\DetailGmpEmployee;
+use App\Models\SanitationCheck;
+use App\Models\SanitationArea;
+use App\Models\SanitationResult;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Traits\HasRoles;
 
 class GmpController extends Controller
 {
+    use HasRoles;
+
     public function index()
     {
-        return view('gmp_employee.index');
+        $reports = ReportGmpEmployee::with('area')
+            ->with('details', 'area')
+            ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+                $query->where('area_uuid', Auth::user()->area_uuid);
+            })
+            ->latest()
+            ->get();
+
+        return view('gmp_employee.index', compact('reports'));
+    }
+
+    public function create()
+    {
+        return view('gmp_employee.create');
+    }
+
+    // public function store(Request $request)
+    // {
+    //     // Simpan report utama
+    //     $report = ReportGmpEmployee::create([
+    //         'uuid' => Str::uuid(),
+    //         'area_uuid' => Auth::user()->area_uuid,
+    //         'date' => $request->date,
+    //         'shift' => $request->shift,
+    //         'created_by' => Auth::user()->name,
+    //         'known_by' => $request->known_by,
+    //         'approved_by' => $request->approved_by,
+    //     ]);
+
+    //     // Simpan detailnya
+    //     foreach ($request->details as $detail) {
+    //         DetailGmpEmployee::create([
+    //             'uuid' => Str::uuid(),
+    //             'report_uuid' => $report->uuid,
+    //             'inspection_hour' => $detail['inspection_hour'],
+    //             'section_name' => $detail['section_name'],
+    //             'employee_name' => $detail['employee_name'],
+    //             'notes' => $detail['notes'],
+    //             'corrective_action' => $detail['corrective_action'],
+    //             'verification' => $detail['verification'],
+    //         ]);
+    //     }
+
+    //     return redirect()->route('gmp-employee.index')->with('success', 'Laporan berhasil disimpan.');
+    // }
+
+
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Simpan Laporan Utama GMP
+            $report = ReportGmpEmployee::create([
+                'uuid' => Str::uuid(),
+                'area_uuid' => Auth::user()->area_uuid,
+                'date' => $request->date,
+                'shift' => $request->shift,
+                'created_by' => Auth::user()->name,
+                'known_by' => $request->known_by,
+                'approved_by' => $request->approved_by,
+            ]);
+
+            // Simpan Detail Inspeksi jika ada
+            if ($request->has('details')) {
+                foreach ($request->details as $detail) {
+                    $detailData = [
+                        'uuid' => Str::uuid(),
+                        'report_uuid' => $report->uuid,
+                        'inspection_hour' => $detail['inspection_hour'] ?? null,
+                        'section_name' => $detail['section_name'] ?? null,
+                        'employee_name' => $detail['employee_name'] ?? null,
+                        'notes' => $detail['notes'] ?? null,
+                        'corrective_action' => $detail['corrective_action'] ?? null,
+                        'verification' => $detail['verification'] ?? null,
+                    ];
+                    DetailGmpEmployee::create($detailData);
+                }
+            }
+
+            // Simpan Sanitasi jika ada input
+            if ($request->has('sanitation.hour_1') || $request->has('sanitation.hour_2')) {
+                $checkUUID = Str::uuid();
+
+                // Simpan sanitation_checks
+                $sanitationCheck = SanitationCheck::create([
+                    'uuid' => $checkUUID,
+                    'area_uuid' => Auth::user()->area_uuid,
+                    'report_gmp_employee_id' => $report->id,
+                    'hour_1' => $request->input('sanitation.hour_1'),
+                    'hour_2' => $request->input('sanitation.hour_2'),
+                    'verification' => $request->input('sanitation.verification'),
+                ]);
+
+                // Simpan sanitation_areas dan sanitation_results
+                if ($request->has('sanitation_area')) {
+                    foreach ($request->sanitation_area as $area) {
+                        $areaUUID = Str::uuid();
+
+                        $sanitationArea = SanitationArea::create([
+                            'uuid' => $areaUUID,
+                            'sanitation_check_uuid' => $checkUUID,
+                            'area_name' => $area['area_name'] ?? null,
+                            'chlorine_std' => $area['chlorine_std'] ?? null,
+                        ]);
+
+                        SanitationResult::create([
+                            'sanitation_area_uuid' => $areaUUID,
+                            'hour_to' => '1',
+                            'chlorine_level' => $area['chlorine_level'] ?? null,
+                            'temperature' => $area['temperature'] ?? null,
+                            'notes' => $area['notes'] ?? null,
+                            'corrective_action' => $area['corrective_action'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('gmp-employee.index')->with('success', 'Laporan berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        $report = ReportGmpEmployee::findOrFail($id);
+        $report->delete();
+
+        return redirect()->route('gmp-employee.index')->with('success', 'Report dan data sanitasi berhasil dihapus.');
+    }
+
+    public function createDetail($reportId)
+    {
+        $report = ReportGmpEmployee::where('id', $reportId)->firstOrFail();
+        return view('gmp_employee.create-detail', compact('report'));
+    }
+
+    public function storeDetail(Request $request, $reportId)
+    {
+        $request->validate([
+            'inspection_hour' => 'required',
+            'section_name' => 'required',
+            'employee_name' => 'required',
+            'notes' => 'nullable',
+            'corrective_action' => 'nullable',
+            'verification' => 'nullable|boolean',
+        ]);
+
+        DetailGmpEmployee::create([
+            'uuid' => Str::uuid(),
+            'report_uuid' => $request->report_uuid,
+            'inspection_hour' => $request->inspection_hour,
+            'section_name' => $request->section_name,
+            'employee_name' => $request->employee_name,
+            'notes' => $request->notes,
+            'corrective_action' => $request->corrective_action,
+            'verification' => $request->verification ? 1 : 0,
+        ]);
+
+        return redirect()->route('gmp-employee.index')->with('success', 'Detail inspeksi berhasil ditambahkan.');
     }
 }
