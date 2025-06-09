@@ -55,15 +55,17 @@
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
                                         </form>
+
+                                        <a href="{{ route('gmp-employee.export.pdf', $report->uuid) }}" target="_blank" class="btn btn-sm btn-outline-secondary">🖨 Cetak PDF</a>
                                     </td>
                                 </tr>
-
 
                                 {{-- Detail Row --}}
                                 <tr class="collapse" id="detail-{{ $report->id }}">
                                     <td colspan="6">
                                         <strong>Area:</strong> {{ $report->area->name ?? '-' }}<br><br>
 
+                                        <h6 class="fw-bold mt-4">GMP Karyawan</h6>
                                         <table class="table table-sm table-striped">
                                             <thead>
                                                 <tr>
@@ -94,6 +96,78 @@
                                         <div class="d-flex justify-content-end">
                                             <a href="{{ route('gmp-employee.detail.create', $report->id) }}" class="btn btn-sm btn-primary mt-3">+ Tambah Detail</a>
                                         </div>
+
+                                        {{-- TABEL SANITASI AREA --}}
+                                        @if($report->sanitationCheck && $report->sanitationCheck->count())
+                                            <h6 class="fw-bold mt-4">Sanitasi Area</h6>
+
+                                            @php
+                                                $firstCheck = $report->sanitationCheck->first();
+                                                $hour1 = $firstCheck?->hour_1 ?? 'Jam 1';
+                                                $hour2 = $firstCheck?->hour_2 ?? 'Jam 2';
+                                            @endphp
+
+                                            <table class="table table-bordered table-sm mt-2">
+                                                <thead class="table-light text-center align-middle">
+                                                    <tr>
+                                                        <th rowspan="3" style="border: 1px solid rgb(226, 220, 220);">No</th>
+                                                        <th rowspan="3" style="border: 1px solid rgb(226, 220, 220);">Area</th>
+                                                        <th rowspan="3" style="border: 1px solid rgb(226, 220, 220);">Std Klorin (ppm)</th>
+                                                        <th colspan="4" style="border: 1px solid rgb(226, 220, 220);">Hasil Pengecekan</th>
+                                                        <th rowspan="3" style="border: 1px solid rgb(226, 220, 220);">Keterangan</th>
+                                                        <th rowspan="3" style="border: 1px solid rgb(226, 220, 220);">Tindakan Koreksi</th>
+                                                        <th rowspan="3" style="border: 1px solid rgb(226, 220, 220);">Verifikasi</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="2" style="border: 1px solid rgb(226, 220, 220);">Jam 1: <span style="font-weight: 400">{{ $hour1 }}</span> </th>
+                                                        <th colspan="2" style="border: 1px solid rgb(226, 220, 220);">Jam 2: <span style="font-weight: 400">{{ $hour2 }}</span> </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th style="border: 1px solid rgb(226, 220, 220);">Kadar Klorin (ppm)</th>
+                                                        <th style="border: 1px solid rgb(226, 220, 220);">Suhu (°C)</th>
+                                                        <th style="border: 1px solid rgb(226, 220, 220);">Kadar Klorin (ppm)</th>
+                                                        <th style="border: 1px solid rgb(226, 220, 220);">Suhu (°C)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php $no = 1; @endphp
+                                                    @foreach($report->sanitationCheck as $sanitationCheck)
+                                                        @foreach($sanitationCheck->sanitationArea as $area)
+                                                            @php
+                                                                $jam1 = $area->sanitationResult->firstWhere('hour_to', 1);
+                                                                $jam2 = $area->sanitationResult->firstWhere('hour_to', 2);
+                                                            @endphp
+                                                            <tr class="text-center align-middle">
+                                                                <td>{{ $no++ }}</td>
+                                                                <td class="text-start">{{ $area->area_name ?? '-' }}</td>
+                                                                <td>{{ $area->chlorine_std ?? '-' }}</td>
+                                                                <td>{{ $jam1?->chlorine_level ?? '-' }}</td>
+                                                                <td>{{ $jam1?->temperature ?? '-' }}</td>
+                                                                <td>{{ $jam2?->chlorine_level ?? '-' }}</td>
+                                                                <td>{{ $jam2?->temperature ?? '-' }}</td>
+                                                                <td class="text-start">{{ $area->notes ?? '-' }}</td>
+                                                                <td class="text-start">{{ $area->corrective_action ?? '-' }}</td>
+                                                                <td>
+                                                                    @if($sanitationCheck->verification === 1)
+                                                                        ✔
+                                                                    @elseif($sanitationCheck->verification === 0)
+                                                                        ✘
+                                                                    @else
+                                                                        -
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+
+                                            <div class="d-flex justify-content-end">
+                                                <a href="{{ route('gmp-employee.sanitation-detail.create', $report->id) }}" class="btn btn-sm btn-primary mt-3">+ Tambah Detail Sanitasi</a>
+                                            </div>
+                                        @else
+                                            <p class="text-muted">Belum ada data sanitasi area.</p>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

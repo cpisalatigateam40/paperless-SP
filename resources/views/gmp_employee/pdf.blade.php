@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Form PDF - Kebersihan Area Proses</title>
+    <title>Laporan GMP</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -101,7 +101,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN KONDISI KEBERSIHAN</h3>
+    <h3 class="mb-2 text-center">KONTROL SANITASI</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -111,66 +111,96 @@
             <td style="text-align: left; border: none;">
                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
-            <td style="text-align: left; border: none;">
-              Area: <span style="text-decoration: underline;"> {{ $report->section_name }}</span>
-            </td>
         </tr>
     </table>
 
+    <h4>KEBERSIHAN KARYAWAN</h4>
     <table>
         <thead>
             <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Pukul</th>
-                <th rowspan="2">Item</th>
-                <th colspan="2">Kondisi</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi</th>
-            </tr>
-            <tr>
-                <th>Bersih</th>
-                <th>Kotor</th>
+                <th>No.</th>
+                <th>Jam</th>
+                <th>Area</th>
+                <th>Nama Karyawan</th>
+                <th>Keterangan</th>
+                <th>Tindakan Koreksi</th>
+                <th>Verifikasi</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $index => $detail)
-                @foreach($detail->items as $i => $item)
-                    <tr>
-                        @if($i === 0)
-                            <td rowspan="4">{{ $index + 1 }}</td>
-                            <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                        @endif
-
-                        <td>{{ $item->item }}</td>
-
-                        @if(Str::startsWith($item->item, 'Suhu ruang'))
-                            <td colspan="2" style="text-align: center">{{ $item->condition }}</td>
-                        @else
-                            <td style="text-align: center">{{ strtolower($item->condition) === 'bersih' ? '✓' : '' }}</td>
-                            <td style="text-align: center">{{ strtolower($item->condition) === 'kotor' ? 'x' : '' }}</td>
-                        @endif
-
-                        <td>{{ $item->notes }}</td>
-                        <td>{{ $item->corrective_action }}</td>
-                        <td>{{ $item->verification == 1 ? 'OK' : 'Tidak OK' }}</td>
-                    </tr>
-                @endforeach
+            @foreach($report->details as $i => $detail)
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $detail->inspection_hour }}</td>
+                <td>{{ $detail->section_name }}</td>
+                <td>{{ $detail->employee_name }}</td>
+                <td>{{ $detail->notes }}</td>
+                <td>{{ $detail->corrective_action }}</td>
+                <td>{{ $detail->verification ? '✔' : '✘' }}</td>
+            </tr>
             @endforeach
-            {{-- <tr>
-                <td colspan="10" style="text-align: right; border: none;">QM 02 / 00</td>
-            </tr> --}}
         </tbody>
     </table>
+    <p>Ket : * meliput Boot, Seragam, Topi, Masker dan Sarung tangan.</p>
 
+    @if($report->sanitationCheck->count())
+        <h4>KONTROL SANITASI</h4>
+        @php
+            $firstCheck = $report->sanitationCheck->first();
+            $hour1 = $firstCheck?->hour_1 ?? 'Jam 1';
+            $hour2 = $firstCheck?->hour_2 ?? 'Jam 2';
+        @endphp
 
-    <p><strong>Keterangan:</strong></p>
-    <ul style="padding-left: 20px;">
-        <li>1. ✓: OK/bersih</li>
-        <li>2. x: Tidak OK/kotor</li>
-    </ul>
-
-    <br><br>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="3">No</th>
+                    <th rowspan="3">Area</th>
+                    <th rowspan="3">Std Klorin (ppm)</th>
+                    <th colspan="4">Hasil Pengecekan</th>
+                    <th rowspan="3">Keterangan</th>
+                    <th rowspan="3">Tindakan Koreksi</th>
+                    <th rowspan="3">Verifikasi</th>
+                </tr>
+                <tr>
+                    <th colspan="2">Jam 1: {{ $hour1 }}</th>
+                    <th colspan="2">Jam 2: {{ $hour2 }}</th>
+                </tr>
+                <tr>
+                    <th>Kadar klorin (ppm)</th>
+                    <th>Suhu (°C)</th>
+                    <th>Kadar klorin (ppm)</th>
+                    <th>Suhu (°C)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php $no = 1; @endphp
+                @foreach($report->sanitationCheck as $sanitationCheck)
+                    @foreach($sanitationCheck->sanitationArea as $area)
+                        @php
+                            $jam1 = $area->sanitationResult->firstWhere('hour_to', 1);
+                            $jam2 = $area->sanitationResult->firstWhere('hour_to', 2);
+                        @endphp
+                        <tr>
+                            <td>{{ $no++ }}</td>
+                            <td>{{ $area->area_name }}</td>
+                            <td>{{ $area->chlorine_std }}</td>
+                            <td>{{ $jam1?->chlorine_level ?? '-' }}</td>
+                            <td>{{ $jam1?->temperature ?? '-' }}</td>
+                            <td>{{ $jam2?->chlorine_level ?? '-' }}</td>
+                            <td>{{ $jam2?->temperature ?? '-' }}</td>
+                            <td>{{ $area->notes ?? '-' }}</td>
+                            <td>{{ $area->corrective_action ?? '-' }}</td>
+                            <td>{{ $sanitationCheck->verification ? '✔' : '✘' }}</td>
+                        </tr>
+                    @endforeach
+                @endforeach
+                <tr>
+                    <td colspan="10" style="text-align: right; border: none;">QM 02 / 00</td>
+                </tr>
+            </tbody>
+        </table>
+    @endif
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -188,6 +218,5 @@
             </td>
         </tr>
     </table>
-
 </body>
 </html>
