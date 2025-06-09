@@ -12,7 +12,7 @@ class SanitationArea extends Model
     protected $table = 'sanitation_areas';
 
     protected $fillable =
-        ['uuid', 'sanitation_check_uuid', 'area_name', 'chlorine_std'];
+        ['uuid', 'sanitation_check_uuid', 'area_name', 'chlorine_std', 'notes', 'corrective_action'];
 
     public function sanitationCheck()
     {

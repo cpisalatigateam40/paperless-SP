@@ -25,7 +25,7 @@
                 <ul class="nav nav-tabs" id="gmpTabs" role="tablist">
                     <li class="nav-item">
                         <button class="nav-link active" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab">
-                            Detail Inspeksi
+                            GMP Karyawan
                         </button>
                     </li>
                     <li class="nav-item">
@@ -34,41 +34,6 @@
                         </button>
                     </li>
                 </ul>
-
-                {{-- <hr>
-                <h4>Detail Inspeksi</h4> --}}
-
-                {{-- <div id="detail-inspections">
-                    <div class="detail-inspection border p-3 mb-3">
-                        <div class="mb-2">
-                            <label>Jam Inspeksi</label>
-                            <input type="time" name="details[0][inspection_hour]" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label>Nama Area</label>
-                            <input type="text" name="details[0][section_name]" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label>Nama Karyawan</label>
-                            <input type="text" name="details[0][employee_name]" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label>Catatan</label>
-                            <input type="text" name="details[0][notes]" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label>Tindakan Korektif</label>
-                            <input type="text" name="details[0][corrective_action]" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label>Verifikasi</label>
-                            <select name="details[0][verification]" class="form-control" required>
-                                <option value="0">Tidak OK</option>
-                                <option value="1">OK</option>
-                            </select>
-                        </div>
-                    </div>
-                </div> --}}
 
                 <div class="tab-content mt-3" id="gmpTabsContent">
                     {{-- Tab Detail Inspeksi --}}
@@ -133,29 +98,50 @@
 
                             <hr>
                             <h6>Area Sanitasi</h6>
-                            <div class="mb-2">
-                                <label>Nama Area</label>
-                                <input type="text" name="sanitation_area[0][area_name]" class="form-control">
-                            </div>
-                            <div class="mb-2">
-                                <label>Standar Klorin</label>
-                                <input type="number" name="sanitation_area[0][chlorine_std]" class="form-control">
-                            </div>
-                            <div class="mb-2">
-                                <label>Level Klorin</label>
-                                <input type="number" step="0.01" name="sanitation_area[0][chlorine_level]" class="form-control">
-                            </div>
-                            <div class="mb-2">
-                                <label>Suhu</label>
-                                <input type="number" step="0.1" name="sanitation_area[0][temperature]" class="form-control">
-                            </div>
-                            <div class="mb-2">
-                                <label>Catatan</label>
-                                <input type="text" name="sanitation_area[0][notes]" class="form-control">
-                            </div>
-                            <div class="mb-2">
-                                <label>Tindakan Korektif</label>
-                                <input type="text" name="sanitation_area[0][corrective_action]" class="form-control">
+                            <div class="border p-2 mb-3">
+                                <div class="mb-2">
+                                    <label>Nama Area</label>
+                                    <input type="text" name="sanitation_area[0][area_name]" class="form-control">
+                                </div>
+                                <div class="mb-2">
+                                    <label>Standar Klorin</label>
+                                    <input type="number" name="sanitation_area[0][chlorine_std]" class="form-control">
+                                </div>
+
+                                <div class="d-flex" style="gap: 1rem">
+                                    <div class="col-md-6">
+                                        <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 1</p>
+                                        <div class="mb-2">
+                                            <label>Kadar Klorin</label>
+                                            <input type="number" name="sanitation_area[0][result][1][chlorine_level]" class="form-control">
+                                        </div>
+                                        <div class="mb-2">
+                                            <label>Suhu</label>
+                                           <input type="number" name="sanitation_area[0][result][1][temperature]" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 2</p>
+                                        <div class="mb-2">
+                                            <label>Kadar Klorin</label>
+                                           <input type="number" name="sanitation_area[0][result][2][chlorine_level]" class="form-control">
+                                        </div>
+                                        <div class="mb-2">
+                                            <label>Suhu</label>
+                                            <input type="number" name="sanitation_area[0][result][2][temperature]" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label>Catatan</label>
+                                    <input type="text" name="sanitation_area[0][notes]" class="form-control">
+                                </div>
+                                <div class="mb-2">
+                                    <label>Tindakan Korektif</label>
+                                    <input type="text" name="sanitation_area[0][corrective_action]" class="form-control">
+                                </div>
                             </div>
                         </div>
                     </div>

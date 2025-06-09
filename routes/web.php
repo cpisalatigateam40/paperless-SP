@@ -145,6 +145,9 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::get('{report}/detail/create', 'createDetail')->name('detail.create');
             Route::post('{report}/detail/store', 'storeDetail')->name('detail.store');
+            Route::get('{report}/sanitation-detail/create', 'createSanitationDetail')->name('sanitation-detail.create');
+            Route::post('{report}/sanitation-detail', 'storeSanitationDetail')->name('sanitation-detail.store');
+            Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
         });
 
 });
