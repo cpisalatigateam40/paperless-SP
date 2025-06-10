@@ -56,6 +56,7 @@
                 <a class="collapse-item" href="{{ route('areas.index') }}">Area</a>
                 {{-- <a class="collapse-item" href="{{ route('sections.index') }}">Section</a> --}}
                 <a class="collapse-item" href="{{ route('raw-materials.index') }}">Raw Material</a>
+                <a class="collapse-item" href="{{ route('fragile-item.index') }}">Fragile Item</a>
             </div>
         </div>
     </li>
@@ -104,6 +105,10 @@
 
                 <a class="collapse-item" href="{{ route('gmp-employee.index') }}">
                     Report GMP karyawan
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
+                    Report Barang Mudah Pecah
                 </a>
             </div>
         </div>

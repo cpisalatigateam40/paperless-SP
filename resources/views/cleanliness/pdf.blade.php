@@ -163,17 +163,28 @@
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
-            <td style="text-align: center; border: none;">
-                Diperiksa oleh,<br><br><div style="height: 50px;"></div>
-                <strong>{{ $report->created_by }}</strong><br>QC Inspector
+            <td style="text-align: center; border: none; width: 33%;">
+                Diperiksa oleh:<br><br>
+                <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
+                <strong>{{ $report->created_by }}</strong><br><br>
+                QC Inspector
             </td>
-            <td style="text-align: center; border: none;">
-                Diketahui oleh,<br><br><div style="height: 50px;"></div>
-                <strong>{{ $report->known_by }}</strong><br>SPV/Foreman /Lady Produksi
+            <td style="text-align: center; border: none; width: 33%;">
+                Diketahui oleh:<br><br>
+                <div style="height: 50px;"></div>
+                <strong>{{ $report->known_by }}</strong><br>
+                SPV/Foreman/Lady Produksi
             </td>
-            <td style="text-align: center; border: none;">
-                Disetujui oleh,<br><br><div style="height: 50px;"></div>
-                <strong>{{ $report->approved_by }}</strong><br>SPV/ Forelady QC
+            <td style="text-align: center; border: none; width: 33%;">
+                Disetujui oleh:<br><br>
+                @if($report->approved_by)
+                    <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
+                    <strong>{{ $report->approved_by }}</strong><br><br>
+                @else
+                    <div style="height: 120px;"></div>
+                    <strong>-</strong><br>
+                @endif
+                Supervisor QC
             </td>
         </tr>
     </table>

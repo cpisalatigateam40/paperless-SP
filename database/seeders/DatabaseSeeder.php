@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AreaSeeder::class,
             UserSeeder::class,
             RawMaterialSeeder::class,
+            FragileItemSeeder::class,
         ]);
     }
 }

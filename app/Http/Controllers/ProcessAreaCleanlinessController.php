@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ProcessAreaCleanlinessController extends Controller
 {
@@ -46,6 +47,7 @@ class ProcessAreaCleanlinessController extends Controller
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,
                 'approved_by' => $request->approved_by,
+                'created_at' => now()->setTimezone('Asia/Jakarta'),
             ]);
 
             foreach ($request->details as $detailInput) {
@@ -102,6 +104,7 @@ class ProcessAreaCleanlinessController extends Controller
         }
 
         $report->approved_by = $user->name;
+        $report->approved_at = now();
         $report->save();
 
         return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
@@ -153,7 +156,23 @@ class ProcessAreaCleanlinessController extends Controller
     {
         $report = ReportProcessAreaCleanliness::with('area', 'details.items')->where('uuid', $uuid)->firstOrFail();
 
-        $pdf = Pdf::loadView('cleanliness_PA.pdf', compact('report'));
+        // Generate QR untuk created_by
+        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
+        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+
+        // Generate QR untuk approved_by
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
+        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+
+        $pdf = Pdf::loadView('cleanliness_PA.pdf', [
+            'report' => $report,
+            'createdQr' => $createdQrBase64,
+            'approvedQr' => $approvedQrBase64,
+        ]);
 
         return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');
     }
