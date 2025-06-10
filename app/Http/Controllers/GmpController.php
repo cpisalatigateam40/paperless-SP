@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Milon\Barcode\DNS1D;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GmpController extends Controller
 {
@@ -51,6 +53,7 @@ class GmpController extends Controller
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,
                 'approved_by' => $request->approved_by,
+                'created_at' => now()->setTimezone('Asia/Jakarta'),
             ]);
 
             // Simpan Detail Inspeksi jika ada
@@ -228,6 +231,22 @@ class GmpController extends Controller
         }
     }
 
+    public function approve($id)
+    {
+        $report = ReportGmpEmployee::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->approved_by) {
+            return redirect()->back()->with('error', 'Laporan sudah disetujui.');
+        }
+
+        $report->approved_by = $user->name;
+        $report->approved_at = now();
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
+    }
+
     public function exportPdf($uuid)
     {
         $report = ReportGmpEmployee::with([
@@ -236,7 +255,24 @@ class GmpController extends Controller
             'sanitationCheck.sanitationArea.sanitationResult'
         ])->where('uuid', $uuid)->firstOrFail();
 
-        $pdf = PDF::loadView('gmp_employee.pdf', compact('report'));
+        // Generate QR untuk created_by
+        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
+        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+
+        // Generate QR untuk approved_by
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
+        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+
+
+        $pdf = PDF::loadView('gmp_employee.pdf', [
+            'report' => $report,
+            'createdQr' => $createdQrBase64,
+            'approvedQr' => $approvedQrBase64,
+        ]);
 
         return $pdf->stream('Laporan_GMP_' . $report->date . '.pdf');
     }

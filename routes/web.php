@@ -11,6 +11,8 @@ use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\StorageRmCleanlinessController;
 use App\Http\Controllers\ProcessAreaCleanlinessController;
 use App\Http\Controllers\GmpController;
+use App\Http\Controllers\FragileItemController;
+use App\Http\Controllers\ReportFragileItemController;
 
 Route::redirect('/', '/login');
 
@@ -148,6 +150,32 @@ Route::middleware(['auth'])->group(function () {
             Route::get('{report}/sanitation-detail/create', 'createSanitationDetail')->name('sanitation-detail.create');
             Route::post('{report}/sanitation-detail', 'storeSanitationDetail')->name('sanitation-detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
+            Route::post('/{id}/approve', 'approve')->name('approve');
         });
+
+    // FRAGILE ITEM MD ROUTES
+    Route::prefix('fragile-item')
+        ->name('fragile-item.')
+        ->controller(FragileItemController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{fragileItem}/edit', 'edit')->name('edit');
+            Route::put('/{fragileItem}', 'update')->name('update');
+            Route::delete('/{fragileItem}', 'destroy')->name('destroy');
+        });
+
+    // REPORT FRAGILE ITEM MD ROUTES
+    Route::prefix('report-fragile-item')
+        ->name('report-fragile-item.')
+        ->controller(ReportFragileItemController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+        });
+
 
 });

@@ -57,6 +57,25 @@
                                         </form>
 
                                         <a href="{{ route('gmp-employee.export.pdf', $report->uuid) }}" target="_blank" class="btn btn-sm btn-outline-secondary">🖨 Cetak PDF</a>
+
+                                        @can('approve report')
+                                        @if(!$report->approved_by)
+                                            <form action="{{ route('gmp-employee.approve', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                            </form>
+                                        @else
+                                            <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                Disetujui oleh {{ $report->approved_by }}
+                                            </span>
+                                        @endif
+                                        @else
+                                            @if($report->approved_by)
+                                                <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                    Disetujui oleh {{ $report->approved_by }}
+                                                </span>
+                                            @endif
+                                        @endcan
                                     </td>
                                 </tr>
 

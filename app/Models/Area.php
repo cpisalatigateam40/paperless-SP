@@ -47,4 +47,9 @@ class Area extends Model
     {
         return $this->hasMany(ReportProcessAreaCleanliness::class, 'area_uuid', 'uuid');
     }
+
+    public function fragileItems()
+    {
+        return $this->hasMany(FragileItem::class, 'area_uuid', 'uuid');
+    }
 }
