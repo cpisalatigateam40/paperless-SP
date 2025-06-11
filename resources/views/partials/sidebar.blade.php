@@ -57,6 +57,7 @@
                 {{-- <a class="collapse-item" href="{{ route('sections.index') }}">Section</a> --}}
                 <a class="collapse-item" href="{{ route('raw-materials.index') }}">Raw Material</a>
                 <a class="collapse-item" href="{{ route('fragile-item.index') }}">Fragile Item</a>
+                <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a>
             </div>
         </div>
     </li>
@@ -109,6 +110,21 @@
 
                 <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
                     Report Barang Mudah Pecah
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesQc"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-wrench"></i>
+            <span>Pemeriksaan Peralatan QC</span>
+        </a>
+        <div id="collapsePagesQc" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+           <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#">
+                    Report Inventaris QC
                 </a>
             </div>
         </div>

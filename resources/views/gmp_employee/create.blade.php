@@ -13,7 +13,7 @@
 
                 <div class="mb-3">
                     <label>Tanggal</label>
-                    <input type="date" name="date" class="form-control" required>
+                    <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                 </div>
 
                 <div class="mb-3">

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Form PDF - Kebersihan Area Penyimpanan Bahan</title>
+    <title>Laporan Pemeriksaan Barang Mudah Pecah</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -71,7 +71,6 @@
     </style>
 </head>
 <body>
-
     {{-- header --}}
     <div class="header">
         <table class="header-table">
@@ -102,9 +101,9 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">KONDISI RUANG PENYIMPANAN BAHAN BAKU DAN PENUNJANG</h3>
+    <h3 class="mb-2 text-center">LAPORAN PEMERIKSAAN BARANG MUDAH PECAH</h3>
 
-    <table style="width: 100%; border: none;">
+   <table style="width: 100%; border: none;">
         <tr style="border: none;">
             <td style="text-align: left; border: none;">
               Hari/Tanggal: <span style="text-decoration: underline;"> {{ $report->date }}</span>
@@ -112,54 +111,53 @@
             <td style="text-align: left; border: none;">
                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
-            <td style="text-align: left; border: none;">
-              Area: <span style="text-decoration: underline;"> {{ $report->room_name }}</span>
-            </td>
         </tr>
     </table>
 
     <table>
         <thead>
             <tr>
-                <th>Jam</th>
-                <th>No</th>
-                <th>Item</th>
-                <th>Kondisi</th>
-                <th>Keterangan</th>
-                <th>Tindakan Koreksi</th>
-                <th>Verifikasi</th>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Nama Barang</th>
+                <th rowspan="2">Pemilik (Area)</th>
+                <th rowspan="2">Jumlah</th>
+                <th colspan="2">Waktu</th>
+                <th rowspan="2">Keterangan</th>
+            </tr>
+            <tr>
+                <th>Awal</th>
+                <th>Akhir</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $detail)
-                @foreach($detail->items as $i => $item)
+            @php
+                $grouped = $report->details->groupBy(fn($item) => $item->item->section_name);
+                $no = 1;
+            @endphp
+
+            @foreach ($grouped as $section => $items)
+                <tr class="section-row">
+                    <td colspan="7">{{ $section }}</td>
+                </tr>
+                @foreach ($items as $item)
                     <tr>
-                        @if($i === 0)
-                            <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                        @endif
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $item->item }}</td>
-                        <td style="text-align: center">{{ $item->condition }}</td>
-                        <td>{{ $item->notes }}</td>
-                        <td>{{ $item->corrective_action }}</td>
-                        <td>{{ $item->verification == 1 ? 'OK' : 'Tidak OK' }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $item->item->item_name }}</td>
+                        <td>{{ $item->item->owner }}</td>
+                        <td>{{ $item->item->quantity }}</td>
+                        <td>{{ $item->time_start == '1' ? '✓' : '' }}</td>
+                        <td>{{ $item->time_end == '1' ? '✓' : '' }}</td>
+                        <td>{{ $item->notes == '1' ? '✓' : 'X' }}</td>
                     </tr>
                 @endforeach
             @endforeach
+            <tr>
+                <td colspan="7" style="text-align: right; border: none;">QM 15 / 03</td>
+            </tr>
         </tbody>
     </table>
 
-    <p><strong>Keterangan:</strong></p>
-    <ul style="padding-left: 20px;">
-        <li>1. Tertata rapi</li>
-        <li>2. Penempatan sesuai tagging dan jenis allergen</li>
-        <li>3. Bersih dan bebas dari kontaminan</li>
-        <li>4. Tidak tertata rapi</li>
-        <li>5. Penempatan tidak sesuai tagging dan jenis allergen</li>
-        <li>6. Tidak bersih / ada kontaminan</li>
-    </ul>
-
-    <br><br>
+    <p>Ket : √ = Ok / Tidak Pecah X = Tidak Ok / Pecah.</p>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
