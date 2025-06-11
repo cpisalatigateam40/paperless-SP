@@ -4,24 +4,18 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h5>Tambah Barang Mudah Pecah</h5>
+            <h5>Tambah Inventaris Peralatan QC</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('fragile-item.store') }}" method="POST">
+            <form action="{{ route('qc-equipment.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label>Nama Barang</label>
                     <input type="text" name="item_name" class="form-control" required>
                 </div>
-
                 <div class="mb-3">
                     <label>Nama Area</label>
                     <input type="text" name="section_name" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label>Pemilik</label>
-                    <input type="text" name="owner" class="form-control">
                 </div>
 
                 <div class="mb-3">
@@ -30,7 +24,7 @@
                 </div>
 
                 <button class="btn btn-primary">Simpan</button>
-                <a href="{{ route('fragile-item.index') }}" class="btn btn-secondary">Kembali</a>
+                <a href="{{ route('qc-equipment.index') }}" class="btn btn-secondary">Kembali</a>
             </form>
         </div>
     </div>

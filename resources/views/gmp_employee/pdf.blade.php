@@ -202,7 +202,7 @@
         </table>
     @endif
 
-    <table style="width: 100%; border: none;">
+    <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
             <td style="text-align: center; border: none; width: 33%;">
                 Diperiksa oleh:<br><br>
