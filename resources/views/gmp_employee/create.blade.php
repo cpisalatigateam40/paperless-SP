@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Buat Laporan GMP Karyawan</h5>
+            <h5>Buat Laporan GMP Karyawan & Kontrol Sanitasi</h5>
         </div>
 
         <div class="card-body">
@@ -97,52 +97,65 @@
                             </div>
 
                             <hr>
+                            @php
+                                $areaList = [
+                                    ['name' => 'Foot Basin', 'chlorine_std' => 200],
+                                    ['name' => 'Hand Basin', 'chlorine_std' => 50],
+                                    ['name' => 'Air Cuci Tangan', 'chlorine_std' => null],
+                                    ['name' => 'Air Cleaning', 'chlorine_std' => null],
+                                ];
+                            @endphp
                             <h6>Area Sanitasi</h6>
-                            <div class="border p-2 mb-3">
-                                <div class="mb-2">
-                                    <label>Nama Area</label>
-                                    <input type="text" name="sanitation_area[0][area_name]" class="form-control">
-                                </div>
-                                <div class="mb-2">
-                                    <label>Standar Klorin</label>
-                                    <input type="number" name="sanitation_area[0][chlorine_std]" class="form-control">
-                                </div>
 
-                                <div class="d-flex" style="gap: 1rem">
-                                    <div class="col-md-6">
-                                        <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 1</p>
-                                        <div class="mb-2">
-                                            <label>Kadar Klorin</label>
-                                            <input type="number" name="sanitation_area[0][result][1][chlorine_level]" class="form-control">
+                            @foreach ($areaList as $index => $area)
+                                <div class="border p-2 mb-3">
+                                    <div class="mb-2">
+                                        <label>Nama Area</label>
+                                        <input type="text" name="sanitation_area[{{ $index }}][area_name]" class="form-control"
+                                            value="{{ $area['name'] }}" readonly>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label>Standar Klorin</label>
+                                        <input type="number" name="sanitation_area[{{ $index }}][chlorine_std]" class="form-control"
+                                            value="{{ $area['chlorine_std'] }}">
+                                    </div>
+
+                                    <div class="d-flex" style="gap: 1rem">
+                                        <div class="col-md-6">
+                                            <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 1</p>
+                                            <div class="mb-2">
+                                                <label>Kadar Klorin</label>
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][1][chlorine_level]" class="form-control">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label>Suhu</label>
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][1][temperature]" class="form-control">
+                                            </div>
                                         </div>
-                                        <div class="mb-2">
-                                            <label>Suhu</label>
-                                           <input type="number" name="sanitation_area[0][result][1][temperature]" class="form-control">
+
+                                        <div class="col-md-6">
+                                            <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 2</p>
+                                            <div class="mb-2">
+                                                <label>Kadar Klorin</label>
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][2][chlorine_level]" class="form-control">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label>Suhu</label>
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][2][temperature]" class="form-control">
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 2</p>
-                                        <div class="mb-2">
-                                            <label>Kadar Klorin</label>
-                                           <input type="number" name="sanitation_area[0][result][2][chlorine_level]" class="form-control">
-                                        </div>
-                                        <div class="mb-2">
-                                            <label>Suhu</label>
-                                            <input type="number" name="sanitation_area[0][result][2][temperature]" class="form-control">
-                                        </div>
+                                    <div class="mb-2">
+                                        <label>Catatan</label>
+                                        <input type="text" name="sanitation_area[{{ $index }}][notes]" class="form-control">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label>Tindakan Korektif</label>
+                                        <input type="text" name="sanitation_area[{{ $index }}][corrective_action]" class="form-control">
                                     </div>
                                 </div>
-
-                                <div class="mb-2">
-                                    <label>Catatan</label>
-                                    <input type="text" name="sanitation_area[0][notes]" class="form-control">
-                                </div>
-                                <div class="mb-2">
-                                    <label>Tindakan Korektif</label>
-                                    <input type="text" name="sanitation_area[0][corrective_action]" class="form-control">
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 

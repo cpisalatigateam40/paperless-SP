@@ -105,7 +105,7 @@
                 </a>
 
                 <a class="collapse-item" href="{{ route('gmp-employee.index') }}">
-                    Report GMP karyawan
+                    Report GMP karyawan & Kontrol Sanitasi
                 </a>
 
                 <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
@@ -123,7 +123,7 @@
         </a>
         <div id="collapsePagesQc" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
            <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="#">
+                <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">
                     Report Inventaris QC
                 </a>
             </div>

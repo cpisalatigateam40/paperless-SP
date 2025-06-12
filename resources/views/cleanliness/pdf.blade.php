@@ -127,7 +127,7 @@
                 <th>Kondisi</th>
                 <th>Keterangan</th>
                 <th>Tindakan Koreksi</th>
-                <th>Verifikasi</th>
+                <th>Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
             </tr>
         </thead>
         <tbody>
@@ -146,6 +146,9 @@
                     </tr>
                 @endforeach
             @endforeach
+            <tr>
+                <td colspan="7" style="text-align: right; border: none;">QM 12 / 01</td>
+            </tr>
         </tbody>
     </table>
 

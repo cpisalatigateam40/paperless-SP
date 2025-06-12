@@ -4,19 +4,21 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5 class="mb-3">Form Pemeriksaan Barang Mudah Pecah</h5>
+            <h5 class="mb-3">Edit Laporan Barang Mudah Pecah</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('report-fragile-item.store') }}" method="POST">
+            <form action="{{ route('report-fragile-item.update', $report->uuid) }}" method="POST">
                 @csrf
+                @method('PUT')
+
                 <div class="row" style="margin-bottom: 2rem;">
                     <div class="col-md-3">
                         <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                        <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}" required>
                     </div>
                     <div class="col-md-2">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" required>
+                        <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}" required>
                     </div>
                 </div>
 
@@ -46,19 +48,14 @@
                                                 <label for="checkAllStart-{{ Str::slug($section) }}" class="form-check-label">Check All Waktu Awal</label>
                                             </div>
 
-                                            <div class="form-check form-check-inline" >
+                                            <div class="form-check form-check-inline">
                                                 <input type="checkbox" class="form-check-input check-all-time-end" data-section="{{ Str::slug($section) }}" id="checkAllEnd-{{ Str::slug($section) }}">
                                                 <label for="checkAllEnd-{{ Str::slug($section) }}" class="form-check-label">Check All Waktu Akhir</label>
                                             </div>
 
                                             <div class="form-check form-check-inline">
-                                                <input type="checkbox"
-                                                    class="form-check-input check-all"
-                                                    data-section="{{ Str::slug($section) }}"
-                                                    id="checkAll-{{ Str::slug($section) }}">
-                                                <label class="form-check-label" for="checkAll-{{ Str::slug($section) }}" style="cursor: pointer;">
-                                                    Check All Notes
-                                                </label>
+                                                <input type="checkbox" class="form-check-input check-all" data-section="{{ Str::slug($section) }}" id="checkAll-{{ Str::slug($section) }}">
+                                                <label class="form-check-label" for="checkAll-{{ Str::slug($section) }}" style="cursor: pointer;">Check All Notes</label>
                                             </div>
                                         </div>
                                     </div>
@@ -66,6 +63,9 @@
                             </tr>
 
                             @foreach ($items as $item)
+                                @php
+                                    $detail = $report->details->where('fragile_item_uuid', $item->uuid)->first();
+                                @endphp
                                 <tr>
                                     <td class="align-middle">{{ $no++ }}</td>
                                     <td class="align-middle">
@@ -79,14 +79,16 @@
                                         <input type="checkbox"
                                             name="items[{{ $item->uuid }}][time_start]"
                                             value="1"
-                                            class="check-time-start check-time-start-{{ Str::slug($section) }}">
+                                            class="check-time-start check-time-start-{{ Str::slug($section) }}"
+                                            {{ (optional($detail)->time_start ?? false) ? 'checked' : '' }}>
                                     </td>
                                     <td class="text-center align-middle">
                                         <input type="hidden" name="items[{{ $item->uuid }}][time_end]" value="0">
                                         <input type="checkbox"
                                             name="items[{{ $item->uuid }}][time_end]"
                                             value="1"
-                                            class="check-time-end check-time-end-{{ Str::slug($section) }}">
+                                            class="check-time-end check-time-end-{{ Str::slug($section) }}"
+                                            {{ (optional($detail)->time_end ?? false) ? 'checked' : '' }}>
                                     </td>
                                     <td class="text-center align-middle">
                                         <input type="hidden" name="items[{{ $item->uuid }}][notes]" value="0">
@@ -94,14 +96,14 @@
                                             name="items[{{ $item->uuid }}][notes]"
                                             value="1"
                                             class="check-item check-{{ Str::slug($section) }}"
-                                            style="cursor: pointer;">
+                                            {{ (optional($detail)->notes ?? false) ? 'checked' : '' }}>
                                     </td>
                                 </tr>
                             @endforeach
                         @endforeach
                     </tbody>
                 </table>
-                <button class="btn btn-primary" style="margin-top: 1rem;">Simpan Laporan</button>
+                <button class="btn btn-primary mt-3">Update Laporan</button>
             </form>
         </div>
     </div>
@@ -114,31 +116,21 @@
         document.querySelectorAll('.check-all').forEach(function (checkAllBox) {
             checkAllBox.addEventListener('change', function () {
                 const sectionClass = 'check-' + this.dataset.section;
-                const checkboxes = document.querySelectorAll('.' + sectionClass);
-
-                checkboxes.forEach(function (cb) {
-                    cb.checked = checkAllBox.checked;
-                });
+                document.querySelectorAll('.' + sectionClass).forEach(cb => cb.checked = checkAllBox.checked);
             });
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Time Start Check All
         document.querySelectorAll('.check-all-time-start').forEach(function (checkAllBox) {
             checkAllBox.addEventListener('change', function () {
                 const section = this.dataset.section;
-                const checkboxes = document.querySelectorAll('.check-time-start-' + section);
-                checkboxes.forEach(cb => cb.checked = this.checked);
+                document.querySelectorAll('.check-time-start-' + section).forEach(cb => cb.checked = checkAllBox.checked);
             });
         });
 
-        // Time End Check All
         document.querySelectorAll('.check-all-time-end').forEach(function (checkAllBox) {
             checkAllBox.addEventListener('change', function () {
                 const section = this.dataset.section;
-                const checkboxes = document.querySelectorAll('.check-time-end-' + section);
-                checkboxes.forEach(cb => cb.checked = this.checked);
+                document.querySelectorAll('.check-time-end-' + section).forEach(cb => cb.checked = checkAllBox.checked);
             });
         });
     });

@@ -33,6 +33,18 @@ class ReportGmpEmployee extends Model
 
     public function sanitationCheck()
     {
-        return $this->hasMany(SanitationCheck::class, 'report_gmp_employee_id', 'id');
+        return $this->hasOne(SanitationCheck::class, 'report_gmp_employee_id', 'id');
+    }
+
+    public function sanitationAreas()
+    {
+        return $this->hasManyThrough(
+            SanitationArea::class,
+            SanitationCheck::class,
+            'report_gmp_employee_id',
+            'sanitation_check_uuid',
+            'id',
+            'uuid'
+        );
     }
 }

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Form PDF - Kebersihan Area Proses</title>
+    <title>Laporan Checklist Inventaris Peralatan QC Sausage</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -101,18 +101,15 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN KONDISI KEBERSIHAN</h3>
+    <h3 class="mb-2 text-center">CHECKLIST INVENTARIS PERALATAN QC SAUSAGE</h3>
 
-    <table style="width: 100%; border: none;">
+   <table style="width: 100%; border: none;">
         <tr style="border: none;">
             <td style="text-align: left; border: none;">
               Hari/Tanggal: <span style="text-decoration: underline;"> {{ $report->date }}</span>
             </td>
             <td style="text-align: left; border: none;">
                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
-            <td style="text-align: left; border: none;">
-              Area: <span style="text-decoration: underline;"> {{ $report->section_name }}</span>
             </td>
         </tr>
     </table>
@@ -121,56 +118,62 @@
         <thead>
             <tr>
                 <th rowspan="2">No</th>
-                <th rowspan="2">Pukul</th>
-                <th rowspan="2">Item</th>
+                <th rowspan="2">Nama Alat</th>
+                <th rowspan="2">Jumlah</th>
                 <th colspan="2">Kondisi</th>
                 <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
             </tr>
             <tr>
-                <th>Bersih</th>
-                <th>Kotor</th>
+                <th>Awal Shift*</th>
+                <th>Akhir Shift*</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $index => $detail)
-                @foreach($detail->items as $i => $item)
+            @php
+                $grouped = $report->details->groupBy(fn($item) => $item->item->section_name);
+                $no = 1;
+
+                $notesOptions = [
+                    '-' => 'Tidak Tersedia',
+                    '1' => 'Baik',
+                    '2' => 'Rusak',
+                    '3' => 'Hilang',
+                    '4' => 'Bersih',
+                    '5' => 'Kotor',
+                    '6' => 'Masih',
+                    '7' => 'Habis',
+                    '8' => 'Di dalam meja',
+                    '9' => 'Di luar meja',
+                    '10' => 'Baik, Bersih, Masih, Di dalam meja',
+                ];
+            @endphp
+
+            @foreach ($grouped as $section => $items)
+                <tr class="section-row">
+                    <td colspan="6">{{ $section }}</td>
+                </tr>
+                @foreach ($items as $item)
                     <tr>
-                        @if($i === 0)
-                            <td rowspan="4">{{ $index + 1 }}</td>
-                            <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                        @endif
-
-                        <td>{{ $item->item }}</td>
-
-                        @if(Str::startsWith($item->item, 'Suhu ruang'))
-                            <td colspan="2" style="text-align: center">{{ $item->condition }}</td>
-                        @else
-                            <td style="text-align: center">{{ strtolower($item->condition) === 'bersih' ? '✓' : '' }}</td>
-                            <td style="text-align: center">{{ strtolower($item->condition) === 'kotor' ? 'x' : '' }}</td>
-                        @endif
-
-                        <td>{{ $item->notes }}</td>
-                        <td>{{ $item->corrective_action }}</td>
-                        <td>{{ $item->verification == 1 ? 'OK' : 'Tidak OK' }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $item->item->item_name }}</td>
+                        <td>{{ $item->item->quantity }}</td>
+                        <td>{{ $item->time_start == '1' ? '✓' : 'X' }}</td>
+                        <td>{{ $item->time_end == '1' ? '✓' : 'X' }}</td>
+                        <td>{{ $notesOptions[$item->notes] ?? '-' }}</td>
                     </tr>
                 @endforeach
             @endforeach
             <tr>
-                <td colspan="8" style="text-align: right; border: none;">QM 13 / 01</td>
+                <td colspan="6" style="text-align: right; border: none;">QM 19 / 02</td>
             </tr>
         </tbody>
     </table>
 
-
-    <p><strong>Keterangan:</strong></p>
-    <ul style="padding-left: 20px;">
-        <li>1. ✓: OK/bersih</li>
-        <li>2. x: Tidak OK/kotor</li>
-    </ul>
-
-    <br><br>
+    <p>Ket : (-) Tidak Tersedia
+(1) Baik; (2) Rusak (3) Hilang
+(4) Bersih; (5) Kotor; (6) Masih; (7) Habis
+(8) Di dalam meja; (9) Di luar meja
+(10) Baik, Bersih, Masih, Di dalam meja</p>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">

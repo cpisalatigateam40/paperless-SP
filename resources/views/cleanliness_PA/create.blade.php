@@ -62,12 +62,12 @@
                                     <th>Kondisi</th>
                                     <th>Catatan</th>
                                     <th>Tindakan Koreksi</th>
-                                    <th>Verifikasi</th>
+                                    <th>Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
-                                    $items = ['Kondisi dan penempatan barang', 'Pelabelan', 'Kebersihan Ruangan', 'Suhu ruang (℃)'];
+                                    $items = ['Kondisi Kebersihan Ruangan', 'Kondisi Kebersihan Peralatan', 'Kondisi Kebersihan Karyawan', 'Suhu ruang (℃)'];
                                 @endphp
 
                                 @foreach($items as $i => $item)

@@ -3,27 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ReportFragileItem;
-use App\Models\DetailFragileItem;
-use App\Models\FragileItem;
+use App\Models\ReportQcEquipment;
+use App\Models\DetailQcEquipment;
+use App\Models\QcEquipment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-
-class ReportFragileItemController extends Controller
+class ReportQcEquipmentController extends Controller
 {
     public function index()
     {
-        $reports = ReportFragileItem::latest()->paginate(10);
-        return view('report_fragile_item.index', compact('reports'));
+        $reports = ReportQcEquipment::latest()->paginate(10);
+        return view('report_qc_equipment.index', compact('reports'));
     }
 
     public function create()
     {
-        $fragileItems = FragileItem::orderBy('section_name')->get();
-        return view('report_fragile_item.create', compact('fragileItems'));
+        $qcEquipments = QcEquipment::orderBy('section_name')->get();
+        return view('report_qc_equipment.create', compact('qcEquipments'));
     }
 
     public function store(Request $request)
@@ -33,7 +32,7 @@ class ReportFragileItemController extends Controller
             'shift' => 'required|string',
         ]);
 
-        $report = ReportFragileItem::create([
+        $report = ReportQcEquipment::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
@@ -44,60 +43,72 @@ class ReportFragileItemController extends Controller
         ]);
 
         foreach ($request->items as $data) {
-            DetailFragileItem::create([
+            DetailQcEquipment::create([
                 'uuid' => Str::uuid(),
-                'report_fragile_item_uuid' => $report->uuid,
-                'fragile_item_uuid' => $data['fragile_item_uuid'],
+                'report_qc_equipment_uuid' => $report->uuid,
+                'qc_equipment_uuid' => $data['qc_equipment_uuid'],
                 'time_start' => $data['time_start'] ?? '0',
                 'time_end' => $data['time_end'] ?? '0',
-                'notes' => $data['notes'] ?? '0',
+                'notes' => $data['notes'] ?? '-',
             ]);
         }
 
-        return redirect()->route('report-fragile-item.index')->with('success', 'Laporan berhasil disimpan.');
+        return redirect()->route('report-qc-equipment.index')->with('success', 'Laporan berhasil disimpan.');
     }
 
     public function edit($uuid)
     {
-        $report = ReportFragileItem::with('details')->where('uuid', $uuid)->firstOrFail();
-        $fragileItems = FragileItem::all();
+        $report = ReportQcEquipment::where('uuid', $uuid)->firstOrFail();
+        $qcEquipments = QcEquipment::orderBy('section_name')->get();
+        $details = DetailQcEquipment::where('report_qc_equipment_uuid', $report->uuid)->get()->keyBy('qc_equipment_uuid');
 
-        return view('report_fragile_item.edit', compact('report', 'fragileItems'));
+        return view('report_qc_equipment.edit', compact('report', 'qcEquipments', 'details'));
     }
 
     public function update(Request $request, $uuid)
     {
-        $report = ReportFragileItem::where('uuid', $uuid)->firstOrFail();
+        $report = ReportQcEquipment::where('uuid', $uuid)->firstOrFail();
+
+        $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|string',
+        ]);
 
         $report->update([
             'date' => $request->date,
             'shift' => $request->shift,
+            'known_by' => $request->known_by,
+            'approved_by' => $request->approved_by,
         ]);
 
-        $report->details()->delete();
-
-        foreach ($request->items as $item) {
-            $report->details()->create([
-                'fragile_item_uuid' => $item['fragile_item_uuid'],
-                'time_start' => isset($item['time_start']) ? 1 : 0,
-                'time_end' => isset($item['time_end']) ? 1 : 0,
-                'notes' => isset($item['notes']) ? 1 : 0,
-            ]);
+        foreach ($request->items as $qc_uuid => $data) {
+            DetailQcEquipment::updateOrCreate(
+                [
+                    'report_qc_equipment_uuid' => $report->uuid,
+                    'qc_equipment_uuid' => $data['qc_equipment_uuid'],
+                ],
+                [
+                    'time_start' => $data['time_start'] ?? '0',
+                    'time_end' => $data['time_end'] ?? '0',
+                    'notes' => $data['notes'] ?? '-',
+                ]
+            );
         }
 
-        return redirect()->route('report-fragile-item.index')->with('success', 'Laporan berhasil diperbarui.');
+        return redirect()->route('report-qc-equipment.index')->with('success', 'Laporan berhasil diperbarui.');
     }
+
 
     public function destroy($uuid)
     {
-        $report = ReportFragileItem::where('uuid', $uuid)->firstOrFail();
+        $report = ReportQcEquipment::where('uuid', $uuid)->firstOrFail();
         $report->delete();
-        return redirect()->route('report-fragile-item.index')->with('success', 'Laporan berhasil dihapus.');
+        return redirect()->route('report-qc-equipment.index')->with('success', 'Laporan berhasil dihapus.');
     }
 
     public function approve($id)
     {
-        $report = ReportFragileItem::findOrFail($id);
+        $report = ReportQcEquipment::findOrFail($id);
         $user = Auth::user();
 
         if ($report->approved_by) {
@@ -113,7 +124,7 @@ class ReportFragileItemController extends Controller
 
     public function exportPdf($uuid)
     {
-        $report = ReportFragileItem::with(['details.item'])->where('uuid', $uuid)->firstOrFail();
+        $report = ReportQcEquipment::with(['details.item'])->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
         $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
@@ -127,12 +138,12 @@ class ReportFragileItemController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
-        return Pdf::loadView('report_fragile_item.pdf', [
+        return Pdf::loadView('report_qc_equipment.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
         ])
             ->setPaper('A4', 'portrait')
-            ->stream('Laporan Fragile Item - ' . $report->date . '.pdf');
+            ->stream('Laporan QC Equipment - ' . $report->date . '.pdf');
     }
 }
