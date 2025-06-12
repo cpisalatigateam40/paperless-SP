@@ -5,17 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class QcEquipment extends Model
+class ReportQcEquipment extends Model
 {
     use HasFactory;
-    protected $table = 'qc_equipments';
+
+    protected $table = 'report_qc_equipments';
 
     protected $fillable = [
         'uuid',
         'area_uuid',
-        'item_name',
-        'section_name',
-        'quantity',
+        'date',
+        'shift',
+        'created_by',
+        'known_by',
+        'approved_by',
+        'approved_at',
     ];
 
     public function area()
@@ -23,8 +27,8 @@ class QcEquipment extends Model
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 
-    public function detailReports()
+    public function details()
     {
-        return $this->hasMany(DetailQcEquipment::class, 'qc_equipment_uuid', 'uuid');
+        return $this->hasMany(DetailQcEquipment::class, 'report_qc_equipment_uuid', 'uuid');
     }
 }

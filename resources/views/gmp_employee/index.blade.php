@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="card shadow mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>Daftar Laporan Kontrol Sanitasi</h5>
+                <h5>Daftar Laporan GMP Karyawan & Kontrol Sanitasi</h5>
                 <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
             </div>
 
@@ -49,6 +49,10 @@
                                         <button class="btn btn-sm btn-info" data-bs-toggle="collapse" data-bs-target="#detail-{{ $report->id }}">
                                             Lihat Detail
                                         </button>
+
+                                         <a href="{{ route('gmp-employee.edit', $report->uuid) }}" class="btn btn-sm btn-warning">
+                                            Edit
+                                        </a>
 
                                         <form action="{{ route('gmp-employee.destroy', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
                                             @csrf
@@ -119,11 +123,10 @@
                                         {{-- TABEL SANITASI AREA --}}
                                         @if($report->sanitationCheck && $report->sanitationCheck->count())
                                             <h6 class="fw-bold mt-4">Sanitasi Area</h6>
-
                                             @php
-                                                $firstCheck = $report->sanitationCheck->first();
-                                                $hour1 = $firstCheck?->hour_1 ?? 'Jam 1';
-                                                $hour2 = $firstCheck?->hour_2 ?? 'Jam 2';
+                                                $sanitationCheck = $report->sanitationCheck;
+                                                $hour1 = $sanitationCheck?->hour_1 ?? 'Jam 1';
+                                                $hour2 = $sanitationCheck?->hour_2 ?? 'Jam 2';
                                             @endphp
 
                                             <table class="table table-bordered table-sm mt-2">
@@ -150,7 +153,7 @@
                                                 </thead>
                                                 <tbody>
                                                     @php $no = 1; @endphp
-                                                    @foreach($report->sanitationCheck as $sanitationCheck)
+                                                    @if(is_iterable($sanitationCheck->sanitationArea ?? null))
                                                         @foreach($sanitationCheck->sanitationArea as $area)
                                                             @php
                                                                 $jam1 = $area->sanitationResult->firstWhere('hour_to', 1);
@@ -177,13 +180,9 @@
                                                                 </td>
                                                             </tr>
                                                         @endforeach
-                                                    @endforeach
+                                                    @endif
                                                 </tbody>
                                             </table>
-
-                                            <div class="d-flex justify-content-end">
-                                                <a href="{{ route('gmp-employee.sanitation-detail.create', $report->id) }}" class="btn btn-sm btn-primary mt-3">+ Tambah Detail Sanitasi</a>
-                                            </div>
                                         @else
                                             <p class="text-muted">Belum ada data sanitasi area.</p>
                                         @endif

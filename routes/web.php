@@ -14,6 +14,7 @@ use App\Http\Controllers\GmpController;
 use App\Http\Controllers\FragileItemController;
 use App\Http\Controllers\ReportFragileItemController;
 use App\Http\Controllers\QcEquipmentController;
+use App\Http\Controllers\ReportQcEquipmentController;
 use App\Models\QcEquipment;
 
 Route::redirect('/', '/login');
@@ -138,7 +139,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
         });
 
-    // PROCESS AREA ROUTES
+    // GMP EMPLOYEE ROUTES
     Route::prefix('gmp-employee')
         ->name('gmp-employee.')
         ->controller(GmpController::class)
@@ -146,11 +147,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/store', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->whereUuid('uuid')->name('edit');
+            Route::put('/{uuid}', 'update')->whereUuid('uuid')->name('update');
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::get('{report}/detail/create', 'createDetail')->name('detail.create');
             Route::post('{report}/detail/store', 'storeDetail')->name('detail.store');
-            Route::get('{report}/sanitation-detail/create', 'createSanitationDetail')->name('sanitation-detail.create');
-            Route::post('{report}/sanitation-detail', 'storeSanitationDetail')->name('sanitation-detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
             Route::post('/{id}/approve', 'approve')->name('approve');
         });
@@ -176,6 +177,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
@@ -192,5 +195,20 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{qcEquipment}/edit', 'edit')->name('edit');
             Route::put('/{qcEquipment}', 'update')->name('update');
             Route::delete('/{qcEquipment}', 'destroy')->name('destroy');
+        });
+
+    // REPORT QC EQUIPMENT ROUTES
+    Route::prefix('report-qc-equipment')
+        ->name('report-qc-equipment.')
+        ->controller(ReportQcEquipmentController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export', 'exportPdf')->name('export');
         });
 });

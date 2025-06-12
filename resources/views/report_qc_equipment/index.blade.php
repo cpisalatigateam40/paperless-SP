@@ -5,8 +5,8 @@
     <div class="card shadow">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5>Daftar Laporan Pemeriksaan Barang Mudah Pecah</h5>
-                <a href="{{ route('report-fragile-item.create') }}" class="btn btn-primary btn-sm">+ Buat Laporan Baru</a>
+                <h5>Daftar Laporan Inventaris QC</h5>
+                <a href="{{ route('report-qc-equipment.create') }}" class="btn btn-primary btn-sm">+ Buat Laporan Baru</a>
             </div>
         </div>
         <div class="card-body">
@@ -42,21 +42,19 @@
                                 <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                                 <td>{{ $report->shift }}</td>
                                 <td>
-                                    <a href="{{ route('report-fragile-item.edit', $report->uuid) }}" class="btn btn-sm btn-warning">
-                                        Edit
-                                    </a>
-
-                                    <form action="{{ route('report-fragile-item.destroy', $report->uuid) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
+                                    <a href="{{ route('report-qc-equipment.edit', $report->uuid) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    
+                                    <form action="{{ route('report-qc-equipment.destroy', $report->uuid) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-danger">Hapus</button>
                                     </form>
 
-                                    <a href="{{ route('report-fragile-item.export', $report->uuid) }}" target="_blank" class="btn btn-sm btn-outline-secondary">🖨 Cetak PDF</a>
+                                    <a href="{{ route('report-qc-equipment.export', $report->uuid) }}" target="_blank" class="btn btn-sm btn-outline-secondary">🖨 Cetak PDF</a>
 
                                     @can('approve report')
                                     @if(!$report->approved_by)
-                                        <form action="{{ route('report-fragile-item.approve', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                        <form action="{{ route('report-qc-equipment.approve', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-success">Approve</button>
                                         </form>
@@ -85,7 +83,7 @@
             
         </div>
 
-        {{ $reports->links() }} {{-- Pagination --}}
+        {{ $reports->links('pagination::bootstrap-5') }} {{-- Pagination --}}
     </div>
 </div>
 @endsection
