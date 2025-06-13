@@ -123,18 +123,39 @@ class GmpController extends Controller
         }
     }
 
+    // public function edit($uuid)
+    // {
+    //     $report = ReportGmpEmployee::with([
+    //         'details',
+    //         'sanitationCheck',
+    //         'sanitationAreas.sanitationResult'
+    //     ])->where('uuid', $uuid)->firstOrFail();
+
+    //     $details = $report->details;
+    //     $sanitation = $report->sanitationCheck;
+
+    //     $sanitationAreas = $report->sanitationAreas?->map(function ($area) {
+    //         $results = $area->sanitationResult ?? collect();
+    //         $area->results_by_hour = $results->keyBy('hour_to');
+    //         return $area;
+    //     }) ?? collect();
+
+    //     return view('gmp_employee.edit', compact('report', 'details', 'sanitation', 'sanitationAreas'));
+    // }
+
+
     public function edit($uuid)
     {
         $report = ReportGmpEmployee::with([
             'details',
-            'sanitationCheck',
-            'sanitationAreas.sanitationResult'
+            'sanitationCheck.sanitationArea.sanitationResult'
         ])->where('uuid', $uuid)->firstOrFail();
 
         $details = $report->details;
         $sanitation = $report->sanitationCheck;
 
-        $sanitationAreas = $report->sanitationAreas?->map(function ($area) {
+        // Ambil sanitationArea melalui sanitationCheck
+        $sanitationAreas = $sanitation?->sanitationArea?->map(function ($area) {
             $results = $area->sanitationResult ?? collect();
             $area->results_by_hour = $results->keyBy('hour_to');
             return $area;
@@ -142,6 +163,7 @@ class GmpController extends Controller
 
         return view('gmp_employee.edit', compact('report', 'details', 'sanitation', 'sanitationAreas'));
     }
+
 
 
     public function update(Request $request, $uuid)
@@ -189,7 +211,7 @@ class GmpController extends Controller
                 $sanitationCheck = SanitationCheck::create([
                     'uuid' => $checkUUID,
                     'area_uuid' => $report->area_uuid,
-                    'report_gmp_employee_uuid' => $report->uuid, // disesuaikan jika relasi pakai uuid
+                    'report_gmp_employee_id' => $report->id,
                     'hour_1' => $request->input('sanitation.hour_1'),
                     'hour_2' => $request->input('sanitation.hour_2'),
                     'verification' => $request->input('sanitation.verification'),

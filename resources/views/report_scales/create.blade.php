@@ -1,0 +1,157 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h5>Buat Laporan Pemeriksaan Timbangan</h5>
+        </div>
+
+        <div class="card-body">
+            <form action="{{ route('report-scales.store') }}" method="POST">
+                @csrf
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="date">Tanggal</label>
+                        <input type="date" name="date" class="form-control @error('date') is-invalid @enderror"
+                            value="{{ old('date') }}" required>
+                        @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="shift">Shift</label>
+                        <input type="text" name="shift" class="form-control @error('shift') is-invalid @enderror"
+                            value="{{ old('shift') }}" required>
+                        @error('shift') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                {{-- Form Detail Timbangan --}}
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered align-middle" id="detail-table">
+                        <thead class="text-center">
+                            <tr>
+                                <th rowspan="3" class="align-middle">No</th>
+                                <th rowspan="3" class="align-middle">Jenis dan Kode Timbangan</th>
+                                <th colspan="6" class="align-middle">Pemeriksaan</th>
+                                <th rowspan="3" class="align-middle">Keterangan</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">Pukul 1
+                                    <input type="time" id="time1" value="08:00" class="form-control form-control-sm mt-1">
+                                </th>
+                                <th colspan="3">Pukul 2
+                                    <input type="time" id="time2" value="14:00" class="form-control form-control-sm mt-1">
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>1000 Gr</th>
+                                <th>5000 Gr</th>
+                                <th>10000 Gr</th>
+                                <th>1000 Gr</th>
+                                <th>5000 Gr</th>
+                                <th>10000 Gr</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-body">
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td>
+                                    <select name="data[0][scale_uuid]" class="form-select form-control" required>
+                                        <option value="">-- Pilih Timbangan --</option>
+                                        @foreach($scales as $scale)
+                                            <option value="{{ $scale->uuid }}">{{ $scale->type }} - {{ $scale->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" name="data[0][time_1]" class="time1-input" value="08:00">
+                                    <input type="hidden" name="data[0][time_2]" class="time2-input" value="14:00">
+                                </td>
+
+                                {{-- Pukul 1 --}}
+                                <td><input type="number" step="0.01" name="data[0][p1_1000]" class="form-control" required></td>
+                                <td><input type="number" step="0.01" name="data[0][p1_5000]" class="form-control" required></td>
+                                <td><input type="number" step="0.01" name="data[0][p1_10000]" class="form-control" required></td>
+
+                                {{-- Pukul 2 --}}
+                                <td><input type="number" step="0.01" name="data[0][p2_1000]" class="form-control" required></td>
+                                <td><input type="number" step="0.01" name="data[0][p2_5000]" class="form-control" required></td>
+                                <td><input type="number" step="0.01" name="data[0][p2_10000]" class="form-control" required></td>
+
+                                {{-- Status --}}
+                                <td>
+                                    <select name="data[0][status]" class="form-select" required>
+                                        <option value="1">OK</option>
+                                        <option value="0">Tidak OK</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary btn-sm mt-4" id="add-row">
+                    + Tambah Detail Timbangan
+                </button>
+
+                <div class="mt-4">
+                    <button class="btn btn-success">Simpan Laporan</button>
+                    <a href="{{ route('report-scales.index') }}" class="btn btn-secondary">Kembali</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('script')
+<script>
+let rowCount = 1;
+
+// Tambah Baris Baru
+document.getElementById('add-row').addEventListener('click', function () {
+    const tbody = document.getElementById('detail-body');
+    const time1 = document.getElementById('time1').value;
+    const time2 = document.getElementById('time2').value;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td class="text-center">${rowCount + 1}</td>
+        <td>
+            <select name="data[${rowCount}][scale_uuid]" class="form-select form-control" required>
+                <option value="">-- Pilih Timbangan --</option>
+                @foreach($scales as $scale)
+                    <option value="{{ $scale->uuid }}">{{ $scale->type }} - {{ $scale->code }}</option>
+                @endforeach
+            </select>
+            <input type="hidden" name="data[${rowCount}][time_1]" class="time1-input" value="${time1}">
+            <input type="hidden" name="data[${rowCount}][time_2]" class="time2-input" value="${time2}">
+        </td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p1_1000]" class="form-control" required></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p1_5000]" class="form-control" required></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p1_10000]" class="form-control" required></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p2_1000]" class="form-control" required></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p2_5000]" class="form-control" required></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p2_10000]" class="form-control" required></td>
+        <td>
+            <select name="data[${rowCount}][status]" class="form-select" required>
+                <option value="1">OK</option>
+                <option value="0">Tidak OK</option>
+            </select>
+        </td>
+    `;
+
+    tbody.appendChild(row);
+    rowCount++;
+});
+
+// Sync waktu ke seluruh baris
+document.getElementById('time1').addEventListener('input', function () {
+    document.querySelectorAll('.time1-input').forEach(input => input.value = this.value);
+});
+
+document.getElementById('time2').addEventListener('input', function () {
+    document.querySelectorAll('.time2-input').forEach(input => input.value = this.value);
+});
+</script>
+
+@endsection

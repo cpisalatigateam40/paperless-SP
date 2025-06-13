@@ -57,6 +57,10 @@
             gap: .5rem;
         }
 
+        .border-th {
+            border: 1px solid rgb(231, 230, 237) !important;
+        }
+
     </style>
 </head>
 <body id="page-top">
