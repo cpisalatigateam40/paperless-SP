@@ -15,6 +15,8 @@ use App\Http\Controllers\FragileItemController;
 use App\Http\Controllers\ReportFragileItemController;
 use App\Http\Controllers\QcEquipmentController;
 use App\Http\Controllers\ReportQcEquipmentController;
+use App\Http\Controllers\ScaleController;
+use App\Http\Controllers\ReportScaleController;
 use App\Models\QcEquipment;
 
 Route::redirect('/', '/login');
@@ -211,4 +213,33 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
         });
+
+    // SCALES MD ROUTES
+    Route::prefix('scales')
+        ->name('scales.')
+        ->controller(ScaleController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+        });
+
+    // REPORT SCALES MD ROUTES
+
+    Route::prefix('report-scales')
+        ->name('report-scales.')
+        ->controller(ReportScaleController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index'); // daftar laporan
+            Route::get('/create', 'create')->name('create'); // form create (isi + detail)
+            Route::post('/', 'store')->name('store'); // simpan header + detail
+            Route::get('/{uuid}/edit', 'edit')->name('edit'); // edit header
+            Route::put('/{uuid}', 'update')->name('update'); // update header
+            Route::delete('/{uuid}', 'destroy')->name('destroy'); // hapus laporan
+        });
+
+
 });

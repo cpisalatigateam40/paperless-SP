@@ -143,7 +143,7 @@
     </table>
     <p>Ket : * meliput Boot, Seragam, Topi, Masker dan Sarung tangan.</p>
 
-    @if($report->sanitationCheck->count())
+    @if($report->sanitationCheck)
         <h4>KONTROL SANITASI</h4>
         @php
             $firstCheck = $report->sanitationCheck->first();
@@ -175,8 +175,8 @@
             </thead>
             <tbody>
                 @php $no = 1; @endphp
-                @foreach($report->sanitationCheck as $sanitationCheck)
-                    @foreach($sanitationCheck->sanitationArea as $area)
+                
+                    @foreach($report->sanitationCheck->sanitationArea as $area)
                         @php
                             $jam1 = $area->sanitationResult->firstWhere('hour_to', 1);
                             $jam2 = $area->sanitationResult->firstWhere('hour_to', 2);
@@ -191,10 +191,10 @@
                             <td>{{ $jam2?->temperature ?? '-' }}</td>
                             <td>{{ $area->notes ?? '-' }}</td>
                             <td>{{ $area->corrective_action ?? '-' }}</td>
-                            <td>{{ $sanitationCheck->verification ? '✔' : '✘' }}</td>
+                            <td>{{ $report->sanitationCheck->verification ? '✔' : '✘' }}</td>
                         </tr>
                     @endforeach
-                @endforeach
+                
                 <tr>
                     <td colspan="10" style="text-align: right; border: none;">QM 02 / 00</td>
                 </tr>
