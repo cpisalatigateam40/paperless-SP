@@ -39,4 +39,9 @@ class ReportScale extends Model
     {
         return $this->hasMany(DetailScale::class, 'report_scale_uuid', 'uuid');
     }
+
+    public function thermometerDetails()
+    {
+        return $this->hasMany(DetailThermometer::class, 'report_scale_uuid', 'uuid');
+    }
 }

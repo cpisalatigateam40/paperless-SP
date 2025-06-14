@@ -4,10 +4,10 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Buat Laporan Pemeriksaan Timbangan</h5>
+            <h5>Buat Laporan Pemeriksaan Timbangan & Thermometer</h5>
         </div>
 
-        <div class="card-body">
+        {{-- <div class="card-body">
             <form action="{{ route('report-scales.store') }}" method="POST">
                 @csrf
                 <div class="row mb-3">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                {{-- Form Detail Timbangan --}}
+                
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered align-middle" id="detail-table">
                         <thead class="text-center">
@@ -67,17 +67,17 @@
                                     <input type="hidden" name="data[0][time_2]" class="time2-input" value="14:00">
                                 </td>
 
-                                {{-- Pukul 1 --}}
+                                
                                 <td><input type="number" step="0.01" name="data[0][p1_1000]" class="form-control" required></td>
                                 <td><input type="number" step="0.01" name="data[0][p1_5000]" class="form-control" required></td>
                                 <td><input type="number" step="0.01" name="data[0][p1_10000]" class="form-control" required></td>
 
-                                {{-- Pukul 2 --}}
+                               
                                 <td><input type="number" step="0.01" name="data[0][p2_1000]" class="form-control" required></td>
                                 <td><input type="number" step="0.01" name="data[0][p2_5000]" class="form-control" required></td>
                                 <td><input type="number" step="0.01" name="data[0][p2_10000]" class="form-control" required></td>
 
-                                {{-- Status --}}
+                                
                                 <td>
                                     <select name="data[0][status]" class="form-select" required>
                                         <option value="1">OK</option>
@@ -98,7 +98,55 @@
                     <a href="{{ route('report-scales.index') }}" class="btn btn-secondary">Kembali</a>
                 </div>
             </form>
+        </div> --}}
+
+        <div class="card-body">
+            <form action="{{ route('report-scales.store') }}" method="POST">
+                @csrf
+
+                {{-- Data Header --}}
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="date">Tanggal</label>
+                        <input type="date" name="date" class="form-control @error('date') is-invalid @enderror"
+                            value="{{ old('date') }}" required>
+                        @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="shift">Shift</label>
+                        <input type="text" name="shift" class="form-control @error('shift') is-invalid @enderror"
+                            value="{{ old('shift') }}" required>
+                        @error('shift') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                {{-- Tabs --}}
+                <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="scale-tab" data-bs-toggle="tab" href="#scale" role="tab">Timbangan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="thermometer-tab" data-bs-toggle="tab" href="#thermometer" role="tab">Thermometer</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3" id="reportTabsContent">
+                    <div class="tab-pane fade show active" id="scale" role="tabpanel">
+                        @include('report_scales.partials.scale', ['scales' => $scales])
+                    </div>
+                    <div class="tab-pane fade" id="thermometer" role="tabpanel">
+                        @include('report_scales.partials.thermometer', ['thermometers' => $thermometers])
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-success">Simpan Laporan</button>
+                    <a href="{{ route('report-scales.index') }}" class="btn btn-secondary">Kembali</a>
+                </div>
+            </form>
         </div>
+
     </div>
 </div>
 @endsection

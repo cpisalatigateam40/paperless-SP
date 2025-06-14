@@ -6,25 +6,30 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 
-class DetailScale extends Model
+class DetailThermometer extends Model
 {
     use HasFactory;
 
-    protected $table = 'detail_scales';
+    protected $table = 'detail_thermometers';
 
     protected $fillable = [
         'uuid',
         'report_scale_uuid',
-        'scale_uuid',
+        'thermometer_uuid',
         'time_1',
         'time_2',
-        'notes',
+        'note',
+    ];
+
+    protected $casts = [
+        'time_1' => 'datetime:H:i',
+        'time_2' => 'datetime:H:i',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($scale) {
-            $scale->uuid = (string) Str::uuid();
+        static::creating(function ($model) {
+            $model->uuid = (string) Str::uuid();
         });
     }
 
@@ -33,13 +38,13 @@ class DetailScale extends Model
         return $this->belongsTo(ReportScale::class, 'report_scale_uuid', 'uuid');
     }
 
-    public function scale()
+    public function thermometer()
     {
-        return $this->belongsTo(Scale::class, 'scale_uuid', 'uuid');
+        return $this->belongsTo(Thermometer::class, 'thermometer_uuid', 'uuid');
     }
 
     public function measurements()
     {
-        return $this->hasMany(MeasurementScale::class, 'detail_scale_uuid', 'uuid');
+        return $this->hasMany(MeasurementThermometer::class, 'detail_thermometer_uuid', 'uuid');
     }
 }
