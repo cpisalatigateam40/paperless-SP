@@ -6,6 +6,9 @@ use App\Models\ReportScale;
 use App\Models\DetailScale;
 use App\Models\MeasurementScale;
 use App\Models\Scale;
+use App\Models\Thermometer;
+use App\Models\DetailThermometer;
+use App\Models\MeasurementThermometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -20,8 +23,12 @@ class ReportScaleController extends Controller
 
     public function create()
     {
-        $scales = Scale::where('area_uuid', Auth::user()->area_uuid)->get();
-        return view('report_scales.create', compact('scales'));
+        $areaUuid = Auth::user()->area_uuid;
+
+        $scales = Scale::where('area_uuid', $areaUuid)->get();
+        $thermometers = Thermometer::where('area_uuid', $areaUuid)->get();
+
+        return view('report_scales.create', compact('scales', 'thermometers'));
     }
 
     public function store(Request $request)
@@ -29,7 +36,8 @@ class ReportScaleController extends Controller
         $request->validate([
             'date' => 'required|date',
             'shift' => 'required|string|max:50',
-            'data' => 'required|array',
+            'data' => 'nullable|array',
+            'thermo_data' => 'nullable|array',
         ]);
 
         $report = ReportScale::create([
@@ -40,47 +48,88 @@ class ReportScaleController extends Controller
             'created_by' => Auth::user()->name,
         ]);
 
-        foreach ($request->data as $row) {
-            $detail = DetailScale::create([
-                'uuid' => Str::uuid(),
-                'report_scale_uuid' => $report->uuid,
-                'scale_uuid' => $row['scale_uuid'],
-                'notes' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
-                'time_1' => now()->setTimeFromTimeString($row['time_1'] ?? '08:00'),
-                'time_2' => now()->setTimeFromTimeString($row['time_2'] ?? '14:00'),
-            ]);
-
-            // Pemeriksaan Pukul 1
-            foreach ([1000, 5000, 10000] as $weight) {
-                MeasurementScale::create([
+        // ===================== TIMBANGAN =====================
+        if ($request->filled('data')) {
+            foreach ($request->data as $row) {
+                $detail = DetailScale::create([
                     'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 1,
-                    'standard_weight' => $weight,
-                    'measured_value' => $row['p1_' . $weight],
+                    'report_scale_uuid' => $report->uuid,
+                    'scale_uuid' => $row['scale_uuid'],
+                    'notes' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
+                    'time_1' => now()->setTimeFromTimeString($row['time_1'] ?? '08:00'),
+                    'time_2' => now()->setTimeFromTimeString($row['time_2'] ?? '14:00'),
                 ]);
+
+                foreach ([1000, 5000, 10000] as $weight) {
+                    MeasurementScale::create([
+                        'uuid' => Str::uuid(),
+                        'detail_scale_uuid' => $detail->uuid,
+                        'inspection_time_index' => 1,
+                        'standard_weight' => (int) $weight,
+                        'measured_value' => $row['p1_' . $weight],
+                    ]);
+
+                    if (!empty($row['p2_' . $weight])) {
+                        MeasurementScale::create([
+                            'uuid' => Str::uuid(),
+                            'detail_scale_uuid' => $detail->uuid,
+                            'inspection_time_index' => 2,
+                            'standard_weight' => $weight,
+                            'measured_value' => $row['p2_' . $weight],
+                        ]);
+                    }
+                }
             }
+        }
 
-            // Pemeriksaan Pukul 2
-            foreach ([1000, 5000, 10000] as $weight) {
-                MeasurementScale::create([
+        // ===================== THERMOMETER =====================
+        if ($request->filled('thermo_data')) {
+            foreach ($request->thermo_data as $row) {
+                $detail = DetailThermometer::create([
                     'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 2,
-                    'standard_weight' => $weight,
-                    'measured_value' => $row['p2_' . $weight],
+                    'report_scale_uuid' => $report->uuid,
+                    'thermometer_uuid' => $row['thermometer_uuid'],
+                    'time_1' => now()->setTimeFromTimeString($row['time_1'] ?? '08:00'),
+                    'time_2' => now()->setTimeFromTimeString($row['time_2'] ?? '14:00'),
+                    'note' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
                 ]);
+
+                foreach ([0, 100] as $temp) {
+                    MeasurementThermometer::create([
+                        'uuid' => Str::uuid(),
+                        'detail_thermometer_uuid' => $detail->uuid,
+                        'inspection_time_index' => 1,
+                        'standard_temperature' => $temp,
+                        'measured_value' => $row['p1_' . $temp],
+                    ]);
+
+                    if (!empty($row['p2_' . $temp])) {
+                        MeasurementThermometer::create([
+                            'uuid' => Str::uuid(),
+                            'detail_thermometer_uuid' => $detail->uuid,
+                            'inspection_time_index' => 2,
+                            'standard_temperature' => $temp,
+                            'measured_value' => $row['p2_' . $temp],
+                        ]);
+                    }
+                }
             }
         }
 
         return redirect()->route('report-scales.index')->with('success', 'Laporan dan data timbangan berhasil disimpan.');
     }
 
-
     public function edit(string $uuid)
     {
-        $report = ReportScale::where('uuid', $uuid)->firstOrFail();
-        return view('report_scales.edit', compact('report'));
+        $report = ReportScale::with([
+            'details.measurements',
+            'thermometerDetails.measurements',
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        $scales = Scale::where('area_uuid', $report->area_uuid)->get();
+        $thermometers = Thermometer::where('area_uuid', $report->area_uuid)->get();
+
+        return view('report_scales.edit', compact('report', 'scales', 'thermometers'));
     }
 
     public function update(Request $request, string $uuid)
@@ -90,12 +139,81 @@ class ReportScaleController extends Controller
         $request->validate([
             'date' => 'required|date',
             'shift' => 'required|string|max:50',
+            'data' => 'nullable|array',
+            'thermo_data' => 'nullable|array',
         ]);
 
+        // Update header
         $report->update([
             'date' => $request->date,
             'shift' => $request->shift,
         ]);
+
+        // Hapus detail timbangan & thermometer sebelumnya
+        $report->details()->delete();
+        $report->thermometerDetails()->delete();
+
+        // ===================== SIMPAN TIMBANGAN =====================
+        if ($request->filled('data')) {
+            foreach ($request->data as $row) {
+                $detail = DetailScale::create([
+                    'uuid' => Str::uuid(),
+                    'report_scale_uuid' => $report->uuid,
+                    'scale_uuid' => $row['scale_uuid'],
+                    'notes' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
+                    'time_1' => now()->setTimeFromTimeString($row['time_1']),
+                    'time_2' => now()->setTimeFromTimeString($row['time_2']),
+                ]);
+
+                foreach ([1000, 5000, 10000] as $weight) {
+                    MeasurementScale::create([
+                        'uuid' => Str::uuid(),
+                        'detail_scale_uuid' => $detail->uuid,
+                        'inspection_time_index' => 1,
+                        'standard_weight' => $weight,
+                        'measured_value' => $row['p1_' . $weight],
+                    ]);
+                    MeasurementScale::create([
+                        'uuid' => Str::uuid(),
+                        'detail_scale_uuid' => $detail->uuid,
+                        'inspection_time_index' => 2,
+                        'standard_weight' => $weight,
+                        'measured_value' => $row['p2_' . $weight],
+                    ]);
+                }
+            }
+        }
+
+        // ===================== SIMPAN THERMOMETER =====================
+        if ($request->filled('thermo_data')) {
+            foreach ($request->thermo_data as $row) {
+                $detail = DetailThermometer::create([
+                    'uuid' => Str::uuid(),
+                    'report_scale_uuid' => $report->uuid,
+                    'thermometer_uuid' => $row['thermometer_uuid'],
+                    'time_1' => now()->setTimeFromTimeString($row['time_1']),
+                    'time_2' => now()->setTimeFromTimeString($row['time_2']),
+                    'note' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
+                ]);
+
+                foreach ([0, 100] as $temp) {
+                    MeasurementThermometer::create([
+                        'uuid' => Str::uuid(),
+                        'detail_thermometer_uuid' => $detail->uuid,
+                        'inspection_time_index' => 1,
+                        'standard_temperature' => $temp,
+                        'measured_value' => $row['p1_' . $temp],
+                    ]);
+                    MeasurementThermometer::create([
+                        'uuid' => Str::uuid(),
+                        'detail_thermometer_uuid' => $detail->uuid,
+                        'inspection_time_index' => 2,
+                        'standard_temperature' => $temp,
+                        'measured_value' => $row['p2_' . $temp],
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('report-scales.index')->with('success', 'Laporan berhasil diperbarui.');
     }
@@ -106,97 +224,5 @@ class ReportScaleController extends Controller
         $report->delete();
 
         return redirect()->route('report-scales.index')->with('success', 'Laporan berhasil dihapus.');
-    }
-
-    // ==============================
-    // FORM DETAIL TIMBANGAN
-    // ==============================
-
-    public function fill(string $uuid)
-    {
-        $report = ReportScale::where('uuid', $uuid)->firstOrFail();
-        $scales = Scale::where('area_uuid', $report->area_uuid)->get();
-
-        return view('report_scales.fill', compact('report', 'scales'));
-    }
-
-    public function storeDetail(Request $request, string $uuid)
-    {
-        $report = ReportScale::where('uuid', $uuid)->firstOrFail();
-
-        foreach ($request->data as $row) {
-            $detail = DetailScale::create([
-                'uuid' => Str::uuid(),
-                'report_scale_uuid' => $report->uuid,
-                'scale_uuid' => $row['scale_uuid'],
-                'notes' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
-                'time_1' => now()->setTimeFromTimeString($row['time_1'] ?? '08:00'),
-                'time_2' => now()->setTimeFromTimeString($row['time_2'] ?? '14:00'),
-            ]);
-
-            // Pemeriksaan Pukul 1
-            MeasurementScale::insert([
-                [
-                    'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 1,
-                    'standard_weight' => 1000,
-                    'measured_value' => $row['p1_1000'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 1,
-                    'standard_weight' => 5000,
-                    'measured_value' => $row['p1_5000'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 1,
-                    'standard_weight' => 10000,
-                    'measured_value' => $row['p1_10000'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-            ]);
-
-            // Pemeriksaan Pukul 2
-            MeasurementScale::insert([
-                [
-                    'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 2,
-                    'standard_weight' => 1000,
-                    'measured_value' => $row['p2_1000'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 2,
-                    'standard_weight' => 5000,
-                    'measured_value' => $row['p2_5000'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'uuid' => Str::uuid(),
-                    'detail_scale_uuid' => $detail->uuid,
-                    'inspection_time_index' => 2,
-                    'standard_weight' => 10000,
-                    'measured_value' => $row['p2_10000'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-            ]);
-        }
-
-        return redirect()->route('report-scales.index')->with('success', 'Detail pemeriksaan berhasil disimpan.');
     }
 }

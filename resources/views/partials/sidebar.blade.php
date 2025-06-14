@@ -59,6 +59,7 @@
                 <a class="collapse-item" href="{{ route('fragile-item.index') }}">Fragile Item</a>
                 <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a>
                 <a class="collapse-item" href="{{ route('scales.index') }}">Timbangan</a>
+                <a class="collapse-item" href="{{ route('thermometers.index') }}">Thermometer</a>
             </div>
         </div>
     </li>
@@ -129,7 +130,7 @@
                 </a>
 
                 <a class="collapse-item" href="{{ route('report-scales.index') }}">
-                    Report Timbangan
+                    Report Timbangan & Thermometer
                 </a>
             </div>
         </div>

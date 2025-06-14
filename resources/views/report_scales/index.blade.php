@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Data Laporan Pemeriksaan Timbangan</h5>
+            <h5>Data Laporan Pemeriksaan Timbangan & Thermometer</h5>
             <a href="{{ route('report-scales.create') }}" class="btn btn-primary btn-sm">+ Tambah Laporan</a>
         </div>
 

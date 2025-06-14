@@ -17,6 +17,7 @@ use App\Http\Controllers\QcEquipmentController;
 use App\Http\Controllers\ReportQcEquipmentController;
 use App\Http\Controllers\ScaleController;
 use App\Http\Controllers\ReportScaleController;
+use App\Http\Controllers\ThermometerController;
 use App\Models\QcEquipment;
 
 Route::redirect('/', '/login');
@@ -227,8 +228,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
         });
 
-    // REPORT SCALES MD ROUTES
-
+    // REPORT SCALES ROUTES
     Route::prefix('report-scales')
         ->name('report-scales.')
         ->controller(ReportScaleController::class)
@@ -239,6 +239,19 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit'); // edit header
             Route::put('/{uuid}', 'update')->name('update'); // update header
             Route::delete('/{uuid}', 'destroy')->name('destroy'); // hapus laporan
+        });
+
+    // THERMOMETER MD ROUTES
+    Route::prefix('thermometers')
+        ->name('thermometers.')
+        ->controller(ThermometerController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
         });
 
 
