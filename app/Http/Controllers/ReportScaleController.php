@@ -12,6 +12,8 @@ use App\Models\MeasurementThermometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportScaleController extends Controller
 {
@@ -224,5 +226,51 @@ class ReportScaleController extends Controller
         $report->delete();
 
         return redirect()->route('report-scales.index')->with('success', 'Laporan berhasil dihapus.');
+    }
+
+    public function approve($id)
+    {
+        $report = ReportScale::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->approved_by) {
+            return redirect()->back()->with('error', 'Laporan sudah disetujui.');
+        }
+
+        $report->approved_by = $user->name;
+        $report->approved_at = now();
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
+    }
+
+    public function exportPdf(string $uuid)
+    {
+        $report = ReportScale::with([
+            'area',
+            'details.scale',
+            'details.measurements',
+            'thermometerDetails.thermometer',
+            'thermometerDetails.measurements',
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        // Generate QR untuk created_by
+        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
+        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+
+        // Generate QR untuk approved_by
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
+        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+
+        $pdf = PDF::loadView('report_scales.pdf', [
+            'report' => $report,
+            'createdQr' => $createdQrBase64,
+            'approvedQr' => $approvedQrBase64,
+        ]);
+        return $pdf->stream('Laporan-Timbangan-Thermometer-' . $report->date . '.pdf');
     }
 }

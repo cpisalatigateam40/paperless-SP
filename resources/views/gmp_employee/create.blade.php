@@ -43,11 +43,17 @@
                                 <h6>Detail Inspeksi</h6>
                                 <div class="mb-2">
                                     <label>Jam Inspeksi</label>
-                                    <input type="time" name="details[0][inspection_hour]" class="form-control">
+                                    <input type="time" name="details[0][inspection_hour]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label>Nama Bagian</label>
-                                    <input type="text" name="details[0][section_name]" class="form-control">
+                                    <select name="details[0][section_name]" class="form-control">
+                                        <option value="">-- Pilih Bagian --</option>
+                                        <option value="MP">MP</option>
+                                        <option value="Cooking">Cooking</option>
+                                        <option value="Packing">Packing</option>
+                                        <option value="Cartoning">Cartoning</option>
+                                    </select>
                                 </div>
                                 <div class="mb-2">
                                     <label>Nama Karyawan</label>
@@ -69,8 +75,6 @@
                                         <option value="0">Tidak OK</option>
                                     </select>
                                 </div>
-
-                                {{-- <button type="button" id="add-detail" class="btn btn-sm btn-secondary">+ Tambah Baris</button> --}}
                             </div>
                         </div>                      
                     </div>
@@ -81,11 +85,11 @@
                             <h6>Data Sanitasi</h6>
                             <div class="mb-2">
                                 <label>Jam 1</label>
-                                <input type="time" name="sanitation[hour_1]" class="form-control">
+                                <input type="time" name="sanitation[hour_1]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}" {{ $isEdit ? 'disabled' : '' }}>
                             </div>
                             <div class="mb-2">
                                 <label>Jam 2</label>
-                                <input type="time" name="sanitation[hour_2]" class="form-control">
+                                <input type="time" name="sanitation[hour_2]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}" {{ !$isEdit ? 'disabled' : '' }}>
                             </div>
                             <div class="mb-2">
                                 <label>Verifikasi</label>
@@ -125,11 +129,11 @@
                                             <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 1</p>
                                             <div class="mb-2">
                                                 <label>Kadar Klorin</label>
-                                                <input type="number" name="sanitation_area[{{ $index }}][result][1][chlorine_level]" class="form-control">
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][1][chlorine_level]" class="form-control" {{ $isEdit ? 'disabled' : '' }}>
                                             </div>
                                             <div class="mb-2">
                                                 <label>Suhu</label>
-                                                <input type="number" name="sanitation_area[{{ $index }}][result][1][temperature]" class="form-control">
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][1][temperature]" class="form-control" {{ $isEdit ? 'disabled' : '' }}>
                                             </div>
                                         </div>
 
@@ -137,11 +141,11 @@
                                             <p style="margin-top: 2rem; font-weight: bold;">Hasil Pengecekan Jam 2</p>
                                             <div class="mb-2">
                                                 <label>Kadar Klorin</label>
-                                                <input type="number" name="sanitation_area[{{ $index }}][result][2][chlorine_level]" class="form-control">
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][2][chlorine_level]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}>
                                             </div>
                                             <div class="mb-2">
                                                 <label>Suhu</label>
-                                                <input type="number" name="sanitation_area[{{ $index }}][result][2][temperature]" class="form-control">
+                                                <input type="number" name="sanitation_area[{{ $index }}][result][2][temperature]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}>
                                             </div>
                                         </div>
                                     </div>

@@ -52,7 +52,7 @@
                         <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection" style="z-index: 1; right: 0; top: 0; margin-top: .5rem; margin-right: .5rem;" aria-label="Close">x</button>
                         
                         <label>Jam Inspeksi:</label>
-                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5" required>
+                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5" value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
 
                         <table class="table">
                             <thead>

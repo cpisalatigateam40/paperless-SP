@@ -32,7 +32,7 @@
                                 <th>No</th>
                                 <th>Tanggal</th>
                                 <th>Shift</th>
-                                {{-- <th>Area</th> --}}
+                                <th>Area</th>
                                 <th>Dibuat oleh</th>
                                 <th>Aksi</th>
                             </tr>
@@ -43,7 +43,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $report->date }}</td>
                                     <td>{{ $report->shift }}</td>
-                                    {{-- <td> {{ $report->details->first()->section_name ?? '-' }}</td> --}}
+                                    <td> {{ $report->details->first()->section_name ?? '-' }}</td>
                                     <td>{{ $report->created_by }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-info" data-bs-toggle="collapse" data-bs-target="#detail-{{ $report->id }}">
@@ -51,7 +51,7 @@
                                         </button>
 
                                          <a href="{{ route('gmp-employee.edit', $report->uuid) }}" class="btn btn-sm btn-warning">
-                                            Edit
+                                            Update Laporan
                                         </a>
 
                                         <form action="{{ route('gmp-employee.destroy', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">

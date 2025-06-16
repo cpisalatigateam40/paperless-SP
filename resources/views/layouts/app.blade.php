@@ -63,7 +63,7 @@
 
     </style>
 </head>
-<body id="page-top">
+<body>
     <div id="wrapper">
         @include('partials.sidebar')
 
