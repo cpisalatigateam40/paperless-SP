@@ -22,7 +22,7 @@ class ReportQcEquipmentController extends Controller
     public function create()
     {
         $qcEquipments = QcEquipment::orderBy('section_name')->get();
-        return view('report_qc_equipment.create', compact('qcEquipments'));
+        return view('report_qc_equipment.create', compact('qcEquipments'))->with('isEdit', false);
     }
 
     public function store(Request $request)
@@ -62,7 +62,7 @@ class ReportQcEquipmentController extends Controller
         $qcEquipments = QcEquipment::orderBy('section_name')->get();
         $details = DetailQcEquipment::where('report_qc_equipment_uuid', $report->uuid)->get()->keyBy('qc_equipment_uuid');
 
-        return view('report_qc_equipment.edit', compact('report', 'qcEquipments', 'details'));
+        return view('report_qc_equipment.edit', compact('report', 'qcEquipments', 'details'))->with('isEdit', true);
     }
 
     public function update(Request $request, $uuid)

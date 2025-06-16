@@ -9,7 +9,7 @@
                 <div class="border rounded p-3 mb-3 position-relative">
                 
                 <label>Jam Inspeksi:</label>
-                <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5">
+                <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5" value="{{ \Carbon\Carbon::now()->format('H:i') }}">
 
                 <table class="table">
                     <thead>

@@ -44,12 +44,12 @@
 
                                         <div style="margin-right: 1rem; display: flex; gap: 3.5rem;">
                                             <div class="form-check form-check-inline">
-                                                <input type="checkbox" class="form-check-input check-all-time-start" data-section="{{ Str::slug($section) }}" id="checkAllStart-{{ Str::slug($section) }}">
+                                                <input type="checkbox" class="form-check-input check-all-time-start" data-section="{{ Str::slug($section) }}" id="checkAllStart-{{ Str::slug($section) }}" {{ $isEdit ? 'disabled' : '' }}>
                                                 <label for="checkAllStart-{{ Str::slug($section) }}" class="form-check-label">Check All Waktu Awal</label>
                                             </div>
 
                                             <div class="form-check form-check-inline">
-                                                <input type="checkbox" class="form-check-input check-all-time-end" data-section="{{ Str::slug($section) }}" id="checkAllEnd-{{ Str::slug($section) }}">
+                                                <input type="checkbox" class="form-check-input check-all-time-end" data-section="{{ Str::slug($section) }}" id="checkAllEnd-{{ Str::slug($section) }}" {{ !$isEdit ? 'disabled' : '' }}>
                                                 <label for="checkAllEnd-{{ Str::slug($section) }}" class="form-check-label">Check All Waktu Akhir</label>
                                             </div>
 
@@ -75,12 +75,12 @@
                                     <td class="align-middle">{{ $item->owner }}</td>
                                     <td class="align-middle">{{ $item->quantity }}</td>
                                     <td class="text-center align-middle">
-                                        <input type="hidden" name="items[{{ $item->uuid }}][time_start]" value="0">
+                                        <input type="hidden" name="items[{{ $item->uuid }}][time_start]" value="{{ (optional($detail)->time_start ?? 0) }}">
                                         <input type="checkbox"
                                             name="items[{{ $item->uuid }}][time_start]"
                                             value="1"
                                             class="check-time-start check-time-start-{{ Str::slug($section) }}"
-                                            {{ (optional($detail)->time_start ?? false) ? 'checked' : '' }}>
+                                            {{ (optional($detail)->time_start ?? false) ? 'checked' : '' }} {{ $isEdit ? 'disabled' : '' }}>
                                     </td>
                                     <td class="text-center align-middle">
                                         <input type="hidden" name="items[{{ $item->uuid }}][time_end]" value="0">
@@ -88,7 +88,7 @@
                                             name="items[{{ $item->uuid }}][time_end]"
                                             value="1"
                                             class="check-time-end check-time-end-{{ Str::slug($section) }}"
-                                            {{ (optional($detail)->time_end ?? false) ? 'checked' : '' }}>
+                                            {{ (optional($detail)->time_end ?? false) ? 'checked' : '' }} {{ !$isEdit ? 'disabled' : '' }}>
                                     </td>
                                     <td class="text-center align-middle">
                                         <input type="hidden" name="items[{{ $item->uuid }}][notes]" value="0">

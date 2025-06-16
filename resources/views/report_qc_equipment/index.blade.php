@@ -42,7 +42,7 @@
                                 <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                                 <td>{{ $report->shift }}</td>
                                 <td>
-                                    <a href="{{ route('report-qc-equipment.edit', $report->uuid) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{{ route('report-qc-equipment.edit', $report->uuid) }}" class="btn btn-sm btn-warning">Update Laporan</a>
                                     
                                     <form action="{{ route('report-qc-equipment.destroy', $report->uuid) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
                                         @csrf
@@ -63,13 +63,13 @@
                                             Disetujui oleh {{ $report->approved_by }}
                                         </span>
                                     @endif
-                                @else
-                                    @if($report->approved_by)
-                                        <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            Disetujui oleh {{ $report->approved_by }}
-                                        </span>
-                                    @endif
-                                @endcan
+                                    @else
+                                        @if($report->approved_by)
+                                            <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                Disetujui oleh {{ $report->approved_by }}
+                                            </span>
+                                        @endif
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

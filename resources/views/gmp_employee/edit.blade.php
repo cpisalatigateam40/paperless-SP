@@ -82,11 +82,11 @@
                             <h6>Data Sanitasi</h6>
                             <div class="mb-2">
                                 <label>Jam 1</label>
-                                <input type="time" name="sanitation[hour_1]" class="form-control" value="{{ optional($sanitation)->hour_1 }}">
+                                <input type="time" name="sanitation[hour_1]" class="form-control" value="{{ optional($sanitation)->hour_1 }}" {{ $isEdit ? 'disabled' : '' }}>
                             </div>
                             <div class="mb-2">
                                 <label>Jam 2</label>
-                                <input type="time" name="sanitation[hour_2]" class="form-control" value="{{ optional($sanitation)->hour_2 }}">
+                                <input type="time" name="sanitation[hour_2]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}" {{ !$isEdit ? 'disabled' : '' }}>
                             </div>
                             <div class="mb-2">
                                 <label>Verifikasi</label>
@@ -118,14 +118,14 @@
                                             <input type="number"
                                                 name="sanitation_area[{{ $index }}][result][1][chlorine_level]"
                                                 class="form-control"
-                                                value="{{ $area->results_by_hour[1]->chlorine_level ?? '' }}">
+                                                value="{{ $area->results_by_hour[1]->chlorine_level ?? '' }}" {{ $isEdit ? 'disabled' : '' }}>
                                         </div>
                                         <div class="mb-2">
                                             <label>Suhu</label>
                                             <input type="number"
                                                 name="sanitation_area[{{ $index }}][result][1][temperature]"
                                                 class="form-control"
-                                                value="{{ $area->results_by_hour[1]->temperature ?? '' }}">
+                                                value="{{ $area->results_by_hour[1]->temperature ?? '' }}" {{ $isEdit ? 'disabled' : '' }}>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -135,14 +135,14 @@
                                             <input type="number"
                                                 name="sanitation_area[{{ $index }}][result][2][chlorine_level]"
                                                 class="form-control"
-                                                value="{{ $area->results_by_hour[2]->chlorine_level ?? '' }}">
+                                                value="{{ $area->results_by_hour[2]->chlorine_level ?? '' }}" {{ !$isEdit ? 'disabled' : '' }}>
                                         </div>
                                         <div class="mb-2">
                                             <label>Suhu</label>
                                             <input type="number"
                                                 name="sanitation_area[{{ $index }}][result][2][temperature]"
                                                 class="form-control"
-                                                value="{{ $area->results_by_hour[2]->temperature ?? '' }}">
+                                                value="{{ $area->results_by_hour[2]->temperature ?? '' }}" {{ !$isEdit ? 'disabled' : '' }}>
                                         </div>
                                     </div>
                                 </div>

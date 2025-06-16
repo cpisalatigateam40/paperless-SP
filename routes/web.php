@@ -239,6 +239,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit'); // edit header
             Route::put('/{uuid}', 'update')->name('update'); // update header
             Route::delete('/{uuid}', 'destroy')->name('destroy'); // hapus laporan
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
 
     // THERMOMETER MD ROUTES

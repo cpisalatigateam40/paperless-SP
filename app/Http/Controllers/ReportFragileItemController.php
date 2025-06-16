@@ -16,14 +16,14 @@ class ReportFragileItemController extends Controller
 {
     public function index()
     {
-        $reports = ReportFragileItem::latest()->paginate(10);
+        $reports = ReportFragileItem::with(['details.item'])->latest()->paginate(10);
         return view('report_fragile_item.index', compact('reports'));
     }
 
     public function create()
     {
         $fragileItems = FragileItem::orderBy('section_name')->get();
-        return view('report_fragile_item.create', compact('fragileItems'));
+        return view('report_fragile_item.create', compact('fragileItems'))->with('isEdit', false);
     }
 
     public function store(Request $request)
@@ -62,7 +62,7 @@ class ReportFragileItemController extends Controller
         $report = ReportFragileItem::with('details')->where('uuid', $uuid)->firstOrFail();
         $fragileItems = FragileItem::all();
 
-        return view('report_fragile_item.edit', compact('report', 'fragileItems'));
+        return view('report_fragile_item.edit', compact('report', 'fragileItems'))->with('isEdit', true);
     }
 
     public function update(Request $request, $uuid)
@@ -79,9 +79,9 @@ class ReportFragileItemController extends Controller
         foreach ($request->items as $item) {
             $report->details()->create([
                 'fragile_item_uuid' => $item['fragile_item_uuid'],
-                'time_start' => isset($item['time_start']) ? 1 : 0,
-                'time_end' => isset($item['time_end']) ? 1 : 0,
-                'notes' => isset($item['notes']) ? 1 : 0,
+                'time_start' => $item['time_start'] ?? 0,
+                'time_end' => $item['time_end'] ?? 0,
+                'notes' => $item['notes'] ?? 0,
             ]);
         }
 
