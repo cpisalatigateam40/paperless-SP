@@ -107,7 +107,10 @@
    <table style="width: 100%; border: none;">
         <tr style="border: none;">
             <td style="text-align: left; border: none;">
-              Hari/Tanggal: <span style="text-decoration: underline;"> {{ $report->date }}</span>
+                Hari/Tanggal:
+                <span style="text-decoration: underline;">
+                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
+                </span>
             </td>
             <td style="text-align: left; border: none;">
                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
@@ -122,8 +125,14 @@
             <tr>
                 <th rowspan="3">No</th>
                 <th rowspan="3">Jenis dan Kode Timbangan</th>
-                <th colspan="3">Pemeriksaan Pukul :</th>
-                <th colspan="3">Pemeriksaan Pukul :</th>
+                <th colspan="3">
+                    Pemeriksaan Pukul:
+                    {{ optional($report->details->pluck('time_1')->filter()->first()) ? \Carbon\Carbon::parse($report->details->pluck('time_1')->filter()->first())->format('H:i') : '-' }}
+                </th>
+                <th colspan="3">
+                    Pemeriksaan Pukul:
+                    {{ optional($report->details->pluck('time_2')->filter()->last()) ? \Carbon\Carbon::parse($report->details->pluck('time_2')->filter()->last())->format('H:i') : '-' }}
+                </th>
                 <th rowspan="3">Keterangan</th>
             </tr>
             <tr>
@@ -167,8 +176,14 @@
             <tr>
                 <th rowspan="3">No</th>
                 <th rowspan="3">Jenis dan Kode Timbangan</th>
-                <th colspan="2">Pemeriksaan Pukul :</th>
-                <th colspan="2">Pemeriksaan Pukul :</th>
+                <th colspan="2">
+                    Pemeriksaan Pukul:
+                    {{ optional($report->thermometerDetails->pluck('time_1')->filter()->first()) ? \Carbon\Carbon::parse($report->thermometerDetails->pluck('time_1')->filter()->first())->format('H:i') : '-' }}
+                </th>
+                <th colspan="2">
+                    Pemeriksaan Pukul:
+                    {{ optional($report->thermometerDetails->pluck('time_2')->filter()->last()) ? \Carbon\Carbon::parse($report->thermometerDetails->pluck('time_2')->filter()->last())->format('H:i') : '-' }}
+                </th>
                 <th rowspan="3">Keterangan</th>
             </tr>
             <tr>

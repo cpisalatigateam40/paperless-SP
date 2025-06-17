@@ -19,7 +19,14 @@ class ReportScaleController extends Controller
 {
     public function index()
     {
-        $reports = ReportScale::with('area')->latest()->paginate(10);
+        $reports = ReportScale::with([
+            'area',
+            'details.scale',
+            'details.measurements',
+            'thermometerDetails.thermometer',
+            'thermometerDetails.measurements',
+        ])->latest()->paginate(10);
+
         return view('report_scales.index', compact('reports'));
     }
 
@@ -30,7 +37,7 @@ class ReportScaleController extends Controller
         $scales = Scale::where('area_uuid', $areaUuid)->get();
         $thermometers = Thermometer::where('area_uuid', $areaUuid)->get();
 
-        return view('report_scales.create', compact('scales', 'thermometers'));
+        return view('report_scales.create', compact('scales', 'thermometers'))->with('isEdit', false);
     }
 
     public function store(Request $request)
@@ -131,7 +138,7 @@ class ReportScaleController extends Controller
         $scales = Scale::where('area_uuid', $report->area_uuid)->get();
         $thermometers = Thermometer::where('area_uuid', $report->area_uuid)->get();
 
-        return view('report_scales.edit', compact('report', 'scales', 'thermometers'));
+        return view('report_scales.edit', compact('report', 'scales', 'thermometers'))->with('isEdit', true);
     }
 
     public function update(Request $request, string $uuid)

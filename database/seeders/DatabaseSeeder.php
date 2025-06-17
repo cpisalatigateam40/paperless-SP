@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RawMaterialSeeder::class,
             FragileItemSeeder::class,
+            RoomEquipmentSeeder::class,
         ]);
     }
 }

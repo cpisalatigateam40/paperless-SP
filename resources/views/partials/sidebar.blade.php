@@ -60,6 +60,7 @@
                 <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a>
                 <a class="collapse-item" href="{{ route('scales.index') }}">Timbangan</a>
                 <a class="collapse-item" href="{{ route('thermometers.index') }}">Thermometer</a>
+                <a class="collapse-item" href="{{ route('rooms.index') }}">Ruangan, Mesin, dan Peralatan</a>
             </div>
         </div>
     </li>
@@ -112,6 +113,10 @@
 
                 <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
                     Report Barang Mudah Pecah
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-re-cleanliness.index') }}">
+                    Report Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan
                 </a>
             </div>
         </div>

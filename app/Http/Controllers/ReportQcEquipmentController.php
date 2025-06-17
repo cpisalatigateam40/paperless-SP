@@ -15,7 +15,7 @@ class ReportQcEquipmentController extends Controller
 {
     public function index()
     {
-        $reports = ReportQcEquipment::latest()->paginate(10);
+        $reports = ReportQcEquipment::with(['details.item'])->latest()->paginate(10);
         return view('report_qc_equipment.index', compact('reports'));
     }
 

@@ -18,7 +18,8 @@ use App\Http\Controllers\ReportQcEquipmentController;
 use App\Http\Controllers\ScaleController;
 use App\Http\Controllers\ReportScaleController;
 use App\Http\Controllers\ThermometerController;
-use App\Models\QcEquipment;
+use App\Http\Controllers\RoomEquipmentController;
+use App\Http\Controllers\ReportReCleanlinessController;
 
 Route::redirect('/', '/login');
 
@@ -256,5 +257,34 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
         });
 
+    // VERKEBRUANG MD ROUTES
+    Route::prefix('rooms')
+        ->name('rooms.')
+        ->controller(RoomEquipmentController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'storeRoom')->name('store');
+            Route::delete('/{uuid}', 'destroyRoom')->name('destroy');
+        });
+    Route::prefix('equipments')
+        ->name('equipments.')
+        ->controller(RoomEquipmentController::class)
+        ->group(function () {
+            Route::post('/', 'storeEquipment')->name('store');
+            Route::delete('/{uuid}', 'destroyEquipment')->name('destroy');
+        });
+
+    // REPORT RE ROUTES
+    Route::prefix('report-re-cleanliness')
+        ->name('report-re-cleanliness.')
+        ->controller(ReportReCleanlinessController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+        });
 
 });
