@@ -106,7 +106,10 @@
    <table style="width: 100%; border: none;">
         <tr style="border: none;">
             <td style="text-align: left; border: none;">
-              Hari/Tanggal: <span style="text-decoration: underline;"> {{ $report->date }}</span>
+                Hari/Tanggal:
+                <span style="text-decoration: underline;">
+                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
+                </span>
             </td>
             <td style="text-align: left; border: none;">
                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>

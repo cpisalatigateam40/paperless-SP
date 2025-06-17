@@ -1,0 +1,208 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Daftar Laporan Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan</h4>
+            <a href="{{ route('report-re-cleanliness.create') }}" class="btn btn-sm btn-primary">+ Buat Laporan</a>
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+                <div id="success-alert" class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div id="error-alert" class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Area</th>
+                        <th>Pemeriksa</th>
+                        <th>Dibuat</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($reports as $report)
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($report->date)->format('d/m/Y') }}</td>
+                            <td>{{ optional($report->area)->name }}</td>
+                            <td>{{ $report->created_by }}</td>
+                            <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>
+                            <td class="d-flex" style="gap: .3rem;">
+                                <button class="btn btn-sm btn-info" onclick="toggleDetail('{{ $report->uuid }}')">Lihat Detail</button>
+
+                                <form action="{{ route('report-re-cleanliness.destroy', $report->uuid) }}" method="POST" onsubmit="return confirm('Yakin hapus laporan ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger">Hapus</button>
+                                </form>
+
+                                <a href="{{ route('report-re-cleanliness.exportPdf', $report->uuid) }}"
+                                class="btn btn-sm btn-outline-secondary" target="_blank">
+                                🖨 Cetak PDF
+                                </a>
+
+                                @can('approve report')
+                                @if(!$report->approved_by)
+                                    <form action="{{ route('report-re-cleanliness.approve', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                @else
+                                    <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        Disetujui oleh {{ $report->approved_by }}
+                                    </span>
+                                @endif
+                                @else
+                                    @if($report->approved_by)
+                                        <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                            Disetujui oleh {{ $report->approved_by }}
+                                        </span>
+                                    @endif
+                                @endcan
+                            </td>
+                        </tr>
+                        {{-- Baris detail (ruangan & equipment) --}}
+                        <tr id="detail-{{ $report->uuid }}" style="display: none;">
+                            <td colspan="5">
+                                {{-- Detail Ruangan --}}
+                                <h6 style="font-weight: bold;">Pemeriksaan Ruangan</h6>
+                                <table class="table table-bordered table-sm mb-4 align-middle">
+                                    <thead class="align-middle text-center">
+                                        <tr>
+                                            <th rowspan="2" class="align-middle">No</th>
+                                            <th rowspan="2" class="align-middle">Area Produksi / Elemen</th>
+                                            <th colspan="2" class="align-middle">Kondisi</th>
+                                            <th rowspan="2" class="align-middle">Keterangan</th>
+                                            <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
+                                            <th rowspan="2" class="align-middle">Verifikasi Setelah Tindakan Koreksi</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Bersih</th>
+                                            <th>Kotor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $no = 1; @endphp
+                                        @foreach ($report->roomDetails->groupBy('room.name') as $roomName => $details)
+                                            {{-- Baris judul ruangan --}}
+                                            <tr>
+                                                <td class="text-center fw-bold">{{ $no++ }}</td>
+                                                <td class="fw-bold" colspan="7" style="font-weight: bold;">{{ strtoupper($roomName) }}</td>
+                                            </tr>
+
+                                            {{-- Baris elemen-elemen ruangan --}}
+                                            @foreach ($details as $detail)
+                                                <tr>
+                                                    <td></td> {{-- Kosongkan kolom No --}}
+                                                    <td>{{ optional($detail->element)->element_name }}</td>
+                                                    <td class="text-center">
+                                                        @if ($detail->condition === 'clean') ✔ @endif
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if ($detail->condition === 'dirty') ✔ @endif
+                                                    </td>
+                                                    <td>{{ $detail->notes }}</td>
+                                                    <td>{{ $detail->corrective_action }}</td>
+                                                    <td>{{ $detail->verification }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+
+
+                                </table>
+
+                                {{-- Detail Equipment --}}
+                                <h6 style="font-weight: bold;">Pemeriksaan Mesin & Peralatan</h6>
+                                <table class="table table-bordered table-sm align-middle">
+                                    <thead class="align-middle text-center">
+                                        <tr>
+                                            <th rowspan="2" class="align-middle">No</th>
+                                            <th rowspan="2" class="align-middle">Peralatan / Part</th>
+                                            <th colspan="2" class="align-middle">Kondisi</th>
+                                            <th rowspan="2" class="align-middle">Keterangan</th>
+                                            <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
+                                            <th rowspan="2" class="align-middle">Verifikasi Setelah Tindakan Koreksi</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Bersih</th>
+                                            <th>Kotor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $no = 1; @endphp
+                                        @foreach ($report->equipmentDetails->groupBy('equipment.name') as $equipmentName => $details)
+                                            {{-- Baris judul peralatan --}}
+                                            <tr>
+                                                <td class="text-center fw-bold">{{ $no++ }}</td>
+                                                <td class="fw-bold" colspan="6" style="font-weight: bold;">{{ strtoupper($equipmentName) }}</td>
+                                            </tr>
+
+                                            {{-- Baris part-part dari peralatan --}}
+                                            @foreach ($details as $detail)
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ optional($detail->part)->part_name }}</td>
+                                                    <td class="text-center">
+                                                        @if ($detail->condition === 'clean') ✔ @endif
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if ($detail->condition === 'dirty') ✔ @endif
+                                                    </td>
+                                                    <td>{{ $detail->notes }}</td>
+                                                    <td>{{ $detail->corrective_action }}</td>
+                                                    <td>{{ $detail->verification }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4">Belum ada laporan</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+@endsection
+
+@section('script')
+    <script>
+        $(document).ready(function () {
+            setTimeout(() => {
+                $('#success-alert').fadeOut('slow');
+                $('#error-alert').fadeOut('slow');
+            }, 3000);
+        });
+
+        function toggleDetail(uuid) {
+            const row = document.getElementById('detail-' + uuid);
+            if (row.style.display === 'none') {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    </script>
+@endsection

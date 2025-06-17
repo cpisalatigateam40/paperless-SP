@@ -9,10 +9,10 @@
             </tr>
             <tr>
                 <th colspan="3">Pemeriksaan Pukul:
-                    <input type="time" id="time1" value="08:00" class="form-control form-control-sm mt-1">
+                    <input type="time" id="time1" value="{{ \Carbon\Carbon::now()->format('H:i') }}" class="form-control form-control-sm mt-1" {{ $isEdit ? 'disabled' : '' }}>
                 </th>
                 <th colspan="3">Pemeriksaan Pukul:
-                    <input type="time" id="time2" value="14:00" class="form-control form-control-sm mt-1">
+                    <input type="time" id="time2" value="{{ \Carbon\Carbon::now()->format('H:i') }}" class="form-control form-control-sm mt-1" {{ !$isEdit ? 'disabled' : '' }}>
                 </th>
             </tr>
             <tr>
@@ -34,19 +34,19 @@
                             <option value="{{ $scale->uuid }}">{{ $scale->type }} - {{ $scale->code }}</option>
                         @endforeach
                     </select>
-                    <input type="hidden" name="data[0][time_1]" class="time1-input" value="08:00">
-                    <input type="hidden" name="data[0][time_2]" class="time2-input" value="14:00">
+                    <input type="hidden" name="data[0][time_1]" class="time1-input" value="08:00" {{ $isEdit ? 'disabled' : '' }}>
+                    <input type="hidden" name="data[0][time_2]" class="time2-input" value="14:00" {{ !$isEdit ? 'disabled' : '' }}>
                 </td>
 
                 {{-- Pemeriksaan Pukul 1 --}}
-                <td><input type="number" step="0.01" name="data[0][p1_1000]" class="form-control"></td>
-                <td><input type="number" step="0.01" name="data[0][p1_5000]" class="form-control"></td>
-                <td><input type="number" step="0.01" name="data[0][p1_10000]" class="form-control"></td>
+                <td><input type="number" step="0.01" name="data[0][p1_1000]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="data[0][p1_5000]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="data[0][p1_10000]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
 
                 {{-- Pemeriksaan Pukul 2 --}}
-                <td><input type="number" step="0.01" name="data[0][p2_1000]" class="form-control"></td>
-                <td><input type="number" step="0.01" name="data[0][p2_5000]" class="form-control"></td>
-                <td><input type="number" step="0.01" name="data[0][p2_10000]" class="form-control"></td>
+                <td><input type="number" step="0.01" name="data[0][p2_1000]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="data[0][p2_5000]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="data[0][p2_10000]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
 
                 {{-- Status --}}
                 <td>
@@ -82,15 +82,15 @@ document.getElementById('add-row').addEventListener('click', function () {
                     <option value="{{ $scale->uuid }}">{{ $scale->type }} - {{ $scale->code }}</option>
                 @endforeach
             </select>
-            <input type="hidden" name="data[${rowCount}][time_1]" class="time1-input" value="${time1}">
+            <input type="hidden" name="data[${rowCount}][time_1]" class="time1-input" value="${time1}" {{ $isEdit ? 'disabled' : '' }}>
             <input type="hidden" name="data[${rowCount}][time_2]" class="time2-input" value="${time2}">
         </td>
-        <td><input type="number" step="0.01" name="data[${rowCount}][p1_1000]" class="form-control"></td>
-        <td><input type="number" step="0.01" name="data[${rowCount}][p1_5000]" class="form-control"></td>
-        <td><input type="number" step="0.01" name="data[${rowCount}][p1_10000]" class="form-control"></td>
-        <td><input type="number" step="0.01" name="data[${rowCount}][p2_1000]" class="form-control"></td>
-        <td><input type="number" step="0.01" name="data[${rowCount}][p2_5000]" class="form-control"></td>
-        <td><input type="number" step="0.01" name="data[${rowCount}][p2_10000]" class="form-control"></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p1_1000]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p1_5000]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p1_10000]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p2_1000]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p2_5000]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
+        <td><input type="number" step="0.01" name="data[${rowCount}][p2_10000]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
         <td>
             <select name="data[${rowCount}][status]" class="form-select form-control">
                 <option value="1">OK</option>

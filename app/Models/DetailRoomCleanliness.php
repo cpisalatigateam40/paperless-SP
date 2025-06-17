@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
+
+
+class DetailRoomCleanliness extends Model
+{
+    use HasFactory;
+
+    protected $table = 'detail_room_cleanliness';
+
+    protected $fillable = [
+        'uuid',
+        'report_re_uuid',
+        'room_uuid',
+        'room_element_uuid',
+        'condition',
+        'notes',
+        'corrective_action',
+        'verification',
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->uuid = (string) Str::uuid();
+        });
+    }
+
+    public function report()
+    {
+        return $this->belongsTo(ReportReCleanliness::class, 'report_re_uuid', 'uuid');
+    }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_uuid', 'uuid');
+    }
+
+    public function element()
+    {
+        return $this->belongsTo(RoomElement::class, 'room_element_uuid', 'uuid');
+    }
+}

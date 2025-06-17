@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Laporan GMP</title>
+    <meta charset="UTF-8">
+    <title>Laporan Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -101,7 +101,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">KONTROL SANITASI</h3>
+    <h3 class="mb-2 text-center">VERIFIKASI KEBERSIHAN RUANGAN, MESIN, DAN PERALATAN</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -111,99 +111,111 @@
                     {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
                 </span>
             </td>
-            <td style="text-align: left; border: none;">
-               Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
         </tr>
     </table>
 
-    <h4>KEBERSIHAN KARYAWAN</h4>
-    <table>
-        <thead>
+    <h3>Pemeriksaan Ruangan</h3>
+    <table class="table table-bordered table-sm mb-4 align-middle">
+        <thead class="align-middle text-center">
             <tr>
-                <th>No.</th>
-                <th>Jam</th>
-                <th>Area</th>
-                <th>Nama Karyawan</th>
-                <th>Keterangan</th>
-                <th>Tindakan Koreksi</th>
-                <th>Verifikasi</th>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Area Produksi / Elemen</th>
+                <th colspan="2">Kondisi</th>
+                <th rowspan="2">Keterangan</th>
+                <th rowspan="2">Tindakan Koreksi</th>
+                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
+            </tr>
+            <tr>
+                <th>Bersih</th>
+                <th>Kotor</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $i => $detail)
-            <tr>
-                <td>{{ $i + 1 }}</td>
-                <td>{{ $detail->inspection_hour }}</td>
-                <td>{{ $detail->section_name }}</td>
-                <td>{{ $detail->employee_name }}</td>
-                <td>{{ $detail->notes }}</td>
-                <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verification ? '✔' : '✘' }}</td>
-            </tr>
+            @php $no = 1; @endphp
+            @foreach ($report->roomDetails->groupBy('room.name') as $roomName => $details)
+                {{-- Judul ruangan --}}
+                <tr>
+                    <td class="text-center fw-bold">{{ $no++ }}</td>
+                    <td class="fw-bold" colspan="6">{{ strtoupper($roomName) }}</td>
+                </tr>
+                {{-- Elemen --}}
+                @foreach ($details as $detail)
+                    <tr>
+                        <td></td>
+                        <td>{{ optional($detail->element)->element_name }}</td>
+                        <td class="text-center">
+                            @if ($detail->condition === 'clean') ✔ @endif
+                        </td>
+                        <td class="text-center">
+                            @if ($detail->condition === 'dirty') X @endif
+                        </td>
+                        <td>{{ $detail->notes }}</td>
+                        <td>{{ $detail->corrective_action }}</td>
+                        <td>{{ $detail->verification }}</td>
+                    </tr>
+                @endforeach
             @endforeach
         </tbody>
     </table>
-    <p>Ket : * meliput Boot, Seragam, Topi, Masker dan Sarung tangan.</p>
 
-    @if($report->sanitationCheck)
-        <h4>KONTROL SANITASI</h4>
-        @php
-            $firstCheck = $report->sanitationCheck->first();
-            $hour1 = $firstCheck?->hour_1 ?? 'Jam 1';
-            $hour2 = $firstCheck?->hour_2 ?? 'Jam 2';
-        @endphp
+    <h3>Pemeriksaan Mesin & Peralatan</h3>
+    <table class="table table-bordered table-sm align-middle">
+        <thead class="align-middle text-center">
+            <tr>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Peralatan / Part</th>
+                <th colspan="2">Kondisi</th>
+                <th rowspan="2">Keterangan</th>
+                <th rowspan="2">Tindakan Koreksi</th>
+                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
+            </tr>
+            <tr>
+                <th>Bersih</th>
+                <th>Kotor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $no = 1; @endphp
+            @foreach ($report->equipmentDetails->groupBy('equipment.name') as $equipmentName => $details)
+                <tr>
+                    <td class="text-center fw-bold">{{ $no++ }}</td>
+                    <td class="fw-bold" colspan="6">{{ strtoupper($equipmentName) }}</td>
+                </tr>
+                @foreach ($details as $detail)
+                    <tr>
+                        <td></td>
+                        <td>{{ optional($detail->part)->part_name }}</td>
+                        <td class="text-center">
+                            @if ($detail->condition === 'clean') ✔ @endif
+                        </td>
+                        <td class="text-center">
+                            @if ($detail->condition === 'dirty') X @endif
+                        </td>
+                        <td>{{ $detail->notes }}</td>
+                        <td>{{ $detail->corrective_action }}</td>
+                        <td>{{ $detail->verification }}</td>
+                    </tr>
+                @endforeach
+            @endforeach
+            <tr>
+                <td colspan="7" style="text-align: right; border: none;">QM 01 / 05</td>
+            </tr>
+        </tbody>
+    </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th rowspan="3">No</th>
-                    <th rowspan="3">Area</th>
-                    <th rowspan="3">Std Klorin (ppm)</th>
-                    <th colspan="4">Hasil Pengecekan</th>
-                    <th rowspan="3">Keterangan</th>
-                    <th rowspan="3">Tindakan Koreksi</th>
-                    <th rowspan="3">Verifikasi</th>
-                </tr>
-                <tr>
-                    <th colspan="2">Jam 1: {{ $hour1 }}</th>
-                    <th colspan="2">Jam 2: {{ $hour2 }}</th>
-                </tr>
-                <tr>
-                    <th>Kadar klorin (ppm)</th>
-                    <th>Suhu (°C)</th>
-                    <th>Kadar klorin (ppm)</th>
-                    <th>Suhu (°C)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $no = 1; @endphp
-                
-                    @foreach($report->sanitationCheck->sanitationArea as $area)
-                        @php
-                            $jam1 = $area->sanitationResult->firstWhere('hour_to', 1);
-                            $jam2 = $area->sanitationResult->firstWhere('hour_to', 2);
-                        @endphp
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            <td>{{ $area->area_name }}</td>
-                            <td>{{ $area->chlorine_std }}</td>
-                            <td>{{ $jam1?->chlorine_level ?? '-' }}</td>
-                            <td>{{ $jam1?->temperature ?? '-' }}</td>
-                            <td>{{ $jam2?->chlorine_level ?? '-' }}</td>
-                            <td>{{ $jam2?->temperature ?? '-' }}</td>
-                            <td>{{ $area->notes ?? '-' }}</td>
-                            <td>{{ $area->corrective_action ?? '-' }}</td>
-                            <td>{{ $report->sanitationCheck->verification ? '✔' : '✘' }}</td>
-                        </tr>
-                    @endforeach
-                
-                <tr>
-                    <td colspan="10" style="text-align: right; border: none;">QM 02 / 00</td>
-                </tr>
-            </tbody>
-        </table>
-    @endif
+    <p><strong>Keterangan:</strong></p>
+    <ul style="list-style: none; padding-left: 0;">
+        <li>✔ : Bersih dan bebas material non halal</li>
+        <li>x : Kotor</li>
+    </ul>
+
+    <ol style="padding-left: 1.2rem;">
+        <li>Berdebu</li>
+        <li>Noda (karat, cat atau sejenisnya)</li>
+        <li>Endapan kotoran</li>
+        <li>Pertumbuhan mikroorganisme (jamur, bau busuk)</li>
+        <li>Becek/menggenang</li>
+    </ol>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
@@ -232,5 +244,6 @@
             </td>
         </tr>
     </table>
+
 </body>
 </html>

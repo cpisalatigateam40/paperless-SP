@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Area extends Model
 {
@@ -51,5 +52,15 @@ class Area extends Model
     public function fragileItems()
     {
         return $this->hasMany(FragileItem::class, 'area_uuid', 'uuid');
+    }
+
+    public function rooms(): HasMany
+    {
+        return $this->hasMany(Room::class, 'area_uuid', 'uuid');
+    }
+
+    public function equipments(): HasMany
+    {
+        return $this->hasMany(Equipment::class, 'area_uuid', 'uuid');
     }
 }
