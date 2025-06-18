@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Laporan Pemeriksaan</title>
+    <title>Laporan Pemeriksaan Kebersihan dan Sanitasi Setelah Perbaikan Mesin</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -102,9 +101,9 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">LAPORAN PEMERIKSAAN TIMBANGAN & THERMOMETER</h3>
+    <h3 class="mb-4 text-center">PEMERIKSAAN KEBERSIHAN DAN SANITASI SETELAH PERBAIKAN MESIN</h3>
 
-   <table style="width: 100%; border: none;">
+    <table style="width: 100%; border: none;">
         <tr style="border: none;">
             <td style="text-align: left; border: none;">
                 Hari/Tanggal:
@@ -118,108 +117,54 @@
         </tr>
     </table>
 
-    {{-- Timbangan --}}
-    <h5>1.PEMERIKSAAN TIMBANGAN</h5>
+    <br>
+
     <table>
         <thead>
             <tr>
-                <th rowspan="3">No</th>
-                <th rowspan="3">Jenis dan Kode Timbangan</th>
-                <th colspan="3">
-                    Pemeriksaan Pukul:
-                    {{ optional($report->details->pluck('time_1')->filter()->first()) ? \Carbon\Carbon::parse($report->details->pluck('time_1')->filter()->first())->format('H:i') : '-' }}
-                </th>
-                <th colspan="3">
-                    Pemeriksaan Pukul:
-                    {{ optional($report->details->pluck('time_2')->filter()->last()) ? \Carbon\Carbon::parse($report->details->pluck('time_2')->filter()->last())->format('H:i') : '-' }}
-                </th>
+                <th rowspan="3">Mesin / Peralatan</th>
+                <th rowspan="3">Jenis Perbaikan</th>
+                <th rowspan="3">Area</th>
+                <th colspan="4">Kondisi Mesin Setelah Perbaikan</th>
                 <th rowspan="3">Keterangan</th>
             </tr>
             <tr>
-                <th colspan="3">Standart Berat</th>
-                <th colspan="3">Standart Berat</th>
+                <th colspan="2">Kebersihan</th>
+                <th colspan="2">Spare Part yang</th>
             </tr>
             <tr>
-                <th>1000 Gr</th>
-                <th>5000 Gr</th>
-                <th>10000 Gr</th>
-                <th>1000 Gr</th>
-                <th>5000 Gr</th>
-                <th>10000 Gr</th>
+                <th>Bersih</th>
+                <th>Kotor</th>
+                <th>Ada</th>
+                <th>Tidak Ada</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $i => $d)
-                @php
-                    $m1 = $d->measurements->where('inspection_time_index', 1)->keyBy('standard_weight');
-                    $m2 = $d->measurements->where('inspection_time_index', 2)->keyBy('standard_weight');
-                @endphp
-                <tr>
-                    <td>{{ $i+1 }}</td>
-                    <td>{{ $d->scale->type ?? '' }} - {{ $d->scale->code ?? '' }}</td>
-                    <td>{{ $m1->get(1000)->measured_value ?? '' }}</td>
-                    <td>{{ $m1->get(5000)->measured_value ?? '' }}</td>
-                    <td>{{ $m1->get(10000)->measured_value ?? '' }}</td>
-                    <td>{{ $m2->get(1000)->measured_value ?? '' }}</td>
-                    <td>{{ $m2->get(5000)->measured_value ?? '' }}</td>
-                    <td>{{ $m2->get(10000)->measured_value ?? '' }}</td>
-                    <td>{{ $d->notes }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    {{-- Thermometer --}}
-    <h5 style="margin-top:30px;">2.PEMERIKSAAN THERMOMETER</h5>
-    <table>
-        <thead>
+            @foreach ($report->details as $detail)
             <tr>
-                <th rowspan="3">No</th>
-                <th rowspan="3">Jenis dan Kode Timbangan</th>
-                <th colspan="2">
-                    Pemeriksaan Pukul:
-                    {{ optional($report->thermometerDetails->pluck('time_1')->filter()->first()) ? \Carbon\Carbon::parse($report->thermometerDetails->pluck('time_1')->filter()->first())->format('H:i') : '-' }}
-                </th>
-                <th colspan="2">
-                    Pemeriksaan Pukul:
-                    {{ optional($report->thermometerDetails->pluck('time_2')->filter()->last()) ? \Carbon\Carbon::parse($report->thermometerDetails->pluck('time_2')->filter()->last())->format('H:i') : '-' }}
-                </th>
-                <th rowspan="3">Keterangan</th>
+                <td>{{ mb_convert_encoding($detail->equipment->name ?? '-', 'UTF-8', 'UTF-8') }}</td>
+                <td>{{ mb_convert_encoding($detail->repair_type ?? '-', 'UTF-8', 'UTF-8') }}</td>
+                <td>{{ mb_convert_encoding($detail->section->section_name ?? '-', 'UTF-8', 'UTF-8') }}</td>
+                <td class="text-center">
+                    {!! $detail->clean_condition === 'bersih' ? '&#10003;' : '' !!} {{-- ✓ --}}
+                </td>
+                <td class="text-center">
+                    {!! $detail->clean_condition === 'kotor' ? '&#10007;' : '' !!} {{-- ✗ --}}
+                </td>
+                <td class="text-center">
+                    {!! $detail->spare_part_left === 'ada' ? '&#10003;' : '' !!} {{-- ✓ --}}
+                </td>
+                <td class="text-center">
+                    {!! $detail->spare_part_left === 'tidak ada' ? '&#10007;' : '' !!} {{-- ✗ --}}
+                </td>
+                <td>{{ mb_convert_encoding($detail->notes ?? '-', 'UTF-8', 'UTF-8') }}</td>
             </tr>
-            <tr>
-                <th colspan="2">Standart Suhu</th>
-                <th colspan="2">Standart Suhu</th>
-            </tr>
-            <tr>
-                <th>0°C</th>
-                <th>100°C</th>
-                <th>0°C</th>
-                <th>100°C</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($report->thermometerDetails as $i => $d)
-                @php
-                    $m1 = $d->measurements->where('inspection_time_index', 1)->keyBy('standard_temperature');
-                    $m2 = $d->measurements->where('inspection_time_index', 2)->keyBy('standard_temperature');
-                @endphp
-                <tr>
-                    <td>{{ $i+1 }}</td>
-                    <td>{{ $d->thermometer->type ?? '' }} - {{ $d->thermometer->code ?? '' }}</td>
-                    <td>{{ $m1->get(0)->measured_value ?? '' }}</td>
-                    <td>{{ $m1->get(100)->measured_value ?? '' }}</td>
-                    <td>{{ $m2->get(0)->measured_value ?? '' }}</td>
-                    <td>{{ $m2->get(100)->measured_value ?? '' }}</td>
-                    <td>{{ $d->note }}</td>
-                </tr>
             @endforeach
             <tr>
-                <td colspan="7" style="text-align: right; border: none;">QM 16 / 00</td>
+                <td colspan="8" style="text-align: right; border: none;">QM 22 / 00</td>
             </tr>
         </tbody>
     </table>
-
-    <p>Ket : √ = Ok <br> X = Tidak OK</p>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
@@ -248,5 +193,6 @@
             </td>
         </tr>
     </table>
+
 </body>
 </html>

@@ -20,6 +20,9 @@ use App\Http\Controllers\ReportScaleController;
 use App\Http\Controllers\ThermometerController;
 use App\Http\Controllers\RoomEquipmentController;
 use App\Http\Controllers\ReportReCleanlinessController;
+use App\Http\Controllers\ReportRepairCleanlinessController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReportConveyorCleanlinessController;
 
 Route::redirect('/', '/login');
 
@@ -285,6 +288,49 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+        });
+
+    // REPORT REPAIR CLEANLINESS ROUTES
+    Route::prefix('repair-cleanliness')
+        ->name('repair-cleanliness.')
+        ->controller(ReportRepairCleanlinessController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'createDetail')->name('add-detail');
+            Route::post('/store-detail', 'storeDetail')->name('store-detail');
+            Route::get('/{uuid}/export', 'exportPdf')->name('export');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+        });
+
+    // MD PRODUCT
+    Route::prefix('products')
+        ->name('products.')
+        ->controller(ProductController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+        });
+
+    // REPORT CONVEYOR
+    Route::prefix('report-conveyor-cleanliness')
+        ->name('report-conveyor-cleanliness.')
+        ->controller(ReportConveyorCleanlinessController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetail')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
         });
 
 });

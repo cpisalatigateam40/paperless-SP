@@ -32,4 +32,14 @@ class Section extends Model
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
+
+    public function cleanlinessDetails()
+    {
+        return $this->hasMany(DetailRepairCleanliness::class, 'section_uuid', 'uuid');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(ReportConveyorCleanliness::class, 'section_uuid', 'uuid');
+    }
 }
