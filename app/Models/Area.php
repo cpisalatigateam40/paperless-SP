@@ -63,4 +63,19 @@ class Area extends Model
     {
         return $this->hasMany(Equipment::class, 'area_uuid', 'uuid');
     }
+
+    public function repairReports()
+    {
+        return $this->hasMany(ReportRepairCleanliness::class, 'area_uuid', 'uuid');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'area_uuid', 'uuid');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(ReportConveyorCleanliness::class, 'area_uuid', 'uuid');
+    }
 }

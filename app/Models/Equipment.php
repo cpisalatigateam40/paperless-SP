@@ -31,4 +31,9 @@ class Equipment extends Model
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
+
+    public function cleanlinessDetails()
+    {
+        return $this->hasMany(DetailRepairCleanliness::class, 'equipment_uuid', 'uuid');
+    }
 }

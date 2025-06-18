@@ -54,13 +54,14 @@
                     <a class="collapse-item" href="{{ route('users.index') }}">User</a>
                 @endcan
                 <a class="collapse-item" href="{{ route('areas.index') }}">Area</a>
-                {{-- <a class="collapse-item" href="{{ route('sections.index') }}">Section</a> --}}
+                <a class="collapse-item" href="{{ route('sections.index') }}">Section</a>
                 <a class="collapse-item" href="{{ route('raw-materials.index') }}">Raw Material</a>
                 <a class="collapse-item" href="{{ route('fragile-item.index') }}">Fragile Item</a>
                 <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a>
                 <a class="collapse-item" href="{{ route('scales.index') }}">Timbangan</a>
                 <a class="collapse-item" href="{{ route('thermometers.index') }}">Thermometer</a>
                 <a class="collapse-item" href="{{ route('rooms.index') }}">Ruangan, Mesin, dan Peralatan</a>
+                <a class="collapse-item" href="{{ route('products.index') }}">Produk</a>
             </div>
         </div>
     </li>
@@ -117,6 +118,14 @@
 
                 <a class="collapse-item" href="{{ route('report-re-cleanliness.index') }}">
                     Report Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan
+                </a>
+
+                <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">
+                    Report Pemeriksaan dan Sanitasi Setelah Perbaikan Mesin
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-conveyor-cleanliness.index') }}">
+                    Report Pemeriksaan Kebersihan Conveyor Packing
                 </a>
             </div>
         </div>
