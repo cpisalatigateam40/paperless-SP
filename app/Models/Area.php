@@ -78,4 +78,9 @@ class Area extends Model
     {
         return $this->hasMany(ReportConveyorCleanliness::class, 'area_uuid', 'uuid');
     }
+
+    public function reportSolvents()
+    {
+        return $this->hasMany(ReportSolvent::class, 'area_uuid', 'uuid');
+    }
 }

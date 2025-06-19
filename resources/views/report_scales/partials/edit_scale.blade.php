@@ -6,11 +6,11 @@
                 <th>Jenis & Kode Timbangan</th>
                 <th colspan="3">
                     Pemeriksaan Pukul:
-                    <input type="time" id="edit-time1" value="{{ $details->first()?->time_1 ? date('H:i', strtotime($details->first()->time_1)) : '08:00' }}" class="form-control form-control-sm mt-1">
+                    <input type="time" id="scale-time1" value="{{ $details->first()?->time_1 ? date('H:i', strtotime($details->first()->time_1)) : now()->format('H:i') }}" class="form-control form-control-sm mt-1">
                 </th>
                 <th colspan="3">
                     Pemeriksaan Pukul:
-                    <input type="time" id="edit-time2" value="{{ $details->first()?->time_2 ? date('H:i', strtotime($details->first()->time_2)) : '14:00' }}" class="form-control form-control-sm mt-1">
+                    <input type="time" id="scale-time2" value="{{ $details->first()?->time_2 ? date('H:i', strtotime($details->first()->time_2)) : now()->format('H:i') }}" class="form-control form-control-sm mt-1">
                 </th>
                 <th>Keterangan</th>
             </tr>
@@ -67,18 +67,3 @@
         </tbody>
     </table>
 </div>
-
-<script>
-    const updateAllTimes = () => {
-        const t1 = document.getElementById('edit-time1').value;
-        const t2 = document.getElementById('edit-time2').value;
-
-        document.querySelectorAll('.time1-hidden').forEach(input => input.value = t1);
-        document.querySelectorAll('.time2-hidden').forEach(input => input.value = t2);
-    };
-
-    document.getElementById('edit-time1').addEventListener('change', updateAllTimes);
-    document.getElementById('edit-time2').addEventListener('change', updateAllTimes);
-
-    updateAllTimes();
-</script>

@@ -23,6 +23,7 @@ use App\Http\Controllers\ReportReCleanlinessController;
 use App\Http\Controllers\ReportRepairCleanlinessController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportConveyorCleanlinessController;
+use App\Http\Controllers\ReportSolventController;
 
 Route::redirect('/', '/login');
 
@@ -331,6 +332,25 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetail')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
+
+    // REPORT SOLVENT
+    Route::prefix('report-solvents')
+        ->name('report-solvents.')
+        ->controller(ReportSolventController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
 
 });

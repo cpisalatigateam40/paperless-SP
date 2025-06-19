@@ -50,11 +50,35 @@
                             <td>
                                 <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $report->id }}">Lihat Detail</button>
 
+                                <a href="{{ route('report-conveyor-cleanliness.edit', $report->uuid) }}" class="btn btn-sm btn-warning">
+                                    Update Laporan
+                                </a>
+
                                 <form action="{{ route('report-conveyor-cleanliness.destroy', $report->uuid) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Hapus laporan ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
                                 </form>
+                                <a href="{{ route('report-conveyor-cleanliness.export-pdf', $report->uuid) }}" target="_blank" class="btn btn-sm btn-outline-secondary">🖨 Cetak PDF</a>
+
+                                @can('approve report')
+                                @if(!$report->approved_by)
+                                    <form action="{{ route('report-conveyor-cleanliness.approve', $report->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                @else
+                                    <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        Disetujui oleh {{ $report->approved_by }}
+                                    </span>
+                                @endif
+                                @else
+                                    @if($report->approved_by)
+                                        <span class="badge bg-success" style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                            Disetujui oleh {{ $report->approved_by }}
+                                        </span>
+                                    @endif
+                                @endcan
                             </td>
                         </tr>
 
@@ -82,14 +106,11 @@
                                     <tbody>
                                         @php $grouped = $report->machines->chunk(4); @endphp
                                         @foreach ($grouped as $groupIndex => $group)
-                                            @foreach ($group as $i => $machine)
+                                            @php $innerIndex = 0; @endphp
+                                            @foreach ($group as $machine)
                                                 <tr>
-                                                    <td>{{ $i === 0 ? $groupIndex + 1 : '' }}</td>
-                                                    <td>
-                                                        @if ($i === 0)
-                                                            {{ $group[0]->time ? \Illuminate\Support\Carbon::parse($group[0]->time)->format('H:i') : '-' }}
-                                                        @endif
-                                                    </td>
+                                                    <td>{{ $innerIndex === 0 ? $groupIndex + 1 : '' }}</td>
+                                                    <td>{{ $machine->time ? \Illuminate\Support\Carbon::parse($machine->time)->format('H:i') : '-' }}</td>
                                                     <td class="text-start">{{ $machine->machine_name }}</td>
                                                     <td>{!! $machine->status === 'bersih' ? '✓' : '' !!}</td>
                                                     <td>{!! $machine->status === 'kotor' ? 'X' : '' !!}</td>
@@ -99,9 +120,11 @@
                                                     <td>{!! $machine->qc_check ? '✓' : '' !!}</td>
                                                     <td>{!! $machine->kr_check ? '✓' : '' !!}</td>
                                                 </tr>
+                                                @php $innerIndex++; @endphp
                                             @endforeach
                                         @endforeach
                                     </tbody>
+
                                 </table>
                                 <div class="d-flex justify-content-end mt-3">
                                     <a href="{{ route('report-conveyor-cleanliness.add-detail', $report->uuid) }}" class="btn btn-sm btn-primary">

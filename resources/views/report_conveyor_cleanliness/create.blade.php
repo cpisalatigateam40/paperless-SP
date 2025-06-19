@@ -12,7 +12,6 @@
 
                 {{-- HEADER --}}
                 <div style="margin-bottom: 3rem;">
-                    <h5>Informasi Umum</h5>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label>Tanggal</label>
@@ -67,13 +66,8 @@
                                 <tr>
                                     <td>{{ $i === 0 ? 1 : '' }}</td>
 
-                                    {{-- Pukul hanya di baris pertama --}}
                                     <td>
-                                        @if ($i === 0)
-                                            <input type="time" name="machines[{{ $i }}][time]" class="form-control">
-                                        @else
-                                            <input type="hidden" name="machines[{{ $i }}][time]" value="">
-                                        @endif
+                                        <input type="time" name="machines[{{ $i }}][time]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                                     </td>
 
                                     <td class="text-start">

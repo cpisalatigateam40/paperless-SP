@@ -127,6 +127,10 @@
                 <a class="collapse-item" href="{{ route('report-conveyor-cleanliness.index') }}">
                     Report Pemeriksaan Kebersihan Conveyor Packing
                 </a>
+
+                <a class="collapse-item" href="{{ route('report-solvents.index') }}">
+                    Report Pembuatan Larutan Cleaning dan Sanitasi
+                </a>
             </div>
         </div>
     </li>
