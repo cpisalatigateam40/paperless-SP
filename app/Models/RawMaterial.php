@@ -28,4 +28,9 @@ class RawMaterial extends Model
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
+
+    public function detailArrivals()
+    {
+        return $this->hasMany(DetailRmArrival::class, 'raw_material_uuid', 'uuid');
+    }
 }

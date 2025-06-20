@@ -83,4 +83,9 @@ class Area extends Model
     {
         return $this->hasMany(ReportSolvent::class, 'area_uuid', 'uuid');
     }
+
+    public function reportRmArrivals()
+    {
+        return $this->hasMany(ReportRmArrival::class, 'area_uuid', 'uuid');
+    }
 }

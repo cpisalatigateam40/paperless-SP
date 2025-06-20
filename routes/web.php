@@ -24,6 +24,7 @@ use App\Http\Controllers\ReportRepairCleanlinessController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportConveyorCleanlinessController;
 use App\Http\Controllers\ReportSolventController;
+use App\Http\Controllers\ReportRmArrivalController;
 
 Route::redirect('/', '/login');
 
@@ -353,4 +354,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
 
+    // REPORT RM ARRIVAL
+    Route::prefix('report-rm-arrivals')
+        ->name('report_rm_arrivals.')
+        ->controller(ReportRmArrivalController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+        });
 });
