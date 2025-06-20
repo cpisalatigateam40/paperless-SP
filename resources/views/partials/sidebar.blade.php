@@ -51,7 +51,7 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
                 @can('user view')
-                    <a class="collapse-item" href="{{ route('users.index') }}">User</a>
+                <a class="collapse-item" href="{{ route('users.index') }}">User</a>
                 @endcan
                 <a class="collapse-item" href="{{ route('areas.index') }}">Area</a>
                 <a class="collapse-item" href="{{ route('sections.index') }}">Section</a>
@@ -68,19 +68,19 @@
 
     <!-- access control -->
     @can('user view')
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-wrench"></i>
-                <span>Access Control</span>
-            </a>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="soft-salmon py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ route('roles.index') }}">Role</a>
-                    <a class="collapse-item" href="{{ route('permissions.index') }}">Permission</a>
-                </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+            aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-wrench"></i>
+            <span>Access Control</span>
+        </a>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('roles.index') }}">Role</a>
+                <a class="collapse-item" href="{{ route('permissions.index') }}">Permission</a>
             </div>
-        </li>
+        </div>
+    </li>
     @endcan
 
     <!-- Divider -->
@@ -99,7 +99,7 @@
             <span>Pemeriksaan Kondisi Area, GMP Karyawan, dan Kontrol Sanitasi</span>
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-           <div class="soft-salmon py-2 collapse-inner rounded">
+            <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('cleanliness.index') }}">
                     Report kebersihan area penyimpanan bahan
                 </a>
@@ -142,13 +142,28 @@
             <span>Pemeriksaan Peralatan QC</span>
         </a>
         <div id="collapsePagesQc" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-           <div class="soft-salmon py-2 collapse-inner rounded">
+            <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">
                     Report Inventaris QC
                 </a>
 
                 <a class="collapse-item" href="{{ route('report-scales.index') }}">
                     Report Timbangan & Thermometer
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesRm"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-boxes"></i>
+            <span>Raw Material & Packaging</span>
+        </a>
+        <div id="collapsePagesRm" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report_rm_arrivals.index') }}">
+                    Pemeriksaan Kedatangan Bahan Baku Chillroom
                 </a>
             </div>
         </div>
