@@ -19,13 +19,8 @@
                     <input type="text" name="supplier" id="supplier" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label for="area_uuid" class="form-label">Area</label>
-                    <select name="area_uuid" id="area_uuid" class="form-control">
-                        <option value="">-- Pilih Area --</option>
-                        @foreach($areas as $area)
-                        <option value="{{ $area->uuid }}">{{ $area->name }}</option>
-                        @endforeach
-                    </select>
+                    <label for="shelf_life" class="form-label">Batas Kadaluarsa (Bulan)</label>
+                    <input type="number" name="shelf_life" id="shelf_life" class="form-control" min="0">
                 </div>
                 <button type="submit" class="btn btn-primary">Simpan</button>
                 <a href="{{ route('raw-materials.index') }}" class="btn btn-secondary">Kembali</a>

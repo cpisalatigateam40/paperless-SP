@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\RawMaterial;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class RawMaterialSeeder extends Seeder
 {
@@ -23,6 +23,7 @@ class RawMaterialSeeder extends Seeder
                 'uuid' => Str::uuid(),
                 'material_name' => 'Material ' . $i,
                 'supplier' => $suppliers[array_rand($suppliers)],
+                'shelf_life' => rand(1, 12),
                 'area_uuid' => $areaUuids[array_rand($areaUuids)] ?? null,
             ]);
         }

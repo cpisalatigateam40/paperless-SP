@@ -88,4 +88,14 @@ class Area extends Model
     {
         return $this->hasMany(ReportRmArrival::class, 'area_uuid', 'uuid');
     }
+
+    public function premixes()
+    {
+        return $this->hasMany(Premix::class, 'area_uuid', 'uuid');
+    }
+
+    public function reportPremixes()
+    {
+        return $this->hasMany(ReportPremix::class, 'area_uuid', 'uuid');
+    }
 }

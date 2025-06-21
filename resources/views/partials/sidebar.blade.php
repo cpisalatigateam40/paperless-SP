@@ -1,15 +1,15 @@
 <style>
-    .collapse-item {
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-        margin-bottom: .2rem !important;
-    }
+.collapse-item {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    margin-bottom: .2rem !important;
+}
 
-    .collapse-inner {
-        overflow: hidden !important;
-        padding: 0.5rem !important;
-    }
+.collapse-inner {
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+}
 </style>
 
 <!-- Sidebar -->
@@ -43,8 +43,8 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-            aria-expanded="true" aria-controls="collapseTwo">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
+            aria-controls="collapseTwo">
             <i class="fas fa-database"></i>
             <span>Master data</span>
         </a>
@@ -62,6 +62,9 @@
                 <a class="collapse-item" href="{{ route('thermometers.index') }}">Thermometer</a>
                 <a class="collapse-item" href="{{ route('rooms.index') }}">Ruangan, Mesin, dan Peralatan</a>
                 <a class="collapse-item" href="{{ route('products.index') }}">Produk</a>
+                <a class="collapse-item" href="{{ route('premixes.index') }}">
+                    Premix
+                </a>
             </div>
         </div>
     </li>
@@ -69,8 +72,8 @@
     <!-- access control -->
     @can('user view')
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-            aria-expanded="true" aria-controls="collapseTwo">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true"
+            aria-controls="collapseTwo">
             <i class="fas fa-wrench"></i>
             <span>Access Control</span>
         </a>
@@ -93,8 +96,8 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-            aria-expanded="true" aria-controls="collapsePages">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
+            aria-controls="collapsePages">
             <i class="fas fa-fw fa-recycle"></i>
             <span>Pemeriksaan Kondisi Area, GMP Karyawan, dan Kontrol Sanitasi</span>
         </a>
@@ -164,6 +167,9 @@
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('report_rm_arrivals.index') }}">
                     Pemeriksaan Kedatangan Bahan Baku Chillroom
+                </a>
+                <a class="collapse-item" href="{{ route('report-premixes.index') }}">
+                    Pemeriksaan Premix
                 </a>
             </div>
         </div>

@@ -25,6 +25,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportConveyorCleanlinessController;
 use App\Http\Controllers\ReportSolventController;
 use App\Http\Controllers\ReportRmArrivalController;
+use App\Http\Controllers\PremixController;
+use App\Http\Controllers\ReportPremixController;
 
 Route::redirect('/', '/login');
 
@@ -363,5 +365,29 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetail')->name('add_detail');
+            Route::post('/{uuid}/store-detail', 'storeDetail')->name('store_detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
+
+    // MD PREMIX
+    Route::prefix('premixes')->name('premixes.')->controller(PremixController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+    });
+
+    // REPORT PREMIX
+    Route::prefix('report-premixes')->name('report-premixes.')->controller(ReportPremixController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+    });
 });

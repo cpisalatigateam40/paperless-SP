@@ -13,29 +13,26 @@
                 @method('PUT')
                 <div class="mb-3">
                     <label for="material_name" class="form-label">Nama Material</label>
-                    <input type="text" name="material_name" id="material_name" class="form-control" value="{{ $rawMaterial->material_name }}" required>
+                    <input type="text" name="material_name" id="material_name" class="form-control"
+                        value="{{ $rawMaterial->material_name }}" required>
                 </div>
+
                 <div class="mb-3">
                     <label for="supplier" class="form-label">Produsen</label>
-                    <input type="text" name="supplier" id="supplier" class="form-control" value="{{ $rawMaterial->supplier }}">
+                    <input type="text" name="supplier" id="supplier" class="form-control"
+                        value="{{ $rawMaterial->supplier }}">
                 </div>
+
                 <div class="mb-3">
-                    <label for="area_uuid" class="form-label">Area</label>
-                    <select name="area_uuid" id="area_uuid" class="form-control">
-                        <option value="">-- Pilih Area --</option>
-                        @foreach($areas as $area)
-                        <option value="{{ $area->uuid }}" {{ $area->uuid === $rawMaterial->area_uuid ? 'selected' : '' }}>
-                            {{ $area->name }}
-                        </option>
-                        @endforeach
-                    </select>
+                    <label for="shelf_life" class="form-label">Batas Kadaluarsa (Bulan)</label>
+                    <input type="number" name="shelf_life" id="shelf_life" class="form-control"
+                        value="{{ $rawMaterial->shelf_life }}">
                 </div>
+
                 <button type="submit" class="btn btn-primary">Update</button>
                 <a href="{{ route('raw-materials.index') }}" class="btn btn-secondary">Kembali</a>
             </form>
         </div>
     </div>
 </div>
-
-
 @endsection
