@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\RawMaterial;
 use App\Models\Area;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RawMaterialController extends Controller
 {
@@ -25,10 +27,17 @@ class RawMaterialController extends Controller
         $request->validate([
             'material_name' => 'required|string|max:255',
             'supplier' => 'nullable|string|max:255',
-            'area_uuid' => 'nullable|exists:areas,uuid',
+            'shelf_life' => 'nullable|integer|min:0',
         ]);
 
-        RawMaterial::create($request->all());
+        RawMaterial::create([
+            'uuid' => Str::uuid(),
+            'material_name' => $request->material_name,
+            'supplier' => $request->supplier,
+            'shelf_life' => $request->shelf_life,
+            'area_uuid' => Auth::user()->area_uuid,
+        ]);
+
         return redirect()->route('raw-materials.index')->with('success', 'Data berhasil ditambahkan.');
     }
 
@@ -44,14 +53,21 @@ class RawMaterialController extends Controller
         $request->validate([
             'material_name' => 'required|string|max:255',
             'supplier' => 'nullable|string|max:255',
-            'area_uuid' => 'nullable|exists:areas,uuid',
+            'shelf_life' => 'nullable|integer|min:0',
         ]);
 
         $rawMaterial = RawMaterial::where('uuid', $uuid)->firstOrFail();
-        $rawMaterial->update($request->all());
+
+        $rawMaterial->update([
+            'material_name' => $request->material_name,
+            'supplier' => $request->supplier,
+            'shelf_life' => $request->shelf_life,
+            'area_uuid' => $request->area_uuid ?? Auth::user()->area_uuid,
+        ]);
 
         return redirect()->route('raw-materials.index')->with('success', 'Data berhasil diperbarui.');
     }
+
 
     public function destroy($uuid)
     {

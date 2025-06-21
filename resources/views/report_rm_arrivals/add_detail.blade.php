@@ -4,28 +4,16 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h5>Tambah Laporan Kedatangan Bahan Baku</h5>
+            <h5>Tambah Pemeriksaan untuk Laporan Tanggal
+                {{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }} (Shift {{ $report->shift }})
+            </h5>
         </div>
 
         <div class="card-body">
-            <form method="POST" action="{{ route('report_rm_arrivals.store') }}">
+            <form method="POST" action="{{ route('report_rm_arrivals.store_detail', $report->uuid) }}">
                 @csrf
 
-                <div class="row mb-5">
-                    <div class="col-md-4">
-                        <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control"
-                            value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" required>
-                    </div>
-                </div>
-
-                <h5>Detail Pemeriksaan</h5>
                 <div id="detail-container">
-                    {{-- Baris pertama default --}}
                     <div class="detail-row mb-3 p-3 border rounded bg-light">
                         <div class="row align-items-end">
                             <div class="col-md-3">
@@ -68,34 +56,28 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <label class="form-label">Problem</label>
-                                <textarea name="details[0][problem]" class="form-control" rows="2"
-                                    placeholder="Jika ada masalah, tulis di sini..."></textarea>
+                                <textarea name="details[0][problem]" class="form-control" rows="2"></textarea>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Tindakan Koreksi</label>
-                                <textarea name="details[0][corrective_action]" class="form-control" rows="2"
-                                    placeholder="Langkah yang dilakukan..."></textarea>
+                                <textarea name="details[0][corrective_action]" class="form-control" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Tombol Tambah --}}
-                <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">
-                    + Tambah Pemeriksaan
-                </button>
-
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Simpan Laporan</button>
-                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">+ Tambah Baris
+                    Pemeriksaan</button>
+                <button type="submit" class="btn btn-success">Simpan Pemeriksaan</button>
+                <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-secondary">Kembali</a>
             </form>
         </div>
     </div>
 </div>
 
-{{-- TEMPLATE TERSEMBUNYI --}}
+{{-- TEMPLATE --}}
 <div id="detail-template" style="display: none;">
-    <div class="detail-row mb-3 p-3 border rounded bg-light">
+    <div class="detail-row mb-3 p-3 border rounded bg-light position-relative">
         <div class="row align-items-end">
             <div class="col-md-3">
                 <label class="form-label">Bahan Baku</label>
@@ -111,36 +93,34 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label">Jam</label>
-                <input type="time" name="details[__index__][time]" class="form-control"
-                    value="{{ \Carbon\Carbon::now()->format('H:i') }}">
+                <input type="time" name="details[__index__][time]" class="form-control">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Suhu (°C)</label>
+                <label class="form-label">Suhu</label>
                 <input type="number" step="0.1" name="details[__index__][temperature]" class="form-control">
             </div>
             <div class="col-md-1">
-                <label class="form-label">Kemasan</label>
+                <label>Kemasan</label>
                 <select name="details[__index__][packaging_condition]" class="form-control">
                     <option value="✓">✓</option>
                     <option value="x">x</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Sensorik</label>
+                <label>Sensorik</label>
                 <select name="details[__index__][sensorial_condition]" class="form-control">
                     <option value="✓">✓</option>
                     <option value="x">x</option>
                 </select>
             </div>
         </div>
-
         <div class="row mt-3">
             <div class="col-md-6">
-                <label class="form-label">Problem</label>
+                <label>Problem</label>
                 <textarea name="details[__index__][problem]" class="form-control" rows="2"></textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Tindakan Koreksi</label>
+                <label>Tindakan Koreksi</label>
                 <textarea name="details[__index__][corrective_action]" class="form-control" rows="2"></textarea>
             </div>
         </div>
@@ -151,16 +131,12 @@
 @section('script')
 <script>
 let detailIndex = 1;
-
 document.getElementById('add-detail-btn').addEventListener('click', function() {
-    const template = document.getElementById('detail-template').innerHTML;
-    const newRowHtml = template.replace(/__index__/g, detailIndex);
-    const container = document.getElementById('detail-container');
-
+    const templateHtml = document.getElementById('detail-template').innerHTML;
+    const rendered = templateHtml.replace(/__index__/g, detailIndex);
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = newRowHtml;
-    container.appendChild(wrapper.firstElementChild);
-
+    wrapper.innerHTML = rendered;
+    document.getElementById('detail-container').appendChild(wrapper.firstElementChild);
     detailIndex++;
 });
 </script>

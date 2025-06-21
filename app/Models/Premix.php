@@ -6,20 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 
-class RawMaterial extends Model
+class Premix extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'uuid',
-        'material_name',
-        'supplier',
         'area_uuid',
+        'name',
+        'production_code',
         'shelf_life',
     ];
 
-    protected static function booted()
+    protected static function boot()
     {
+        parent::boot();
         static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
         });
@@ -30,8 +31,8 @@ class RawMaterial extends Model
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 
-    public function detailArrivals()
+    public function detailPremixes()
     {
-        return $this->hasMany(DetailRmArrival::class, 'raw_material_uuid', 'uuid');
+        return $this->hasMany(DetailPremix::class, 'premix_uuid', 'uuid');
     }
 }
