@@ -42,4 +42,14 @@ class Section extends Model
     {
         return $this->hasMany(ReportConveyorCleanliness::class, 'section_uuid', 'uuid');
     }
+
+    public function foreignObjectReports()
+    {
+        return $this->hasMany(ReportForeignObject::class, 'section_uuid', 'uuid');
+    }
+
+    public function reportMagnetTraps()
+    {
+        return $this->hasMany(ReportMagnetTrap::class, 'section_uuid', 'uuid');
+    }
 }

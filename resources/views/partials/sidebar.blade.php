@@ -175,6 +175,24 @@
         </div>
     </li>
 
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesMetalD"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-magnet"></i>
+            <span>Verifikasi Magnet Trap</span>
+        </a>
+        <div id="collapsePagesMetalD" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report-foreign-objects.index') }}">
+                    Pemeriksaan Kontaminasi Benda Asing
+                </a>
+                <a class="collapse-item" href="{{ route('report_magnet_traps.index') }}">
+                    Pemeriksaan Magnet Trap
+                </a>
+            </div>
+        </div>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

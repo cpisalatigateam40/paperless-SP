@@ -2,11 +2,17 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>Form PDF - Kebersihan Area Proses</title>
+    <title>Laporan Pemeriksaan Magnet Trap</title>
     <style>
+    @font-face {
+        font-family: "DejaVu Sans";
+        font-style: normal;
+        font-weight: normal;
+        src: url("{{ storage_path('fonts/DejaVuSans.ttf') }}") format("truetype");
+    }
+
     body {
-        font-family: DejaVu Sans, sans-serif;
+        font-family: "DejaVu Sans", sans-serif;
         font-size: 10px;
         margin-top: 30px;
     }
@@ -21,7 +27,6 @@
     td {
         border: 1px solid #000;
         padding: 2px 3px;
-        /* lebih rapat */
         text-align: left;
         vertical-align: top;
     }
@@ -113,7 +118,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN KONDISI KEBERSIHAN</h3>
+    <h3 class="mb-2 text-center">PEMERIKSAAN MAGNET TRAP</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -124,10 +129,7 @@
                 </span>
             </td>
             <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section_name }}</span>
+                Area: <span style="text-decoration: underline;"> {{ $report->section->section_name }}</span>
             </td>
         </tr>
     </table>
@@ -135,82 +137,32 @@
     <table>
         <thead>
             <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Pukul</th>
-                <th rowspan="2">Item</th>
-                <th colspan="2">Kondisi</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
-            </tr>
-            <tr>
-                <th>Bersih</th>
-                <th>Kotor</th>
+                <th class="text-center">Jam</th>
+                <th class="text-center">Temuan</th>
+                <th class="text-center">QC</th>
+                <th class="text-center">Produksi</th>
+                <th class="text-center">Keterangan</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $index => $detail)
-            @foreach($detail->items as $i => $item)
+            @foreach ($report->details as $detail)
             <tr>
-                @if($i === 0)
-                <td rowspan="4">{{ $index + 1 }}</td>
-                <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                @endif
-
-                <td>{{ $item->item }}</td>
-
-                @if(Str::startsWith($item->item, 'Suhu ruang'))
-                <td colspan="2" style="text-align: center">{{ $item->condition }}</td>
-                @else
-                <td style="text-align: center">{{ strtolower($item->condition) === 'bersih' ? '✓' : '' }}</td>
-                <td style="text-align: center">{{ strtolower($item->condition) === 'kotor' ? 'x' : '' }}</td>
-                @endif
-
-                <td>{{ $item->notes }}</td>
-                <td>{{ $item->corrective_action }}</td>
-                <td>
-                    @php
-                    $mainVerification = 'Kondisi: ' . ($item->verification ? 'OK' : 'Tidak OK')
-                    . ', Keterangan: ' . ($item->notes ?? '-')
-                    . ', Tindakan Koreksi: ' . ($item->corrective_action ?? '-');
-
-                    $followupDescriptions = $item->followups->map(function ($followup, $index) {
-                    return 'Follow-up #' . ($index + 1) . ': '
-                    . 'Kondisi: ' . ($followup->verification ? 'OK' : 'Tidak OK')
-                    . ', Keterangan: ' . ($followup->notes ?? '-')
-                    . ', Tindakan Koreksi: ' . ($followup->action ?? '-');
-                    })->toArray();
-
-                    $combinedVerificationText = implode(', ', array_filter([
-                    $mainVerification,
-                    ...$followupDescriptions
-                    ]));
-                    @endphp
-
-                    {{ $combinedVerificationText }}
-                </td>
-
+                <td class="text-center">{{ $detail->time }}</td>
+                <td>{{ $detail->finding }}</td>
+                <td class="text-center">@if ($detail->source === 'QC') &#10003; @endif</td>
+                <td class="text-center">@if ($detail->source === 'Produksi') &#10003; @endif</td>
+                <td>{{ $detail->note ?: '-' }}</td>
             </tr>
             @endforeach
-            @endforeach
             <tr>
-                <td colspan="8" style="text-align: right; border: none;">QM 13 / 01</td>
+                <td colspan="5" style="text-align: right; border: none;">QM 46 / 00</td>
             </tr>
         </tbody>
     </table>
 
-
-    <p><strong>Keterangan:</strong></p>
-    <ul style="padding-left: 20px;">
-        <li>1. ✓: OK/bersih</li>
-        <li>2. x: Tidak OK/kotor</li>
-    </ul>
-
-    <br><br>
-
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
-            <td style="text-align: center; border: none; width: 33%;">
+            <!-- <td style="text-align: center; border: none; width: 33%;">
                 Diperiksa oleh:<br><br>
                 <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
                 <strong>{{ $report->created_by }}</strong><br><br>
@@ -221,8 +173,8 @@
                 <div style="height: 50px;"></div>
                 <strong>{{ $report->known_by }}</strong><br>
                 SPV/Foreman/Lady Produksi
-            </td>
-            <td style="text-align: center; border: none; width: 33%;">
+            </td> -->
+            <td style="text-align: right; border: none; width: 33%;">
                 Disetujui oleh:<br><br>
                 @if($report->approved_by)
                 <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
@@ -233,6 +185,7 @@
                 @endif
                 Supervisor QC
             </td>
+
         </tr>
     </table>
 

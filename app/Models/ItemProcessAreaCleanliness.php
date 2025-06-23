@@ -24,4 +24,9 @@ class ItemProcessAreaCleanliness extends Model
     {
         return $this->belongsTo(DetailProcessAreaCleanliness::class, 'detail_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(ItemFollowup::class, 'item_id');
+    }
 }

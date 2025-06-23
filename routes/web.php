@@ -27,6 +27,8 @@ use App\Http\Controllers\ReportSolventController;
 use App\Http\Controllers\ReportRmArrivalController;
 use App\Http\Controllers\PremixController;
 use App\Http\Controllers\ReportPremixController;
+use App\Http\Controllers\ReportForeignObjectController;
+use App\Http\Controllers\ReportMagnetTrapController;
 
 Route::redirect('/', '/login');
 
@@ -390,4 +392,35 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/approve', 'approve')->name('approve');
         Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
     });
+
+    // REPORT FOREIGN OBJECT
+    Route::prefix('report-foreign-objects')
+    ->name('report-foreign-objects.')
+    ->controller(ReportForeignObjectController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/add-detail', 'createDetail')->name('add-detail');
+        Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+    });
+
+    // REPORT MAGNET TRAP
+    Route::prefix('report-magnet-traps')
+    ->name('report_magnet_traps.')
+    ->controller(ReportMagnetTrapController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/store', 'store')->name('store');
+        Route::delete('/{uuid}/destroy', 'destroy')->name('destroy');
+        Route::get('/{uuid}/details/add', 'addDetail')->name('details.add');
+        Route::post('/{uuid}/details/store', 'storeDetail')->name('details.store');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+    });
+
 });
