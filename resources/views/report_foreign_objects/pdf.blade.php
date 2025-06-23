@@ -2,11 +2,17 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>Form PDF - Kebersihan Area Proses</title>
+    <title>Laporan Pemeriksaan Kontaminasi Benda Asing</title>
     <style>
+    @font-face {
+        font-family: "DejaVu Sans";
+        font-style: normal;
+        font-weight: normal;
+        src: url("{{ storage_path('fonts/DejaVuSans.ttf') }}") format("truetype");
+    }
+
     body {
-        font-family: DejaVu Sans, sans-serif;
+        font-family: "DejaVu Sans", sans-serif;
         font-size: 10px;
         margin-top: 30px;
     }
@@ -21,7 +27,6 @@
     td {
         border: 1px solid #000;
         padding: 2px 3px;
-        /* lebih rapat */
         text-align: left;
         vertical-align: top;
     }
@@ -113,7 +118,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN KONDISI KEBERSIHAN</h3>
+    <h3 class="mb-2 text-center">PEMERIKSAAN KONTAMINASI BENDA ASING</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -127,86 +132,57 @@
                 Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
             <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section_name }}</span>
+                Area: <span style="text-decoration: underline;"> {{ $report->section->section_name }}</span>
             </td>
         </tr>
     </table>
 
-    <table>
+    <table style="margin-top: 10px;">
         <thead>
             <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Pukul</th>
-                <th rowspan="2">Item</th>
-                <th colspan="2">Kondisi</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
-            </tr>
-            <tr>
-                <th>Bersih</th>
-                <th>Kotor</th>
+                <th class="align-middle">Jam</th>
+                <th class="align-middle">Nama Produk</th>
+                <th class="align-middle">Kode Produksi</th>
+                <th class="align-middle">Jenis Kontaminan</th>
+                <th class="align-middle">Bukti (Foto)</th>
+                <th class="align-middle">Tahapan</th>
+                <th class="align-middle">Analisis Asal Kontaminan</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $index => $detail)
-            @foreach($detail->items as $i => $item)
+            @foreach ($report->details as $detail)
             <tr>
-                @if($i === 0)
-                <td rowspan="4">{{ $index + 1 }}</td>
-                <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                @endif
-
-                <td>{{ $item->item }}</td>
-
-                @if(Str::startsWith($item->item, 'Suhu ruang'))
-                <td colspan="2" style="text-align: center">{{ $item->condition }}</td>
-                @else
-                <td style="text-align: center">{{ strtolower($item->condition) === 'bersih' ? '✓' : '' }}</td>
-                <td style="text-align: center">{{ strtolower($item->condition) === 'kotor' ? 'x' : '' }}</td>
-                @endif
-
-                <td>{{ $item->notes }}</td>
-                <td>{{ $item->corrective_action }}</td>
-                <td>
+                <td>{{ $detail->time }}</td>
+                <td>{{ $detail->product->product_name ?? '-' }}</td>
+                <td>{{ $detail->production_code }}</td>
+                <td>{{ $detail->contaminant_type }}</td>
+                <td class="text-center">
                     @php
-                    $mainVerification = 'Kondisi: ' . ($item->verification ? 'OK' : 'Tidak OK')
-                    . ', Keterangan: ' . ($item->notes ?? '-')
-                    . ', Tindakan Koreksi: ' . ($item->corrective_action ?? '-');
+                    $evidencePath = storage_path('app/public/' . $detail->evidence);
+                    $evidenceBase64 = null;
 
-                    $followupDescriptions = $item->followups->map(function ($followup, $index) {
-                    return 'Follow-up #' . ($index + 1) . ': '
-                    . 'Kondisi: ' . ($followup->verification ? 'OK' : 'Tidak OK')
-                    . ', Keterangan: ' . ($followup->notes ?? '-')
-                    . ', Tindakan Koreksi: ' . ($followup->action ?? '-');
-                    })->toArray();
-
-                    $combinedVerificationText = implode(', ', array_filter([
-                    $mainVerification,
-                    ...$followupDescriptions
-                    ]));
+                    if ($detail->evidence && file_exists($evidencePath)) {
+                    $type = pathinfo($evidencePath, PATHINFO_EXTENSION);
+                    $data = file_get_contents($evidencePath);
+                    $evidenceBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
                     @endphp
 
-                    {{ $combinedVerificationText }}
+                    @if($evidenceBase64)
+                    <img src="{{ $evidenceBase64 }}" width="50">
+                    @else
+                    -
+                    @endif
                 </td>
-
+                <td>{{ $detail->analysis_stage }}</td>
+                <td>{{ $detail->contaminant_origin }}</td>
             </tr>
             @endforeach
-            @endforeach
             <tr>
-                <td colspan="8" style="text-align: right; border: none;">QM 13 / 01</td>
+                <td colspan="7" style="text-align: right; border: none;">QM 09 / 00</td>
             </tr>
         </tbody>
     </table>
-
-
-    <p><strong>Keterangan:</strong></p>
-    <ul style="padding-left: 20px;">
-        <li>1. ✓: OK/bersih</li>
-        <li>2. x: Tidak OK/kotor</li>
-    </ul>
-
-    <br><br>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
@@ -235,7 +211,6 @@
             </td>
         </tr>
     </table>
-
 </body>
 
 </html>

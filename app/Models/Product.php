@@ -29,4 +29,9 @@ class Product extends Model
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
+
+    public function detailForeignObjects()
+    {
+        return $this->hasMany(DetailForeignObject::class, 'product_uuid', 'uuid');
+    }
 }

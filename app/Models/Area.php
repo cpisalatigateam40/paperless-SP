@@ -98,4 +98,15 @@ class Area extends Model
     {
         return $this->hasMany(ReportPremix::class, 'area_uuid', 'uuid');
     }
+
+    public function foreignObjectReports()
+    {
+        return $this->hasMany(ReportForeignObject::class, 'area_uuid', 'uuid');
+    }
+
+    public function reportMagnetTraps()
+    {
+        return $this->hasMany(ReportMagnetTrap::class, 'area_uuid', 'uuid');
+    }
+
 }

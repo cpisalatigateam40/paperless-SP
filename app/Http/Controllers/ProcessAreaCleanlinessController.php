@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\ItemFollowup;
 
 class ProcessAreaCleanlinessController extends Controller
 {
@@ -19,7 +20,7 @@ class ProcessAreaCleanlinessController extends Controller
 
     public function index()
     {
-        $reports = ReportProcessAreaCleanliness::with('details.items', 'area')
+        $reports = ReportProcessAreaCleanliness::with('details.items.followups', 'area')
             ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
                 $query->where('area_uuid', Auth::user()->area_uuid);
             })
@@ -37,7 +38,6 @@ class ProcessAreaCleanlinessController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Simpan Report
             $report = ReportProcessAreaCleanliness::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
@@ -51,7 +51,6 @@ class ProcessAreaCleanlinessController extends Controller
             ]);
 
             foreach ($request->details as $detailInput) {
-                // Simpan Detail
                 $detail = DetailProcessAreaCleanliness::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
@@ -61,13 +60,11 @@ class ProcessAreaCleanlinessController extends Controller
                 foreach ($detailInput['items'] as $itemInput) {
                     $itemName = $itemInput['item'];
 
-                    if ($itemName === 'Suhu ruang (℃)') {
-                        $condition = 'Suhu: ' . $itemInput['temperature'] . ' °C,';
-                    } else {
-                        $condition = $itemInput['condition'];
-                    }
-                    // Simpan Item
-                    ItemProcessAreaCleanliness::create([
+                    $condition = $itemName === 'Suhu ruang (℃)'
+                        ? 'Suhu: ' . $itemInput['temperature'] . ' °C,'
+                        : $itemInput['condition'];
+
+                    $item = ItemProcessAreaCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $condition,
@@ -75,6 +72,18 @@ class ProcessAreaCleanlinessController extends Controller
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
+
+                    // Simpan followups jika ada
+                    if (!empty($itemInput['followups']) && is_array($itemInput['followups'])) {
+                        foreach ($itemInput['followups'] as $followup) {
+                            ItemFollowup::create([
+                                'item_id' => $item->id,
+                                'notes' => $followup['notes'] ?? null,
+                                'action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? 0,
+                            ]);
+                        }
+                    }
                 }
             }
 
@@ -133,7 +142,7 @@ class ProcessAreaCleanlinessController extends Controller
                         ? 'Suhu: ' . $itemInput['temperature'] . ' °C,'
                         : $itemInput['condition'];
 
-                    ItemProcessAreaCleanliness::create([
+                    $item = ItemProcessAreaCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $condition,
@@ -141,6 +150,17 @@ class ProcessAreaCleanlinessController extends Controller
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
+
+                    if (!empty($itemInput['followups']) && is_array($itemInput['followups'])) {
+                        foreach ($itemInput['followups'] as $followup) {
+                            ItemFollowup::create([
+                                'item_id' => $item->id,
+                                'notes' => $followup['notes'] ?? null,
+                                'action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? 0,
+                            ]);
+                        }
+                    }
                 }
             }
 
@@ -152,9 +172,10 @@ class ProcessAreaCleanlinessController extends Controller
         }
     }
 
+
     public function exportPdf($uuid)
     {
-        $report = ReportProcessAreaCleanliness::with('area', 'details.items')->where('uuid', $uuid)->firstOrFail();
+        $report = ReportProcessAreaCleanliness::with('area', 'details.items.followups')->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
         $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
