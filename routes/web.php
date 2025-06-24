@@ -29,6 +29,8 @@ use App\Http\Controllers\PremixController;
 use App\Http\Controllers\ReportPremixController;
 use App\Http\Controllers\ReportForeignObjectController;
 use App\Http\Controllers\ReportMagnetTrapController;
+use App\Http\Controllers\SharpToolController;
+use App\Http\Controllers\ReportSharpToolController;
 
 Route::redirect('/', '/login');
 
@@ -395,32 +397,57 @@ Route::middleware(['auth'])->group(function () {
 
     // REPORT FOREIGN OBJECT
     Route::prefix('report-foreign-objects')
-    ->name('report-foreign-objects.')
-    ->controller(ReportForeignObjectController::class)
-    ->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/create', 'create')->name('create');
-        Route::post('/', 'store')->name('store');
-        Route::get('/{uuid}/add-detail', 'createDetail')->name('add-detail');
-        Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
-        Route::delete('/{uuid}', 'destroy')->name('destroy');
-        Route::post('/{id}/approve', 'approve')->name('approve');
-        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
-    });
+        ->name('report-foreign-objects.')
+        ->controller(ReportForeignObjectController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/add-detail', 'createDetail')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
 
     // REPORT MAGNET TRAP
     Route::prefix('report-magnet-traps')
-    ->name('report_magnet_traps.')
-    ->controller(ReportMagnetTrapController::class)
-    ->group(function () {
+        ->name('report_magnet_traps.')
+        ->controller(ReportMagnetTrapController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store');
+            Route::delete('/{uuid}/destroy', 'destroy')->name('destroy');
+            Route::get('/{uuid}/details/add', 'addDetail')->name('details.add');
+            Route::post('/{uuid}/details/store', 'storeDetail')->name('details.store');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+        });
+
+    // SHARP TOOL MD
+    Route::prefix('sharp-tools')->name('sharp_tools.')->controller(SharpToolController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
-        Route::post('/store', 'store')->name('store');
-        Route::delete('/{uuid}/destroy', 'destroy')->name('destroy');
-        Route::get('/{uuid}/details/add', 'addDetail')->name('details.add');
-        Route::post('/{uuid}/details/store', 'storeDetail')->name('details.store');
-        Route::post('/{id}/approve', 'approve')->name('approve');
-        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
     });
+
+    // 
+    Route::prefix('report-sharp-tools')->name('report_sharp_tools.')->controller(ReportSharpToolController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::get('/{uuid}/add-detail', 'addDetail')->name('details.add');
+        Route::post('/{uuid}/add-detail', 'storeDetail')->name('details.store');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::get('/{uuid}/pdf', 'exportPdf')->name('exportPdf');
+    });
+
 
 });

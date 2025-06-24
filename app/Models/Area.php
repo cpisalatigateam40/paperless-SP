@@ -109,4 +109,14 @@ class Area extends Model
         return $this->hasMany(ReportMagnetTrap::class, 'area_uuid', 'uuid');
     }
 
+    public function sharpTools()
+    {
+        return $this->hasMany(SharpTool::class, 'area_uuid', 'uuid');
+    }
+
+    public function reportSharpTools()
+    {
+        return $this->hasMany(ReportSharpTool::class, 'area_uuid', 'uuid');
+    }
+
 }
