@@ -65,6 +65,9 @@
                 <a class="collapse-item" href="{{ route('premixes.index') }}">
                     Premix
                 </a>
+                <a class="collapse-item" href="{{ route('sharp_tools.index') }}">
+                    Benda Tajam
+                </a>
             </div>
         </div>
     </li>
@@ -152,6 +155,10 @@
 
                 <a class="collapse-item" href="{{ route('report-scales.index') }}">
                     Report Timbangan & Thermometer
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_sharp_tools.index') }}">
+                    Report Benda Tajam
                 </a>
             </div>
         </div>
