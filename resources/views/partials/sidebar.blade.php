@@ -137,6 +137,14 @@
                 <a class="collapse-item" href="{{ route('report-solvents.index') }}">
                     Report Pembuatan Larutan Cleaning dan Sanitasi
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_pre_operations.index') }}">
+                    Pemeriksaan Pra Operasi Produk
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_product_changes.index') }}">
+                    Verifikasi Pergantian Produk
+                </a>
             </div>
         </div>
     </li>

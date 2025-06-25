@@ -36,4 +36,14 @@ class Equipment extends Model
     {
         return $this->hasMany(DetailRepairCleanliness::class, 'equipment_uuid', 'uuid');
     }
+
+    public function verificationEquipments()
+    {
+        return $this->hasMany(VerificationEquipment::class, 'equipment_uuid', 'uuid');
+    }
+
+    public function preOperationEquipments()
+    {
+        return $this->hasMany(PreOperationEquipment::class, 'equipment_uuid', 'uuid');
+    }
 }
