@@ -119,4 +119,13 @@ class Area extends Model
         return $this->hasMany(ReportSharpTool::class, 'area_uuid', 'uuid');
     }
 
+    public function reportProductChanges()
+    {
+        return $this->hasMany(ReportProductChange::class, 'area_uuid', 'uuid');
+    }
+
+    public function preOperationReports()
+    {
+        return $this->hasMany(ReportPreOperation::class, 'area_uuid', 'uuid');
+    }
 }

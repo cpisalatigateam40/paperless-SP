@@ -34,4 +34,14 @@ class Product extends Model
     {
         return $this->hasMany(DetailForeignObject::class, 'product_uuid', 'uuid');
     }
+
+    public function reportProductChanges()
+    {
+        return $this->hasMany(ReportProductChange::class, 'product_uuid', 'uuid');
+    }
+
+    public function preOperationReports()
+    {
+        return $this->hasMany(ReportPreOperation::class, 'product_uuid', 'uuid');
+    }
 }

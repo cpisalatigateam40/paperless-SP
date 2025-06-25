@@ -52,4 +52,14 @@ class Section extends Model
     {
         return $this->hasMany(ReportMagnetTrap::class, 'section_uuid', 'uuid');
     }
+
+    public function verificationSections()
+    {
+        return $this->hasMany(VerificationSection::class, 'section_uuid', 'uuid');
+    }
+
+    public function preOperationRooms()
+    {
+        return $this->hasMany(PreOperationRoom::class, 'section_uuid', 'uuid');
+    }
 }

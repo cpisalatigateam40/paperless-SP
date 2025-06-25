@@ -1,68 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Paperless SP</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <!-- CSS -->
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
 
     <style>
-         body, h1, h2, h3, h4, h5, h6, p, a, span, div {
-            font-family: 'Poppins', sans-serif !important;
-        }
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    a,
+    span,
+    div {
+        font-family: 'Poppins', sans-serif !important;
+    }
 
-        table {
-            font-size: .8rem;
-        }
+    table {
+        font-size: .8rem;
+    }
 
-        .container-fluid {
-            padding: 1.5rem;
-        }
+    .container-fluid {
+        padding: 1.5rem;
+    }
 
-        .card-header {
-            padding-inline: 2rem;
-            margin-top: .5rem;
-        }
+    .card-header {
+        padding-inline: 2rem;
+        margin-top: .5rem;
+    }
 
-        .card-body {
-            padding: 2rem;
-            /* padding-block: 1rem; */
-        }
+    .card-body {
+        padding: 2rem;
+        /* padding-block: 1rem; */
+    }
 
-        .bg-primary {
-            background: #cc7064 !important;
-        }
+    .bg-primary {
+        background: #cc7064 !important;
+    }
 
-        .soft-salmon {
-            background-color: #FFF4F2;
-        }
+    .soft-salmon {
+        background-color: #FFF4F2;
+    }
 
-        #content {
-             background-color: #FFF4F2;
-        }
+    #content {
+        background-color: #FFF4F2;
+    }
 
-        .btn-primary {
-            background-color: #5b96c9;
-            border: #5b96c9;
-        }
+    .btn-primary {
+        background-color: #5b96c9;
+        border: #5b96c9;
+    }
 
-        .table {
-            margin-bottom: unset;
-        }
+    .table {
+        margin-bottom: unset;
+    }
 
-        .gap-action {
-            gap: .5rem;
-        }
+    .gap-action {
+        gap: .5rem;
+    }
 
-        .border-th {
-            border: 1px solid rgb(231, 230, 237) !important;
-        }
+    .border-th {
+        border: 1px solid rgb(231, 230, 237) !important;
+    }
 
+    ul {
+        padding: unset;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
+
 <body>
     <div id="wrapper">
         @include('partials.sidebar')
@@ -89,4 +109,5 @@
 
     @yield('script')
 </body>
+
 </html>

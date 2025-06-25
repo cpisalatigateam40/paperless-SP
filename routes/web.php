@@ -31,6 +31,8 @@ use App\Http\Controllers\ReportForeignObjectController;
 use App\Http\Controllers\ReportMagnetTrapController;
 use App\Http\Controllers\SharpToolController;
 use App\Http\Controllers\ReportSharpToolController;
+use App\Http\Controllers\ReportProductChangeController;
+use App\Http\Controllers\ReportPreOperationController;
 
 Route::redirect('/', '/login');
 
@@ -435,7 +437,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{uuid}', 'destroy')->name('destroy');
     });
 
-    // 
+    // REPORT BENDA TAJAM
     Route::prefix('report-sharp-tools')->name('report_sharp_tools.')->controller(ReportSharpToolController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -449,5 +451,25 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{uuid}/pdf', 'exportPdf')->name('exportPdf');
     });
 
+    // REPORT
+    Route::prefix('report-product-changes')->name('report_product_changes.')->controller(ReportProductChangeController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/store', 'store')->name('store');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+    });
 
+    Route::prefix('report-pre-operations')
+        ->name('report_pre_operations.')
+        ->controller(ReportPreOperationController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{report_pre_operation}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+        });
 });
