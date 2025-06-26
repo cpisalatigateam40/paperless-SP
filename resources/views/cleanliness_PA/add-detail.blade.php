@@ -2,24 +2,27 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="card shadow">
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h5>Tambah Detail Pemeriksaan</h5>
+        </div>
         <div class="card-body">
             <form action="{{ route('process-area-cleanliness.detail.store', $report->id) }}" method="POST">
                 @csrf
 
-                <div class="border rounded p-3 mb-3 position-relative">
+                <div class="inspection-block border rounded p-3 mb-3 position-relative">
                     <label>Jam Inspeksi:</label>
                     <input type="time" name="details[0][inspection_hour]" class="form-control mb-3 col-md-5" required>
 
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Item</th>
-                                <th>Kondisi</th>
-                                <th>Catatan</th>
-                                <th>Tindakan Koreksi</th>
-                                <th>Verifikasi</th>
+                                <th class="align-middle">No</th>
+                                <th class="align-middle">Item</th>
+                                <th class="align-middle">Kondisi</th>
+                                <th class="align-middle">Catatan</th>
+                                <th class="align-middle">Tindakan Koreksi</th>
+                                <th class="align-middle">Verifikasi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -34,12 +37,12 @@
 
                             @foreach($items as $i => $item)
                             <tr>
-                                <td>{{ $i + 1 }}</td>
-                                <td>
+                                <td class="align-middle">{{ $i + 1 }}</td>
+                                <td class="align-middle">
                                     <input type="hidden" name="details[0][items][{{ $i }}][item]" value="{{ $item }}">
                                     {{ $item }}
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     @if($item === 'Suhu ruang (℃)')
                                     <input type="number" step="0.1" name="details[0][items][{{ $i }}][temperature]"
                                         placeholder="℃" class="form-control" required>
@@ -52,7 +55,6 @@
                                     </select>
                                     @endif
                                 </td>
-
                                 <td><input type="text" name="details[0][items][{{ $i }}][notes]"
                                         class="form-control notes-input"></td>
                                 <td><input type="text" name="details[0][items][{{ $i }}][corrective_action]"
@@ -63,10 +65,13 @@
                                         <option value="0">Tidak OK</option>
                                         <option value="1">OK</option>
                                     </select>
-
-                                    <div class="followup-wrapper mt-2"></div>
                                     <button type="button" class="btn btn-sm btn-outline-secondary add-followup mt-1"
                                         style="display:none;">+ Tambah Koreksi Lanjutan</button>
+                                </td>
+                            </tr>
+                            <tr class="followup-row">
+                                <td colspan="6">
+                                    <div class="followup-wrapper"></div>
                                 </td>
                             </tr>
                             @endforeach
@@ -83,60 +88,100 @@
 
 @section('script')
 <script>
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('add-followup')) {
+document.addEventListener('DOMContentLoaded', function() {
+    // Klik tombol tambah manual
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-followup')) {
+            const row = e.target.closest('tr');
+            addFollowupField(row);
+        }
+    });
+
+    // Perubahan kondisi atau verifikasi
+    document.addEventListener('change', function(e) {
         const row = e.target.closest('tr');
-        const wrapper = row.querySelector('.followup-wrapper');
+        if (!row) return;
+
+        const wrapperRow = row.nextElementSibling;
+        if (!wrapperRow) return;
+
+        const wrapper = wrapperRow.querySelector('.followup-wrapper');
+        const notes = row.querySelector('.notes-input');
+        const action = row.querySelector('.action-input');
+        const verification = row.querySelector('.verification-select');
+        const addBtn = row.querySelector('.add-followup');
+        const condition = row.querySelector('.condition-select')?.value;
+
+        // Saat kondisi diubah
+        if (e.target.classList.contains('condition-select')) {
+            if (e.target.value === 'Bersih') {
+                notes.value = '';
+                action.value = '';
+                verification.value = '1';
+                notes.setAttribute('readonly', true);
+                action.setAttribute('readonly', true);
+                wrapper.innerHTML = '';
+                addBtn.style.display = 'none';
+            } else {
+                notes.removeAttribute('readonly');
+                action.removeAttribute('readonly');
+                verification.value = '0';
+                wrapper.innerHTML = '';
+                addBtn.style.display = 'none';
+                addFollowupField(row);
+            }
+        }
+
+        // Saat verifikasi utama diubah
+        if (e.target.classList.contains('verification-select')) {
+            if (condition === 'Kotor') {
+                if (e.target.value === '0') {
+                    wrapper.innerHTML = '';
+                    addFollowupField(row);
+                } else {
+                    wrapper.innerHTML = '';
+                }
+                addBtn.style.display = 'none';
+            }
+        }
+    });
+
+    function addFollowupField(row) {
+        const wrapperRow = row.nextElementSibling;
+        if (!wrapperRow) return;
+        const wrapper = wrapperRow.querySelector('.followup-wrapper');
         const baseName = row.querySelector('.verification-select').name.replace('[verification]', '');
         const count = wrapper.querySelectorAll('.followup-group').length;
 
         const html = `
-                <div class="followup-group border rounded p-2 mb-2">
-                    <label class="small mb-1">Koreksi Lanjutan #${count + 1}</label>
-                    <input type="text" name="${baseName}[followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan">
-                    <input type="text" name="${baseName}[followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
-                    <select name="${baseName}[followups][${count}][verification]" class="form-control">
-                        <option value="0">Tidak OK</option>
-                        <option value="1">OK</option>
-                    </select>
-                </div>
-            `;
+            <div class="followup-group border rounded p-2 mb-2">
+                <label class="small mb-1">Koreksi Lanjutan #${count + 1}</label>
+                <input type="text" name="${baseName}[followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan">
+                <input type="text" name="${baseName}[followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
+                <select name="${baseName}[followups][${count}][verification]" class="form-control followup-verification">
+                    <option value="0">Tidak OK</option>
+                    <option value="1">OK</option>
+                </select>
+            </div>
+        `;
+
         wrapper.insertAdjacentHTML('beforeend', html);
-    }
-});
 
-document.addEventListener('change', function(e) {
-    if (e.target.classList.contains('condition-select')) {
-        const row = e.target.closest('tr');
-        const notes = row.querySelector('.notes-input');
-        const action = row.querySelector('.action-input');
-        const verification = row.querySelector('.verification-select');
-        const followupWrapper = row.querySelector('.followup-wrapper');
-        const addBtn = row.querySelector('.add-followup');
+        const newSelect = wrapper.querySelectorAll('.followup-verification')[count];
+        newSelect.addEventListener('change', function() {
+            const allFollowups = wrapper.querySelectorAll('.followup-group');
+            const currentIndex = Array.from(allFollowups).indexOf(this.closest('.followup-group'));
 
-        if (e.target.value === 'Bersih') {
-            notes.value = '';
-            action.value = '';
-            verification.value = '1';
-            notes.setAttribute('readonly', true);
-            action.setAttribute('readonly', true);
-            followupWrapper.innerHTML = '';
-            addBtn.style.display = 'none';
-        } else {
-            notes.removeAttribute('readonly');
-            action.removeAttribute('readonly');
-            verification.value = '0';
-            addBtn.style.display = 'block';
-        }
-    }
-
-    if (e.target.classList.contains('verification-select')) {
-        const row = e.target.closest('tr');
-        const condition = row.querySelector('.condition-select')?.value;
-        const addBtn = row.querySelector('.add-followup');
-        if (condition === 'Kotor') {
-            addBtn.style.display = e.target.value === '0' ? 'block' : 'none';
-        }
+            if (this.value === '0') {
+                if (allFollowups.length === currentIndex + 1) {
+                    addFollowupField(row);
+                }
+            } else {
+                for (let i = allFollowups.length - 1; i > currentIndex; i--) {
+                    allFollowups[i].remove();
+                }
+            }
+        });
     }
 });
 </script>

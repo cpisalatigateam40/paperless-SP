@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use App\Models\ReportStorageRmCleanliness;
 use App\Models\DetailStorageRmCleanliness;
 use App\Models\ItemStorageRmCleanliness;
+use App\Models\FollowupCleanlinessStorage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
@@ -61,6 +62,7 @@ class StorageRmCleanlinessController extends Controller
                 ]);
 
                 foreach ($detailInput['items'] as $itemInput) {
+
                     $itemName = $itemInput['item'];
 
                     if ($itemName === 'Suhu ruang (℃) / RH (%)') {
@@ -78,6 +80,7 @@ class StorageRmCleanlinessController extends Controller
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
                 }
+
             }
 
             DB::commit();
@@ -144,6 +147,7 @@ class StorageRmCleanlinessController extends Controller
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
                 }
+
             }
 
             DB::commit();
