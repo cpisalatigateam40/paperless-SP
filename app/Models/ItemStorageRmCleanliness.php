@@ -23,4 +23,9 @@ class ItemStorageRmCleanliness extends Model
     {
         return $this->belongsTo(DetailStorageRmCleanliness::class, 'detail_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowupCleanlinessStorage::class, 'item_storage_rm_cleanliness_id');
+    }
 }

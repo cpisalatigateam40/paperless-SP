@@ -59,8 +59,8 @@
                 @foreach($report->details as $detail)
                 <div class="mb-3 mt-3">
                     <strong>Jam Inspeksi:</strong> {{ $detail->inspection_hour }}
-                    <table class="table table-sm table-striped mt-2">
-                        <thead class="table-light">
+                    <table class="table table-sm mt-2">
+                        <thead>
                             <tr>
                                 <th class="align-middle">No</th>
                                 <th class="align-middle">Item</th>
