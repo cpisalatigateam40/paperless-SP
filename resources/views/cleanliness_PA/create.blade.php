@@ -19,7 +19,7 @@
                         </div>
                         <div class="col-md-5 mb-3">
                             <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control" required>
+                            <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
                         </div>
                     </div>
 

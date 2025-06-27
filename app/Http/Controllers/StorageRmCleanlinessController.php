@@ -21,7 +21,7 @@ class StorageRmCleanlinessController extends Controller
 
     public function index()
     {
-        $reports = ReportStorageRmCleanliness::with('details.items', 'area')
+        $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
             ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
                 $query->where('area_uuid', Auth::user()->area_uuid);
             })
@@ -45,7 +45,7 @@ class StorageRmCleanlinessController extends Controller
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => now()->toDateString(),
-                'shift' => $request->shift,
+                'shift' => getShift(),
                 'room_name' => $request->room_name,
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,
@@ -71,7 +71,7 @@ class StorageRmCleanlinessController extends Controller
                         $condition = $itemInput['condition'];
                     }
                     // Simpan Item
-                    ItemStorageRmCleanliness::create([
+                    $item = ItemStorageRmCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $condition,
@@ -79,8 +79,18 @@ class StorageRmCleanlinessController extends Controller
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
-                }
 
+                    if (isset($itemInput['followups'])) {
+                        foreach ($itemInput['followups'] as $followupInput) {
+                            FollowupCleanlinessStorage::create([
+                                'item_storage_rm_cleanliness_id' => $item->id,
+                                'notes' => $followupInput['notes'] ?? null,
+                                'corrective_action' => $followupInput['corrective_action'] ?? null,
+                                'verification' => $followupInput['verification'] ?? 0,
+                            ]);
+                        }
+                    }
+                }
             }
 
             DB::commit();
@@ -125,6 +135,7 @@ class StorageRmCleanlinessController extends Controller
         DB::beginTransaction();
         try {
             foreach ($request->details as $detailInput) {
+                // Simpan detail inspeksi
                 $detail = DetailStorageRmCleanliness::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
@@ -138,7 +149,8 @@ class StorageRmCleanlinessController extends Controller
                         ? 'Suhu: ' . $itemInput['temperature'] . ' °C, RH: ' . $itemInput['humidity'] . ' %'
                         : $itemInput['condition'];
 
-                    ItemStorageRmCleanliness::create([
+                    // Simpan item inspeksi
+                    $item = ItemStorageRmCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $condition,
@@ -146,17 +158,29 @@ class StorageRmCleanlinessController extends Controller
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
-                }
 
+                    // Simpan koreksi lanjutan jika ada
+                    if (isset($itemInput['followups']) && is_array($itemInput['followups'])) {
+                        foreach ($itemInput['followups'] as $followupInput) {
+                            FollowupCleanlinessStorage::create([
+                                'item_storage_rm_cleanliness_id' => $item->id,
+                                'notes' => $followupInput['notes'] ?? null,
+                                'corrective_action' => $followupInput['corrective_action'] ?? null,
+                                'verification' => $followupInput['verification'] ?? 0,
+                            ]);
+                        }
+                    }
+                }
             }
 
             DB::commit();
             return redirect()->route('cleanliness.index')->with('success', 'Detail inspeksi berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
+
 
     public function exportPdf($uuid)
     {

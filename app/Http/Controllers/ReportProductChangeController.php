@@ -52,7 +52,7 @@ class ReportProductChangeController extends Controller
             'product_uuid' => $request->product_uuid,
             'production_code' => $request->production_code,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => getShift(),
             'created_by' => Auth::user()->name,
             'known_by' => $request->known_by,
             'approved_by' => $request->approved_by,

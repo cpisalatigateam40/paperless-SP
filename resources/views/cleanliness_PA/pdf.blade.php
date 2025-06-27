@@ -21,14 +21,13 @@
     td {
         border: 1px solid #000;
         padding: 2px 3px;
-        /* lebih rapat */
         text-align: left;
-        vertical-align: top;
+        vertical-align: middle;
     }
 
     th {
         text-align: center;
-        font-weight: normal;
+        font-weight: bold;
     }
 
     .text-center {
@@ -78,6 +77,15 @@
     @page {
         margin-top: 80px;
         size: 210mm 330mm;
+    }
+
+    ul {
+        margin: unset;
+        padding: .5rem;
+    }
+
+    li {
+        list-style-type: none;
     }
     </style>
 </head>
@@ -169,27 +177,24 @@
                 <td>{{ $item->notes }}</td>
                 <td>{{ $item->corrective_action }}</td>
                 <td>
-                    @php
-                    $mainVerification = 'Kondisi: ' . ($item->verification ? 'OK' : 'Tidak OK')
-                    . ', Keterangan: ' . ($item->notes ?? '-')
-                    . ', Tindakan Koreksi: ' . ($item->corrective_action ?? '-');
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $item->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $item->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
+                        </li>
 
-                    $followupDescriptions = $item->followups->map(function ($followup, $index) {
-                    return 'Follow-up #' . ($index + 1) . ': '
-                    . 'Kondisi: ' . ($followup->verification ? 'OK' : 'Tidak OK')
-                    . ', Keterangan: ' . ($followup->notes ?? '-')
-                    . ', Tindakan Koreksi: ' . ($followup->action ?? '-');
-                    })->toArray();
-
-                    $combinedVerificationText = implode(', ', array_filter([
-                    $mainVerification,
-                    ...$followupDescriptions
-                    ]));
-                    @endphp
-
-                    {{ $combinedVerificationText }}
+                        @foreach($item->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
                 </td>
-
             </tr>
             @endforeach
             @endforeach

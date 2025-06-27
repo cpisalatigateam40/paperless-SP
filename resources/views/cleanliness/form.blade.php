@@ -20,7 +20,7 @@
                         </div>
                         <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control" required>
+                            <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
                         </div>
                     </div>
 
@@ -43,7 +43,7 @@
 
                 <!-- Template -->
                 <template id="inspection-template">
-                    <div class="inspection-block border rounded p-3 mb-3 position-relative">
+                    <div class="inspection-block border rounded p-3 mb-3 position-relative" data-index="__index__">
                         <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection"
                             style="z-index: 1; right: 0; top: 0; margin-top: .5rem; margin-right: .5rem;">x</button>
 
@@ -96,11 +96,16 @@
                                             id="corrective-0" class="form-control corrective-field">
                                     </td>
                                     <td>
-                                        <select name="details[__index__][items][0][verification]" class="form-control"
-                                            required>
+                                        <select name="details[__index__][items][0][verification]" data-item="0"
+                                            class="form-control verification-select" required>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
+                                    </td>
+                                </tr>
+                                <tr class="followup-row">
+                                    <td colspan="6">
+                                        <div class="followup-wrapper"></div>
                                     </td>
                                 </tr>
 
@@ -138,11 +143,16 @@
                                             id="corrective-1" class="form-control corrective-field">
                                     </td>
                                     <td>
-                                        <select name="details[__index__][items][1][verification]" class="form-control"
-                                            required>
+                                        <select name="details[__index__][items][1][verification]" data-item="1"
+                                            class="form-control verification-select" required>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
+                                    </td>
+                                </tr>
+                                <tr class="followup-row">
+                                    <td colspan="6">
+                                        <div class="followup-wrapper"></div>
                                     </td>
                                 </tr>
 
@@ -192,14 +202,18 @@
                                             id="corrective-2" class="form-control corrective-field">
                                     </td>
                                     <td>
-                                        <select name="details[__index__][items][2][verification]" class="form-control"
-                                            required>
+                                        <select name="details[__index__][items][2][verification]"
+                                            class="form-control verification-select" data-item="2" required>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
                                     </td>
                                 </tr>
-
+                                <tr class="followup-row">
+                                    <td colspan="6">
+                                        <div class="followup-wrapper"></div>
+                                    </td>
+                                </tr>
 
                                 {{-- ITEM 4 --}}
                                 <tr>
@@ -252,11 +266,26 @@ let inspectionIndex = 0;
 document.getElementById('add-inspection').addEventListener('click', function() {
     const template = document.getElementById('inspection-template').innerHTML;
     const rendered = template.replace(/__index__/g, inspectionIndex);
-    document.getElementById('inspection-details').insertAdjacentHTML('beforeend', rendered);
+    const container = document.createElement('div');
+    container.innerHTML = rendered;
+
+    // Bind ulang untuk setiap note-select di template baru
+    container.querySelectorAll('.note-select').forEach(select => {
+        select.addEventListener('change', function(e) {
+            const selected = e.target.value;
+            const itemIndex = e.target.dataset.item;
+            const corrective = container.querySelector('#corrective-' + itemIndex);
+            if (corrective) {
+                corrective.value = koreksiMap[selected] || '';
+            }
+        });
+    });
+
+    document.getElementById('inspection-details').appendChild(container);
     inspectionIndex++;
 });
 
-// Trigger satu kali di awal
+
 document.getElementById('add-inspection').click();
 
 document.addEventListener('click', function(e) {
@@ -266,13 +295,10 @@ document.addEventListener('click', function(e) {
 });
 
 const koreksiMap = {
-    // Item 1 & 2
     'Sesuai': '-',
     'Penataan bahan tidak rapi': 'Penataan bahan dengan rapi',
     'Penempatan bahan tidak sesuai dengan labelnya': 'Penataan bahan sesuai dengan labelnya',
     'Tidak ada label/tagging di tempat penyimpanan': 'Labelling/tagging sesuai tempat penyimpanan',
-
-    // Item 3
     'Rak penyimpanan bahan kotor': 'Cleaning area/peralatan yang kotor',
     'Langit-langit kotor': 'Cleaning area/peralatan yang kotor',
     'Pintu kotor': 'Cleaning area/peralatan yang kotor',
@@ -288,60 +314,97 @@ const koreksiMap = {
     'Temuan pest di dalam bahan': 'Inspeksi pest'
 };
 
+function addFollowupField(block, itemIndex) {
+    const wrapper = block.querySelectorAll('.followup-wrapper')[itemIndex];
+    const count = wrapper.querySelectorAll('.followup-group').length;
 
-document.addEventListener('change', function(e) {
-    if (e.target.classList.contains('note-select')) {
-        const selected = e.target.value;
-        const itemIndex = e.target.dataset.item;
-        const target = document.getElementById('corrective-' + itemIndex);
-        target.value = koreksiMap[selected] || '';
-    }
-});
+    const html = `
+        <div class="followup-group border rounded p-3 mb-3">
+            <label class="small mb-2 d-block">Koreksi Lanjutan #${count + 1}</label>
+            <div class="mb-2">
+                <input type="text" name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][notes]" class="form-control" placeholder="Catatan">
+            </div>
+            <div class="mb-2">
+                <input type="text" name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][corrective_action]" class="form-control" placeholder="Tindakan Koreksi">
+            </div>
+            <div>
+                <select name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][verification]" class="form-control followup-verification">
+                    <option value="0">Tidak OK</option>
+                    <option value="1">OK</option>
+                </select>
+            </div>
+        </div>
+    `;
+
+    wrapper.insertAdjacentHTML('beforeend', html);
+
+    const newSelect = wrapper.querySelectorAll('.followup-group')[count].querySelector('.followup-verification');
+    newSelect.addEventListener('change', function() {
+        const allFollowups = wrapper.querySelectorAll('.followup-group');
+        const currentIndex = Array.from(allFollowups).indexOf(this.closest('.followup-group'));
+
+        if (this.value === '0') {
+            if (allFollowups.length === currentIndex + 1) {
+                addFollowupField(block, itemIndex);
+            }
+        } else {
+            for (let i = allFollowups.length - 1; i > currentIndex; i--) {
+                allFollowups[i].remove();
+            }
+        }
+    });
+}
 
 document.addEventListener('change', function(e) {
     const target = e.target;
 
-    // ITEM 1: Kondisi dan penempatan barang
-    if (target.name.includes('[0][condition]')) {
+    // auto koreksi dari note
+    if (target.classList.contains('note-select')) {
+        const selected = target.value;
+        const itemIndex = target.dataset.item;
+        const corrective = document.getElementById('corrective-' + itemIndex);
+        corrective.value = koreksiMap[selected] || '';
+    }
+
+    // verifikasi berubah -> trigger followup
+    if (target.classList.contains('verification-select')) {
         const block = target.closest('.inspection-block');
-        if (target.value === 'Tertata rapi') {
-            block.querySelector('select[name$="[0][notes]"]').value = 'Sesuai';
-            block.querySelector('input[name$="[0][corrective_action]"]').value = '-';
-            block.querySelector('select[name$="[0][verification]"]').value = '1';
-        } else {
-            block.querySelector('select[name$="[0][notes]"]').value = '';
-            block.querySelector('input[name$="[0][corrective_action]"]').value = '';
-            block.querySelector('select[name$="[0][verification]"]').value = '0';
+        const itemIndex = parseInt(target.dataset.item);
+        const wrapper = block.querySelectorAll('.followup-wrapper')[itemIndex];
+        wrapper.innerHTML = '';
+
+        if (target.value === '0') {
+            addFollowupField(block, itemIndex);
         }
     }
 
-    // ITEM 2: Pelabelan
-    if (target.name.includes('[1][condition]')) {
-        const block = target.closest('.inspection-block');
-        if (target.value === 'Sesuai tagging dan jenis alergen') {
-            block.querySelector('select[name$="[1][notes]"]').value = 'Sesuai';
-            block.querySelector('input[name$="[1][corrective_action]"]').value = '-';
-            block.querySelector('select[name$="[1][verification]"]').value = '1';
-        } else {
-            block.querySelector('select[name$="[1][notes]"]').value = '';
-            block.querySelector('input[name$="[1][corrective_action]"]').value = '';
-            block.querySelector('select[name$="[1][verification]"]').value = '0';
+    // Auto-fill based on kondisi
+    const autoFill = (itemIdx, conditionMatch, noteValue, correctiveValue, verificationValue) => {
+        if (target.name.includes(`[${itemIdx}][condition]`)) {
+            const block = target.closest('.inspection-block');
+            const noteField = block.querySelector(`select[name$="[${itemIdx}][notes]"]`);
+            const actionField = block.querySelector(`input[name$="[${itemIdx}][corrective_action]"]`);
+            const verificationField = block.querySelector(`select[name$="[${itemIdx}][verification]"]`);
+            const wrapper = block.querySelectorAll('.followup-wrapper')[itemIdx];
+
+            if (target.value === conditionMatch) {
+                noteField.value = noteValue;
+                actionField.value = correctiveValue;
+                verificationField.value = verificationValue;
+                wrapper.innerHTML = '';
+            } else {
+                noteField.value = '';
+                actionField.value = '';
+                verificationField.value = '0';
+                wrapper.innerHTML = '';
+                addFollowupField(block, itemIdx);
+            }
         }
     }
 
-    // ITEM 3: Kebersihan Ruangan
-    if (target.name.includes('[2][condition]')) {
-        const block = target.closest('.inspection-block');
-        if (target.value === 'Bersih dan bebas kontaminan') {
-            block.querySelector('select[name$="[2][notes]"]').value = 'Sesuai';
-            block.querySelector('input[name$="[2][corrective_action]"]').value = '-';
-            block.querySelector('select[name$="[2][verification]"]').value = '1';
-        } else {
-            block.querySelector('select[name$="[2][notes]"]').value = '';
-            block.querySelector('input[name$="[2][corrective_action]"]').value = '';
-            block.querySelector('select[name$="[2][verification]"]').value = '0';
-        }
-    }
+    autoFill(0, 'Tertata rapi', 'Sesuai', '-', '1');
+    autoFill(1, 'Sesuai tagging dan jenis alergen', 'Sesuai', '-', '1');
+    autoFill(2, 'Bersih dan bebas kontaminan', 'Sesuai', '-', '1');
 });
 </script>
 @endsection

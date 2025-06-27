@@ -15,15 +15,15 @@
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <label for="date">Tanggal</label>
-                        <input type="date" name="date" value="{{ \Carbon\Carbon::today()->toDateString() }}" class="form-control @error('date') is-invalid @enderror"
-                            value="{{ old('date') }}" required>
+                        <input type="date" name="date" value="{{ \Carbon\Carbon::today()->toDateString() }}"
+                            class="form-control @error('date') is-invalid @enderror" value="{{ old('date') }}" required>
                         @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-3">
                         <label for="shift">Shift</label>
                         <input type="text" name="shift" class="form-control @error('shift') is-invalid @enderror"
-                            value="{{ old('shift') }}" required>
+                            value="{{ getShift() }}" required>
                         @error('shift') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
@@ -31,10 +31,12 @@
                 {{-- Tabs --}}
                 <ul class="nav nav-tabs" id="reportTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="scale-tab" data-bs-toggle="tab" href="#scale" role="tab">Timbangan</a>
+                        <a class="nav-link active" id="scale-tab" data-bs-toggle="tab" href="#scale"
+                            role="tab">Timbangan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="thermometer-tab" data-bs-toggle="tab" href="#thermometer" role="tab">Thermometer</a>
+                        <a class="nav-link" id="thermometer-tab" data-bs-toggle="tab" href="#thermometer"
+                            role="tab">Thermometer</a>
                     </li>
                 </ul>
 
@@ -63,7 +65,7 @@
 let rowCount = 1;
 
 // Tambah Baris Baru
-document.getElementById('add-row').addEventListener('click', function () {
+document.getElementById('add-row').addEventListener('click', function() {
     const tbody = document.getElementById('detail-body');
     const time1 = document.getElementById('time1').value;
     const time2 = document.getElementById('time2').value;
@@ -100,11 +102,11 @@ document.getElementById('add-row').addEventListener('click', function () {
 });
 
 // Sync waktu ke seluruh baris
-document.getElementById('time1').addEventListener('input', function () {
+document.getElementById('time1').addEventListener('input', function() {
     document.querySelectorAll('.time1-input').forEach(input => input.value = this.value);
 });
 
-document.getElementById('time2').addEventListener('input', function () {
+document.getElementById('time2').addEventListener('input', function() {
     document.querySelectorAll('.time2-input').forEach(input => input.value = this.value);
 });
 </script>

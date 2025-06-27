@@ -53,7 +53,7 @@ class ReportForeignObjectController extends Controller
         $report = ReportForeignObject::create([
             'uuid' => Str::uuid(),
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => getShift(),
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'created_by' => Auth::user()->name,

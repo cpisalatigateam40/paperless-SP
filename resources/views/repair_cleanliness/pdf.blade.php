@@ -1,74 +1,85 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Laporan Pemeriksaan Kebersihan dan Sanitasi Setelah Perbaikan Mesin</title>
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 10px;
-            margin-top: 30px;
-        }
+    body {
+        font-family: DejaVu Sans, sans-serif;
+        font-size: 10px;
+        margin-top: 30px;
+    }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 12px;
-        }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 12px;
+    }
 
-        th, td {
-            border: 1px solid #000;
-            padding: 2px 3px; /* lebih rapat */
-            text-align: left;
-            vertical-align: top;
-        }
+    th,
+    td {
+        border: 1px solid #000;
+        padding: 2px 3px;
+        text-align: left;
+        vertical-align: middle;
+    }
 
-        th {
-            text-align: center;
-            font-weight: normal;
-        }
+    th {
+        text-align: center;
+        font-weight: bold;
+    }
 
-        .text-center {
-            text-align: center;
-        }
+    .text-center {
+        text-align: center;
+    }
 
-        .signature-box {
-            height: 40px;
-            border-bottom: 1px solid #000;
-            margin-top: 20px;
-            width: 60%;
-        }
+    .signature-box {
+        height: 40px;
+        border-bottom: 1px solid #000;
+        margin-top: 20px;
+        width: 60%;
+    }
 
-        .no-border {
-            border: none !important;
-        }
+    .no-border {
+        border: none !important;
+    }
 
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mb-4 { margin-bottom: 2rem; }
+    .mb-2 {
+        margin-bottom: 1rem;
+    }
 
-        .underline {
-            text-decoration: underline;
-        }
+    .mb-3 {
+        margin-bottom: 1.5rem;
+    }
 
-        .header {
-            position: fixed;
-            top: -60px;
-            left: 0;
-            width: 100%;
-            border: none;
-        }
+    .mb-4 {
+        margin-bottom: 2rem;
+    }
 
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .underline {
+        text-decoration: underline;
+    }
 
-        @page {
-            margin-top: 80px;
-            size: 210mm 330mm;
-        }
+    .header {
+        position: fixed;
+        top: -60px;
+        left: 0;
+        width: 100%;
+        border: none;
+    }
+
+    .header-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    @page {
+        margin-top: 80px;
+        size: 210mm 330mm;
+    }
     </style>
 </head>
+
 <body>
 
     {{-- header --}}
@@ -80,12 +91,12 @@
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
-                                    $path = public_path('storage/image/logo.png');
-                                    if(file_exists($path)) {
-                                        $type = pathinfo($path, PATHINFO_EXTENSION);
-                                        $data = file_get_contents($path);
-                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                    }
+                                $path = public_path('storage/image/logo.png');
+                                if(file_exists($path)) {
+                                $type = pathinfo($path, PATHINFO_EXTENSION);
+                                $data = file_get_contents($path);
+                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                }
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
@@ -112,7 +123,7 @@
                 </span>
             </td>
             <td style="text-align: left; border: none;">
-               Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
+                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
         </tr>
     </table>
@@ -183,11 +194,11 @@
             <td style="text-align: center; border: none; width: 33%;">
                 Disetujui oleh:<br><br>
                 @if($report->approved_by)
-                    <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
-                    <strong>{{ $report->approved_by }}</strong><br><br>
+                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
+                <strong>{{ $report->approved_by }}</strong><br><br>
                 @else
-                    <div style="height: 120px;"></div>
-                    <strong>-</strong><br>
+                <div style="height: 120px;"></div>
+                <strong>-</strong><br>
                 @endif
                 Supervisor QC
             </td>
@@ -195,4 +206,5 @@
     </table>
 
 </body>
+
 </html>

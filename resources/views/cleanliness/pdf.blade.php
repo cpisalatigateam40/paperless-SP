@@ -1,75 +1,95 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Form PDF - Kebersihan Area Penyimpanan Bahan</title>
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 10px;
-            margin-top: 30px;
-        }
+    body {
+        font-family: DejaVu Sans, sans-serif;
+        font-size: 10px;
+        margin-top: 30px;
+    }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 12px;
-        }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 12px;
+    }
 
-        th, td {
-            border: 1px solid #000;
-            padding: 2px 3px; /* lebih rapat */
-            text-align: left;
-            vertical-align: top;
-        }
+    th,
+    td {
+        border: 1px solid #000;
+        padding: 2px 3px;
+        text-align: left;
+        vertical-align: middle;
+    }
 
-        th {
-            text-align: center;
-            font-weight: normal;
-        }
+    th {
+        text-align: center;
+        font-weight: bold;
+    }
 
-        .text-center {
-            text-align: center;
-        }
+    .text-center {
+        text-align: center;
+    }
 
-        .signature-box {
-            height: 40px;
-            border-bottom: 1px solid #000;
-            margin-top: 20px;
-            width: 60%;
-        }
+    .signature-box {
+        height: 40px;
+        border-bottom: 1px solid #000;
+        margin-top: 20px;
+        width: 60%;
+    }
 
-        .no-border {
-            border: none !important;
-        }
+    .no-border {
+        border: none !important;
+    }
 
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mb-4 { margin-bottom: 2rem; }
+    .mb-2 {
+        margin-bottom: 1rem;
+    }
 
-        .underline {
-            text-decoration: underline;
-        }
+    .mb-3 {
+        margin-bottom: 1.5rem;
+    }
 
-        .header {
-            position: fixed;
-            top: -60px;
-            left: 0;
-            width: 100%;
-            border: none;
-        }
+    .mb-4 {
+        margin-bottom: 2rem;
+    }
 
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .underline {
+        text-decoration: underline;
+    }
 
-        @page {
-            margin-top: 80px;
-            size: 210mm 330mm;
-        }
+    .header {
+        position: fixed;
+        top: -60px;
+        left: 0;
+        width: 100%;
+        border: none;
+    }
+
+    .header-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    @page {
+        margin-top: 80px;
+        size: 210mm 330mm;
+    }
+
+    ul {
+        margin: unset;
+        padding: .5rem;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
+
 <body>
 
     {{-- header --}}
@@ -81,12 +101,12 @@
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
-                                    $path = public_path('storage/image/logo.png');
-                                    if(file_exists($path)) {
-                                        $type = pathinfo($path, PATHINFO_EXTENSION);
-                                        $data = file_get_contents($path);
-                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                    }
+                                $path = public_path('storage/image/logo.png');
+                                if(file_exists($path)) {
+                                $type = pathinfo($path, PATHINFO_EXTENSION);
+                                $data = file_get_contents($path);
+                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                }
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
@@ -113,10 +133,10 @@
                 </span>
             </td>
             <td style="text-align: left; border: none;">
-               Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
+                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
             <td style="text-align: left; border: none;">
-              Area: <span style="text-decoration: underline;"> {{ $report->room_name }}</span>
+                Area: <span style="text-decoration: underline;"> {{ $report->room_name }}</span>
             </td>
         </tr>
     </table>
@@ -135,19 +155,38 @@
         </thead>
         <tbody>
             @foreach($report->details as $detail)
-                @foreach($detail->items as $i => $item)
-                    <tr>
-                        @if($i === 0)
-                            <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                        @endif
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $item->item }}</td>
-                        <td style="text-align: center">{{ $item->condition }}</td>
-                        <td>{{ $item->notes }}</td>
-                        <td>{{ $item->corrective_action }}</td>
-                        <td>{{ $item->verification == 1 ? 'OK' : 'Tidak OK' }}</td>
-                    </tr>
-                @endforeach
+            @foreach($detail->items as $i => $item)
+            <tr>
+                @if($i === 0)
+                <td rowspan="4">{{ $detail->inspection_hour }}</td>
+                @endif
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $item->item }}</td>
+                <td style="text-align: center">{{ $item->condition }}</td>
+                <td>{{ $item->notes }}</td>
+                <td>{{ $item->corrective_action }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $item->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $item->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
+                        </li>
+
+                        @foreach($item->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
+
+            </tr>
+            @endforeach
             @endforeach
             <tr>
                 <td colspan="7" style="text-align: right; border: none;">QM 12 / 01</td>
@@ -184,11 +223,11 @@
             <td style="text-align: center; border: none; width: 33%;">
                 Disetujui oleh:<br><br>
                 @if($report->approved_by)
-                    <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
-                    <strong>{{ $report->approved_by }}</strong><br><br>
+                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
+                <strong>{{ $report->approved_by }}</strong><br><br>
                 @else
-                    <div style="height: 120px;"></div>
-                    <strong>-</strong><br>
+                <div style="height: 120px;"></div>
+                <strong>-</strong><br>
                 @endif
                 Supervisor QC
             </td>
@@ -196,4 +235,5 @@
     </table>
 
 </body>
+
 </html>
