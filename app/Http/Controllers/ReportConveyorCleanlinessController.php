@@ -37,7 +37,7 @@ class ReportConveyorCleanlinessController extends Controller
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => getShift(),
             'created_by' => Auth::user()->name,
             'known_by' => $request->known_by,
             'approved_by' => $request->approved_by,

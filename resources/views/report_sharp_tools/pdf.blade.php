@@ -20,14 +20,13 @@
     td {
         border: 1px solid #000;
         padding: 2px 3px;
-        /* lebih rapat */
         text-align: left;
-        vertical-align: top;
+        vertical-align: middle;
     }
 
     th {
         text-align: center;
-        font-weight: normal;
+        font-weight: bold;
     }
 
     .text-center {

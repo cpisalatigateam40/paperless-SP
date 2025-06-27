@@ -51,7 +51,7 @@ class GmpController extends Controller
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => $request->date,
-                'shift' => $request->shift,
+                'shift' => getShift(),
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,
                 'approved_by' => $request->approved_by,

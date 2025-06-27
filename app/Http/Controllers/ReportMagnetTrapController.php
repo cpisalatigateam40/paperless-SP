@@ -41,7 +41,7 @@ class ReportMagnetTrapController extends Controller
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => getShift(),
             'created_by' => Auth::user()->name,
         ]);
 

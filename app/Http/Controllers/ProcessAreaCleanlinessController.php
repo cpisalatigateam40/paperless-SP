@@ -42,7 +42,7 @@ class ProcessAreaCleanlinessController extends Controller
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => now()->toDateString(),
-                'shift' => $request->shift,
+                'shift' => getShift(),
                 'section_name' => $request->section_name,
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,

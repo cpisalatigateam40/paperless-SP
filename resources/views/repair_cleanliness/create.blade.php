@@ -13,12 +13,13 @@
                 <div class="row" style="margin-bottom: 3rem;">
                     <div class="col-md-3">
                         <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control" value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                        <input type="date" name="date" class="form-control"
+                            value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                     </div>
 
                     <div class="col-md-3">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" required>
+                        <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
                     </div>
                 </div>
 
@@ -31,7 +32,7 @@
                             <select name="details[0][equipment_uuid]" class="form-control" required>
                                 <option value="">Pilih Mesin</option>
                                 @foreach ($equipments as $equipment)
-                                    <option value="{{ $equipment->uuid }}">{{ $equipment->name }}</option>
+                                <option value="{{ $equipment->uuid }}">{{ $equipment->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -41,7 +42,7 @@
                             <select name="details[0][section_uuid]" class="form-control" required>
                                 <option value="">Pilih Section</option>
                                 @foreach ($sections as $section)
-                                    <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
+                                <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
                                 @endforeach
                             </select>
                         </div>

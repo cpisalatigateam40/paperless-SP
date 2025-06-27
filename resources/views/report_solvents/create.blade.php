@@ -15,11 +15,12 @@
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
                         <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control" value="{{ old('date', date('Y-m-d')) }}" required>
+                        <input type="date" name="date" class="form-control" value="{{ old('date', date('Y-m-d')) }}"
+                            required>
                     </div>
                     <div class="col-md-4">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" required>
+                        <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
                     </div>
                 </div>
 
@@ -44,26 +45,29 @@
                         </thead>
                         <tbody>
                             @foreach ($solventItems as $i => $item)
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td class="text-start">
-                                        {{ $item->name }}
-                                        <input type="hidden" name="details[{{ $i }}][solvent_uuid]" value="{{ $item->uuid }}">
-                                    </td>
-                                    <td>{{ $item->concentration }}</td>
-                                    <td>{{ $item->volume_material }}</td>
-                                    <td>{{ $item->volume_solvent }}</td>
-                                    <td class="text-start">{{ $item->application_area }}</td>
-                                    <td>
-                                        <input type="checkbox" name="details[{{ $i }}][verification_result]" value="1">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="details[{{ $i }}][corrective_action]" class="form-control form-control-sm">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="details[{{ $i }}][reverification_action]" class="form-control form-control-sm">
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td>{{ $i + 1 }}</td>
+                                <td class="text-start">
+                                    {{ $item->name }}
+                                    <input type="hidden" name="details[{{ $i }}][solvent_uuid]"
+                                        value="{{ $item->uuid }}">
+                                </td>
+                                <td>{{ $item->concentration }}</td>
+                                <td>{{ $item->volume_material }}</td>
+                                <td>{{ $item->volume_solvent }}</td>
+                                <td class="text-start">{{ $item->application_area }}</td>
+                                <td>
+                                    <input type="checkbox" name="details[{{ $i }}][verification_result]" value="1">
+                                </td>
+                                <td>
+                                    <input type="text" name="details[{{ $i }}][corrective_action]"
+                                        class="form-control form-control-sm">
+                                </td>
+                                <td>
+                                    <input type="text" name="details[{{ $i }}][reverification_action]"
+                                        class="form-control form-control-sm">
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
