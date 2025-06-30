@@ -138,7 +138,7 @@
                 <th>Nama Karyawan</th>
                 <th>Keterangan</th>
                 <th>Tindakan Koreksi</th>
-                <th>Verifikasi</th>
+                <th>Verifikasi & Koreksi Lanjutan</th>
             </tr>
         </thead>
         <tbody>
@@ -150,9 +150,30 @@
                 <td>{{ $detail->employee_name }}</td>
                 <td>{{ $detail->notes }}</td>
                 <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verification ? '✔' : '✘' }}</td>
+                <td>
+                    <ul style="margin: 0; padding-left: 16px;">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $detail->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $detail->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($detail->followups as $index => $followup)
+                        <li style="margin-top: 4px;">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
+
+            <tr>
+                <td colspan="7" style="text-align: right; border: none;">QM 13 / 01</td>
+            </tr>
         </tbody>
     </table>
     <p>Ket : * meliput Boot, Seragam, Topi, Masker dan Sarung tangan.</p>
@@ -160,12 +181,13 @@
     @if($report->sanitationCheck)
     <h4>KONTROL SANITASI</h4>
     @php
-    $firstCheck = $report->sanitationCheck->first();
+    $firstCheck = $report->sanitationCheck;
     $hour1 = $firstCheck?->hour_1 ?? 'Jam 1';
     $hour2 = $firstCheck?->hour_2 ?? 'Jam 2';
+    $areas = $report->sanitationCheck->sanitationArea ?? [];
     @endphp
 
-    <table>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
         <thead>
             <tr>
                 <th rowspan="3">No</th>
@@ -174,23 +196,22 @@
                 <th colspan="4">Hasil Pengecekan</th>
                 <th rowspan="3">Keterangan</th>
                 <th rowspan="3">Tindakan Koreksi</th>
-                <th rowspan="3">Verifikasi</th>
+                <th rowspan="3">Verifikasi & Koreksi Lanjutan</th>
             </tr>
             <tr>
                 <th colspan="2">Jam 1: {{ $hour1 }}</th>
                 <th colspan="2">Jam 2: {{ $hour2 }}</th>
             </tr>
             <tr>
-                <th>Kadar klorin (ppm)</th>
+                <th>Kadar Klorin (ppm)</th>
                 <th>Suhu (°C)</th>
-                <th>Kadar klorin (ppm)</th>
+                <th>Kadar Klorin (ppm)</th>
                 <th>Suhu (°C)</th>
             </tr>
         </thead>
         <tbody>
             @php $no = 1; @endphp
-
-            @foreach($report->sanitationCheck->sanitationArea as $area)
+            @foreach($areas as $area)
             @php
             $jam1 = $area->sanitationResult->firstWhere('hour_to', 1);
             $jam2 = $area->sanitationResult->firstWhere('hour_to', 2);
@@ -198,14 +219,31 @@
             <tr>
                 <td>{{ $no++ }}</td>
                 <td>{{ $area->area_name }}</td>
-                <td>{{ $area->chlorine_std }}</td>
+                <td>{{ $area->chlorine_std ?? '-' }}</td>
                 <td>{{ $jam1?->chlorine_level ?? '-' }}</td>
                 <td>{{ $jam1?->temperature ?? '-' }}</td>
                 <td>{{ $jam2?->chlorine_level ?? '-' }}</td>
                 <td>{{ $jam2?->temperature ?? '-' }}</td>
                 <td>{{ $area->notes ?? '-' }}</td>
                 <td>{{ $area->corrective_action ?? '-' }}</td>
-                <td>{{ $report->sanitationCheck->verification ? '✔' : '✘' }}</td>
+                <td>
+                    <ul style="margin: 0; padding-left: 16px;">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $area->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $area->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $area->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($area->followups as $index => $followup)
+                        <li style="margin-top: 4px;">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
 
@@ -215,6 +253,7 @@
         </tbody>
     </table>
     @endif
+
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
