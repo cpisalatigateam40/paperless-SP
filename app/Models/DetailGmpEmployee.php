@@ -26,4 +26,9 @@ class DetailGmpEmployee extends Model
     {
         return $this->belongsTo(ReportGmpEmployee::class, 'report_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowupGmpEmployee::class, 'gmp_employee_detail_id');
+    }
 }

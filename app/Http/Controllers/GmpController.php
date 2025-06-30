@@ -10,6 +10,8 @@ use App\Models\DetailGmpEmployee;
 use App\Models\SanitationCheck;
 use App\Models\SanitationArea;
 use App\Models\SanitationResult;
+use App\Models\FollowupGmpEmployee;
+use App\Models\FollowupSanitation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
@@ -61,7 +63,7 @@ class GmpController extends Controller
             // Simpan Detail Inspeksi jika ada
             if ($request->has('details')) {
                 foreach ($request->details as $detail) {
-                    $detailData = [
+                    $detailData = DetailGmpEmployee::create([
                         'uuid' => Str::uuid(),
                         'report_uuid' => $report->uuid,
                         'inspection_hour' => $detail['inspection_hour'] ?? null,
@@ -70,10 +72,22 @@ class GmpController extends Controller
                         'notes' => $detail['notes'] ?? null,
                         'corrective_action' => $detail['corrective_action'] ?? null,
                         'verification' => $detail['verification'] ?? null,
-                    ];
-                    DetailGmpEmployee::create($detailData);
+                    ]);
+
+                    // ✅ Simpan followups jika ada
+                    if (isset($detail['followups']) && is_array($detail['followups'])) {
+                        foreach ($detail['followups'] as $followup) {
+                            FollowupGmpEmployee::create([
+                                'gmp_employee_detail_id' => $detailData->id,
+                                'notes' => $followup['notes'] ?? null,
+                                'action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? 0,
+                            ]);
+                        }
+                    }
                 }
             }
+
 
             // Simpan Sanitasi jika ada input
             if ($request->has('sanitation.hour_1') || $request->has('sanitation.hour_2')) {
@@ -86,7 +100,6 @@ class GmpController extends Controller
                     'report_gmp_employee_id' => $report->id,
                     'hour_1' => $request->input('sanitation.hour_1'),
                     'hour_2' => $request->input('sanitation.hour_2'),
-                    'verification' => $request->input('sanitation.verification'),
                 ]);
 
                 // Simpan sanitation_areas dan sanitation_results
@@ -101,6 +114,7 @@ class GmpController extends Controller
                             'chlorine_std' => $area['chlorine_std'] ?? null,
                             'notes' => $area['notes'] ?? null,
                             'corrective_action' => $area['corrective_action'] ?? null,
+                            'verification' => $area['verification'] ?? null,
                         ]);
 
                         if (isset($area['result'])) {
@@ -110,6 +124,18 @@ class GmpController extends Controller
                                     'hour_to' => $hourTo,
                                     'chlorine_level' => $result['chlorine_level'] ?? null,
                                     'temperature' => $result['temperature'] ?? null,
+                                ]);
+                            }
+                        }
+
+                        // ✅ Simpan followups jika ada
+                        if (isset($area['followups']) && is_array($area['followups'])) {
+                            foreach ($area['followups'] as $followup) {
+                                FollowupSanitation::create([
+                                    'sanitation_area_uuid' => $areaUUID,
+                                    'notes' => $followup['notes'] ?? null,
+                                    'action' => $followup['action'] ?? null,
+                                    'verification' => $followup['verification'] ?? 0,
                                 ]);
                             }
                         }
@@ -145,94 +171,6 @@ class GmpController extends Controller
         return view('gmp_employee.edit', compact('report', 'details', 'sanitation', 'sanitationAreas'))->with('isEdit', true);
     }
 
-
-
-    // public function update(Request $request, $uuid)
-    // {
-    //     DB::beginTransaction();
-
-    //     try {
-    //         $report = ReportGmpEmployee::where('uuid', $uuid)->firstOrFail();
-
-    //         $report->update([
-    //             'date' => $request->date,
-    //             'shift' => $request->shift,
-    //             'known_by' => $request->known_by,
-    //             'approved_by' => $request->approved_by,
-    //         ]);
-
-    //         // Update detail inspeksi
-    //         $report->details()->delete();
-    //         if ($request->has('details')) {
-    //             foreach ($request->details as $detail) {
-    //                 DetailGmpEmployee::create([
-    //                     'uuid' => Str::uuid(),
-    //                     'report_uuid' => $report->uuid,
-    //                     'inspection_hour' => $detail['inspection_hour'] ?? null,
-    //                     'section_name' => $detail['section_name'] ?? null,
-    //                     'employee_name' => $detail['employee_name'] ?? null,
-    //                     'notes' => $detail['notes'] ?? null,
-    //                     'corrective_action' => $detail['corrective_action'] ?? null,
-    //                     'verification' => $detail['verification'] ?? null,
-    //                 ]);
-    //             }
-    //         }
-
-    //         // Update sanitation
-    //         if ($report->sanitationCheck) {
-    //             $report->sanitationCheck->sanitationArea()->each(function ($area) {
-    //                 $area->sanitationResult()->delete();
-    //                 $area->delete();
-    //             });
-    //             $report->sanitationCheck->delete();
-    //         }
-
-    //         if ($request->has('sanitation.hour_1') || $request->has('sanitation.hour_2')) {
-    //             $checkUUID = Str::uuid();
-    //             $sanitationCheck = SanitationCheck::create([
-    //                 'uuid' => $checkUUID,
-    //                 'area_uuid' => $report->area_uuid,
-    //                 'report_gmp_employee_id' => $report->id,
-    //                 'hour_1' => $request->input('sanitation.hour_1'),
-    //                 'hour_2' => $request->input('sanitation.hour_2'),
-    //                 'verification' => $request->input('sanitation.verification'),
-    //             ]);
-
-    //             if ($request->has('sanitation_area')) {
-    //                 foreach ($request->sanitation_area as $area) {
-    //                     $areaUUID = Str::uuid();
-
-    //                     $sanitationArea = SanitationArea::create([
-    //                         'uuid' => $areaUUID,
-    //                         'sanitation_check_uuid' => $checkUUID,
-    //                         'area_name' => $area['area_name'] ?? null,
-    //                         'chlorine_std' => $area['chlorine_std'] ?? null,
-    //                         'notes' => $area['notes'] ?? null,
-    //                         'corrective_action' => $area['corrective_action'] ?? null,
-    //                     ]);
-
-    //                     if (isset($area['result'])) {
-    //                         foreach ($area['result'] as $hourTo => $result) {
-    //                             SanitationResult::create([
-    //                                 'sanitation_area_uuid' => $areaUUID,
-    //                                 'hour_to' => $hourTo,
-    //                                 'chlorine_level' => $result['chlorine_level'] ?? null,
-    //                                 'temperature' => $result['temperature'] ?? null,
-    //                             ]);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         DB::commit();
-    //         return redirect()->route('gmp-employee.index')->with('success', 'Laporan berhasil diperbarui.');
-    //     } catch (\Exception $e) {
-    //         DB::rollback();
-    //         return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
-    //     }
-    // }
-
     public function update(Request $request, $uuid)
     {
         DB::beginTransaction();
@@ -247,11 +185,11 @@ class GmpController extends Controller
                 'approved_by' => $request->approved_by,
             ]);
 
-            // Update detail inspeksi
             $report->details()->delete();
+
             if ($request->has('details')) {
                 foreach ($request->details as $detail) {
-                    DetailGmpEmployee::create([
+                    $newDetail = DetailGmpEmployee::create([
                         'uuid' => Str::uuid(),
                         'report_uuid' => $report->uuid,
                         'inspection_hour' => $detail['inspection_hour'] ?? null,
@@ -261,17 +199,28 @@ class GmpController extends Controller
                         'corrective_action' => $detail['corrective_action'] ?? null,
                         'verification' => $detail['verification'] ?? null,
                     ]);
+
+                    if (!empty($detail['followups'])) {
+                        foreach ($detail['followups'] as $followup) {
+                            $newDetail->followups()->create([
+                                'notes' => $followup['notes'] ?? null,
+                                'action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? null,
+                            ]);
+                        }
+                    }
                 }
             }
 
-            // Sanitation Update
+            // =========================
+            // Update sanitation check
+            // =========================
             $sanitationCheck = $report->sanitationCheck;
 
             if ($sanitationCheck) {
-                // Update jam 2 dan verifikasi saja
+                // Update jam_2
                 $sanitationCheck->update([
                     'hour_2' => $request->input('sanitation.hour_2'),
-                    'verification' => $request->input('sanitation.verification'),
                 ]);
 
                 if ($request->has('sanitation_area')) {
@@ -281,17 +230,17 @@ class GmpController extends Controller
                             ->first();
 
                         if ($area) {
-                            // Update std, notes, dan tindakan koreksi jika ada
+                            // Update std, notes, corrective action, verification
                             $area->update([
                                 'chlorine_std' => $areaInput['chlorine_std'] ?? null,
                                 'notes' => $areaInput['notes'] ?? null,
                                 'corrective_action' => $areaInput['corrective_action'] ?? null,
+                                'verification' => $areaInput['verification'] ?? null,
                             ]);
 
-                            // Tangani result jam 2
+                            // Update / insert sanitation result jam_2
                             if (isset($areaInput['result'][2])) {
-                                $result2 = $area->sanitationResult()
-                                    ->where('hour_to', 2)->first();
+                                $result2 = $area->sanitationResult()->where('hour_to', 2)->first();
 
                                 if ($result2) {
                                     $result2->update([
@@ -303,6 +252,19 @@ class GmpController extends Controller
                                         'hour_to' => 2,
                                         'chlorine_level' => $areaInput['result'][2]['chlorine_level'] ?? null,
                                         'temperature' => $areaInput['result'][2]['temperature'] ?? null,
+                                    ]);
+                                }
+                            }
+
+                            // Hapus followups lama dulu, baru tambahkan ulang followups baru
+                            $area->followups()->delete();
+
+                            if (!empty($areaInput['followups'])) {
+                                foreach ($areaInput['followups'] as $followup) {
+                                    $area->followups()->create([
+                                        'notes' => $followup['notes'] ?? null,
+                                        'action' => $followup['action'] ?? null,
+                                        'verification' => $followup['verification'] ?? null,
                                     ]);
                                 }
                             }
@@ -318,6 +280,7 @@ class GmpController extends Controller
             return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
+
 
     public function destroy($id)
     {
@@ -344,18 +307,40 @@ class GmpController extends Controller
             'verification' => 'nullable|boolean',
         ]);
 
-        DetailGmpEmployee::create([
-            'uuid' => Str::uuid(),
-            'report_uuid' => $request->report_uuid,
-            'inspection_hour' => $request->inspection_hour,
-            'section_name' => $request->section_name,
-            'employee_name' => $request->employee_name,
-            'notes' => $request->notes,
-            'corrective_action' => $request->corrective_action,
-            'verification' => $request->verification ? 1 : 0,
-        ]);
+        DB::beginTransaction();
+        try {
+            // Simpan detail inspeksi utama
+            $detail = DetailGmpEmployee::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $request->report_uuid,
+                'inspection_hour' => $request->inspection_hour,
+                'section_name' => $request->section_name,
+                'employee_name' => $request->employee_name,
+                'notes' => $request->notes,
+                'corrective_action' => $request->corrective_action,
+                'verification' => $request->verification ? 1 : 0,
+            ]);
 
-        return redirect()->route('gmp-employee.index')->with('success', 'Detail inspeksi berhasil ditambahkan.');
+            // Jika ada followups dikirim dari form
+            if ($request->has('followups') && is_array($request->followups)) {
+                foreach ($request->followups as $followup) {
+                    if (!empty($followup['notes']) || !empty($followup['action'])) {
+                        \App\Models\FollowupGmpEmployee::create([
+                            'gmp_employee_detail_id' => $detail->id,
+                            'notes' => $followup['notes'] ?? null,
+                            'action' => $followup['action'] ?? null,
+                            'verification' => isset($followup['verification']) && $followup['verification'] ? 1 : 0,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('gmp-employee.index')->with('success', 'Detail inspeksi berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function approve($id)
