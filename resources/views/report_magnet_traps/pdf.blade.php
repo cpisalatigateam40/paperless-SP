@@ -148,14 +148,20 @@
             @foreach ($report->details as $detail)
             <tr>
                 <td class="text-center">{{ $detail->time }}</td>
-                <td>{{ $detail->finding }}</td>
+                <td class="text-center">
+                    @if($detail->finding_image)
+                    <img src="{{ public_path('storage/' . $detail->finding_image) }}" width="50">
+                    @else
+                    -
+                    @endif
+                </td>
                 <td class="text-center">@if ($detail->source === 'QC') &#10003; @endif</td>
                 <td class="text-center">@if ($detail->source === 'Produksi') &#10003; @endif</td>
                 <td>{{ $detail->note ?: '-' }}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="5" style="text-align: right; border: none;">QM 46 / 00</td>
+                <td colspan="5" style="border: none; text-align: right;">QM 46 / 00</td>
             </tr>
         </tbody>
     </table>

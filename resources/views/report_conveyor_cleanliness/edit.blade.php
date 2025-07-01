@@ -12,29 +12,34 @@
                 @method('PUT')
 
                 {{-- HEADER --}}
-                <div style="margin-bottom: 3rem;">
+                <div class="mb-4">
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label>Tanggal</label>
-                            <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}">
+                            <input type="date" name="date" class="form-control"
+                                value="{{ old('date', $report->date) }}">
                         </div>
                         <div class="col-md-4">
                             <label>Shift</label>
-                            <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}" required>
+                            <input type="text" name="shift" class="form-control"
+                                value="{{ old('shift', $report->shift) }}" required>
                         </div>
                         <div class="col-md-4">
                             <label>Section</label>
                             <select name="section_uuid" class="form-select form-control">
                                 <option value="">-- Pilih Section --</option>
                                 @foreach ($sections as $section)
-                                    <option value="{{ $section->uuid }}" {{ $section->uuid == $report->section_uuid ? 'selected' : '' }}>{{ $section->section_name }}</option>
+                                <option value="{{ $section->uuid }}"
+                                    {{ $section->uuid == $report->section_uuid ? 'selected' : '' }}>
+                                    {{ $section->section_name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
 
-                {{-- EDIT DETAIL (semua grup mesin) --}}
+                {{-- DETAIL MESIN --}}
                 <h5 class="mt-4">Update Detail Inspeksi</h5>
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle text-center">
@@ -55,28 +60,78 @@
                         <tbody>
                             @php $grouped = $report->machines->chunk(4); @endphp
                             @foreach ($grouped as $groupIndex => $group)
-                                @php $innerIndex = 0; @endphp
-                                @foreach ($group as $machine)
-                                <tr>
-                                    <td>{{ $innerIndex === 0 ? $groupIndex + 1 : '' }}</td>
-                                    <td>
-                                        <input type="time" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][time]" class="form-control" value="{{ old('machines.' . $groupIndex . '.' . $innerIndex . '.time', $machine->time ? \Carbon\Carbon::parse($machine->time)->format('H:i') : '') }}">
-                                    </td>
-                                    <td class="text-start">
-                                        <input type="hidden" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][uuid]" value="{{ $machine->uuid }}">
-                                        <input type="hidden" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][machine_name]" value="{{ $machine->machine_name }}">
-                                        <p class="mb-0">{{ $machine->machine_name }}</p>
-                                    </td>
-                                    <td><input type="radio" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][status]" value="bersih" {{ $machine->status === 'bersih' ? 'checked' : '' }}></td>
-                                    <td><input type="radio" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][status]" value="kotor" {{ $machine->status === 'kotor' ? 'checked' : '' }}></td>
-                                    <td><input type="text" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][notes]" class="form-control" value="{{ $machine->notes }}"></td>
-                                    <td><input type="text" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][corrective_action]" class="form-control" value="{{ $machine->corrective_action }}"></td>
-                                    <td><input type="text" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][verification]" class="form-control" value="{{ $machine->verification }}"></td>
-                                    <td><input type="checkbox" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][qc_check]" value="1" {{ $machine->qc_check ? 'checked' : '' }}></td>
-                                    <td><input type="checkbox" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][kr_check]" value="1" {{ $machine->kr_check ? 'checked' : '' }}></td>
-                                </tr>
-                                @php $innerIndex++; @endphp
-                                @endforeach
+                            @php $innerIndex = 0; @endphp
+                            @foreach ($group as $machine)
+                            <tr>
+                                <td>{{ $innerIndex === 0 ? $groupIndex + 1 : '' }}</td>
+                                <td>
+                                    <input type="time" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][time]"
+                                        value="{{ old('machines.' . $groupIndex . '.' . $innerIndex . '.time', \Carbon\Carbon::parse($machine->time)->format('H:i')) }}"
+                                        class="form-control">
+                                </td>
+                                <td class="text-start">
+                                    <input type="hidden" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][uuid]"
+                                        value="{{ $machine->uuid }}">
+                                    <input type="hidden"
+                                        name="machines[{{ $groupIndex }}][{{ $innerIndex }}][machine_name]"
+                                        value="{{ $machine->machine_name }}">
+                                    {{ $machine->machine_name }}
+                                </td>
+                                <td><input type="radio" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][status]"
+                                        value="bersih" {{ $machine->status === 'bersih' ? 'checked' : '' }}></td>
+                                <td><input type="radio" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][status]"
+                                        value="kotor" {{ $machine->status === 'kotor' ? 'checked' : '' }}></td>
+                                <td><input type="text" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][notes]"
+                                        value="{{ $machine->notes }}" class="form-control"></td>
+                                <td><input type="text"
+                                        name="machines[{{ $groupIndex }}][{{ $innerIndex }}][corrective_action]"
+                                        value="{{ $machine->corrective_action }}" class="form-control"></td>
+                                <td>
+                                    <select name="machines[{{ $groupIndex }}][{{ $innerIndex }}][verification]"
+                                        class="form-select form-control">
+                                        <option value="1" {{ $machine->verification == '1' ? 'selected' : '' }}>OK
+                                        </option>
+                                        <option value="0" {{ $machine->verification == '0' ? 'selected' : '' }}>Tidak OK
+                                        </option>
+                                    </select>
+                                </td>
+                                <td><input type="checkbox"
+                                        name="machines[{{ $groupIndex }}][{{ $innerIndex }}][qc_check]" value="1"
+                                        {{ $machine->qc_check ? 'checked' : '' }}></td>
+                                <td><input type="checkbox"
+                                        name="machines[{{ $groupIndex }}][{{ $innerIndex }}][kr_check]" value="1"
+                                        {{ $machine->kr_check ? 'checked' : '' }}></td>
+                            </tr>
+                            <tr class="followup-row">
+                                <td colspan="10">
+                                    <div class="followup-wrapper">
+                                        @foreach($machine->followups as $idx => $followup)
+                                        <div class="border rounded p-2 mb-2">
+                                            <label class="small mb-1">Koreksi Lanjutan #{{ $idx+1 }}</label>
+                                            <input type="text"
+                                                name="machines[{{ $groupIndex }}][{{ $innerIndex }}][followups][{{ $idx }}][notes]"
+                                                value="{{ $followup->notes }}" class="form-control mb-1"
+                                                placeholder="Catatan">
+                                            <input type="text"
+                                                name="machines[{{ $groupIndex }}][{{ $innerIndex }}][followups][{{ $idx }}][corrective_action]"
+                                                value="{{ $followup->corrective_action }}" class="form-control mb-1"
+                                                placeholder="Tindakan Koreksi">
+                                            <select
+                                                name="machines[{{ $groupIndex }}][{{ $innerIndex }}][followups][{{ $idx }}][verification]"
+                                                class="form-select form-control">
+                                                <option value="1"
+                                                    {{ $followup->verification == '1' ? 'selected' : '' }}>OK</option>
+                                                <option value="0"
+                                                    {{ $followup->verification == '0' ? 'selected' : '' }}>Tidak OK
+                                                </option>
+                                            </select>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </td>
+                            </tr>
+                            @php $innerIndex++; @endphp
+                            @endforeach
                             @endforeach
                         </tbody>
                     </table>

@@ -77,6 +77,15 @@
         margin-top: 80px;
         size: 210mm 330mm;
     }
+
+    ul {
+        margin: unset;
+        padding: .2rem;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
 
@@ -160,13 +169,30 @@
                 <td>{{ $innerIndex === 0 ? $groupIndex + 1 : '' }}</td>
                 <td>{{ $machine->time ? \Illuminate\Support\Carbon::parse($machine->time)->format('H:i') : '-' }}</td>
                 <td class="text-start">{{ $machine->machine_name }}</td>
-                <td>{!! $machine->status === 'bersih' ? '&#10003;' : '' !!}</td>
-                <td>{!! $machine->status === 'kotor' ? '&#10007;' : '' !!}</td>
+                <td style="text-align: center;">{!! $machine->status === 'bersih' ? '&#10003;' : '' !!}</td>
+                <td style="text-align: center;">{!! $machine->status === 'kotor' ? '&#10007;' : '' !!}</td>
                 <td>{{ $machine->notes ?? '-' }}</td>
                 <td>{{ $machine->corrective_action ?? '-' }}</td>
-                <td>{{ $machine->verification ?? '-' }}</td>
-                <td>{!! $machine->qc_check ? '&#10003;' : '' !!}</td>
-                <td>{!! $machine->kr_check ? '&#10003;' : '' !!}</td>
+                <td class="text-start">
+                    <ul class="mb-0" style="padding-left: 1rem;">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $machine->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $machine->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $machine->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($machine->followups as $index => $followup)
+                        <li class="mt-1">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
+                <td style="text-align: center;">{!! $machine->qc_check ? '&#10003;' : '' !!}</td>
+                <td style="text-align: center;">{!! $machine->kr_check ? '&#10003;' : '' !!}</td>
             </tr>
             @php $innerIndex++; @endphp
             @endforeach

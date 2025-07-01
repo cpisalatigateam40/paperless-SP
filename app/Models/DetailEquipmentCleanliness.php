@@ -44,4 +44,10 @@ class DetailEquipmentCleanliness extends Model
     {
         return $this->belongsTo(EquipmentPart::class, 'equipment_part_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowupDetailEquipmentCleanliness::class, 'detail_equipment_uuid', 'uuid');
+    }
+
 }

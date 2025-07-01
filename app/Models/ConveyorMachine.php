@@ -31,4 +31,9 @@ class ConveyorMachine extends Model
     {
         return $this->belongsTo(ReportConveyorCleanliness::class, 'report_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowupConveyorMachine::class, 'conveyor_machine_uuid', 'uuid');
+    }
 }

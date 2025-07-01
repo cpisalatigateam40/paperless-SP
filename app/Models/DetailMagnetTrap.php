@@ -17,7 +17,7 @@ class DetailMagnetTrap extends Model
         'report_uuid',
         'time',
         'source',
-        'finding',
+        'finding_image',
         'note',
     ];
 

@@ -46,10 +46,10 @@ class ReportReCleanlinessController extends Controller
             'created_by' => Auth::user()->name,
         ]);
 
-        // Simpan detail ruangan
+        // Detail room
         foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
             foreach ($roomData['elements'] ?? [] as $element_uuid => $data) {
-                DetailRoomCleanliness::create([
+                $detail = DetailRoomCleanliness::create([
                     'uuid' => Str::uuid(),
                     'report_re_uuid' => $report->uuid,
                     'room_uuid' => $room_uuid,
@@ -59,13 +59,25 @@ class ReportReCleanlinessController extends Controller
                     'corrective_action' => $data['corrective_action'] ?? null,
                     'verification' => $data['verification'] ?? null,
                 ]);
+
+                // Simpan followups jika ada
+                if (isset($data['followups']) && is_array($data['followups'])) {
+                    foreach ($data['followups'] as $followup) {
+                        \App\Models\FollowupDetailRoomCleanliness::create([
+                            'detail_room_uuid' => $detail->uuid,
+                            'notes' => $followup['notes'] ?? null,
+                            'corrective_action' => $followup['action'] ?? null,
+                            'verification' => $followup['verification'] ?? null,
+                        ]);
+                    }
+                }
             }
         }
 
-        // Simpan detail equipment
+        // Detail equipment
         foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
             foreach ($equipmentData['parts'] ?? [] as $part_uuid => $data) {
-                DetailEquipmentCleanliness::create([
+                $detail = DetailEquipmentCleanliness::create([
                     'uuid' => Str::uuid(),
                     'report_re_uuid' => $report->uuid,
                     'equipment_uuid' => $equipment_uuid,
@@ -75,6 +87,17 @@ class ReportReCleanlinessController extends Controller
                     'corrective_action' => $data['corrective_action'] ?? null,
                     'verification' => $data['verification'] ?? null,
                 ]);
+
+                if (isset($data['followups']) && is_array($data['followups'])) {
+                    foreach ($data['followups'] as $followup) {
+                        \App\Models\FollowupDetailEquipmentCleanliness::create([
+                            'detail_equipment_uuid' => $detail->uuid,
+                            'notes' => $followup['notes'] ?? null,
+                            'corrective_action' => $followup['action'] ?? null,
+                            'verification' => $followup['verification'] ?? null,
+                        ]);
+                    }
+                }
             }
         }
 

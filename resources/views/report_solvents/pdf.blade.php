@@ -78,6 +78,16 @@
         margin-top: 80px;
         size: 210mm 330mm;
     }
+
+    ul {
+        margin: unset;
+        padding: .2rem;
+    }
+
+    li {
+        list-style-type: none;
+        margin-left: -1rem;
+    }
     </style>
 </head>
 
@@ -154,16 +164,38 @@
                 <td>{{ $detail->solvent->volume_material ?? '-' }}</td>
                 <td>{{ $detail->solvent->volume_solvent ?? '-' }}</td>
                 <td class="text-start">{{ $detail->solvent->application_area ?? '-' }}</td>
-                <td>{!! $detail->verification_result ? '✓' : '' !!}</td>
+                <td style="text-align: center">{!! $detail->verification_result == '1' ? '✓' :
+                    ($detail->verification_result == '0' ? 'x' : '-') !!}</td>
                 <td>{{ $detail->corrective_action ?? '-' }}</td>
-                <td>{{ $detail->reverification_action ?? '-' }}</td>
+                <td>
+                    <ul class="mb-0" style="padding-left: 1rem; text-align: left;">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi:
+                            {{ $detail->reverification_action == '1' ? 'OK' : ($detail->reverification_action == '0' ? 'Tidak OK' : '-') }}
+                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
+                        </li>
+
+                        @foreach($detail->followups as $index => $followup)
+                        <li class="mt-1">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi:
+                            {{ $followup->verification == '1' ? 'OK' : ($followup->verification == '0' ? 'Tidak OK' : '-') }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
+
             <tr>
                 <td colspan="9" style="text-align: right; border: none;">QM 44 / 01</td>
             </tr>
         </tbody>
     </table>
+
 
     <p style="margin-top: 2rem;">
         <strong>Keterangan:</strong><br>
