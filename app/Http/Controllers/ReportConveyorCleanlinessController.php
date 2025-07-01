@@ -45,8 +45,11 @@ class ReportConveyorCleanlinessController extends Controller
         ]);
 
         foreach ($request->machines ?? [] as $machine) {
-            ConveyorMachine::create([
-                'uuid' => Str::uuid(),
+            $machineUuid = Str::uuid();
+
+            // Simpan detail mesin
+            $newMachine = ConveyorMachine::create([
+                'uuid' => $machineUuid,
                 'report_uuid' => $uuid,
                 'time' => $machine['time'] ?? now()->format('H:i'),
                 'machine_name' => $machine['machine_name'] ?? null,
@@ -57,9 +60,22 @@ class ReportConveyorCleanlinessController extends Controller
                 'corrective_action' => $machine['corrective_action'] ?? null,
                 'verification' => $machine['verification'] ?? null,
             ]);
+
+            // Simpan follow-up jika ada
+            if (!empty($machine['followups']) && is_array($machine['followups'])) {
+                foreach ($machine['followups'] as $followup) {
+                    \App\Models\FollowupConveyorMachine::create([
+                        'conveyor_machine_uuid' => $machineUuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['corrective_action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
+            }
         }
 
-        return redirect()->route('report-conveyor-cleanliness.index')->with('success', 'Laporan berhasil dibuat.');
+        return redirect()->route('report-conveyor-cleanliness.index')
+            ->with('success', 'Laporan berhasil dibuat.');
     }
 
     public function destroy($uuid)
@@ -99,8 +115,11 @@ class ReportConveyorCleanlinessController extends Controller
         $report = ReportConveyorCleanliness::where('uuid', $uuid)->firstOrFail();
 
         foreach ($request->machines ?? [] as $machine) {
-            ConveyorMachine::create([
-                'uuid' => Str::uuid(),
+            $machineUuid = Str::uuid();
+
+            // Simpan mesin
+            $newMachine = \App\Models\ConveyorMachine::create([
+                'uuid' => $machineUuid,
                 'report_uuid' => $uuid,
                 'time' => $machine['time'] ?? now()->format('H:i'),
                 'machine_name' => $machine['machine_name'],
@@ -111,6 +130,18 @@ class ReportConveyorCleanlinessController extends Controller
                 'corrective_action' => $machine['corrective_action'] ?? null,
                 'verification' => $machine['verification'] ?? null,
             ]);
+
+            // Simpan follow-up jika ada
+            if (!empty($machine['followups']) && is_array($machine['followups'])) {
+                foreach ($machine['followups'] as $followup) {
+                    \App\Models\FollowupConveyorMachine::create([
+                        'conveyor_machine_uuid' => $machineUuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['corrective_action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
+            }
         }
 
         return redirect()->route('report-conveyor-cleanliness.index')
@@ -140,7 +171,6 @@ class ReportConveyorCleanlinessController extends Controller
         foreach ($request->machines ?? [] as $group) {
             foreach ($group as $machineData) {
                 if (isset($machineData['uuid'])) {
-                    // Update existing
                     $machine = ConveyorMachine::where('uuid', $machineData['uuid'])->first();
                     if ($machine) {
                         $machine->update([
@@ -152,6 +182,28 @@ class ReportConveyorCleanlinessController extends Controller
                             'qc_check' => isset($machineData['qc_check']),
                             'kr_check' => isset($machineData['kr_check']),
                         ]);
+
+                        // Update followups
+                        if (!empty($machineData['followups']) && is_array($machineData['followups'])) {
+                            foreach ($machineData['followups'] as $idx => $followup) {
+                                // Cek apakah followup sudah ada (optional: pakai id/uuid), kalau belum, buat baru
+                                $existingFollowup = $machine->followups[$idx] ?? null;
+                                if ($existingFollowup) {
+                                    $existingFollowup->update([
+                                        'notes' => $followup['notes'] ?? null,
+                                        'corrective_action' => $followup['corrective_action'] ?? null,
+                                        'verification' => $followup['verification'] ?? null,
+                                    ]);
+                                } else {
+                                    \App\Models\FollowupConveyorMachine::create([
+                                        'conveyor_machine_uuid' => $machine->uuid,
+                                        'notes' => $followup['notes'] ?? null,
+                                        'corrective_action' => $followup['corrective_action'] ?? null,
+                                        'verification' => $followup['verification'] ?? null,
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
             }

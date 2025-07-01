@@ -46,11 +46,16 @@ class ReportMagnetTrapController extends Controller
         ]);
 
         foreach ($request->details as $detail) {
+            $path = null;
+            if (isset($detail['finding']) && $detail['finding']) {
+                $path = $detail['finding']->store('magnet_trap/findings', 'public');
+            }
+
             $report->details()->create([
                 'uuid' => Str::uuid(),
                 'time' => $detail['time'],
                 'source' => $detail['source'] ?? null,
-                'finding' => $detail['finding'] ?? null,
+                'finding_image' => $path,
                 'note' => $detail['note'] ?? null,
             ]);
         }
@@ -76,22 +81,26 @@ class ReportMagnetTrapController extends Controller
         $request->validate([
             'time' => 'required',
             'source' => 'required|in:QC,Produksi',
-            'finding' => 'required|string',
+            'finding' => 'required|image|mimes:jpeg,png,jpg',
             'note' => 'nullable|string',
         ]);
 
         $report = ReportMagnetTrap::where('uuid', $uuid)->firstOrFail();
 
+        // Upload file
+        $path = $request->file('finding')->store('magnet_trap/findings', 'public');
+
         $report->details()->create([
             'uuid' => Str::uuid(),
             'time' => $request->time,
             'source' => $request->source,
-            'finding' => $request->finding,
+            'finding_image' => $path, // simpan path gambar
             'note' => $request->note,
         ]);
 
         return redirect()->route('report_magnet_traps.index')->with('success', 'Detail berhasil ditambahkan.');
     }
+
 
     public function approve($id)
     {
@@ -113,7 +122,7 @@ class ReportMagnetTrapController extends Controller
     {
         $report = ReportMagnetTrap::with('area', 'section', 'details')->where('uuid', $uuid)->firstOrFail();
 
-         // Generate QR untuk created_by
+        // Generate QR untuk created_by
         $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
         $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
         $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);

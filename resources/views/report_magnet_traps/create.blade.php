@@ -7,7 +7,7 @@
             <h5>Tambah Pemeriksaan Magnet Trap</h5>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('report_magnet_traps.store') }}">
+            <form method="POST" action="{{ route('report_magnet_traps.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -64,7 +64,9 @@
                                 </div>
                             </td>
 
-                            <td><input type="text" name="details[0][finding]" class="form-control"></td>
+                            <td>
+                                <input type="file" name="details[0][finding]" class="form-control" accept="image/*">
+                            </td>
                             <td><input type="text" name="details[0][note]" class="form-control"></td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
@@ -94,27 +96,26 @@ document.getElementById('add-row').addEventListener('click', () => {
     const body = document.getElementById('detail-body');
     const row = document.createElement('tr');
     row.innerHTML = `
-                <td><input type="time" name="details[${rowIdx}][time]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}" required></td>
-                <td class="text-center align-middle">
-                    <div class="d-flex justify-content-center align-items-center gap-3" style="gap: 1rem;">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="details[0][source]"
-                                value="QC" required>
-                            <label class="form-check-label">QC</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="details[0][source]"
-                                value="Produksi">
-                            <label class="form-check-label">Produksi</label>
-                        </div>
-                    </div>
-                </td>
-                <td><input type="text" name="details[${rowIdx}][finding]" class="form-control"></td>
-                <td><input type="text" name="details[${rowIdx}][note]" class="form-control"></td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
-                </td>
-            `;
+        <td><input type="time" name="details[${rowIdx}][time]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}" required></td>
+        <td class="text-center align-middle">
+            <div class="d-flex justify-content-center align-items-center gap-3" style="gap: 1rem;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="details[${rowIdx}][source]" value="QC" required>
+                    <label class="form-check-label">QC</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="details[${rowIdx}][source]" value="Produksi">
+                    <label class="form-check-label">Produksi</label>
+                </div>
+            </div>
+        </td>
+        <td><input type="file" name="details[${rowIdx}][finding]" class="form-control" accept="image/*"></td>
+        <td><input type="text" name="details[${rowIdx}][note]" class="form-control"></td>
+        <td class="text-center">
+            <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
+        </td>
+    `;
+
     body.appendChild(row);
     rowIdx++;
 });

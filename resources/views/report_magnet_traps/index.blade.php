@@ -97,7 +97,18 @@
                                     <tr>
                                         <td>{{ $report->shift }}</td>
                                         <td>{{ $detail->time }}</td>
-                                        <td>{{ $detail->finding }}</td>
+                                        <td class="text-center">
+                                            @if($detail->finding_image)
+                                            <a href="{{ asset('storage/' . $detail->finding_image) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $detail->finding_image) }}" alt="Temuan"
+                                                    width="60">
+                                            </a>
+
+                                            @else
+                                            -
+                                            @endif
+                                        </td>
+
                                         <td class="text-center">
                                             @if ($detail->source === 'QC')
                                             ✓

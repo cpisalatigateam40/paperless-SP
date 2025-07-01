@@ -29,4 +29,9 @@ class DetailSolvent extends Model
     {
         return $this->belongsTo(SolventItem::class, 'solvent_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowupDetailSolvent::class, 'detail_solvent_uuid', 'uuid');
+    }
 }

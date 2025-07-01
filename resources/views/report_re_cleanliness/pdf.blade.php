@@ -78,6 +78,15 @@
         margin-top: 80px;
         size: 210mm 330mm;
     }
+
+    ul {
+        margin: unset;
+        padding: .5rem;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
 
@@ -162,7 +171,25 @@
                 </td>
                 <td>{{ $detail->notes }}</td>
                 <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $detail->verification ?? '-' }}<br>
+                            Keterangan: {{ $detail->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($detail->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ?? '-' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
+
             </tr>
             @endforeach
             @endforeach
@@ -204,7 +231,25 @@
                 </td>
                 <td>{{ $detail->notes }}</td>
                 <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $detail->verification ?? '-' }}<br>
+                            Keterangan: {{ $detail->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($detail->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ?? '-' }}<br>
+                            Keterangan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
+
             </tr>
             @endforeach
             @endforeach

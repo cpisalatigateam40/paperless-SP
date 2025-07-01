@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\SolventItem;
 use App\Models\ReportSolvent;
 use App\Models\DetailSolvent;
+use App\Models\FollowupDetailSolvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -69,14 +70,28 @@ class ReportSolventController extends Controller
         ]);
 
         foreach ($request->details ?? [] as $detail) {
+            $detailUuid = Str::uuid();
+
             DetailSolvent::create([
-                'uuid' => Str::uuid(),
+                'uuid' => $detailUuid,
                 'report_uuid' => $uuid,
                 'solvent_uuid' => $detail['solvent_uuid'],
-                'verification_result' => isset($detail['verification_result']),
+                'verification_result' => $detail['verification_result'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
                 'reverification_action' => $detail['reverification_action'] ?? null,
             ]);
+
+            // Simpan followups jika ada
+            if (!empty($detail['followups'])) {
+                foreach ($detail['followups'] as $followup) {
+                    FollowupDetailSolvent::create([
+                        'detail_solvent_uuid' => $detailUuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
+            }
         }
 
         return redirect()->route('report-solvents.index')->with('success', 'Laporan berhasil disimpan.');

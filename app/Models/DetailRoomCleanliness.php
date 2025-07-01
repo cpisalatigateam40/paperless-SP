@@ -45,4 +45,9 @@ class DetailRoomCleanliness extends Model
     {
         return $this->belongsTo(RoomElement::class, 'room_element_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowupDetailRoomCleanliness::class, 'detail_room_uuid', 'uuid');
+    }
 }
