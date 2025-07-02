@@ -28,4 +28,9 @@ class PreOperationEquipment extends Model
     {
         return $this->belongsTo(Equipment::class, 'equipment_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowUpPreOperationEquipment::class, 'pre_operation_equipment_uuid', 'uuid');
+    }
 }

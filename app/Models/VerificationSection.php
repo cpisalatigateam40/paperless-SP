@@ -12,8 +12,12 @@ class VerificationSection extends Model
     protected $table = 'verification_sections';
 
     protected $fillable = [
-        'uuid', 'report_uuid', 'section_uuid',
-        'condition', 'corrective_action', 'verification',
+        'uuid',
+        'report_uuid',
+        'section_uuid',
+        'condition',
+        'corrective_action',
+        'verification',
     ];
 
     public function report()
@@ -25,4 +29,10 @@ class VerificationSection extends Model
     {
         return $this->belongsTo(Section::class, 'section_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowUpSection::class, 'verification_section_uuid', 'uuid');
+    }
+
 }

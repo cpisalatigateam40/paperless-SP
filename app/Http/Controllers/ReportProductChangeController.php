@@ -10,6 +10,9 @@ use App\Models\Section;
 use App\Models\VerificationEquipment;
 use App\Models\VerificationSection;
 use App\Models\VerificationMaterialLeftover;
+use App\Models\FollowUpMaterialLeftover;
+use App\Models\FollowUpEquipment;
+use App\Models\FollowUpSection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -60,38 +63,72 @@ class ReportProductChangeController extends Controller
 
         // Sisa Bahan & Kemasan
         foreach ($request->input('material_leftovers', []) as $item) {
+            $detailUuid = Str::uuid()->toString();
+
             VerificationMaterialLeftover::create([
-                'uuid' => Str::uuid(),
+                'uuid' => $detailUuid,
                 'report_uuid' => $uuid,
                 'item' => $item['item'] ?? null,
                 'condition' => $item['condition'] ?? null,
                 'corrective_action' => $item['corrective_action'] ?? null,
                 'verification' => $item['verification'] ?? null,
             ]);
+
+            // Simpan followups jika ada
+            foreach ($item['followups'] ?? [] as $followup) {
+                FollowUpMaterialLeftover::create([
+                    'material_leftover_uuid' => $detailUuid,
+                    'notes' => $followup['notes'] ?? null,
+                    'corrective_action' => $followup['action'] ?? null,
+                    'verification' => $followup['verification'] ?? null,
+                ]);
+            }
         }
 
         // Mesin & Peralatan
         foreach ($request->input('equipments', []) as $item) {
+            $detailUuid = Str::uuid()->toString();
+
             VerificationEquipment::create([
-                'uuid' => Str::uuid(),
+                'uuid' => $detailUuid,
                 'report_uuid' => $uuid,
                 'equipment_uuid' => $item['equipment_uuid'] ?? null,
                 'condition' => $item['condition'] ?? null,
                 'corrective_action' => $item['corrective_action'] ?? null,
                 'verification' => $item['verification'] ?? null,
             ]);
+
+            foreach ($item['followups'] ?? [] as $followup) {
+                FollowUpEquipment::create([
+                    'verification_equipment_uuid' => $detailUuid,
+                    'notes' => $followup['notes'] ?? null,
+                    'corrective_action' => $followup['action'] ?? null,
+                    'verification' => $followup['verification'] ?? null,
+                ]);
+            }
         }
 
         // Kondisi Ruangan
         foreach ($request->input('sections', []) as $item) {
+            $detailUuid = Str::uuid()->toString();
+
             VerificationSection::create([
-                'uuid' => Str::uuid(),
+                'uuid' => $detailUuid,
                 'report_uuid' => $uuid,
                 'section_uuid' => $item['section_uuid'] ?? null,
                 'condition' => $item['condition'] ?? null,
                 'corrective_action' => $item['corrective_action'] ?? null,
                 'verification' => $item['verification'] ?? null,
             ]);
+
+            foreach ($item['followups'] ?? [] as $followup) {
+                FollowUpSection::create([
+                    'verification_section_uuid' => $detailUuid,
+                    'notes' => $followup['notes'] ?? null,
+                    'corrective_action' => $followup['action'] ?? null,
+                    'verification' => $followup['verification'] ?? null,
+                ]);
+            }
         }
 
         return redirect()->route('report_product_changes.index')->with('success', 'Laporan berhasil disimpan.');
@@ -131,7 +168,7 @@ class ReportProductChangeController extends Controller
             'sections.section'
         ])->where('uuid', $uuid)->firstOrFail();
 
-         // Generate QR untuk created_by
+        // Generate QR untuk created_by
         $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
         $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
         $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);

@@ -85,6 +85,15 @@
         margin-top: 80px;
         size: 210mm 330mm;
     }
+
+    ul {
+        margin: unset;
+        padding: .2rem;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
 
@@ -182,7 +191,27 @@
                 <td class="text-center">{{ in_array($item->condition, [5,6]) ? $item->condition : '' }}</td>
                 <td class="text-center">{{ in_array($item->condition, [7,8]) ? $item->condition : '' }}</td>
                 <td>{{ $item->corrective_action }}</td>
-                <td>{{ $item->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $item->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
+                        </li>
+
+                        @foreach($item->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            {{-- kalau ada notes: --}}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
 
@@ -199,7 +228,28 @@
                 <td class="text-center">{{ in_array($eq->condition, [5,6]) ? $eq->condition : '' }}</td>
                 <td class="text-center">{{ in_array($eq->condition, [7,8]) ? $eq->condition : '' }}</td>
                 <td>{{ $eq->corrective_action }}</td>
-                <td>{{ $eq->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $eq->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $eq->corrective_action ?? '-' }}
+                        </li>
+
+                        @foreach($eq->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            {{-- kalau ada notes: --}}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
+
             </tr>
             @endforeach
 
@@ -216,7 +266,28 @@
                 <td class="text-center">{{ in_array($sec->condition, [5,6]) ? $sec->condition : '' }}</td>
                 <td class="text-center">{{ in_array($sec->condition, [7,8]) ? $sec->condition : '' }}</td>
                 <td>{{ $sec->corrective_action }}</td>
-                <td>{{ $sec->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $sec->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $sec->corrective_action ?? '-' }}
+                        </li>
+
+                        @foreach($sec->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            {{-- kalau ada notes: --}}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
+
             </tr>
             @endforeach
 

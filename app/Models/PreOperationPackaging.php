@@ -23,4 +23,9 @@ class PreOperationPackaging extends Model
     {
         return $this->belongsTo(ReportPreOperation::class, 'report_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowUpPreOperationPackaging::class, 'pre_operation_packaging_uuid', 'uuid');
+    }
 }

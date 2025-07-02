@@ -7,6 +7,10 @@ use App\Models\PreOperationMaterial;
 use App\Models\PreOperationPackaging;
 use App\Models\PreOperationEquipment;
 use App\Models\PreOperationRoom;
+use App\Models\FollowupPreOperationMaterial;
+use App\Models\FollowupPreOperationPackaging;
+use App\Models\FollowupPreOperationEquipment;
+use App\Models\FollowupPreOperationRoom;
 use App\Models\Product;
 use App\Models\Area;
 use App\Models\Equipment;
@@ -81,10 +85,10 @@ class ReportPreOperationController extends Controller
             'approved_by' => $request->approved_by,
         ]);
 
-        // Bahan Baku & Penunjang
+        // ✅ Bahan Baku & Penunjang
         foreach ($request->input('materials', []) as $item) {
             if (!empty($item['item'])) {
-                PreOperationMaterial::create([
+                $detail = PreOperationMaterial::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
                     'type' => $item['type'] ?? null,
@@ -93,13 +97,22 @@ class ReportPreOperationController extends Controller
                     'corrective_action' => $item['corrective_action'] ?? null,
                     'verification' => $item['verification'] ?? null,
                 ]);
+
+                foreach ($item['followups'] ?? [] as $followup) {
+                    FollowupPreOperationMaterial::create([
+                        'pre_operation_material_uuid' => $detail->uuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
             }
         }
 
-        // Kemasan
+        // ✅ Kemasan
         foreach ($request->input('packagings', []) as $item) {
             if (!empty($item['item'])) {
-                PreOperationPackaging::create([
+                $detail = PreOperationPackaging::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
                     'item' => $item['item'] ?? null,
@@ -107,13 +120,22 @@ class ReportPreOperationController extends Controller
                     'corrective_action' => $item['corrective_action'] ?? null,
                     'verification' => $item['verification'] ?? null,
                 ]);
+
+                foreach ($item['followups'] ?? [] as $followup) {
+                    FollowupPreOperationPackaging::create([
+                        'pre_operation_packaging_uuid' => $detail->uuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
             }
         }
 
-        // Mesin & Peralatan
+        // ✅ Mesin & Peralatan
         foreach ($request->input('equipments', []) as $item) {
             if (!empty($item['equipment_uuid'])) {
-                PreOperationEquipment::create([
+                $detail = PreOperationEquipment::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
                     'equipment_uuid' => $item['equipment_uuid'] ?? null,
@@ -121,13 +143,22 @@ class ReportPreOperationController extends Controller
                     'corrective_action' => $item['corrective_action'] ?? null,
                     'verification' => $item['verification'] ?? null,
                 ]);
+
+                foreach ($item['followups'] ?? [] as $followup) {
+                    FollowupPreOperationEquipment::create([
+                        'pre_operation_equipment_uuid' => $detail->uuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
             }
         }
 
-        // Kondisi Ruangan
+        // ✅ Kondisi Ruangan
         foreach ($request->input('rooms', []) as $item) {
             if (!empty($item['section_uuid'])) {
-                PreOperationRoom::create([
+                $detail = PreOperationRoom::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
                     'section_uuid' => $item['section_uuid'] ?? null,
@@ -135,11 +166,21 @@ class ReportPreOperationController extends Controller
                     'corrective_action' => $item['corrective_action'] ?? null,
                     'verification' => $item['verification'] ?? null,
                 ]);
+
+                foreach ($item['followups'] ?? [] as $followup) {
+                    FollowupPreOperationRoom::create([
+                        'pre_operation_room_uuid' => $detail->uuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
             }
         }
 
         return redirect()->route('report_pre_operations.index')->with('success', 'Laporan berhasil disimpan.');
     }
+
 
     public function destroy($uuid)
     {

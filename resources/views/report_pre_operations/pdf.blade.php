@@ -85,6 +85,15 @@
         margin-top: 80px;
         size: 210mm 330mm;
     }
+
+    ul {
+        margin: unset;
+        padding: .2rem;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
 
@@ -156,8 +165,8 @@
         <thead>
             <tr>
                 <th rowspan="2">NO</th>
-                <th rowspan="2">PARAMETER PENGECEKAN</th>
-                <th colspan="4">PENILAIAN KONDISI BAHAN/PERALATAN</th>
+                <th rowspan="2" class="text-left">PARAMETER PENGECEKAN</th>
+                <th colspan="4">PENILAIAN KONDISI BAHAN / PERALATAN</th>
                 <th rowspan="2">TINDAKAN KOREKSI</th>
                 <th rowspan="2">VERIFIKASI</th>
             </tr>
@@ -169,75 +178,148 @@
             </tr>
         </thead>
         <tbody>
-            {{-- BAHAN --}}
+            {{-- === BAHAN BAKU & PENUNJANG === --}}
             <tr>
                 <td colspan="8"><strong>BAHAN BAKU & PENUNJANG</strong></td>
             </tr>
             @foreach ($report->materials as $i => $item)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $item->item }}</td>
-                <td class="text-center">{{ in_array($item->condition, [1, 2]) ? $item->condition : '' }}</td>
-                <td class="text-center">{{ in_array($item->condition, [3, 4]) ? $item->condition : '' }}</td>
-                <td class="text-center">{{ in_array($item->condition, [5, 6]) ? $item->condition : '' }}</td>
-                <td class="text-center">{{ in_array($item->condition, [7, 8]) ? $item->condition : '' }}</td>
+                <td class="text-left">{{ strtoupper($item->item) }}</td>
+                <td class="text-center">{{ in_array($item->condition, [1,2]) ? $item->condition : '' }}</td>
+                <td class="text-center">{{ in_array($item->condition, [3,4]) ? $item->condition : '' }}</td>
+                <td class="text-center">{{ in_array($item->condition, [5,6]) ? $item->condition : '' }}</td>
+                <td class="text-center">{{ in_array($item->condition, [7,8]) ? $item->condition : '' }}</td>
                 <td>{{ $item->corrective_action }}</td>
-                <td>{{ $item->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $item->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($item->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
 
-            {{-- KEMASAN --}}
+            {{-- === KEMASAN === --}}
             <tr>
                 <td colspan="8"><strong>KEMASAN</strong></td>
             </tr>
             @foreach ($report->packagings as $i => $item)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $item->item }}</td>
-                <td class="text-center">{{ in_array($item->condition, [1, 2]) ? $item->condition : '' }}</td>
+                <td class="text-left">{{ strtoupper($item->item) }}</td>
+                <td class="text-center">{{ in_array($item->condition, [1,2]) ? $item->condition : '' }}</td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td>{{ $item->corrective_action }}</td>
-                <td>{{ $item->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $item->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($item->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
 
-            {{-- PERALATAN --}}
+            {{-- === MESIN & PERALATAN === --}}
             <tr>
                 <td colspan="8"><strong>MESIN & PERALATAN</strong></td>
             </tr>
             @foreach ($report->equipments as $i => $eq)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $eq->equipment->name ?? '-' }}</td>
-                <td class="text-center">{{ in_array($eq->condition, [1, 2]) ? $eq->condition : '' }}</td>
-                <td class="text-center">{{ in_array($eq->condition, [3, 4]) ? $eq->condition : '' }}</td>
-                <td class="text-center">{{ in_array($eq->condition, [5, 6]) ? $eq->condition : '' }}</td>
-                <td class="text-center">{{ in_array($eq->condition, [7, 8]) ? $eq->condition : '' }}</td>
+                <td class="text-left">{{ strtoupper($eq->equipment->name ?? '-') }}</td>
+                <td class="text-center">{{ in_array($eq->condition, [1,2]) ? $eq->condition : '' }}</td>
+                <td class="text-center">{{ in_array($eq->condition, [3,4]) ? $eq->condition : '' }}</td>
+                <td class="text-center">{{ in_array($eq->condition, [5,6]) ? $eq->condition : '' }}</td>
+                <td class="text-center">{{ in_array($eq->condition, [7,8]) ? $eq->condition : '' }}</td>
                 <td>{{ $eq->corrective_action }}</td>
-                <td>{{ $eq->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $eq->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $eq->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($eq->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
 
-            {{-- RUANGAN --}}
+            {{-- === KONDISI RUANGAN === --}}
             <tr>
                 <td colspan="8"><strong>KONDISI RUANGAN</strong></td>
             </tr>
             @foreach ($report->rooms as $i => $room)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $room->section->section_name ?? '-' }}</td>
+                <td class="text-left">{{ strtoupper($room->section->section_name ?? '-') }}</td>
                 <td></td>
-                <td class="text-center">{{ in_array($room->condition, [3, 4]) ? $room->condition : '' }}</td>
-                <td class="text-center">{{ in_array($room->condition, [5, 6]) ? $room->condition : '' }}</td>
-                <td class="text-center">{{ in_array($room->condition, [7, 8]) ? $room->condition : '' }}</td>
+                <td class="text-center">{{ in_array($room->condition, [3,4]) ? $room->condition : '' }}</td>
+                <td class="text-center">{{ in_array($room->condition, [5,6]) ? $room->condition : '' }}</td>
+                <td class="text-center">{{ in_array($room->condition, [7,8]) ? $room->condition : '' }}</td>
                 <td>{{ $room->corrective_action }}</td>
-                <td>{{ $room->verification }}</td>
+                <td>
+                    <ul class="mb-0">
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $room->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $room->corrective_action ?? '-' }}
+                        </li>
+                        @foreach($room->followups as $index => $followup)
+                        <li class="mt-2">
+                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification == '1' ? 'OK' : 'Tidak OK' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                            @if(!empty($followup->notes))
+                            <br>Keterangan: {{ $followup->notes }}
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
             </tr>
             @endforeach
+
             <tr>
-                <td colspan="8" style="text-align: right; border: none;">QM 50 / 00</td>
+                <td colspan="8" style="text-align: right; border: none;">QM 51 / 00</td>
             </tr>
         </tbody>
     </table>

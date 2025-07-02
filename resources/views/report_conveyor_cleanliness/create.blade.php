@@ -81,6 +81,7 @@
                                 <td>
                                     <select name="machines[{{ $i }}][verification]"
                                         class="form-select form-control verification-select">
+                                        <option value="">-- Pilih --</option>
                                         <option value="1">OK</option>
                                         <option value="0">Tidak OK</option>
                                     </select>
@@ -166,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <input type="text" name="${baseName}[followups][${index}][notes]" class="form-control mb-1" placeholder="Catatan">
                     <input type="text" name="${baseName}[followups][${index}][corrective_action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
                     <select name="${baseName}[followups][${index}][verification]" class="form-control followup-verification">
+                        <option value="">-- Pilih --</option>
                         <option value="0">Tidak OK</option>
                         <option value="1">OK</option>
                     </select>
@@ -192,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="text" name="${baseName}[followups][${index}][notes]" class="form-control mb-1" placeholder="Catatan">
                 <input type="text" name="${baseName}[followups][${index}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
                 <select name="${baseName}[followups][${index}][verification]" class="form-control followup-verification">
+                    <option value="">-- Pilih --</option>
                     <option value="0">Tidak OK</option>
                     <option value="1">OK</option>
                 </select>

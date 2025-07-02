@@ -10,6 +10,15 @@
     overflow: hidden !important;
     padding: 0.5rem !important;
 }
+
+#sidebarSuggestions {
+    position: absolute;
+    width: 19%;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+}
 </style>
 
 <!-- Sidebar -->
@@ -92,8 +101,25 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
+    <div class="p-2 mb-3">
+        <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-white border-right-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+            </div>
+            <input type="text" id="sidebarSearch" class="form-control border-left-0" placeholder="Cari Menu...">
+        </div>
+        <div id="sidebarSuggestions" class="list-group mt-1" style="max-height:300px; overflow-y:auto; display:none;">
+        </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+
     <!-- Heading -->
-    <div class="sidebar-heading">
+    <div class="sidebar-heading mt-3">
         Report
     </div>
 
@@ -216,3 +242,49 @@
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
 </ul>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('sidebarSearch');
+    const suggestionsBox = document.getElementById('sidebarSuggestions');
+
+    // Ambil semua link menu sidebar yang ingin dicari
+    const menuItems = Array.from(document.querySelectorAll('.collapse-item'));
+
+    searchInput.addEventListener('input', function() {
+        const keyword = this.value.toLowerCase().trim();
+        suggestionsBox.innerHTML = '';
+
+        if (keyword.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        // Filter menu berdasarkan keyword
+        const filtered = menuItems.filter(item => item.textContent.toLowerCase().includes(keyword));
+
+        if (filtered.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        // Buat suggestion
+        filtered.forEach(item => {
+            const suggestion = document.createElement('a');
+            suggestion.href = item.href;
+            suggestion.className = 'list-group-item list-group-item-action';
+            suggestion.textContent = item.textContent.trim();
+            suggestionsBox.appendChild(suggestion);
+        });
+
+        suggestionsBox.style.display = 'block';
+    });
+
+    // Opsional: hide suggestions saat klik di luar
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+});
+</script>

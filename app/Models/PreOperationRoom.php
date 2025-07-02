@@ -28,4 +28,9 @@ class PreOperationRoom extends Model
     {
         return $this->belongsTo(Section::class, 'section_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowUpPreOperationRoom::class, 'pre_operation_room_uuid', 'uuid');
+    }
 }

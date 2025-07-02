@@ -238,6 +238,7 @@ function addFollowupField(group) {
             <input type="text" name="details[${detailIdx}][followups][${followupCount}][notes]" class="form-control mb-1" placeholder="Catatan">
             <input type="text" name="details[${detailIdx}][followups][${followupCount}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
             <select name="details[${detailIdx}][followups][${followupCount}][verification]" class="form-control followup-verification">
+                <option value="">-- Pilih --</option>
                 <option value="0">Tidak OK</option>
                 <option value="1">OK</option>
             </select>
@@ -305,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="text" name="sanitation_area[${areaIndex}][followups][${nextIndex}][notes]" class="form-control mb-1" placeholder="Catatan">
                 <input type="text" name="sanitation_area[${areaIndex}][followups][${nextIndex}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
                 <select name="sanitation_area[${areaIndex}][followups][${nextIndex}][verification]" class="form-control followup-verification">
+                    <option value="">-- Pilih --</option>
                     <option value="1">✔</option>
                     <option value="0">✘</option>
                 </select>
