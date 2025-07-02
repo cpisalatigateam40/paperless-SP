@@ -9,11 +9,15 @@ class VerificationEquipment extends Model
 {
     use HasFactory;
 
-     protected $table = 'verification_equipments';
+    protected $table = 'verification_equipments';
 
     protected $fillable = [
-        'uuid', 'report_uuid', 'equipment_uuid',
-        'condition', 'corrective_action', 'verification',
+        'uuid',
+        'report_uuid',
+        'equipment_uuid',
+        'condition',
+        'corrective_action',
+        'verification',
     ];
 
     public function report()
@@ -24,5 +28,10 @@ class VerificationEquipment extends Model
     public function equipment()
     {
         return $this->belongsTo(Equipment::class, 'equipment_uuid', 'uuid');
+    }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowUpEquipment::class, 'verification_equipment_uuid', 'uuid');
     }
 }

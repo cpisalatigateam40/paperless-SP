@@ -107,8 +107,7 @@
                                         <tbody>
                                             {{-- === BAHAN BAKU & PENUNJANG === --}}
                                             <tr>
-                                                <td colspan="8" class="fw-bold" style="font-weight: bold;">BAHAN BAKU &
-                                                    PENUNJANG</td>
+                                                <td colspan="8" class="fw-bold">BAHAN BAKU & PENUNJANG</td>
                                             </tr>
                                             @foreach ($report->materials as $j => $item)
                                             <tr>
@@ -123,13 +122,23 @@
                                                 <td class="text-center">
                                                     {{ in_array($item->condition, [7,8]) ? $item->condition : '' }}</td>
                                                 <td class="text-left">{{ $item->corrective_action }}</td>
-                                                <td class="text-left">{{ $item->verification }}</td>
+                                                <td class="text-center">{!! $item->verification == '1' ? '✔' : '✘' !!}
+                                                </td>
                                             </tr>
+                                            @foreach($item->followups as $index => $followup)
+                                            <tr class="table-secondary">
+                                                <td></td>
+                                                <td colspan="5">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
+                                                <td>{{ $followup->notes }} - {{ $followup->corrective_action }}</td>
+                                                <td class="text-center">{{ $followup->verification == '1' ? '✔' : '✘' }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
                                             @endforeach
 
                                             {{-- === KEMASAN === --}}
                                             <tr>
-                                                <td colspan="8" class="fw-bold" style="font-weight: bold;">KEMASAN</td>
+                                                <td colspan="8" class="fw-bold">KEMASAN</td>
                                             </tr>
                                             @foreach ($report->packagings as $j => $item)
                                             <tr>
@@ -137,18 +146,27 @@
                                                 <td class="text-left">{{ strtoupper($item->item) }}</td>
                                                 <td class="text-center">
                                                     {{ in_array($item->condition, [1,2]) ? $item->condition : '' }}</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center"></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
                                                 <td class="text-left">{{ $item->corrective_action }}</td>
-                                                <td class="text-left">{{ $item->verification }}</td>
+                                                <td class="text-center">{!! $item->verification == '1' ? '✔' : '✘' !!}
+                                                </td>
                                             </tr>
+                                            @foreach($item->followups as $index => $followup)
+                                            <tr class="table-secondary">
+                                                <td></td>
+                                                <td colspan="5">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
+                                                <td>{{ $followup->notes }} - {{ $followup->corrective_action }}</td>
+                                                <td class="text-center">{{ $followup->verification == '1' ? '✔' : '✘' }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
                                             @endforeach
 
                                             {{-- === MESIN & PERALATAN === --}}
                                             <tr>
-                                                <td colspan="8" class="fw-bold" style="font-weight: bold;">MESIN &
-                                                    PERALATAN</td>
+                                                <td colspan="8" class="fw-bold">MESIN & PERALATAN</td>
                                             </tr>
                                             @foreach ($report->equipments as $j => $eq)
                                             <tr>
@@ -163,14 +181,23 @@
                                                 <td class="text-center">
                                                     {{ in_array($eq->condition, [7,8]) ? $eq->condition : '' }}</td>
                                                 <td class="text-left">{{ $eq->corrective_action }}</td>
-                                                <td class="text-left">{{ $eq->verification }}</td>
+                                                <td class="text-center">{!! $eq->verification == '1' ? '✔' : '✘' !!}
+                                                </td>
                                             </tr>
+                                            @foreach($eq->followups as $index => $followup)
+                                            <tr class="table-secondary">
+                                                <td></td>
+                                                <td colspan="5">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
+                                                <td>{{ $followup->notes }} - {{ $followup->corrective_action }}</td>
+                                                <td class="text-center">{{ $followup->verification == '1' ? '✔' : '✘' }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
                                             @endforeach
 
                                             {{-- === KONDISI RUANGAN === --}}
                                             <tr>
-                                                <td colspan="8" class="fw-bold" style="font-weight: bold;">KONDISI
-                                                    RUANGAN</td>
+                                                <td colspan="8" class="fw-bold">KONDISI RUANGAN</td>
                                             </tr>
                                             @foreach ($report->rooms as $j => $room)
                                             <tr>
@@ -185,8 +212,18 @@
                                                 <td class="text-center">
                                                     {{ in_array($room->condition, [7,8]) ? $room->condition : '' }}</td>
                                                 <td class="text-left">{{ $room->corrective_action }}</td>
-                                                <td class="text-left">{{ $room->verification }}</td>
+                                                <td class="text-center">{!! $room->verification == '1' ? '✔' : '✘' !!}
+                                                </td>
                                             </tr>
+                                            @foreach($room->followups as $index => $followup)
+                                            <tr class="table-secondary">
+                                                <td></td>
+                                                <td colspan="5">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
+                                                <td>{{ $followup->notes }} - {{ $followup->corrective_action }}</td>
+                                                <td class="text-center">{{ $followup->verification == '1' ? '✔' : '✘' }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
                                             @endforeach
                                         </tbody>
                                     </table>
@@ -208,6 +245,7 @@
                             </div>
                         </td>
                     </tr>
+
                     @endforeach
                 </tbody>
             </table>

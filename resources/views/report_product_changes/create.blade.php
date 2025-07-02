@@ -60,10 +60,10 @@ $conditionOptions_3_8 = array_slice($conditionOptions_1_8, 2, 6, true); // dari 
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="align-middle text-center">Item</th>
-                            <th class="align-middle text-center">Kondisi</th>
-                            <th class="align-middle text-center">Tindakan Koreksi</th>
-                            <th class="align-middle text-center">Verifikasi</th>
+                            <th class="text-center">Item</th>
+                            <th class="text-center">Kondisi</th>
+                            <th class="text-center">Tindakan Koreksi</th>
+                            <th class="text-center">Verifikasi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,17 +74,31 @@ $conditionOptions_3_8 = array_slice($conditionOptions_1_8, 2, 6, true); // dari 
                                 {{ $item }}
                             </td>
                             <td>
-                                <select name="material_leftovers[{{ $i }}][condition]" class="form-control">
+                                <select name="material_leftovers[{{ $i }}][condition]"
+                                    class="form-control condition-select" required>
                                     <option value="">-- Pilih --</option>
                                     @foreach ($conditionOptions_1_8 as $val => $desc)
                                     <option value="{{ $val }}">{{ $desc }}</option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td><input type="text" name="material_leftovers[{{ $i }}][corrective_action]"
-                                    class="form-control"></td>
-                            <td><input type="text" name="material_leftovers[{{ $i }}][verification]"
-                                    class="form-control"></td>
+                            <td>
+                                <input type="text" name="material_leftovers[{{ $i }}][corrective_action]"
+                                    class="form-control corrective-action" readonly>
+                            </td>
+                            <td>
+                                <select name="material_leftovers[{{ $i }}][verification]"
+                                    class="form-control verification-select">
+                                    <option value="">--Pilih--</option>
+                                    <option value="0">Tidak OK</option>
+                                    <option value="1">OK</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="followup-row">
+                            <td colspan="4">
+                                <div class="followup-wrapper"></div>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -116,16 +130,29 @@ $conditionOptions_3_8 = array_slice($conditionOptions_1_8, 2, 6, true); // dari 
                                 {{ $equipment->name }}
                             </td>
                             <td>
-                                <select name="equipments[{{ $i }}][condition]" class="form-control">
+                                <select name="equipments[{{ $i }}][condition]" class="form-control condition-select">
                                     <option value="">-- Pilih --</option>
                                     @foreach ($conditionOptions_3_8 as $val => $desc)
                                     <option value="{{ $val }}">{{ $desc }}</option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td><input type="text" name="equipments[{{ $i }}][corrective_action]" class="form-control">
+                            <td><input type="text" name="equipments[{{ $i }}][corrective_action]"
+                                    class="form-control corrective-action" readonly>
                             </td>
-                            <td><input type="text" name="equipments[{{ $i }}][verification]" class="form-control"></td>
+                            <td>
+                                <select name="equipments[{{ $i }}][verification]"
+                                    class="form-control verification-select">
+                                    <option value="">--Pilih--</option>
+                                    <option value="0">Tidak OK</option>
+                                    <option value="1">OK</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="followup-row">
+                            <td colspan="4">
+                                <div class="followup-wrapper"></div>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -157,16 +184,29 @@ $conditionOptions_3_8 = array_slice($conditionOptions_1_8, 2, 6, true); // dari 
                                 {{ $section->section_name }}
                             </td>
                             <td>
-                                <select name="sections[{{ $i }}][condition]" class="form-control">
+                                <select name="sections[{{ $i }}][condition]" class="form-control condition-select">
                                     <option value="">-- Pilih --</option>
                                     @foreach ($conditionOptions_3_8 as $val => $desc)
                                     <option value="{{ $val }}">{{ $desc }}</option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td><input type="text" name="sections[{{ $i }}][corrective_action]" class="form-control">
+                            <td><input type="text" name="sections[{{ $i }}][corrective_action]"
+                                    class="form-control corrective-action" readonly>
                             </td>
-                            <td><input type="text" name="sections[{{ $i }}][verification]" class="form-control"></td>
+                            <td>
+                                <select name="sections[{{ $i }}][verification]"
+                                    class="form-control verification-select">
+                                    <option value="">--Pilih--</option>
+                                    <option value="0">Tidak OK</option>
+                                    <option value="1">OK</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="followup-row">
+                            <td colspan="4">
+                                <div class="followup-wrapper"></div>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -180,4 +220,90 @@ $conditionOptions_3_8 = array_slice($conditionOptions_1_8, 2, 6, true); // dari 
         </div>
     </form>
 </div>
+@endsection
+
+@section('script')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.condition-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const row = select.closest('tr');
+            const corrective = row.querySelector('.corrective-action');
+            const verification = row.querySelector('.verification-select');
+            const val = parseInt(select.value);
+
+            clearFollowups(row);
+
+            if ([1, 3, 5, 7].includes(val)) {
+                corrective.value = '';
+                corrective.setAttribute('readonly', true);
+                verification.value = '1';
+            } else if ([2, 4, 6, 8].includes(val)) {
+                corrective.removeAttribute('readonly');
+                verification.value = '0';
+                addFollowupField(row);
+            } else {
+                corrective.value = '';
+                corrective.setAttribute('readonly', true);
+                verification.value = '0';
+            }
+        });
+    });
+
+    document.querySelectorAll('.verification-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const row = select.closest('tr');
+            clearFollowups(row);
+
+            if (this.value === '0') {
+                addFollowupField(row);
+            }
+        });
+    });
+
+    function addFollowupField(row) {
+        const wrapper = getFollowupWrapper(row);
+        const baseName = row.querySelector('.verification-select').name.replace('[verification]', '');
+        const count = wrapper.querySelectorAll('.followup-group').length;
+
+        const html = `
+            <div class="followup-group border rounded p-2 mb-2">
+                <label class="small mb-1">Koreksi Lanjutan #${count+1}</label>
+                <input type="text" name="${baseName}[followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan">
+                <input type="text" name="${baseName}[followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
+                <select name="${baseName}[followups][${count}][verification]" class="form-control followup-verification">
+                    <option value="">--Pilih--</option>
+                    <option value="0">Tidak OK</option>
+                    <option value="1">OK</option>
+                </select>
+            </div>
+        `;
+        wrapper.insertAdjacentHTML('beforeend', html);
+
+        const newSelect = wrapper.querySelectorAll('.followup-verification')[count];
+        newSelect.addEventListener('change', function() {
+            const followups = wrapper.querySelectorAll('.followup-group');
+            const idx = Array.from(followups).indexOf(this.closest('.followup-group'));
+
+            if (this.value === '0') {
+                if (idx === followups.length - 1) {
+                    addFollowupField(row);
+                }
+            } else {
+                for (let i = followups.length - 1; i > idx; i--) {
+                    followups[i].remove();
+                }
+            }
+        });
+    }
+
+    function clearFollowups(row) {
+        getFollowupWrapper(row).innerHTML = '';
+    }
+
+    function getFollowupWrapper(row) {
+        return row.nextElementSibling.querySelector('.followup-wrapper');
+    }
+});
+</script>
 @endsection

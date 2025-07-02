@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <input type="text" name="followups[${nextIndex}][notes]" class="form-control mb-1" placeholder="Catatan">
                     <input type="text" name="followups[${nextIndex}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
                     <select name="followups[${nextIndex}][verification]" class="form-control followup-verification">
+                        <option value="">-- Pilih --</option>
                         <option value="0">Tidak OK</option>
                         <option value="1">OK</option>
                     </select>

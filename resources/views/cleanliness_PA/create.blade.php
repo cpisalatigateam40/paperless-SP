@@ -101,6 +101,7 @@
                                     <td>
                                         <select name="details[0][items][{{ $i }}][verification]"
                                             class="form-control verification-select">
+                                            <option value="">-- Pilih --</option>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
@@ -151,6 +152,7 @@ function addFollowupField(row) {
             <input type="text" name="${baseName}[followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan">
             <input type="text" name="${baseName}[followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
             <select name="${baseName}[followups][${count}][verification]" class="form-control followup-verification">
+                <option value="">-- Pilih --</option>
                 <option value="0">Tidak OK</option>
                 <option value="1">OK</option>
             </select>

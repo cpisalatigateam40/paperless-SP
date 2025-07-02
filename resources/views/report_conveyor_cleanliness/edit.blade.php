@@ -89,6 +89,7 @@
                                 <td>
                                     <select name="machines[{{ $groupIndex }}][{{ $innerIndex }}][verification]"
                                         class="form-select form-control">
+                                        <option value="">-- Pilih --</option>
                                         <option value="1" {{ $machine->verification == '1' ? 'selected' : '' }}>OK
                                         </option>
                                         <option value="0" {{ $machine->verification == '0' ? 'selected' : '' }}>Tidak OK
@@ -119,6 +120,7 @@
                                             <select
                                                 name="machines[{{ $groupIndex }}][{{ $innerIndex }}][followups][{{ $idx }}][verification]"
                                                 class="form-select form-control">
+                                                <option value="">-- Pilih --</option>
                                                 <option value="1"
                                                     {{ $followup->verification == '1' ? 'selected' : '' }}>OK</option>
                                                 <option value="0"

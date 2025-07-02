@@ -23,4 +23,9 @@ class PreOperationMaterial extends Model
     {
         return $this->belongsTo(ReportPreOperation::class, 'report_uuid', 'uuid');
     }
+
+    public function followups()
+    {
+        return $this->hasMany(FollowUpPreOperationMaterial::class, 'pre_operation_material_uuid', 'uuid');
+    }
 }
