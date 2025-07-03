@@ -80,7 +80,14 @@
     li {
         list-style-type: none;
     }
+
+    thead {
+        background-color: #eaecf4 !important;
+        color: #6e707e !important;
+    }
     </style>
+
+    @yield('style')
 </head>
 
 <body>

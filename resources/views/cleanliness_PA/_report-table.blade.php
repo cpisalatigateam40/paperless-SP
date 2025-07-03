@@ -104,6 +104,7 @@
                 </div>
             </td>
         </tr>
+
         @empty
         <tr>
             <td colspan="5">Tidak ada laporan pada ruangan ini.</td>

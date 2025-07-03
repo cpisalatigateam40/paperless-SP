@@ -62,4 +62,9 @@ class Section extends Model
     {
         return $this->hasMany(PreOperationRoom::class, 'section_uuid', 'uuid');
     }
+
+    public function chlorineResidueReports()
+    {
+        return $this->hasMany(ReportChlorineResidue::class, 'section_uuid', 'uuid');
+    }
 }

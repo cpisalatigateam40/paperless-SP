@@ -234,6 +234,25 @@
         </div>
     </li>
 
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdNoncon"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-industry"></i>
+            <span>Pemeriksaan Proses Produksi</span>
+        </a>
+        <div id="collapsePagesProdNoncon" class="collapse" aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report_production_nonconformities.index') }}">
+                    Pemeriksaan Ketidaksesuaian Proses Produksi
+                </a>
+                <a class="collapse-item" href="{{ route('report_chlorine_residues.index') }}">
+                    Pemeriksaan Air Proses Produksi
+                </a>
+            </div>
+        </div>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

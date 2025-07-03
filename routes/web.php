@@ -33,6 +33,8 @@ use App\Http\Controllers\SharpToolController;
 use App\Http\Controllers\ReportSharpToolController;
 use App\Http\Controllers\ReportProductChangeController;
 use App\Http\Controllers\ReportPreOperationController;
+use App\Http\Controllers\ReportProductionNonconformityController;
+use App\Http\Controllers\ReportChlorineResidueController;
 
 Route::redirect('/', '/login');
 
@@ -471,5 +473,35 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{report_pre_operation}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+        });
+
+    Route::prefix('report-production-nonconformities')
+        ->name('report_production_nonconformities.')
+        ->controller(ReportProductionNonconformityController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+            Route::get('/{uuid}/add-detail', 'addDetail')
+                ->name('add-detail');
+            Route::post('/{uuid}/store-detail', 'storeDetail')->name('store-detail');
+            Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+        });
+
+    Route::prefix('report-chlorine-residues')
+        ->name('report_chlorine_residues.')
+        ->controller(ReportChlorineResidueController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 });

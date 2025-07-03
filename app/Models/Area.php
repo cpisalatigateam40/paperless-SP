@@ -128,4 +128,14 @@ class Area extends Model
     {
         return $this->hasMany(ReportPreOperation::class, 'area_uuid', 'uuid');
     }
+
+    public function productionNonconformities()
+    {
+        return $this->hasMany(ReportProductionNonconformity::class, 'area_uuid', 'uuid');
+    }
+
+    public function chlorineResidueReports()
+    {
+        return $this->hasMany(ReportChlorineResidue::class, 'area_uuid', 'uuid');
+    }
 }
