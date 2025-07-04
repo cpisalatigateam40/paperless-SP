@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Verification select
+        // Verification select utama
         document.querySelectorAll('.verification-select').forEach(select => {
             select.addEventListener('change', function() {
                 const day = this.dataset.day;
@@ -172,23 +172,33 @@ document.addEventListener('DOMContentLoaded', function() {
             const count = wrapper.querySelectorAll('.followup-group').length;
 
             const html = `
-        <div class="followup-group border rounded p-1 mb-3">
-            <p>Koreksi Lanjutan #${count + 1}</p>
-            <input type="text" name="details[${day}][followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan Koreksi Lanjutan">
-            <input type="text" name="details[${day}][followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
-            <select name="details[${day}][followups][${count}][verification]" class="form-control followup-verification">
-                <option value="">- Pilih Verifikasi -</option>
-                <option value="OK">OK</option>
-                <option value="Tidak OK">Tidak OK</option>
-            </select>
-        </div>
-    `;
+            <div class="followup-group border rounded p-1 mb-2">
+                <strong>Koreksi Lanjutan #${count + 1}</strong>
+                <input type="text" name="details[${day}][followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan Koreksi Lanjutan">
+                <input type="text" name="details[${day}][followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
+                <select name="details[${day}][followups][${count}][verification]" class="form-control followup-verification">
+                    <option value="">- Pilih Verifikasi -</option>
+                    <option value="OK">OK</option>
+                    <option value="Tidak OK">Tidak OK</option>
+                </select>
+            </div>`;
             wrapper.insertAdjacentHTML('beforeend', html);
 
             const newSelect = wrapper.querySelectorAll('.followup-verification')[count];
             newSelect.addEventListener('change', function() {
+                const allFollowups = wrapper.querySelectorAll('.followup-group');
+                const currentIndex = Array.from(allFollowups).indexOf(this.closest(
+                    '.followup-group'));
+
                 if (this.value === 'Tidak OK') {
-                    addFollowupField(day);
+                    if (currentIndex === allFollowups.length - 1) {
+                        addFollowupField(day);
+                    }
+                } else if (this.value === 'OK') {
+                    // Hapus semua followup setelah currentIndex
+                    for (let i = allFollowups.length - 1; i > currentIndex; i--) {
+                        allFollowups[i].remove();
+                    }
                 }
             });
         }

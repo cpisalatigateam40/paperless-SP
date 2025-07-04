@@ -77,6 +77,15 @@
         margin-top: 80px;
         size: 210mm 330mm;
     }
+
+    ul {
+        margin: unset;
+        padding: .2rem;
+    }
+
+    li {
+        list-style-type: none;
+    }
     </style>
 </head>
 
@@ -149,15 +158,28 @@
             @foreach($report->details as $index => $detail)
             <tr>
                 <td class="text-center">{{ $detail->day }}</td>
-
-                @if($index === 0)
-                <td class="text-center" rowspan="{{ $rowspan }}" style="vertical-align: middle;">0,1 - 5</td>
-                @endif
-
+                <td class="text-center">0,1 - 5</td>
                 <td class="text-center">{{ $detail->result_ppm ?? '' }}</td>
                 <td class="text-center">{{ $detail->remark ?? '' }}</td>
                 <td class="text-center">{{ $detail->corrective_action ?? '' }}</td>
-                <td class="text-center">{{ $detail->verification ?? '' }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <strong>Verifikasi Utama:</strong><br>
+                            Kondisi: {{ $detail->verification ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
+                        </li>
+
+                        @foreach($detail->followups as $findex => $followup)
+                        <li class="mt-1">
+                            <strong>Koreksi Lanjutan #{{ $findex + 1 }}:</strong><br>
+                            Kondisi: {{ $followup->verification ?? '-' }}<br>
+                            Catatan: {{ $followup->notes ?? '-' }}<br>
+                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </td>
                 <td class="text-center">{{ $detail->verified_by ?? '' }}</td>
                 <td class="text-center">
                     @if($detail->verified_at)
@@ -171,6 +193,7 @@
             </tr>
         </tbody>
     </table>
+
 
     <p class="small-text">*) OK/TIDAK OK</p>
 
