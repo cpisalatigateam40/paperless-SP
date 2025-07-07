@@ -49,17 +49,33 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                        $foundEditable = false;
+                        $userName = Auth::user()->name;
+                        $today = now()->format('Y-m-d');
+                        @endphp
                         @foreach($report->details as $detail)
+                        @php
+                        if(!$foundEditable && $detail->result_ppm == null){
+                        // ini hari pertama yang bisa diisi
+                        $readonly = '';
+                        $disabled = '';
+                        $foundEditable = true;
+                        } else {
+                        $readonly = 'readonly';
+                        $disabled = 'disabled';
+                        }
+                        @endphp
                         <tr>
                             <td class="text-center">{{ $detail->day }}</td>
                             <td class="text-center">0,1 - 5</td>
                             <td>
                                 <input type="number" step="0.01" name="details[{{ $detail->id }}][result_ppm]"
-                                    value="{{ $detail->result_ppm }}" class="form-control">
+                                    value="{{ $detail->result_ppm }}" class="form-control" {{ $readonly }}>
                             </td>
                             <td>
                                 <select name="details[{{ $detail->id }}][remark]" class="form-control remark-select"
-                                    data-id="{{ $detail->id }}">
+                                    data-id="{{ $detail->id }}" {{ $disabled }}>
                                     <option value="">- Pilih -</option>
                                     <option value="OK" {{ $detail->remark == 'OK' ? 'selected' : '' }}>OK</option>
                                     <option value="Tidak OK" {{ $detail->remark == 'Tidak OK' ? 'selected' : '' }}>Tidak
@@ -69,11 +85,12 @@
                             <td>
                                 <input type="text" name="details[{{ $detail->id }}][corrective_action]"
                                     value="{{ $detail->corrective_action }}" class="form-control corrective-action"
-                                    data-id="{{ $detail->id }}">
+                                    data-id="{{ $detail->id }}" {{ $readonly }}>
                             </td>
                             <td>
                                 <select name="details[{{ $detail->id }}][verification]"
-                                    class="form-control verification-select" data-id="{{ $detail->id }}">
+                                    class="form-control verification-select" data-id="{{ $detail->id }}"
+                                    {{ $disabled }}>
                                     <option value="">- Pilih -</option>
                                     <option value="OK" {{ $detail->verification == 'OK' ? 'selected' : '' }}>OK</option>
                                     <option value="Tidak OK"
@@ -81,15 +98,18 @@
                                 </select>
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" class="form-check-input verify-checkbox"
-                                    data-id="{{ $detail->id }}" {{ $detail->verified_by ? 'checked' : '' }}>
+                                @if(!$readonly)
+                                {{-- hari yang diedit: langsung set verified_by & verified_at --}}
                                 <input type="hidden" name="details[{{ $detail->id }}][verified_by]"
-                                    id="verified_by_{{ $detail->id }}" value="{{ $detail->verified_by }}">
+                                    value="{{ $userName }}">
                                 <input type="hidden" name="details[{{ $detail->id }}][verified_at]"
-                                    id="verified_at_{{ $detail->id }}" value="{{ $detail->verified_at }}">
+                                    value="{{ $today }}">
+                                <small class="text-muted">by {{ $userName }}</small>
+                                @else
+                                <small>{{ $detail->verified_by }}</small>
                                 @if($detail->verified_at)
-                                <small
-                                    class="d-block">{{ \Carbon\Carbon::parse($detail->verified_at)->format('d-m-Y') }}</small>
+                                <br><small>{{ \Carbon\Carbon::parse($detail->verified_at)->format('d-m-Y') }}</small>
+                                @endif
                                 @endif
                             </td>
                         </tr>
@@ -101,16 +121,17 @@
                             <td colspan="2">↳ Koreksi Lanjutan #{{ $index+1 }}</td>
                             <td>
                                 <input type="text" name="details[{{ $detail->id }}][followups][{{ $index }}][notes]"
-                                    value="{{ $followup->notes }}" class="form-control">
+                                    value="{{ $followup->notes }}" class="form-control" {{ $readonly }}>
                             </td>
                             <td>
                                 <input type="text"
                                     name="details[{{ $detail->id }}][followups][{{ $index }}][corrective_action]"
-                                    value="{{ $followup->corrective_action }}" class="form-control">
+                                    value="{{ $followup->corrective_action }}" class="form-control" {{ $readonly }}>
                             </td>
                             <td>
                                 <select name="details[{{ $detail->id }}][followups][{{ $index }}][verification]"
-                                    class="form-control followup-verification" data-id="{{ $detail->id }}">
+                                    class="form-control followup-verification" data-id="{{ $detail->id }}"
+                                    {{ $disabled }}>
                                     <option value="">- Pilih -</option>
                                     <option value="OK" {{ $followup->verification == 'OK' ? 'selected' : '' }}>OK
                                     </option>
@@ -122,16 +143,18 @@
                         </tr>
                         @endforeach
 
-                        {{-- Tempatkan followup baru --}}
+                        {{-- Tempat followup baru hanya di hari editable --}}
+                        @if(!$readonly)
                         <tr>
                             <td colspan="7">
                                 <div id="followup-wrapper-{{ $detail->id }}"></div>
                             </td>
                         </tr>
+                        @endif
+
                         @endforeach
                     </tbody>
                 </table>
-
                 <button type="submit" class="btn btn-success mt-3">Update</button>
             </form>
         </div>
@@ -140,49 +163,33 @@
 @endsection
 
 @section('script')
-@php
-$userName = Auth::user()->name;
-@endphp
+@php $userName = Auth::user()->name; @endphp
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const userName = @json($userName);
-
-    // Checkbox diverifikasi
-    document.querySelectorAll('.verify-checkbox').forEach(cb => {
-        cb.addEventListener('change', function() {
-            const id = this.dataset.id;
-            document.getElementById('verified_by_' + id).value = this.checked ? userName : '';
-            document.getElementById('verified_at_' + id).value = this.checked ? new Date()
-                .toISOString().slice(0, 10) : '';
-        });
-    });
-
-    // Remark select: kalau OK → disable corrective, kalau Tidak OK → enable + tambahkan followup pertama
+    // remark-select & verification-select logic sama seperti sebelumnya
     document.querySelectorAll('.remark-select').forEach(select => {
         select.addEventListener('change', function() {
             const id = this.dataset.id;
-            const corrective = document.querySelector(`.corrective-action[data-id="${id}"]`);
             const verification = document.querySelector(
-            `.verification-select[data-id="${id}"]`);
+                `.verification-select[data-id="${id}"]`);
+            const corrective = document.querySelector(`.corrective-action[data-id="${id}"]`);
             const wrapper = document.getElementById(`followup-wrapper-${id}`);
             wrapper.innerHTML = '';
-
             if (this.value === 'OK') {
+                verification.value = 'OK';
                 corrective.value = '';
                 corrective.setAttribute('readonly', true);
-                verification.value = 'OK';
             } else if (this.value === 'Tidak OK') {
-                corrective.removeAttribute('readonly');
                 verification.value = 'Tidak OK';
-                addFollowupField(id, wrapper); // tambahkan followup pertama
+                corrective.removeAttribute('readonly');
+                addFollowupField(id, wrapper);
             } else {
-                corrective.setAttribute('readonly', true);
                 verification.value = '';
+                corrective.setAttribute('readonly', true);
             }
         });
     });
 
-    // Verifikasi utama (bukan followup): saat dipilih "Tidak OK" → kalau belum ada followup, tambahkan followup pertama
     document.querySelectorAll('.verification-select').forEach(select => {
         select.addEventListener('change', function() {
             const id = this.dataset.id;
@@ -192,14 +199,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     addFollowupField(id, wrapper);
                 }
             } else if (this.value === 'OK') {
-                wrapper.innerHTML = ''; // hapus semua followup
+                wrapper.innerHTML = '';
             }
         });
     });
 
     function addFollowupField(id, wrapper) {
         const count = wrapper.querySelectorAll('.followup-group').length;
-
         const html = `
         <div class="followup-group border rounded p-1 mb-2">
             <strong>Koreksi Lanjutan #${count+1}</strong>
@@ -213,25 +219,56 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>`;
         wrapper.insertAdjacentHTML('beforeend', html);
 
-        // Listener untuk verifikasi followup
         const newSelect = wrapper.querySelectorAll('.followup-verification')[count];
         newSelect.addEventListener('change', function() {
-            const allFollowups = wrapper.querySelectorAll('.followup-group');
-            const currentIndex = Array.from(allFollowups).indexOf(this.closest('.followup-group'));
-
+            const all = wrapper.querySelectorAll('.followup-group');
+            const current = Array.from(all).indexOf(this.closest('.followup-group'));
             if (this.value === 'Tidak OK') {
-                // Tambahkan followup baru hanya kalau ini adalah followup terakhir
-                if (currentIndex === allFollowups.length - 1) {
-                    addFollowupField(id, wrapper);
-                }
+                if (current === all.length - 1) addFollowupField(id, wrapper);
             } else if (this.value === 'OK') {
-                // Hapus followup setelahnya
-                for (let i = allFollowups.length - 1; i > currentIndex; i--) {
-                    allFollowups[i].remove();
-                }
+                for (let i = all.length - 1; i > current; i--) all[i].remove();
             }
         });
     }
+
+    // Auto set remark & verification saat user isi result_ppm
+    document.querySelectorAll('input[name^="details"][name$="[result_ppm]"]').forEach(input => {
+        // Hanya aktifkan untuk field yang boleh diedit (tidak readonly)
+        if (!input.hasAttribute('readonly')) {
+            input.addEventListener('input', function() {
+                const id = this.name.match(/\[(\d+)\]/)[1];
+                const value = parseFloat(this.value);
+                const remarkSelect = document.querySelector(
+                    `select[name="details[${id}][remark]"]`);
+                const verificationSelect = document.querySelector(
+                    `select[name="details[${id}][verification]"]`);
+                const corrective = document.querySelector(
+                `.corrective-action[data-id="${id}"]`);
+                const wrapper = document.getElementById(`followup-wrapper-${id}`);
+                wrapper.innerHTML = '';
+
+                if (!isNaN(value)) {
+                    if (value >= 0.1 && value <= 5) {
+                        remarkSelect.value = 'OK';
+                        verificationSelect.value = 'OK';
+                        corrective.value = '';
+                        corrective.setAttribute('readonly', true);
+                    } else {
+                        remarkSelect.value = 'Tidak OK';
+                        verificationSelect.value = 'Tidak OK';
+                        corrective.removeAttribute('readonly');
+                        addFollowupField(id, wrapper);
+                    }
+                } else {
+                    remarkSelect.value = '';
+                    verificationSelect.value = '';
+                    corrective.value = '';
+                    corrective.setAttribute('readonly', true);
+                }
+            });
+        }
+    });
+
 });
 </script>
 @endsection

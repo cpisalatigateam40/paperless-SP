@@ -44,4 +44,14 @@ class Product extends Model
     {
         return $this->hasMany(ReportPreOperation::class, 'product_uuid', 'uuid');
     }
+
+    public function detailRepackVerifs()
+    {
+        return $this->hasMany(DetailRepackVerif::class, 'product_uuid', 'uuid');
+    }
+
+    public function detailLabSamples()
+    {
+        return $this->hasMany(DetailLabSample::class, 'product_uuid', 'uuid');
+    }
 }

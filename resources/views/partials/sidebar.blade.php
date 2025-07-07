@@ -253,6 +253,25 @@
         </div>
     </li>
 
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagestest"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-industry"></i>
+            <span>Test</span>
+        </a>
+        <div id="collapsePagestest" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report_repack_verifs.index') }}">
+                    Verifikasi Repack Product
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_lab_samples.index') }}">
+                    Pembuatan Sample Laboratorium
+                </a>
+            </div>
+        </div>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

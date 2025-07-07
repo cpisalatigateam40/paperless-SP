@@ -47,9 +47,10 @@ class ReportChlorineResidueController extends Controller
             'sampling_point' => $request->sampling_point,
         ]);
 
-        // Simpan detail
         foreach ($request->details as $day => $detail) {
-            // Simpan detail
+            // Cek: kalau result_ppm (atau remark) diisi, baru diisi verified_by
+            $isFilled = !empty($detail['result_ppm']) || !empty($detail['remark']) || !empty($detail['verification']);
+
             $detailModel = DetailChlorineResidue::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
@@ -58,8 +59,8 @@ class ReportChlorineResidueController extends Controller
                 'remark' => $detail['remark'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
                 'verification' => $detail['verification'] ?? null,
-                'verified_by' => $detail['verified_by'] ?? null,
-                'verified_at' => $detail['verified_at'] ?? null,
+                'verified_by' => $isFilled ? Auth::user()->name : null,
+                'verified_at' => $isFilled ? now() : null,
             ]);
 
             // Simpan followups jika ada
@@ -75,6 +76,7 @@ class ReportChlorineResidueController extends Controller
 
         return redirect()->route('report_chlorine_residues.index')->with('success', 'Report berhasil dibuat!');
     }
+
 
     public function destroy($uuid)
     {
@@ -113,13 +115,20 @@ class ReportChlorineResidueController extends Controller
 
         foreach ($request->details as $id => $data) {
             $detail = DetailChlorineResidue::findOrFail($id);
+
+            // Perbaikan: gunakan data lama kalau field tidak dikirim (karena disabled)
+            $remark = array_key_exists('remark', $data) ? $data['remark'] : $detail->remark;
+            $verification = array_key_exists('verification', $data) ? $data['verification'] : $detail->verification;
+            $verified_by = array_key_exists('verified_by', $data) ? $data['verified_by'] : $detail->verified_by;
+            $verified_at = array_key_exists('verified_at', $data) ? $data['verified_at'] : $detail->verified_at;
+
             $detail->update([
                 'result_ppm' => is_numeric($data['result_ppm']) ? $data['result_ppm'] : null,
-                'remark' => $data['remark'] ?? null,
-                'corrective_action' => $data['corrective_action'] ?? null,
-                'verification' => $data['verification'] ?? null,
-                'verified_by' => $data['verified_by'] ?? null,
-                'verified_at' => $data['verified_at'] ?? null,
+                'remark' => $remark,
+                'corrective_action' => $data['corrective_action'] ?? $detail->corrective_action,
+                'verification' => $verification,
+                'verified_by' => $verified_by,
+                'verified_at' => $verified_at,
             ]);
 
             // Hapus followups lama lalu insert ulang
@@ -136,6 +145,7 @@ class ReportChlorineResidueController extends Controller
 
         return redirect()->route('report_chlorine_residues.index')->with('success', 'Report berhasil diperbarui!');
     }
+
 
     public function approve($id)
     {
