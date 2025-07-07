@@ -35,6 +35,8 @@ use App\Http\Controllers\ReportProductChangeController;
 use App\Http\Controllers\ReportPreOperationController;
 use App\Http\Controllers\ReportProductionNonconformityController;
 use App\Http\Controllers\ReportChlorineResidueController;
+use App\Http\Controllers\ReportRepackVerifController;
+use App\Http\Controllers\ReportLabSampleController;
 
 Route::redirect('/', '/login');
 
@@ -504,4 +506,35 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
         });
+
+    Route::prefix('report-repack-verifs')
+        ->name('report_repack_verifs.')
+        ->controller(ReportRepackVerifController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+            Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
+            Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
+        });
+
+    Route::prefix('report-lab-samples')
+        ->name('report_lab_samples.')
+        ->controller(ReportLabSampleController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+
+            // (opsional) fungsi approve, export pdf, tambah detail
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+            Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
+            Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
+        });
+
 });

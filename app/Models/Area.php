@@ -138,4 +138,14 @@ class Area extends Model
     {
         return $this->hasMany(ReportChlorineResidue::class, 'area_uuid', 'uuid');
     }
+
+    public function reportRepackVerifs()
+    {
+        return $this->hasMany(ReportRepackVerif::class, 'area_uuid', 'uuid');
+    }
+
+    public function reportLabSamples()
+    {
+        return $this->hasMany(ReportLabSample::class, 'area_uuid', 'uuid');
+    }
 }

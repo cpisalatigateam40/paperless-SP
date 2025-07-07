@@ -56,56 +56,96 @@ document.addEventListener('DOMContentLoaded', function() {
         const daysInMonth = new Date(year, month, 0).getDate();
 
         let html = `
-            <table class="table table-bordered table-sm">
-                <thead class="text-center">
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Standar (PPM)</th>
-                        <th>Hasil Pemeriksaan (PPM)</th>
-                        <th>Keterangan</th>
-                        <th>Tindakan Koreksi</th>
-                        <th>Verifikasi</th>
-                        <th>Diverifikasi Oleh</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-        for (let day = 1; day <= daysInMonth; day++) {
-            html += `
-                <tr>
-                    <td class="text-center">${day}</td>
-                    <td class="text-center">0,1 - 5</td>
-                    <td><input type="number" step="0.01" name="details[${day}][result_ppm]" class="form-control"></td>
-                    <td>
-                        <select name="details[${day}][remark]" class="form-control remark-select" data-day="${day}">
-                            <option value="">- Pilih -</option>
-                            <option value="OK">OK</option>
-                            <option value="Tidak OK">Tidak OK</option>
-                        </select>
-                    </td>
-                    <td><input type="text" name="details[${day}][corrective_action]" class="form-control corrective-action" data-day="${day}"></td>
-                    <td>
-                        <select name="details[${day}][verification]" class="form-control verification-select" data-day="${day}">
-                            <option value="">- Pilih -</option>
-                            <option value="OK">OK</option>
-                            <option value="Tidak OK">Tidak OK</option>
-                        </select>
-                    </td>
-                    <td class="text-center">
-                        <input type="checkbox" class="form-check-input verify-checkbox" data-day="${day}">
-                        <input type="hidden" name="details[${day}][verified_by]" id="verified_by_${day}">
-                        <input type="hidden" name="details[${day}][verified_at]" id="verified_at_${day}">
-                    </td>
-                </tr>
-                <tr id="followup-row-${day}" class="d-none">
-                    <td colspan="7">
-                        <div class="followup-wrapper" id="followup-wrapper-${day}"></div>
-                    </td>
-                </tr>
+                <table class="table table-bordered table-sm">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Standar (PPM)</th>
+                            <th>Hasil Pemeriksaan (PPM)</th>
+                            <th>Keterangan</th>
+                            <th>Tindakan Koreksi</th>
+                            <th>Verifikasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
+        for (let day = 1; day <= daysInMonth; day++) {
+            const disabled = (day !== 1) ? 'disabled' : '';
+            const readonly = (day !== 1) ? 'readonly' : '';
+
+            html += `
+            <tr>
+                <td class="text-center">${day}</td>
+                <td class="text-center">0,1 - 5</td>
+                <td><input type="number" step="0.01" name="details[${day}][result_ppm]" class="form-control" ${readonly}></td>
+                <td>
+                    <select name="details[${day}][remark]" class="form-control remark-select" data-day="${day}" ${disabled}>
+                        <option value="">- Pilih -</option>
+                        <option value="OK">OK</option>
+                        <option value="Tidak OK">Tidak OK</option>
+                    </select>
+                </td>
+                <td><input type="text" name="details[${day}][corrective_action]" class="form-control corrective-action" data-day="${day}" ${readonly}></td>
+                <td>
+                    <select name="details[${day}][verification]" class="form-control verification-select" data-day="${day}" ${disabled}>
+                        <option value="">- Pilih -</option>
+                        <option value="OK">OK</option>
+                        <option value="Tidak OK">Tidak OK</option>
+                    </select>
+                </td>
+            </tr>
+            <tr id="followup-row-${day}" class="d-none">
+                <td colspan="7">
+                    <div class="followup-wrapper" id="followup-wrapper-${day}"></div>
+                </td>
+            </tr>
+        `;
         }
+
         html += '</tbody></table>';
         container.innerHTML = html;
+
+        // Listener untuk result_ppm input
+        document.querySelectorAll('input[name^="details"][name$="[result_ppm]"]').forEach(input => {
+            input.addEventListener('input', function() {
+                const day = this.name.match(/\[(\d+)\]/)[1];
+                const value = parseFloat(this.value);
+                const remarkSelect = document.querySelector(
+                    `select[name="details[${day}][remark]"]`);
+                const verificationSelect = document.querySelector(
+                    `select[name="details[${day}][verification]"]`);
+                const corrective = document.querySelector(
+                    `.corrective-action[data-day="${day}"]`);
+                const followupRow = document.getElementById(`followup-row-${day}`);
+                const wrapper = document.getElementById(`followup-wrapper-${day}`);
+
+                if (!isNaN(value)) {
+                    if (value >= 0.1 && value <= 5) {
+                        remarkSelect.value = 'OK';
+                        verificationSelect.value = 'OK';
+                        corrective.value = '';
+                        corrective.setAttribute('readonly', true);
+                        followupRow.classList.add('d-none');
+                        wrapper.innerHTML = '';
+                    } else {
+                        remarkSelect.value = 'Tidak OK';
+                        verificationSelect.value = 'Tidak OK';
+                        corrective.removeAttribute('readonly');
+                        followupRow.classList.remove('d-none');
+                        wrapper.innerHTML = '';
+                        addFollowupField(day);
+                    }
+                } else {
+                    remarkSelect.value = '';
+                    verificationSelect.value = '';
+                    corrective.value = '';
+                    corrective.setAttribute('readonly', true);
+                    followupRow.classList.add('d-none');
+                    wrapper.innerHTML = '';
+                }
+            });
+        });
+
 
         // Checkbox verified
         document.querySelectorAll('.verify-checkbox').forEach(cb => {
@@ -172,16 +212,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const count = wrapper.querySelectorAll('.followup-group').length;
 
             const html = `
-            <div class="followup-group border rounded p-1 mb-2">
-                <strong>Koreksi Lanjutan #${count + 1}</strong>
-                <input type="text" name="details[${day}][followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan Koreksi Lanjutan">
-                <input type="text" name="details[${day}][followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
-                <select name="details[${day}][followups][${count}][verification]" class="form-control followup-verification">
-                    <option value="">- Pilih Verifikasi -</option>
-                    <option value="OK">OK</option>
-                    <option value="Tidak OK">Tidak OK</option>
-                </select>
-            </div>`;
+                <div class="followup-group border rounded p-1 mb-2">
+                    <strong>Koreksi Lanjutan #${count + 1}</strong>
+                    <input type="text" name="details[${day}][followups][${count}][notes]" class="form-control mb-1" placeholder="Catatan Koreksi Lanjutan">
+                    <input type="text" name="details[${day}][followups][${count}][action]" class="form-control mb-1" placeholder="Tindakan Koreksi">
+                    <select name="details[${day}][followups][${count}][verification]" class="form-control followup-verification">
+                        <option value="">- Pilih Verifikasi -</option>
+                        <option value="OK">OK</option>
+                        <option value="Tidak OK">Tidak OK</option>
+                    </select>
+                </div>`;
             wrapper.insertAdjacentHTML('beforeend', html);
 
             const newSelect = wrapper.querySelectorAll('.followup-verification')[count];
