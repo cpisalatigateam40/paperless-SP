@@ -268,6 +268,10 @@
                 <a class="collapse-item" href="{{ route('report_lab_samples.index') }}">
                     Pembuatan Sample Laboratorium
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_returns.index') }}">
+                    Retur Ketidaksesuaian Bahan Baku / Bahan Kemas
+                </a>
             </div>
         </div>
     </li>

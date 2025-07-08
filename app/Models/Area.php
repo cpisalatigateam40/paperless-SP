@@ -148,4 +148,9 @@ class Area extends Model
     {
         return $this->hasMany(ReportLabSample::class, 'area_uuid', 'uuid');
     }
+
+    public function reportReturns()
+    {
+        return $this->hasMany(ReportReturn::class, 'area_uuid', 'uuid');
+    }
 }
