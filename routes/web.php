@@ -37,6 +37,7 @@ use App\Http\Controllers\ReportProductionNonconformityController;
 use App\Http\Controllers\ReportChlorineResidueController;
 use App\Http\Controllers\ReportRepackVerifController;
 use App\Http\Controllers\ReportLabSampleController;
+use App\Http\Controllers\ReportReturnController;
 
 Route::redirect('/', '/login');
 
@@ -537,4 +538,18 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
         });
 
+    Route::prefix('report-returns')
+        ->name('report_returns.')
+        ->controller(ReportReturnController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+            Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
+            Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
+            Route::delete('/details/{id}', 'destroyDetail')->name('details.destroy');
+        });
 });
