@@ -54,4 +54,9 @@ class Product extends Model
     {
         return $this->hasMany(DetailLabSample::class, 'product_uuid', 'uuid');
     }
+
+    public function detailMetalDetectors()
+    {
+        return $this->hasMany(DetailMetalDetector::class, 'product_uuid', 'uuid');
+    }
 }

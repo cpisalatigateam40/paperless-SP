@@ -272,6 +272,10 @@
                 <a class="collapse-item" href="{{ route('report_returns.index') }}">
                     Retur Ketidaksesuaian Bahan Baku / Bahan Kemas
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_metal_detectors.index') }}">
+                    Pemeriksaan Metal Detector Adonan
+                </a>
             </div>
         </div>
     </li>

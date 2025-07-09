@@ -67,4 +67,9 @@ class Section extends Model
     {
         return $this->hasMany(ReportChlorineResidue::class, 'section_uuid', 'uuid');
     }
+
+    public function reportMetals()
+    {
+        return $this->hasMany(ReportMetalDetector::class, 'section_uuid', 'uuid');
+    }
 }
