@@ -158,4 +158,15 @@ class Area extends Model
     {
         return $this->hasMany(ReportMetalDetector::class, 'area_uuid', 'uuid');
     }
+
+    public function reportRetains()
+    {
+        return $this->hasMany(ReportRetain::class, 'area_uuid', 'uuid');
+    }
+
+    public function iqfFreezingReports()
+    {
+        return $this->hasMany(ReportIqfFreezing::class, 'area_uuid', 'uuid');
+    }
+
 }
