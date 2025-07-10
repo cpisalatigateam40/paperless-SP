@@ -72,4 +72,9 @@ class Section extends Model
     {
         return $this->hasMany(ReportMetalDetector::class, 'section_uuid', 'uuid');
     }
+
+    public function reportRetains()
+    {
+        return $this->hasMany(ReportRetain::class, 'section_uuid', 'uuid');
+    }
 }

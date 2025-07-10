@@ -276,6 +276,14 @@
                 <a class="collapse-item" href="{{ route('report_metal_detectors.index') }}">
                     Pemeriksaan Metal Detector Adonan
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_retains.index') }}">
+                    Retained Sample Report
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_iqf_freezings.index') }}">
+                    Verifikasi Pembekuan IQF
+                </a>
             </div>
         </div>
     </li>

@@ -59,4 +59,14 @@ class Product extends Model
     {
         return $this->hasMany(DetailMetalDetector::class, 'product_uuid', 'uuid');
     }
+
+    public function detailRetains()
+    {
+        return $this->hasMany(DetailRetain::class, 'product_uuid', 'uuid');
+    }
+
+    public function iqfFreezingDetails()
+    {
+        return $this->hasMany(DetailIqfFreezing::class, 'product_uuid', 'uuid');
+    }
 }
