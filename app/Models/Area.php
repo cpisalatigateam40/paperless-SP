@@ -169,4 +169,14 @@ class Area extends Model
         return $this->hasMany(ReportIqfFreezing::class, 'area_uuid', 'uuid');
     }
 
+    public function reportVacuumConditions()
+    {
+        return $this->hasMany(ReportVacuumCondition::class, 'area_uuid', 'uuid');
+    }
+
+    public function reportMdProducts()
+    {
+        return $this->hasMany(ReportMdProduct::class, 'area_uuid', 'uuid');
+    }
+
 }
