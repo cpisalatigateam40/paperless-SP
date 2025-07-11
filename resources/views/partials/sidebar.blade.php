@@ -284,6 +284,14 @@
                 <a class="collapse-item" href="{{ route('report_iqf_freezings.index') }}">
                     Verifikasi Pembekuan IQF
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_vacuum_conditions.index') }}">
+                    Verifikasi Kondisi Vakum Produk Setelah IQF
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_md_products.index') }}">
+                    Pemeriksaan Metal Detector Produk
+                </a>
             </div>
         </div>
     </li>

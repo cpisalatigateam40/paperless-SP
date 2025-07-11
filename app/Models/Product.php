@@ -69,4 +69,14 @@ class Product extends Model
     {
         return $this->hasMany(DetailIqfFreezing::class, 'product_uuid', 'uuid');
     }
+
+    public function detailVacuumConditions()
+    {
+        return $this->hasMany(DetailVacuumCondition::class, 'product_uuid', 'uuid');
+    }
+
+    public function detailMdProducts()
+    {
+        return $this->hasMany(DetailMdProduct::class, 'product_uuid', 'uuid');
+    }
 }
