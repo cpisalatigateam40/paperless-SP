@@ -179,4 +179,9 @@ class Area extends Model
         return $this->hasMany(ReportMdProduct::class, 'area_uuid', 'uuid');
     }
 
+    public function retainExterminations()
+    {
+        return $this->hasMany(ReportRetainExtermination::class, 'area_uuid', 'uuid');
+    }
+
 }

@@ -43,6 +43,7 @@ use App\Http\Controllers\ReportRetainController;
 use App\Http\Controllers\ReportIqfFreezingController;
 use App\Http\Controllers\ReportVacuumConditionController;
 use App\Http\Controllers\ReportMdProductController;
+use App\Http\Controllers\ReportRetainExterminationController;
 
 Route::redirect('/', '/login');
 
@@ -628,6 +629,20 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
+
+    Route::prefix('report-retain-exterminations')
+        ->name('report_retain_exterminations.')
+        ->controller(ReportRetainExterminationController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
 

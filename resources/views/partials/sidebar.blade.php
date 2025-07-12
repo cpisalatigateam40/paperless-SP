@@ -292,6 +292,10 @@
                 <a class="collapse-item" href="{{ route('report_md_products.index') }}">
                     Pemeriksaan Metal Detector Produk
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_retain_exterminations.index') }}">
+                    Pemusnahan Retain Sample
+                </a>
             </div>
         </div>
     </li>
