@@ -8,6 +8,18 @@
         </div>
     </div>
 
+    @if (session('error'))
+    <div class="alert alert-danger">
+        <strong>Error:</strong> {{ session('error') }}
+    </div>
+    @endif
+
+    @if (session('success'))
+    <div class="alert alert-success">
+        <strong>Success:</strong> {{ session('success') }}
+    </div>
+    @endif
+
     <form action="{{ route('report_maurer_cookings.store') }}" method="POST">
         @csrf
 
@@ -18,11 +30,12 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control" required>
+                        <input type="date" name="date" class="form-control" value="{{ now()->toDateString() }}"
+                            required>
                     </div>
                     <div class="col-md-3">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" placeholder="A / B / C" required>
+                        <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
                     </div>
                     <div class="col-md-3">
                         <label>Section</label>
@@ -80,12 +93,9 @@
                         $steps = [
                         ['name'=>'SHOWERING','fields'=>['time_minutes_1','time_minutes_2']],
                         ['name'=>'WARMING','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'DRYING I
-                        I','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'DRYING II
-                        II','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'DRYING III
-                        III','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
+                        ['name'=>'DRYINGI','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
+                        ['name'=>'DRYINGII','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
+                        ['name'=>'DRYINGIII','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
                         ['name'=>'SMOKING','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
                         ['name'=>'COOKING','fields'=>['room_temperature_1','room_temperature_2','product_temperature_1','product_temperature_2','time_minutes_1','time_minutes_2']],
                         ['name'=>'EVAKUASI','fields'=>['time_minutes_1','time_minutes_2']],

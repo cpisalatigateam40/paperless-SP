@@ -45,6 +45,7 @@ use App\Http\Controllers\ReportVacuumConditionController;
 use App\Http\Controllers\ReportMdProductController;
 use App\Http\Controllers\ReportRetainExterminationController;
 use App\Http\Controllers\ReportMaurerCookingController;
+use App\Http\Controllers\ReportStufferController;
 
 Route::redirect('/', '/login');
 
@@ -655,6 +656,23 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
         });
 
+    Route::prefix('report-stuffers')
+        ->name('report_stuffers.')
+        ->controller(ReportStufferController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
 });
