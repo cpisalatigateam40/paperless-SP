@@ -184,4 +184,9 @@ class Area extends Model
         return $this->hasMany(ReportRetainExtermination::class, 'area_uuid', 'uuid');
     }
 
+    public function reportStuffers()
+    {
+        return $this->hasMany(ReportStuffer::class, 'area_uuid', 'uuid');
+    }
+
 }

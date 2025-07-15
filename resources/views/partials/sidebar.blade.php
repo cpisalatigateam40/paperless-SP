@@ -300,6 +300,10 @@
                 <a class="collapse-item" href="{{ route('report_maurer_cookings.index') }}">
                     Pemeriksaan Pemasakan Rumah Asap, Showering, dan Cooling Down Maurer
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_stuffers.index') }}">
+                    Rekap Stuffer dan Cooking Loss
+                </a>
             </div>
         </div>
     </li>

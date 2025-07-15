@@ -79,4 +79,14 @@ class Product extends Model
     {
         return $this->hasMany(DetailMdProduct::class, 'product_uuid', 'uuid');
     }
+
+    public function detailStuffers()
+    {
+        return $this->hasMany(DetailStuffer::class, 'product_uuid', 'uuid');
+    }
+
+    public function cookingLossStuffers()
+    {
+        return $this->hasMany(CookingLossStuffer::class, 'product_uuid', 'uuid');
+    }
 }
