@@ -117,156 +117,29 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
-
     <!-- Heading -->
     <div class="sidebar-heading mt-3">
         Report
     </div>
 
-    <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
-            aria-controls="collapsePages">
-            <i class="fas fa-fw fa-recycle"></i>
-            <span>Pemeriksaan Kondisi Area, GMP Karyawan, dan Kontrol Sanitasi</span>
-        </a>
-        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('cleanliness.index') }}">
-                    Report kebersihan area penyimpanan bahan
-                </a>
-
-                <a class="collapse-item" href="{{ route('process-area-cleanliness.index') }}">
-                    Report kebersihan area proses
-                </a>
-
-                <a class="collapse-item" href="{{ route('gmp-employee.index') }}">
-                    Report GMP karyawan & Kontrol Sanitasi
-                </a>
-
-                <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
-                    Report Barang Mudah Pecah
-                </a>
-
-                <a class="collapse-item" href="{{ route('report-re-cleanliness.index') }}">
-                    Report Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan
-                </a>
-
-                <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">
-                    Report Pemeriksaan dan Sanitasi Setelah Perbaikan Mesin
-                </a>
-
-                <a class="collapse-item" href="{{ route('report-conveyor-cleanliness.index') }}">
-                    Report Pemeriksaan Kebersihan Conveyor Packing
-                </a>
-
-                <a class="collapse-item" href="{{ route('report-solvents.index') }}">
-                    Report Pembuatan Larutan Cleaning dan Sanitasi
-                </a>
-
-                <a class="collapse-item" href="{{ route('report_pre_operations.index') }}">
-                    Pemeriksaan Pra Operasi Produk
-                </a>
-
-                <a class="collapse-item" href="{{ route('report_product_changes.index') }}">
-                    Verifikasi Pergantian Produk
-                </a>
-            </div>
-        </div>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesQc"
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesMeatPrep"
             aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-wrench"></i>
-            <span>Pemeriksaan Peralatan QC</span>
+            <i class="fas fa-drumstick-bite"></i>
+            <span>Meat Preparation</span>
         </a>
-        <div id="collapsePagesQc" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">
-                    Report Inventaris QC
-                </a>
-
-                <a class="collapse-item" href="{{ route('report-scales.index') }}">
-                    Report Timbangan & Thermometer
-                </a>
-
-                <a class="collapse-item" href="{{ route('report_sharp_tools.index') }}">
-                    Report Benda Tajam
-                </a>
-            </div>
-        </div>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesRm"
-            aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-boxes"></i>
-            <span>Raw Material & Packaging</span>
-        </a>
-        <div id="collapsePagesRm" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+        <div id="collapsePagesMeatPrep" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('report_rm_arrivals.index') }}">
                     Pemeriksaan Kedatangan Bahan Baku Chillroom
                 </a>
+
                 <a class="collapse-item" href="{{ route('report-premixes.index') }}">
                     Pemeriksaan Premix
                 </a>
-            </div>
-        </div>
-    </li>
 
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesMetalD"
-            aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-magnet"></i>
-            <span>Verifikasi Magnet Trap</span>
-        </a>
-        <div id="collapsePagesMetalD" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('report-foreign-objects.index') }}">
                     Pemeriksaan Kontaminasi Benda Asing
-                </a>
-                <a class="collapse-item" href="{{ route('report_magnet_traps.index') }}">
-                    Pemeriksaan Magnet Trap
-                </a>
-            </div>
-        </div>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdNoncon"
-            aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-industry"></i>
-            <span>Pemeriksaan Proses Produksi</span>
-        </a>
-        <div id="collapsePagesProdNoncon" class="collapse" aria-labelledby="headingPages"
-            data-parent="#accordionSidebar">
-            <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('report_production_nonconformities.index') }}">
-                    Pemeriksaan Ketidaksesuaian Proses Produksi
-                </a>
-                <a class="collapse-item" href="{{ route('report_chlorine_residues.index') }}">
-                    Pemeriksaan Air Proses Produksi
-                </a>
-            </div>
-        </div>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagestest"
-            aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-industry"></i>
-            <span>Test</span>
-        </a>
-        <div id="collapsePagestest" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('report_repack_verifs.index') }}">
-                    Verifikasi Repack Product
-                </a>
-
-                <a class="collapse-item" href="{{ route('report_lab_samples.index') }}">
-                    Pembuatan Sample Laboratorium
                 </a>
 
                 <a class="collapse-item" href="{{ route('report_returns.index') }}">
@@ -277,10 +150,76 @@
                     Pemeriksaan Metal Detector Adonan
                 </a>
 
+                <a class="collapse-item" href="{{ route('report_magnet_traps.index') }}">
+                    Pemeriksaan Magnet Trap
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_stuffers.index') }}">
+                    Rekap Stuffer dan Cooking Loss
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesCooking"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fire"></i>
+            <span>Cooking</span>
+        </a>
+        <div id="collapsePagesCooking" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report_maurer_cookings.index') }}">
+                    Pemeriksaan Pemasakan Rumah Asap, Showering, dan Cooling Down Maurer
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_fessman_cookings.index') }}">
+                    Pemeriksaan Pemasakan Rumah Asap, Showering, dan Cooling Down Fessman
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesPacking"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-box-open"></i>
+            <span>Packing</span>
+        </a>
+        <div id="collapsePagesPacking" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report_repack_verifs.index') }}">
+                    Verifikasi Repack Produk
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_lab_samples.index') }}">
+                    Pembuatan Sample Laboratorium
+                </a>
+
                 <a class="collapse-item" href="{{ route('report_retains.index') }}">
                     Retained Sample Report
                 </a>
 
+                <a class="collapse-item" href="{{ route('report_retain_exterminations.index') }}">
+                    Pemusnahan Retain Sample
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_md_products.index') }}">
+                    Pemeriksaan Metal Detector Produk
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesCartoning"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-box"></i>
+            <span>Cartoning</span>
+        </a>
+        <div id="collapsePagesCartoning" class="collapse" aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('report_iqf_freezings.index') }}">
                     Verifikasi Pembekuan IQF
                 </a>
@@ -288,22 +227,91 @@
                 <a class="collapse-item" href="{{ route('report_vacuum_conditions.index') }}">
                     Verifikasi Kondisi Vakum Produk Setelah IQF
                 </a>
+            </div>
+        </div>
+    </li>
 
-                <a class="collapse-item" href="{{ route('report_md_products.index') }}">
-                    Pemeriksaan Metal Detector Produk
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdNonProd"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Verifikasi Non Proses</span>
+        </a>
+        <div id="collapsePagesProdNonProd" class="collapse" aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report-re-cleanliness.index') }}">
+                    Report Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_retain_exterminations.index') }}">
-                    Pemusnahan Retain Sample
+                <a class="collapse-item" href="{{ route('report_pre_operations.index') }}">
+                    Pemeriksaan Pra Operasi Produk
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_maurer_cookings.index') }}">
-                    Pemeriksaan Pemasakan Rumah Asap, Showering, dan Cooling Down Maurer
+                <a class="collapse-item" href="{{ route('report_product_changes.index') }}">
+                    Verifikasi Pergantian Produk
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_stuffers.index') }}">
-                    Rekap Stuffer dan Cooking Loss
+                <a class="collapse-item" href="{{ route('cleanliness.index') }}">
+                    Report kebersihan area penyimpanan bahan
                 </a>
+
+                <a class="collapse-item" href="{{ route('process-area-cleanliness.index') }}">
+                    Report kebersihan area proses
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-conveyor-cleanliness.index') }}">
+                    Report Pemeriksaan Kebersihan Conveyor Packing
+                </a>
+
+                <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">
+                    Report Pemeriksaan dan Sanitasi Setelah Perbaikan Mesin
+                </a>
+
+                <a class="collapse-item" href="{{ route('gmp-employee.index') }}">
+                    Report GMP karyawan & Kontrol Sanitasi
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_chlorine_residues.index') }}">
+                    Pemeriksaan Air Proses Produksi
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-solvents.index') }}">
+                    Report Pembuatan Larutan Cleaning dan Sanitasi
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
+                    Pemeriksaan Barang Mudah Pecah
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-scales.index') }}">
+                    Pemeriksaan Timbangan & Thermometer
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">
+                    Report Inventaris Peralatan QC
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_sharp_tools.index') }}">
+                    Report Benda Tajam
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesketidaksesuaian"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Verifikasi dan Penanganan Ketidaksesuaian</span>
+        </a>
+        <div id="collapsePagesketidaksesuaian" class="collapse" aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('report_production_nonconformities.index') }}">
+                    Pemeriksaan Ketidaksesuaian Proses Produksi
+                </a>
+
             </div>
         </div>
     </li>
