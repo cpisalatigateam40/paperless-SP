@@ -89,4 +89,14 @@ class Product extends Model
     {
         return $this->hasMany(CookingLossStuffer::class, 'product_uuid', 'uuid');
     }
+
+    public function detailFreezPackagings()
+    {
+        return $this->hasMany(DetailFreezPackaging::class, 'product_uuid', 'uuid');
+    }
+
+    public function checkweigherDetails()
+    {
+        return $this->hasMany(DetailCheckweigherBox::class, 'product_uuid', 'uuid');
+    }
 }
