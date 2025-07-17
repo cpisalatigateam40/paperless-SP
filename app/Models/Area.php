@@ -189,4 +189,14 @@ class Area extends Model
         return $this->hasMany(ReportStuffer::class, 'area_uuid', 'uuid');
     }
 
+    public function reportFreezPackagings()
+    {
+        return $this->hasMany(ReportFreezPackaging::class, 'area_uuid', 'uuid');
+    }
+
+    public function checkweigherReports()
+    {
+        return $this->hasMany(ReportCheckweigherBox::class, 'area_uuid', 'uuid');
+    }
+
 }

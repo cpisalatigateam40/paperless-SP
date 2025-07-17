@@ -227,6 +227,14 @@
                 <a class="collapse-item" href="{{ route('report_vacuum_conditions.index') }}">
                     Verifikasi Kondisi Vakum Produk Setelah IQF
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_freez_packagings.index') }}">
+                    Verifikasi Pembekuan IQF dan Pengemasan Karton Box
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_checkweigher_boxes.index') }}">
+                    Pemeriksaan Checkweigher Box
+                </a>
             </div>
         </div>
     </li>
