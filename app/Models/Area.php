@@ -199,4 +199,9 @@ class Area extends Model
         return $this->hasMany(ReportCheckweigherBox::class, 'area_uuid', 'uuid');
     }
 
+    public function reportRetainSamples()
+    {
+        return $this->hasMany(ReportRetainSample::class, 'area_uuid', 'uuid');
+    }
+
 }

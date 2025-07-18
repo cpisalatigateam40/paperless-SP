@@ -99,4 +99,9 @@ class Product extends Model
     {
         return $this->hasMany(DetailCheckweigherBox::class, 'product_uuid', 'uuid');
     }
+
+    public function retainSampleDetails()
+    {
+        return $this->hasMany(DetailRetainSample::class, 'product_uuid', 'uuid');
+    }
 }

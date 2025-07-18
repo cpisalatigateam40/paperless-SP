@@ -49,6 +49,8 @@ use App\Http\Controllers\ReportStufferController;
 use App\Http\Controllers\ReportFessmanCookingController;
 use App\Http\Controllers\ReportFreezPackagingController;
 use App\Http\Controllers\ReportCheckweigherBoxController;
+use App\Http\Controllers\ReportRetainSampleController;
+use App\Http\Controllers\ReportProductVerifController;
 
 Route::redirect('/', '/login');
 
@@ -719,5 +721,34 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
+        });
+
+    Route::prefix('report-retain-samples')
+        ->name('report_retain_samples.')
+        ->controller(ReportRetainSampleController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
+
+    Route::prefix('report-product-verifs')
+        ->name('report_product_verifs.')
+        ->controller(ReportProductVerifController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+
         });
 });

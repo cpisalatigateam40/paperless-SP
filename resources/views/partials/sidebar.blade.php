@@ -207,6 +207,14 @@
                 <a class="collapse-item" href="{{ route('report_md_products.index') }}">
                     Pemeriksaan Metal Detector Produk
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_retain_samples.index') }}">
+                    Pendataan Retain Sample ABF/IQF
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_product_verifs.index') }}">
+                    Verifikasi Produk
+                </a>
             </div>
         </div>
     </li>
