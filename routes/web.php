@@ -51,6 +51,7 @@ use App\Http\Controllers\ReportFreezPackagingController;
 use App\Http\Controllers\ReportCheckweigherBoxController;
 use App\Http\Controllers\ReportRetainSampleController;
 use App\Http\Controllers\ReportProductVerifController;
+use App\Http\Controllers\ReportTofuVerifController;
 
 Route::redirect('/', '/login');
 
@@ -749,6 +750,19 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
 
+    Route::prefix('report-tofu-verifs')
+        ->name('report_tofu_verifs.')
+        ->controller(ReportTofuVerifController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export', 'exportPdf')->name('export');
         });
 });

@@ -204,4 +204,9 @@ class Area extends Model
         return $this->hasMany(ReportRetainSample::class, 'area_uuid', 'uuid');
     }
 
+    public function reportTofuVerifs()
+    {
+        return $this->hasMany(ReportTofuVerif::class, 'area_uuid', 'uuid');
+    }
+
 }

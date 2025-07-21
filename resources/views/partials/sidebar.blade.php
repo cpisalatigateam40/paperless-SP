@@ -215,6 +215,10 @@
                 <a class="collapse-item" href="{{ route('report_product_verifs.index') }}">
                     Verifikasi Produk
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_tofu_verifs.index') }}">
+                    Verifikasi Produk Tofu
+                </a>
             </div>
         </div>
     </li>
