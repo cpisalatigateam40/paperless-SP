@@ -1,0 +1,247 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container-fluid">
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Tofu Product Verification Reports</h5>
+            <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">+ New Report</a>
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+            <div id="success-alert" class="alert alert-success">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            @if ($errors->any())
+            <div id="error-alert" class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Created By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($reports as $index => $report)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $report->date }}</td>
+                            <td>{{ $report->shift }}</td>
+                            <td>{{ $report->created_by }}</td>
+                            <td class="d-flex" style="gap: .2rem;">
+                                <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#detail-{{ $report->id }}">
+                                    Lihat Detail
+                                </button>
+
+                                <a href="{{ route('report_tofu_verifs.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning">
+                                    Update Laporan
+                                </a>
+
+                                <form action="{{ route('report_tofu_verifs.destroy', $report->uuid) }}" method="POST"
+                                    onsubmit="return confirm('Delete this report?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+
+                                @can('approve report')
+                                @if(!$report->approved_by)
+                                <form action="{{ route('report_tofu_verifs.approve', $report->id) }}" method="POST"
+                                    style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                </form>
+                                @else
+                                <span class="badge bg-success"
+                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                    Disetujui oleh {{ $report->approved_by }}
+                                </span>
+                                @endif
+                                @else
+                                @if($report->approved_by)
+                                <span class="badge bg-success"
+                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                    Disetujui oleh {{ $report->approved_by }}
+                                </span>
+                                @endif
+                                @endcan
+
+                                <a href="{{ route('report_tofu_verifs.export', $report->uuid) }}" target="_blank"
+                                    class="btn btn-sm btn-outline-secondary">
+                                    🖨 Cetak PDF
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="detail-{{ $report->id }}">
+                            <td colspan="6">
+                                <div class="table-responsive mt-2">
+                                    @php
+                                    $products = $report->productInfos;
+                                    $weights = $report->weightVerifs;
+                                    $defects = $report->defectVerifs;
+
+                                    $getValue = function ($collection, $type, $index, $field) {
+                                    return optional($collection->where(
+                                    'weight_category',
+                                    $type
+                                    )->values()->get($index))->{$field} ?? '-';
+                                    };
+                                    $getDefect = function ($collection, $type, $index, $field) {
+                                    return optional($collection->where(
+                                    'defect_type',
+                                    $type
+                                    )->values()->get($index))->{$field} ?? '-';
+                                    };
+                                    @endphp
+
+                                    <table class="table table-bordered table-sm text-center align-middle">
+                                        <tbody>
+                                            {{-- Row: Kode Produksi --}}
+                                            <tr>
+                                                <td class="text-start">Kode Produksi</td>
+                                                @foreach($products as $p)
+                                                <td>{{ $p->production_code }}</td>
+                                                @endforeach
+                                            </tr>
+
+                                            {{-- Row: Expired Date --}}
+                                            <tr>
+                                                <td class="text-start">Expired Date</td>
+                                                @foreach($products as $p)
+                                                <td>{{ $p->expired_date }}</td>
+                                                @endforeach
+                                            </tr>
+
+                                            {{-- Row: Jumlah Sampel --}}
+                                            <tr>
+                                                <td class="text-start">Jumlah Sampel (pcs)</td>
+                                                @foreach($products as $p)
+                                                <td>{{ $p->sample_amount }}</td>
+                                                @endforeach
+                                            </tr>
+
+                                            {{-- Header: Pemeriksaan Berat --}}
+                                            <tr class="table-light">
+                                                <th class="text-start" colspan="{{ $products->count() + 1 }}">
+                                                    Pemeriksaan Berat</th>
+                                            </tr>
+
+                                            {{-- Berat: Under --}}
+                                            <tr>
+                                                <td class="text-start">- Under (&lt; 11gr/pc)</td>
+                                                @foreach ($products as $i => $p)
+                                                <td>
+                                                    Turus: {{ $getValue($weights, 'under', $i, 'turus') }}<br>
+                                                    Jumlah: {{ $getValue($weights, 'under', $i, 'total') }}<br>
+                                                    %: {{ $getValue($weights, 'under', $i, 'percentage') }}
+                                                </td>
+                                                @endforeach
+                                            </tr>
+
+                                            {{-- Berat: Standard --}}
+                                            <tr>
+                                                <td class="text-start">- Standart (11 - 13 gr/pc)</td>
+                                                @foreach ($products as $i => $p)
+                                                <td>
+                                                    Turus: {{ $getValue($weights, 'standard', $i, 'turus') }}<br>
+                                                    Jumlah: {{ $getValue($weights, 'standard', $i, 'total') }}<br>
+                                                    %: {{ $getValue($weights, 'standard', $i, 'percentage') }}
+                                                </td>
+                                                @endforeach
+                                            </tr>
+
+                                            {{-- Berat: Over --}}
+                                            <tr>
+                                                <td class="text-start">- Over (&gt;13 gr/pc)</td>
+                                                @foreach ($products as $i => $p)
+                                                <td>
+                                                    Turus: {{ $getValue($weights, 'over', $i, 'turus') }}<br>
+                                                    Jumlah: {{ $getValue($weights, 'over', $i, 'total') }}<br>
+                                                    %: {{ $getValue($weights, 'over', $i, 'percentage') }}
+                                                </td>
+                                                @endforeach
+                                            </tr>
+
+                                            {{-- Header: Pemeriksaan Defect --}}
+                                            <tr class="table-light">
+                                                <th class="text-start" colspan="{{ $products->count() + 1 }}">
+                                                    Pemeriksaan Defect</th>
+                                            </tr>
+
+                                            @php
+                                            $defectTypes = [
+                                            'hole' => 'Berlubang',
+                                            'stain' => 'Noda',
+                                            'asymmetry' => 'Bentuk tidak bulat simetris',
+                                            'other' => 'Lain-lain',
+                                            'good' => 'Produk bagus',
+                                            'note' => 'Keterangan',
+                                            ];
+                                            @endphp
+
+                                            {{-- Loop setiap jenis defect --}}
+                                            @foreach($defectTypes as $key => $label)
+                                            <tr>
+                                                <td class="text-start">- {{ $label }}</td>
+                                                @foreach ($products as $i => $p)
+                                                <td>
+                                                    Turus: {{ $getDefect($defects, $key, $i, 'turus') }}<br>
+                                                    Jumlah: {{ $getDefect($defects, $key, $i, 'total') }}<br>
+                                                    %: {{ $getDefect($defects, $key, $i, 'percentage') }}
+                                                </td>
+                                                @endforeach
+                                            </tr>
+                                            @endforeach
+
+                                            {{-- Keterangan (jika ingin tambahkan nanti) --}}
+                                            {{-- <tr>
+                                                        <td class="text-start">Keterangan</td>
+                                                        @foreach ($products as $p)
+                                                        <td>-</td>
+                                                        @endforeach
+                                                    </tr> --}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+
+                        @empty
+                        <tr>
+                            <td colspan="6">No reports found.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('script')
+<script>
+$(document).ready(function() {
+    setTimeout(() => {
+        $('#success-alert').fadeOut('slow');
+        $('#error-alert').fadeOut('slow');
+    }, 3000);
+});
+</script>
+@endsection
