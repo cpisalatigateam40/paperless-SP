@@ -104,4 +104,10 @@ class Product extends Model
     {
         return $this->hasMany(DetailRetainSample::class, 'product_uuid', 'uuid');
     }
+
+    public function detailLossVacums()
+    {
+        return $this->hasMany(DetailProdLossVacum::class, 'product_uuid', 'uuid');
+    }
+
 }

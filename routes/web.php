@@ -52,6 +52,8 @@ use App\Http\Controllers\ReportCheckweigherBoxController;
 use App\Http\Controllers\ReportRetainSampleController;
 use App\Http\Controllers\ReportProductVerifController;
 use App\Http\Controllers\ReportTofuVerifController;
+use App\Http\Controllers\ReportProdLossVacumController;
+use App\Http\Controllers\ReportWeightStufferController;
 
 Route::redirect('/', '/login');
 
@@ -765,4 +767,31 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
         });
+
+    Route::prefix('report-prod-loss-vacums')
+        ->name('report_prod_loss_vacums.')
+        ->controller(ReportProdLossVacumController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
+
+    Route::prefix('report-weight-stuffers')
+        ->name('report_weight_stuffers.')
+        ->controller(ReportWeightStufferController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+        });
+
 });
