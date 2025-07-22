@@ -157,6 +157,10 @@
                 <a class="collapse-item" href="{{ route('report_stuffers.index') }}">
                     Rekap Stuffer dan Cooking Loss
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_weight_stuffers.index') }}">
+                    Verifikasi Berat Stuffer
+                </a>
             </div>
         </div>
     </li>
@@ -218,6 +222,10 @@
 
                 <a class="collapse-item" href="{{ route('report_tofu_verifs.index') }}">
                     Verifikasi Produk Tofu
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_prod_loss_vacums.index') }}">
+                    Verifikasi Produk Loss Vacum
                 </a>
             </div>
         </div>
