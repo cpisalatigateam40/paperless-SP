@@ -4,8 +4,8 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4 class="mb-4">Daftar Pemeriksaan Metal Detector Produk</h4>
-            <a href="{{ route('report_md_products.create') }}" class="btn btn-primary mb-3">Tambah Report</a>
+            <h4>Daftar Pemeriksaan Metal Detector Produk</h4>
+            <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Report</a>
         </div>
         <div class="card-body">
             @if(session('success'))

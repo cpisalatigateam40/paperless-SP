@@ -54,6 +54,9 @@ use App\Http\Controllers\ReportProductVerifController;
 use App\Http\Controllers\ReportTofuVerifController;
 use App\Http\Controllers\ReportProdLossVacumController;
 use App\Http\Controllers\ReportWeightStufferController;
+use App\Http\Controllers\ReportPackagingVerifController;
+use App\Http\Controllers\FormulaController;
+use App\Http\Controllers\ReportEmulsionMakingController;
 
 Route::redirect('/', '/login');
 
@@ -792,6 +795,50 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
+
+    Route::prefix('report-packaging-verifs')
+        ->name('report_packaging_verifs.')
+        ->controller(ReportPackagingVerifController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
+
+    Route::prefix('formulas')
+        ->name('formulas.')
+        ->controller(FormulaController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/detail', 'detail')->name('detail');
+            Route::post('/{uuid}/add-detail', 'addDetail')->name('addDetail');
+            Route::delete('/{uuid}/delete-detail/{detail_uuid}', 'deleteDetail')->name('deleteDetail');
+        });
+
+    Route::prefix('report-emulsion-makings')
+        ->name('report_emulsion_makings.')
+        ->controller(ReportEmulsionMakingController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
+            Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        });
+
 
 });
