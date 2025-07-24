@@ -77,4 +77,9 @@ class Section extends Model
     {
         return $this->hasMany(ReportRetain::class, 'section_uuid', 'uuid');
     }
+
+    public function reportPackagingVerifs()
+    {
+        return $this->hasMany(ReportPackagingVerif::class, 'section_uuid', 'uuid');
+    }
 }

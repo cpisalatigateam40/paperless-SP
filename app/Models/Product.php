@@ -110,4 +110,14 @@ class Product extends Model
         return $this->hasMany(DetailProdLossVacum::class, 'product_uuid', 'uuid');
     }
 
+    public function detailPackagingVerifs()
+    {
+        return $this->hasMany(DetailPackagingVerif::class, 'product_uuid', 'uuid');
+    }
+
+    public function formulas()
+    {
+        return $this->hasMany(Formula::class, 'product_uuid', 'uuid');
+    }
+
 }

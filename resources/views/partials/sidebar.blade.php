@@ -77,6 +77,9 @@
                 <a class="collapse-item" href="{{ route('sharp_tools.index') }}">
                     Benda Tajam
                 </a>
+                <a class="collapse-item" href="{{ route('formulas.index') }}">
+                    Formulasi
+                </a>
             </div>
         </div>
     </li>
@@ -161,6 +164,10 @@
                 <a class="collapse-item" href="{{ route('report_weight_stuffers.index') }}">
                     Verifikasi Berat Stuffer
                 </a>
+
+                <a class="collapse-item" href="{{ route('report_emulsion_makings.index') }}">
+                    Verifikasi Pembuatan Emulsi / CCM Block
+                </a>
             </div>
         </div>
     </li>
@@ -226,6 +233,10 @@
 
                 <a class="collapse-item" href="{{ route('report_prod_loss_vacums.index') }}">
                     Verifikasi Produk Loss Vacum
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_packaging_verifs.index') }}">
+                    Verifikasi Pemeriksaan Kemasan Plastik
                 </a>
             </div>
         </div>

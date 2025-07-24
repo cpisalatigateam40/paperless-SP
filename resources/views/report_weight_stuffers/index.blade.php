@@ -52,6 +52,34 @@
                                 @method('DELETE')
                                 <button class="btn btn-sm btn-danger">Hapus</button>
                             </form>
+
+                            @can('approve report')
+                            @if(!$report->approved_by)
+                            <form action="{{ route('report_weight_stuffers.approve', $report->id) }}" method="POST"
+                                style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                            </form>
+                            @else
+                            <span class="badge bg-success"
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                Disetujui oleh {{ $report->approved_by }}
+                            </span>
+                            @endif
+                            @else
+                            @if($report->approved_by)
+                            <span class="badge bg-success"
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                Disetujui oleh {{ $report->approved_by }}
+                            </span>
+                            @endif
+                            @endcan
+
+                            <a href="{{ route('report_weight_stuffers.export-pdf', $report->uuid) }}"
+                                class="btn btn-sm btn-outline-secondary" target="_blank">
+                                🖨 Cetak PDF
+                            </a>
+
                         </td>
                     </tr>
                     <tr class="collapse" id="detail-{{ $report->id }}">
@@ -162,7 +190,7 @@
                                 </table>
                             </div>
 
-                            <div class="d-flex justify-content-end mt-2">
+                            <div class="d-flex justify-content-end">
                                 <a href="{{ route('report_weight_stuffers.add-detail', $report->uuid) }}"
                                     class="btn btn-secondary btn-sm">
                                     Tambah Detail
@@ -170,8 +198,6 @@
                             </div>
                         </td>
                     </tr>
-
-
 
                     @empty
                     <tr>

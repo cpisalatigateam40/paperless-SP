@@ -39,4 +39,9 @@ class RawMaterial extends Model
     {
         return $this->hasMany(DetailReturn::class, 'rm_uuid', 'uuid');
     }
+
+    public function formulations()
+    {
+        return $this->hasMany(Formulation::class, 'raw_material_uuid', 'uuid');
+    }
 }

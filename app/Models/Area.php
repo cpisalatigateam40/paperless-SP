@@ -214,4 +214,14 @@ class Area extends Model
         return $this->hasMany(ReportProdLossVacum::class, 'area_uuid', 'uuid');
     }
 
+    public function reportPackagingVerifs()
+    {
+        return $this->hasMany(ReportPackagingVerif::class, 'area_uuid', 'uuid');
+    }
+
+    public function formulas()
+    {
+        return $this->hasMany(Formula::class, 'area_uuid', 'uuid');
+    }
+
 }
