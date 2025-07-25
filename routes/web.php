@@ -824,6 +824,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/detail', 'detail')->name('detail');
             Route::post('/{uuid}/add-detail', 'addDetail')->name('addDetail');
             Route::delete('/{uuid}/delete-detail/{detail_uuid}', 'deleteDetail')->name('deleteDetail');
+            Route::delete('/{uuid}/delete-detail-by-name/{formulation_name}', 'deleteDetailByName')->name('deleteDetailByName');
         });
 
     Route::prefix('report-emulsion-makings')
