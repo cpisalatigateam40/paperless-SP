@@ -52,26 +52,60 @@ class FormulaController extends Controller
     {
         $formula = Formula::with(['product', 'area', 'formulations.rawMaterial'])->where('uuid', $uuid)->firstOrFail();
         $rawMaterials = \App\Models\RawMaterial::all();
-        return view('formulas.detail', compact('formula', 'rawMaterials'));
+        $premixes = \App\Models\Premix::all();
+        return view('formulas.detail', compact('formula', 'rawMaterials', 'premixes'));
     }
 
     public function addDetail(Request $request, $uuid)
     {
         $formula = Formula::where('uuid', $uuid)->firstOrFail();
 
+        $raws = $request->raw_material_uuid ?? [];
+        $rawWeights = $request->raw_material_weight ?? [];
+
+        $premixes = $request->premix_uuid ?? [];
+        $premixWeights = $request->premix_weight ?? [];
+
+        // validasi
         $request->validate([
             'formulation_name' => 'required|string|max:255',
-            'raw_material_uuid' => 'nullable|exists:raw_materials,uuid',
+            'raw_material_uuid' => 'nullable|array',
+            'raw_material_uuid.*' => 'nullable|exists:raw_materials,uuid',
+            'raw_material_weight' => 'nullable|array',
+            'raw_material_weight.*' => 'nullable|numeric|min:0',
+
+            'premix_uuid' => 'nullable|array',
+            'premix_uuid.*' => 'nullable|exists:premixes,uuid',
+            'premix_weight' => 'nullable|array',
+            'premix_weight.*' => 'nullable|numeric|min:0',
         ]);
 
-        Formulation::create([
-            'uuid' => Str::uuid(),
-            'formula_uuid' => $formula->uuid,
-            'formulation_name' => $request->formulation_name,
-            'raw_material_uuid' => $request->raw_material_uuid,
-        ]);
+        // insert satu formulation per raw_material + berat
+        foreach ($raws as $index => $raw_uuid) {
+            Formulation::create([
+                'uuid' => Str::uuid(),
+                'formula_uuid' => $formula->uuid,
+                'formulation_name' => $request->formulation_name,
+                'raw_material_uuid' => $raw_uuid,
+                'premix_uuid' => null,
+                'weight' => isset($rawWeights[$index]) ? (float) $rawWeights[$index] : null,
+            ]);
+        }
 
-        return redirect()->route('formulas.detail', $formula->uuid)->with('success', 'Detail added successfully.');
+        // insert satu formulation per premix + berat
+        foreach ($premixes as $index => $premix_uuid) {
+            Formulation::create([
+                'uuid' => Str::uuid(),
+                'formula_uuid' => $formula->uuid,
+                'formulation_name' => $request->formulation_name,
+                'raw_material_uuid' => null,
+                'premix_uuid' => $premix_uuid,
+                'weight' => isset($premixWeights[$index]) ? (float) $premixWeights[$index] : null,
+            ]);
+        }
+
+        return redirect()->route('formulas.detail', $formula->uuid)
+            ->with('success', 'Formulasi berhasil ditambahkan.');
     }
 
     public function deleteDetail($uuid, $detail_uuid)
@@ -82,4 +116,17 @@ class FormulaController extends Controller
 
         return redirect()->route('formulas.detail', $formula->uuid)->with('success', 'Detail deleted successfully.');
     }
+
+    public function deleteDetailByName($uuid, $formulation_name)
+    {
+        $formula = Formula::where('uuid', $uuid)->firstOrFail();
+
+        // Hapus semua detail dengan formulation_name sama
+        Formulation::where('formula_uuid', $formula->uuid)
+            ->where('formulation_name', $formulation_name)
+            ->delete();
+
+        return redirect()->route('formulas.detail', $formula->uuid)->with('success', 'Berhasil hapus data formulasi.');
+    }
+
 }

@@ -4,17 +4,17 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Create Formula</h4>
+            <h4>Buat Formula</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('formulas.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
-                    <label>Formula Name</label>
+                    <label>Nama Formula</label>
                     <input type="text" name="formula_name" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label>Product</label>
+                    <label>Nama Produk</label>
                     <select name="product_uuid" class="form-control">
                         <option value="">-- Select Product --</option>
                         @foreach($products as $product)

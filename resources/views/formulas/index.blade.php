@@ -8,6 +8,21 @@
             <a href="{{ route('formulas.create') }}" class="btn btn-primary btn-sm">Tambah Formula</a>
         </div>
         <div class="card-body">
+            @if(session('success'))
+            <div id="success-alert" class="alert alert-success">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            @if ($errors->any())
+            <div id="error-alert" class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -41,4 +56,15 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+$(document).ready(function() {
+    setTimeout(() => {
+        $('#success-alert').fadeOut('slow');
+        $('#error-alert').fadeOut('slow');
+    }, 3000);
+});
+</script>
 @endsection
