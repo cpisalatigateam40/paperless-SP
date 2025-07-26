@@ -241,6 +241,11 @@
                                             <span class="icon">🔄</span>
                                             <span class="label">Sync Data Sensor</span>
                                         </button>
+
+                                        <p id="sync-status-message" class="text-success text-center"
+                                            style="display: none; margin-top: -.5rem;">
+                                        </p>
+
                                     </td>
                                     <td>
                                         <input type="text" name="details[__index__][items][3][notes]"
@@ -423,21 +428,22 @@ document.getElementById('sync-sensor').addEventListener('click', function() {
     const button = this;
     const label = button.querySelector('.label');
     const icon = button.querySelector('.icon');
+    const message = document.getElementById('sync-status-message');
 
-    // Ganti jadi loading
     label.textContent = 'Menyinkronkan...';
     icon.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
     button.disabled = true;
+    message.style.display = 'none';
 
     axios.get('http://10.68.1.220:3003/api/sensor/last')
         .then(response => {
-            const mesin301 = response.data.data["301"];
-            if (!mesin301 || !mesin301.DATA || mesin301.DATA.TEMPERATURE === undefined) {
-                alert('Data suhu dari sensor 301 tidak tersedia');
+            const mesin701 = response.data.data["701"];
+            if (!mesin701 || !mesin701.DATA || mesin701.DATA.CH1 === undefined) {
+                alert('Data sensor dari mesin 701 tidak tersedia');
                 return;
             }
 
-            const temperature = mesin301.DATA.TEMPERATURE;
+            const temperature = mesin701.DATA.CH1;
             const humidity = 0;
 
             const blocks = document.querySelectorAll('.inspection-block');
@@ -457,6 +463,11 @@ document.getElementById('sync-sensor').addEventListener('click', function() {
             label.textContent = '✓ Berhasil disinkron!';
             icon.textContent = '';
 
+            message.textContent = 'Data sensor berhasil disinkronisasi.';
+            message.classList.remove('text-danger');
+            message.classList.add('text-success');
+            message.style.display = 'block';
+
             setTimeout(() => {
                 label.textContent = 'Sync Data Sensor';
                 icon.textContent = '🔄';
@@ -471,6 +482,11 @@ document.getElementById('sync-sensor').addEventListener('click', function() {
 
             label.textContent = 'Sync Gagal';
             icon.textContent = '❌';
+
+            message.textContent = 'Gagal menyinkronkan data sensor.';
+            message.classList.remove('text-success');
+            message.classList.add('text-danger');
+            message.style.display = 'block';
 
             setTimeout(() => {
                 label.textContent = 'Sync Data Sensor';
