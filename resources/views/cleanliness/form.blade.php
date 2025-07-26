@@ -224,6 +224,7 @@
                                             value="Suhu ruang (℃) / RH (%)">
                                         Suhu ruang (℃) / RH (%)
                                     </td>
+
                                     <td>
                                         <div class="d-flex gap-1" style="gap: 1rem;">
                                             <input type="number" step="0.1"
@@ -233,6 +234,13 @@
                                                 name="details[__index__][items][3][humidity]" placeholder="RH%"
                                                 class="form-control" required>
                                         </div>
+
+                                        <button type="button" id="sync-sensor"
+                                            class="btn btn-outline-primary mb-3 mt-3 btn-sm w-100 d-flex justify-content-center align-items-center"
+                                            style="gap: .5rem;">
+                                            <span class="icon">🔄</span>
+                                            <span class="label">Sync Data Sensor</span>
+                                        </button>
                                     </td>
                                     <td>
                                         <input type="text" name="details[__index__][items][3][notes]"
@@ -258,6 +266,8 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 @endsection
 
 @section('script')
@@ -320,23 +330,23 @@ function addFollowupField(block, itemIndex) {
     const count = wrapper.querySelectorAll('.followup-group').length;
 
     const html = `
-        <div class="followup-group border rounded p-3 mb-3">
-            <label class="small mb-2 d-block">Koreksi Lanjutan #${count + 1}</label>
-            <div class="mb-2">
-                <input type="text" name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][notes]" class="form-control" placeholder="Catatan">
+            <div class="followup-group border rounded p-3 mb-3">
+                <label class="small mb-2 d-block">Koreksi Lanjutan #${count + 1}</label>
+                <div class="mb-2">
+                    <input type="text" name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][notes]" class="form-control" placeholder="Catatan">
+                </div>
+                <div class="mb-2">
+                    <input type="text" name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][corrective_action]" class="form-control" placeholder="Tindakan Koreksi">
+                </div>
+                <div>
+                    <select name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][verification]" class="form-control followup-verification">
+                        <option value="">-- Pilih --</option>
+                        <option value="0">Tidak OK</option>
+                        <option value="1">OK</option>
+                    </select>
+                </div>
             </div>
-            <div class="mb-2">
-                <input type="text" name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][corrective_action]" class="form-control" placeholder="Tindakan Koreksi">
-            </div>
-            <div>
-                <select name="details[${block.dataset.index}][items][${itemIndex}][followups][${count}][verification]" class="form-control followup-verification">
-                    <option value="">-- Pilih --</option>
-                    <option value="0">Tidak OK</option>
-                    <option value="1">OK</option>
-                </select>
-            </div>
-        </div>
-    `;
+        `;
 
     wrapper.insertAdjacentHTML('beforeend', html);
 
@@ -407,6 +417,67 @@ document.addEventListener('change', function(e) {
     autoFill(0, 'Tertata rapi', 'Sesuai', '-', '1');
     autoFill(1, 'Sesuai tagging dan jenis alergen', 'Sesuai', '-', '1');
     autoFill(2, 'Bersih dan bebas kontaminan', 'Sesuai', '-', '1');
+});
+
+document.getElementById('sync-sensor').addEventListener('click', function() {
+    const button = this;
+    const label = button.querySelector('.label');
+    const icon = button.querySelector('.icon');
+
+    // Ganti jadi loading
+    label.textContent = 'Menyinkronkan...';
+    icon.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+    button.disabled = true;
+
+    axios.get('http://10.68.1.220:3003/api/sensor/last')
+        .then(response => {
+            const mesin301 = response.data.data["301"];
+            if (!mesin301 || !mesin301.DATA || mesin301.DATA.TEMPERATURE === undefined) {
+                alert('Data suhu dari sensor 301 tidak tersedia');
+                return;
+            }
+
+            const temperature = mesin301.DATA.TEMPERATURE;
+            const humidity = 0;
+
+            const blocks = document.querySelectorAll('.inspection-block');
+            if (blocks.length === 0) return;
+
+            const lastBlock = blocks[blocks.length - 1];
+            const tempInput = lastBlock.querySelector('input[name*="[3][temperature]"]');
+            const humInput = lastBlock.querySelector('input[name*="[3][humidity]"]');
+
+            if (tempInput) tempInput.value = temperature;
+            if (humInput) humInput.value = humidity;
+
+            // Feedback sukses
+            button.classList.remove('btn-outline-primary');
+            button.classList.add('btn-success');
+
+            label.textContent = '✓ Berhasil disinkron!';
+            icon.textContent = '';
+
+            setTimeout(() => {
+                label.textContent = 'Sync Data Sensor';
+                icon.textContent = '🔄';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-primary');
+                button.disabled = false;
+            }, 3000);
+        })
+        .catch(error => {
+            alert('Gagal mengambil data dari sensor.');
+            console.error(error);
+
+            label.textContent = 'Sync Gagal';
+            icon.textContent = '❌';
+
+            setTimeout(() => {
+                label.textContent = 'Sync Data Sensor';
+                icon.textContent = '🔄';
+                button.disabled = false;
+            }, 3000);
+        });
 });
 </script>
 @endsection
