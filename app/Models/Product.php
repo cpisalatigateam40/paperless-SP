@@ -120,4 +120,9 @@ class Product extends Model
         return $this->hasMany(Formula::class, 'product_uuid', 'uuid');
     }
 
+    public function detailReports()
+    {
+        return $this->hasMany(DetailProcessProd::class, 'product_uuid', 'uuid');
+    }
+
 }

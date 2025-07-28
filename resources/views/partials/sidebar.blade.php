@@ -1,24 +1,24 @@
 <style>
-    .collapse-item {
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-        margin-bottom: .2rem !important;
-    }
+.collapse-item {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    margin-bottom: .2rem !important;
+}
 
-    .collapse-inner {
-        overflow: hidden !important;
-        padding: 0.5rem !important;
-    }
+.collapse-inner {
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+}
 
-    #sidebarSuggestions {
-        position: absolute;
-        width: 19%;
-        z-index: 9999;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-    }
+#sidebarSuggestions {
+    position: absolute;
+    width: 19%;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+}
 </style>
 
 <!-- Sidebar -->
@@ -60,7 +60,7 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
                 @can('user view')
-                    <a class="collapse-item" href="{{ route('users.index') }}">User</a>
+                <a class="collapse-item" href="{{ route('users.index') }}">User</a>
                 @endcan
                 <a class="collapse-item" href="{{ route('areas.index') }}">Area</a>
                 <a class="collapse-item" href="{{ route('sections.index') }}">Section</a>
@@ -84,19 +84,19 @@
 
     <!-- access control -->
     @can('user view')
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true"
-                aria-controls="collapseTwo">
-                <i class="fas fa-wrench"></i>
-                <span>Access Control</span>
-            </a>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="soft-salmon py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="{{ route('roles.index') }}">Role</a>
-                    <a class="collapse-item" href="{{ route('permissions.index') }}">Permission</a>
-                </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true"
+            aria-controls="collapseTwo">
+            <i class="fas fa-wrench"></i>
+            <span>Access Control</span>
+        </a>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{{ route('roles.index') }}">Role</a>
+                <a class="collapse-item" href="{{ route('permissions.index') }}">Permission</a>
             </div>
-        </li>
+        </div>
+    </li>
     @endcan
 
     <!-- Divider -->
@@ -165,6 +165,10 @@
 
                 <a class="collapse-item" href="{{ route('report_emulsion_makings.index') }}">
                     Verifikasi Pembuatan Emulsi / CCM Block
+                </a>
+
+                <a class="collapse-item" href="{{ route('report_process_productions.index') }}">
+                    Verifikasi Proses Produksi
                 </a>
             </div>
         </div>
@@ -363,47 +367,47 @@
 </ul>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('sidebarSearch');
-        const suggestionsBox = document.getElementById('sidebarSuggestions');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('sidebarSearch');
+    const suggestionsBox = document.getElementById('sidebarSuggestions');
 
-        // Ambil semua link menu sidebar yang ingin dicari
-        const menuItems = Array.from(document.querySelectorAll('.collapse-item'));
+    // Ambil semua link menu sidebar yang ingin dicari
+    const menuItems = Array.from(document.querySelectorAll('.collapse-item'));
 
-        searchInput.addEventListener('input', function () {
-            const keyword = this.value.toLowerCase().trim();
-            suggestionsBox.innerHTML = '';
+    searchInput.addEventListener('input', function() {
+        const keyword = this.value.toLowerCase().trim();
+        suggestionsBox.innerHTML = '';
 
-            if (keyword.length === 0) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+        if (keyword.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
 
-            // Filter menu berdasarkan keyword
-            const filtered = menuItems.filter(item => item.textContent.toLowerCase().includes(keyword));
+        // Filter menu berdasarkan keyword
+        const filtered = menuItems.filter(item => item.textContent.toLowerCase().includes(keyword));
 
-            if (filtered.length === 0) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+        if (filtered.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
 
-            // Buat suggestion
-            filtered.forEach(item => {
-                const suggestion = document.createElement('a');
-                suggestion.href = item.href;
-                suggestion.className = 'list-group-item list-group-item-action';
-                suggestion.textContent = item.textContent.trim();
-                suggestionsBox.appendChild(suggestion);
-            });
-
-            suggestionsBox.style.display = 'block';
+        // Buat suggestion
+        filtered.forEach(item => {
+            const suggestion = document.createElement('a');
+            suggestion.href = item.href;
+            suggestion.className = 'list-group-item list-group-item-action';
+            suggestion.textContent = item.textContent.trim();
+            suggestionsBox.appendChild(suggestion);
         });
 
-        // Opsional: hide suggestions saat klik di luar
-        document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
+        suggestionsBox.style.display = 'block';
     });
+
+    // Opsional: hide suggestions saat klik di luar
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+});
 </script>

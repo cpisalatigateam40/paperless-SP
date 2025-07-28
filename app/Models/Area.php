@@ -224,4 +224,9 @@ class Area extends Model
         return $this->hasMany(Formula::class, 'area_uuid', 'uuid');
     }
 
+    public function reportProcessProds()
+    {
+        return $this->hasMany(ReportProcessProd::class, 'area_uuid', 'uuid');
+    }
+
 }

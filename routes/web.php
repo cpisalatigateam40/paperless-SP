@@ -57,6 +57,7 @@ use App\Http\Controllers\ReportWeightStufferController;
 use App\Http\Controllers\ReportPackagingVerifController;
 use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\ReportEmulsionMakingController;
+use App\Http\Controllers\ReportProcessProdController;
 
 Route::redirect('/', '/login');
 
@@ -841,5 +842,22 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
 
+    Route::prefix('report-process-productions')
+        ->name('report_process_productions.')
+        ->controller(ReportProcessProdController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
+            Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::get('/{uuid}/export', 'exportPdf')->name('export');
+
+            // AJAX Endpoints
+            Route::get('/get-formulas/{productUuid}', 'getFormulas')->name('getFormulas');
+            Route::get('/get-formulations/{formulaUuid}', 'getFormulations')->name('getFormulations');
+        });
 
 });
