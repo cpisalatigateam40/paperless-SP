@@ -34,4 +34,9 @@ class Formulation extends Model
     {
         return $this->belongsTo(Premix::class, 'premix_uuid', 'uuid');
     }
+
+    public function itemDetails()
+    {
+        return $this->hasMany(ItemDetailProd::class, 'formulation_uuid', 'uuid');
+    }
 }

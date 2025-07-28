@@ -82,4 +82,9 @@ class Section extends Model
     {
         return $this->hasMany(ReportPackagingVerif::class, 'section_uuid', 'uuid');
     }
+
+    public function reportProcessProds()
+    {
+        return $this->hasMany(ReportProcessProd::class, 'section_uuid', 'uuid');
+    }
 }

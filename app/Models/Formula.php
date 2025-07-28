@@ -32,4 +32,9 @@ class Formula extends Model
     {
         return $this->hasMany(Formulation::class, 'formula_uuid', 'uuid');
     }
+
+    public function detailReports()
+    {
+        return $this->hasMany(DetailProcessProd::class, 'formula_uuid', 'uuid');
+    }
 }
