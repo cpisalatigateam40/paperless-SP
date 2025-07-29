@@ -48,16 +48,15 @@
                                                 class="form-select premix-select form-control" data-row="0" required>
                                                 <option value="">-- Pilih Premix --</option>
                                                 @foreach ($premixes as $premix)
-                                                <option value="{{ $premix->uuid }}"
-                                                    data-code="{{ $premix->production_code }}">
+                                                <option value="{{ $premix->uuid }}">
                                                     {{ $premix->name }}
                                                 </option>
                                                 @endforeach
                                             </select>
+
                                         </td>
                                         <td>
-                                            <input type="text" name="details[0][production_code]"
-                                                class="form-control code-input" data-row="0" readonly>
+                                            <input type="text" name="details[0][production_code]" class="form-control">
                                         </td>
 
                                         <td><input type="number" name="details[0][weight]" class="form-control"
@@ -104,66 +103,49 @@
 <script>
 let rowIdx = 1;
 
-// Data premix (dari controller Laravel) — pastikan $premixes tersedia
 const premixes = @json($premixes);
 
-// Convert premixes to HTML <option> string
 function generatePremixOptions(row) {
     return premixes.map(p => {
-        return `<option value="${p.uuid}" data-code="${p.production_code}">${p.name}</option>`;
+        return `<option value="${p.uuid}">${p.name}</option>`;
     }).join('');
 }
 
-// Tambah baris detail baru
 function addRow() {
     const tbody = document.querySelector('#detail-table tbody');
     const row = document.createElement('tr');
 
     row.innerHTML = `
-                                                    <td>
-                                                        <select name="details[${rowIdx}][premix_uuid]" class="form-select premix-select form-control" data-row="${rowIdx}" required>
-                                                            <option value="">-- Pilih Premix --</option>
-                                                            ${generatePremixOptions(rowIdx)}
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="details[${rowIdx}][production_code]" class="form-control code-input" data-row="${rowIdx}" readonly>
-                                                    </td>
-                                                    <td><input type="number" name="details[${rowIdx}][weight]" class="form-control" required></td>
-                                                    <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control"></td>
-                                                    <td><input type="text" name="details[${rowIdx}][notes]" class="form-control"></td>
-                                                    <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control"></td>
-                                                    <td>
-                                                        <select name="details[${rowIdx}][verification]" class="form-select form-control">
-                                                            <option value="">--</option>
-                                                            <option value="✓">✓</option>
-                                                            <option value="x">x</option>
-                                                        </select>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Hapus</button>
-                                                    </td>
-                                                `;
+        <td>
+            <select name="details[${rowIdx}][premix_uuid]" class="form-select premix-select form-control" data-row="${rowIdx}" required>
+                <option value="">-- Pilih Premix --</option>
+                ${generatePremixOptions(rowIdx)}
+            </select>
+        </td>
+        <td>
+            <input type="text" name="details[${rowIdx}][production_code]" class="form-control">
+        </td>
+        <td><input type="number" name="details[${rowIdx}][weight]" class="form-control" required></td>
+        <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control"></td>
+        <td><input type="text" name="details[${rowIdx}][notes]" class="form-control"></td>
+        <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control"></td>
+        <td>
+            <select name="details[${rowIdx}][verification]" class="form-select form-control">
+                <option value="">--</option>
+                <option value="✓">✓</option>
+                <option value="x">x</option>
+            </select>
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">Hapus</button>
+        </td>
+    `;
     tbody.appendChild(row);
     rowIdx++;
 }
 
-// Hapus baris
 function removeRow(button) {
     button.closest('tr').remove();
 }
-
-// Saat dropdown premix diubah, isi kode produksinya otomatis
-document.addEventListener('change', function(e) {
-    if (e.target.classList.contains('premix-select')) {
-        const selected = e.target.selectedOptions[0];
-        const row = e.target.dataset.row;
-        const code = selected.getAttribute('data-code');
-        const kodeInput = document.querySelector(`input[name="details[${row}][production_code]"]`);
-        if (kodeInput) {
-            kodeInput.value = code ?? '';
-        }
-    }
-});
 </script>
 @endsection

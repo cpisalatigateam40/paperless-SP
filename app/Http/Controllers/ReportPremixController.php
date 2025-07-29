@@ -44,7 +44,7 @@ class ReportPremixController extends Controller
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-           'shift' => getShift(),
+            'shift' => $request->shift,
             'created_by' => Auth::user()->name,
             'known_by' => $request->known_by,
             'approved_by' => $request->approved_by,
@@ -59,7 +59,7 @@ class ReportPremixController extends Controller
                 'report_uuid' => $report->uuid,
                 'premix_uuid' => $detail['premix_uuid'],
                 'premix_name' => $premix->name,
-                'production_code' => $premix->production_code,
+                'production_code' => $detail['production_code'] ?? null,
                 'weight' => $detail['weight'],
                 'used_for_batch' => $detail['used_for_batch'] ?? null,
                 'notes' => $detail['notes'] ?? null,
@@ -83,6 +83,21 @@ class ReportPremixController extends Controller
         $report->delete();
 
         return redirect()->route('report-premixes.index')->with('success', 'Laporan berhasil dihapus.');
+    }
+
+    public function known($id)
+    {
+        $report = ReportPremix::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
     }
 
     public function approve($id)
@@ -121,10 +136,18 @@ class ReportPremixController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
         $pdf = Pdf::loadView('report_premixes.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'knownQr' => $knownQrBase64,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('laporan_pemeriksaan_premix_' . $report->date->format('Ymd') . '.pdf');

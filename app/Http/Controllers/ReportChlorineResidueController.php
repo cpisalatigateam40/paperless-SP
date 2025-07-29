@@ -163,6 +163,21 @@ class ReportChlorineResidueController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
     }
 
+    public function known($id)
+    {
+        $report = ReportChlorineResidue::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
+    }
+
     public function exportPdf($uuid)
     {
         $report = ReportChlorineResidue::with('section', 'area', 'details')->where('uuid', $uuid)->firstOrFail();
@@ -173,6 +188,13 @@ class ReportChlorineResidueController extends Controller
             : "Belum disetujui";
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
         $pdf = Pdf::loadView('report_chlorine_residues.pdf', [
             'report' => $report,

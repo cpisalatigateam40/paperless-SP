@@ -55,6 +55,28 @@
                                 <button class="btn btn-danger btn-sm">Hapus</button>
                             </form>
 
+                            @can('known report')
+                            @if(!$report->known_by)
+                            <form action="{{ route('report_fessman_cookings.known', $report->id) }}" method="POST"
+                                style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-success">Diketahui</button>
+                            </form>
+                            @else
+                            <span class="badge bg-success"
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                Diketahui oleh {{ $report->known_by }}
+                            </span>
+                            @endif
+                            @else
+                            @if($report->known_by)
+                            <span class="badge bg-success"
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                Diketahui oleh {{ $report->known_by }}
+                            </span>
+                            @endif
+                            @endcan
+
                             @can('approve report')
                             @if(!$report->approved_by)
                             <form action="{{ route('report_fessman_cookings.approve', $report->id) }}" method="POST"

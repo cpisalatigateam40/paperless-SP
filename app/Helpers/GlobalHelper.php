@@ -8,9 +8,9 @@ if (!function_exists('getShift')) {
         $now = $datetime ? Carbon::parse($datetime) : now();
         $hour = $now->hour;
 
-        if ($hour >= 6 && $hour < 14) {
+        if ($hour >= 7 && $hour < 15) {
             return '1';
-        } elseif ($hour >= 14 && $hour < 22) {
+        } elseif ($hour >= 15 && $hour < 23) {
             return '2';
         } else {
             return '3';

@@ -164,6 +164,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{report}/add-detail', 'createDetail')->name('detail.create');
             Route::post('/{report}/add-detail', 'storeDetail')->name('detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // PROCESS AREA ROUTES
@@ -179,6 +180,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{report}/add-detail', 'createDetail')->name('detail.create');
             Route::post('/{report}/add-detail', 'storeDetail')->name('detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // GMP EMPLOYEE ROUTES
@@ -196,6 +198,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('{report}/detail/store', 'storeDetail')->name('detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
             Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // FRAGILE ITEM MD ROUTES
@@ -224,6 +227,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // QC EQUIPMENT ROUTES
@@ -280,6 +284,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy'); // hapus laporan
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // THERMOMETER MD ROUTES
@@ -323,6 +328,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // REPORT REPAIR CLEANLINESS ROUTES
@@ -370,6 +376,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     // REPORT SOLVENT
@@ -398,6 +405,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetail')->name('add_detail');
             Route::post('/{uuid}/store-detail', 'storeDetail')->name('store_detail');
+            Route::post('/{id}/known', 'known')->name('known');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
@@ -418,6 +426,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::post('/{id}/known', 'known')->name('known');
         Route::post('/{id}/approve', 'approve')->name('approve');
         Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
     });
@@ -433,6 +442,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/add-detail', 'createDetail')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/known', 'known')->name('known');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
@@ -474,6 +484,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{uuid}/add-detail', 'storeDetail')->name('details.store');
         Route::post('/{id}/approve', 'approve')->name('approve');
         Route::get('/{uuid}/pdf', 'exportPdf')->name('exportPdf');
+        Route::post('/{id}/known', 'known')->name('known');
     });
 
     // REPORT
@@ -512,6 +523,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('add-detail');
             Route::post('/{uuid}/store-detail', 'storeDetail')->name('store-detail');
             Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-chlorine-residues')
@@ -556,6 +568,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
             Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
             Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-returns')
@@ -583,6 +596,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::get('/{report_uuid}/add-detail', 'addDetail')->name('add_detail');
             Route::post('/{report_uuid}/store-detail', 'storeDetail')->name('store_detail');
+            Route::post('/{id}/known', 'known')->name('known');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{report_uuid}/export-pdf', 'exportPdf')->name('export_pdf');
         });
@@ -644,6 +658,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-retain-exterminations')
@@ -672,6 +687,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-stuffers')
@@ -700,6 +716,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-freez-packagings')
@@ -714,6 +731,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-checkweigher-boxes')
@@ -742,6 +760,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-product-verifs')
@@ -756,6 +775,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-tofu-verifs')
@@ -770,6 +790,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-prod-loss-vacums')
@@ -784,6 +805,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-weight-stuffers')
@@ -797,6 +819,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
         });
 
@@ -812,6 +835,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('formulas')
@@ -840,6 +864,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::post('/{id}/known', 'known')->name('known');
         });
 
     Route::prefix('report-process-productions')
@@ -854,6 +879,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
+            Route::post('/{id}/known', 'known')->name('known');
 
             // AJAX Endpoints
             Route::get('/get-formulas/{productUuid}', 'getFormulas')->name('getFormulas');

@@ -51,6 +51,7 @@
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
+    @can('view master data')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
             aria-controls="collapseTwo">
@@ -67,7 +68,7 @@
                 <a class="collapse-item" href="{{ route('rooms.index') }}">Ruangan, Mesin, dan Peralatan</a>
                 <a class="collapse-item" href="{{ route('fragile-item.index') }}">Barang Mudah Pecah</a>
                 <a class="collapse-item" href="{{ route('sharp_tools.index') }}">Benda Tajam</a>
-                <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a>
+                <!-- <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a> -->
                 <a class="collapse-item" href="{{ route('scales.index') }}">Timbangan</a>
                 <a class="collapse-item" href="{{ route('thermometers.index') }}">Thermometer</a>
                 <a class="collapse-item" href="{{ route('products.index') }}">Produk</a>
@@ -81,6 +82,7 @@
             </div>
         </div>
     </li>
+    @endcan
 
     <!-- access control -->
     @can('user view')
@@ -143,21 +145,21 @@
                     Pemeriksaan Kontaminasi Benda Asing
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_returns.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_returns.index') }}">
                     Retur Ketidaksesuaian Bahan Baku / Bahan Kemas
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report_metal_detectors.index') }}">
                     Pemeriksaan Metal Detector Adonan
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_magnet_traps.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_magnet_traps.index') }}">
                     Pemeriksaan Magnet Trap
-                </a>
+                </a> -->
 
-                <a class="collapse-item" href="{{ route('report_stuffers.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_stuffers.index') }}">
                     Rekap Stuffer dan Cooking Loss
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report_weight_stuffers.index') }}">
                     Verifikasi Berat Stuffer
@@ -201,21 +203,21 @@
         </a>
         <div id="collapsePagesPacking" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('report_repack_verifs.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_repack_verifs.index') }}">
                     Verifikasi Repack Produk
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report_lab_samples.index') }}">
                     Pembuatan Sample Laboratorium
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_retains.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_retains.index') }}">
                     Retained Sample Report
-                </a>
+                </a> -->
 
-                <a class="collapse-item" href="{{ route('report_retain_exterminations.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_retain_exterminations.index') }}">
                     Pemusnahan Retain Sample
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report_md_products.index') }}">
                     Pemeriksaan Metal Detector Produk
@@ -253,21 +255,21 @@
         <div id="collapsePagesCartoning" class="collapse" aria-labelledby="headingPages"
             data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('report_iqf_freezings.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_iqf_freezings.index') }}">
                     Verifikasi Pembekuan IQF
-                </a>
+                </a> -->
 
-                <a class="collapse-item" href="{{ route('report_vacuum_conditions.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_vacuum_conditions.index') }}">
                     Verifikasi Kondisi Vakum Produk Setelah IQF
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report_freez_packagings.index') }}">
                     Verifikasi Pembekuan IQF dan Pengemasan Karton Box
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_checkweigher_boxes.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_checkweigher_boxes.index') }}">
                     Pemeriksaan Checkweigher Box
-                </a>
+                </a> -->
             </div>
         </div>
     </li>
@@ -285,13 +287,13 @@
                     Report Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan
                 </a>
 
-                <a class="collapse-item" href="{{ route('report_pre_operations.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_pre_operations.index') }}">
                     Pemeriksaan Pra Operasi Produk
-                </a>
+                </a> -->
 
-                <a class="collapse-item" href="{{ route('report_product_changes.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report_product_changes.index') }}">
                     Verifikasi Pergantian Produk
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('cleanliness.index') }}">
                     Report kebersihan area penyimpanan bahan
@@ -305,9 +307,9 @@
                     Report Pemeriksaan Kebersihan Conveyor Packing
                 </a>
 
-                <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">
                     Report Pemeriksaan dan Sanitasi Setelah Perbaikan Mesin
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('gmp-employee.index') }}">
                     Report GMP karyawan & Kontrol Sanitasi
@@ -317,9 +319,9 @@
                     Pemeriksaan Air Proses Produksi
                 </a>
 
-                <a class="collapse-item" href="{{ route('report-solvents.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report-solvents.index') }}">
                     Report Pembuatan Larutan Cleaning dan Sanitasi
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report-fragile-item.index') }}">
                     Pemeriksaan Barang Mudah Pecah
@@ -329,9 +331,9 @@
                     Pemeriksaan Timbangan & Thermometer
                 </a>
 
-                <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">
+                <!-- <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">
                     Report Inventaris Peralatan QC
-                </a>
+                </a> -->
 
                 <a class="collapse-item" href="{{ route('report_sharp_tools.index') }}">
                     Report Benda Tajam

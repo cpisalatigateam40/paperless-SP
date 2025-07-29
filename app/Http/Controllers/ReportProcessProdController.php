@@ -247,6 +247,21 @@ class ReportProcessProdController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
     }
 
+    public function known($id)
+    {
+        $report = ReportProcessProd::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
+    }
+
     public function exportPdf($uuid)
     {
         $report = ReportProcessProd::with([
@@ -272,10 +287,18 @@ class ReportProcessProdController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
         $pdf = Pdf::loadView('report_process_productions.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'knownQr' => $knownQrBase64,
         ])->setPaper('A4', 'portrait');
 
         return $pdf->stream('Laporan_Proses_Produksi_' . $report->date . '.pdf');

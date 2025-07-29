@@ -268,6 +268,21 @@ class ReportFessmanCookingController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
     }
 
+    public function known($id)
+    {
+        $report = ReportFessmanCooking::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
+    }
+
     public function exportPdf($uuid)
     {
         $report = ReportFessmanCooking::with([
@@ -290,10 +305,18 @@ class ReportFessmanCookingController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
         $pdf = Pdf::loadView('report_fessman_cookings.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'knownQr' => $knownQrBase64,
         ])
             ->setPaper('a4', 'portrait');
 
