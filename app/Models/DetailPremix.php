@@ -14,6 +14,7 @@ class DetailPremix extends Model
         'uuid',
         'report_uuid',
         'premix_uuid',
+        'production_code',
         'weight',
         'used_for_batch',
         'notes',

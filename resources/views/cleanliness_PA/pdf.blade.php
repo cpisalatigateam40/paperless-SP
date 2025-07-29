@@ -223,8 +223,13 @@
             </td>
             <td style="text-align: center; border: none; width: 33%;">
                 Diketahui oleh:<br><br>
-                <div style="height: 50px;"></div>
-                <strong>{{ $report->known_by }}</strong><br>
+                @if($report->known_by)
+                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
+                <strong>{{ $report->known_by }}</strong><br><br>
+                @else
+                <div style="height: 120px;"></div>
+                <strong>-</strong><br>
+                @endif
                 SPV/Foreman/Lady Produksi
             </td>
             <td style="text-align: center; border: none; width: 33%;">

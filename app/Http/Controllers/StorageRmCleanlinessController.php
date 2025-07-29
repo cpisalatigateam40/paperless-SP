@@ -45,7 +45,7 @@ class StorageRmCleanlinessController extends Controller
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => now()->toDateString(),
-                'shift' => getShift(),
+                'shift' => $request->shift,
                 'room_name' => $request->room_name,
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,
@@ -125,6 +125,21 @@ class StorageRmCleanlinessController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
     }
 
+    public function known($id)
+    {
+        $report = ReportStorageRmCleanliness::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
+    }
+
     public function createDetail(ReportStorageRmCleanliness $report)
     {
         return view('cleanliness.add-detail', compact('report'));
@@ -198,10 +213,18 @@ class StorageRmCleanlinessController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
         $pdf = Pdf::loadView('cleanliness.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'knownQr' => $knownQrBase64,
         ]);
 
         return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');

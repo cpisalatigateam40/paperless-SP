@@ -168,6 +168,21 @@ class ReportWeightStufferController extends Controller
         return redirect()->route('report_weight_stuffers.index')->with('success', 'Detail berhasil ditambahkan.');
     }
 
+    public function known($id)
+    {
+        $report = ReportWeightStuffer::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
+    }
+
     public function approve($id)
     {
         $report = ReportWeightStuffer::findOrFail($id);
@@ -206,10 +221,18 @@ class ReportWeightStufferController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
         $pdf = Pdf::loadView('report_weight_stuffers.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'knownQr' => $knownQrBase64,
         ])->setPaper('A4', 'landscape');
         return $pdf->stream('laporan-verifikasi-berat-stuffer.pdf');
     }

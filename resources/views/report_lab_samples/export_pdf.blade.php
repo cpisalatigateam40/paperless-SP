@@ -205,11 +205,16 @@
                 <strong>{{ $report->created_by }}</strong><br>
                 QC Inspector
             </td>
-            <td style="text-align: center; border: none; width: 25%;">
-                Diketahui oleh,<br><br>
-                <div style="height: 50px;"></div>
+            <td style="text-align: center; border: none; width: 33%;">
+                Diketahui oleh:<br><br>
+                @if($report->known_by)
+                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
                 <strong>{{ $report->known_by }}</strong><br>
-                Foreman / SPV Produksi
+                @else
+                <div style="height: 120px;"></div>
+                <strong>-</strong><br>
+                @endif
+                SPV/Foreman/Lady Produksi
             </td>
             <td style="text-align: center; border: none; width: 25%;">
                 Diterima oleh,<br><br>

@@ -37,7 +37,7 @@ class ReportRmArrivalController extends Controller
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-            'shift' => getShift(),
+            'shift' => $request->shift,
             'created_by' => Auth::user()->name,
         ]);
 
@@ -114,6 +114,21 @@ class ReportRmArrivalController extends Controller
             ->with('success', 'Pemeriksaan tambahan berhasil ditambahkan.');
     }
 
+    public function known($id)
+    {
+        $report = ReportRmArrival::findOrFail($id);
+        $user = Auth::user();
+
+        if ($report->known_by) {
+            return redirect()->back()->with('error', 'Laporan sudah diketahui.');
+        }
+
+        $report->known_by = $user->name;
+        $report->save();
+
+        return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
+    }
+
     public function approve($id)
     {
         $report = ReportRmArrival::findOrFail($id);
@@ -149,10 +164,18 @@ class ReportRmArrivalController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        // Generate QR untuk known_by
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum disetujui";
+        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('report_rm_arrivals.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'knownQr' => $knownQrBase64,
         ])->setPaper('A4', 'portrait');
 
         return $pdf->stream('laporan_rm_arrival_' . $report->date . '.pdf');
