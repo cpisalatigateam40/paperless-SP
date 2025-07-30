@@ -78,27 +78,32 @@ class ReportRetainSampleController extends Controller
 
     public function storeDetail(Request $request, $uuid)
     {
+        // dd($request->all());
+
         $report = ReportRetainSample::where('uuid', $uuid)->firstOrFail();
 
         foreach ($request->details ?? [] as $detail) {
-            DetailRetainSample::create([
-                'uuid' => Str::uuid(),
-                'report_uuid' => $report->uuid,
-                'product_uuid' => $detail['product_uuid'] ?? null,
-                'production_code' => $detail['production_code'] ?? null,
-                'room_temp' => $detail['room_temp'] ?? null,
-                'suction_temp' => $detail['suction_temp'] ?? null,
-                'display_speed' => $detail['display_speed'] ?? null,
-                'actual_speed' => $detail['actual_speed'] ?? null,
-                'time_in' => $detail['time_in'] ?? null,
-                'line_type' => $detail['line_type'] ?? null,
-                'signature_in' => Auth::user()->name ?? 'Unknown',
-                'signature_out' => Auth::user()->name ?? 'Unknown',
-            ]);
+            foreach ($detail['products'] ?? [] as $product) {
+                DetailRetainSample::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'product_uuid' => $product['product_uuid'] ?? null,
+                    'production_code' => $product['production_code'] ?? null,
+                    'room_temp' => $detail['room_temp'] ?? null,
+                    'suction_temp' => $detail['suction_temp'] ?? null,
+                    'display_speed' => $detail['display_speed'] ?? null,
+                    'actual_speed' => $detail['actual_speed'] ?? null,
+                    'time_in' => $detail['time_in'] ?? null,
+                    'line_type' => $detail['line_type'] ?? null,
+                    'signature_in' => Auth::user()->name ?? 'Unknown',
+                    'signature_out' => Auth::user()->name ?? 'Unknown',
+                ]);
+            }
         }
 
         return redirect()->route('report_retain_samples.index')->with('success', 'Detail berhasil ditambahkan.');
     }
+
 
     public function approve($id)
     {
@@ -147,7 +152,7 @@ class ReportRetainSampleController extends Controller
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
-         // Generate QR untuk known_by
+        // Generate QR untuk known_by
         $knownInfo = $report->known_by
             ? "Diketahui oleh: {$report->known_by}"
             : "Belum disetujui";

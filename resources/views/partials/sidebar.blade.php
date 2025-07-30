@@ -141,9 +141,7 @@
                     Pemeriksaan Premix
                 </a>
 
-                <a class="collapse-item" href="{{ route('report-foreign-objects.index') }}">
-                    Pemeriksaan Kontaminasi Benda Asing
-                </a>
+
 
                 <!-- <a class="collapse-item" href="{{ route('report_returns.index') }}">
                     Retur Ketidaksesuaian Bahan Baku / Bahan Kemas
@@ -353,6 +351,10 @@
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('report_production_nonconformities.index') }}">
                     Pemeriksaan Ketidaksesuaian Proses Produksi
+                </a>
+
+                <a class="collapse-item" href="{{ route('report-foreign-objects.index') }}">
+                    Pemeriksaan Kontaminasi Benda Asing
                 </a>
 
             </div>

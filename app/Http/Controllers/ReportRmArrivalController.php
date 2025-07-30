@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ReportRmArrival;
 use App\Models\DetailRmArrival;
 use App\Models\Area;
+use App\Models\Section;
 use App\Models\RawMaterial;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -16,7 +17,7 @@ class ReportRmArrivalController extends Controller
 {
     public function index()
     {
-        $reports = ReportRmArrival::with('area', 'details.rawMaterial')
+        $reports = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
             ->orderByDesc('date')
             ->get();
 
@@ -28,14 +29,17 @@ class ReportRmArrivalController extends Controller
         return view('report_rm_arrivals.create', [
             'areas' => Area::all(),
             'rawMaterials' => RawMaterial::all(),
+            'sections' => Section::all(),
         ]);
     }
+
 
     public function store(Request $request)
     {
         $report = ReportRmArrival::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
+            'section_uuid' => $request->section_uuid,  // tambahkan ini
             'date' => $request->date,
             'shift' => $request->shift,
             'created_by' => Auth::user()->name,
@@ -59,6 +63,7 @@ class ReportRmArrivalController extends Controller
         return redirect()->route('report_rm_arrivals.index')
             ->with('success', 'Laporan kedatangan bahan baku berhasil disimpan.');
     }
+
 
     public function destroy($uuid)
     {

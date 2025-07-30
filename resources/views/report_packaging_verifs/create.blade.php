@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Tambah Verifikasi Pemeriksaan Kemasan Plastik</h4>
+            <h4>Tambah Report Packaging Verif</h4>
         </div>
 
         <div class="card-body">
@@ -61,30 +61,50 @@
                     </tbody>
                 </table>
 
-                <hr>
-
-                @php
-                $checklistGroups = [
-                'in_cutting_manual' => 'In Cutting Manual',
-                'in_cutting_machine' => 'In Cutting Mesin',
-                'packaging_thermoformer' => 'Proses Pengemasan Thermoformer',
-                'packaging_manual' => 'Proses Pengemasan Manual',
-                'sealing_condition' => 'Hasil Sealing Kondisi Seal',
-                'sealing_vacuum' => 'Hasil Sealing Vacum',
-                ];
-                @endphp
-
-                @foreach($checklistGroups as $field => $label)
+                {{-- In Cutting hanya 1 --}}
                 <div class="card mb-3">
-                    <div class="card-header p-2">
-                        <strong>{{ $label }}</strong>
+                    <div class="card-header p-2"><strong>In Cutting</strong></div>
+                    <div class="card-body p-2">
+                        <label class="small d-block">Pilih Salah Satu</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][checklist][in_cutting]"
+                                value="Manual" required>
+                            <label class="form-check-label">Manual</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][checklist][in_cutting]"
+                                value="Mesin">
+                            <label class="form-check-label">Mesin</label>
+                        </div>
                     </div>
+                </div>
+
+                {{-- Proses Pengemasan hanya 1 --}}
+                <div class="card mb-3">
+                    <div class="card-header p-2"><strong>Proses Pengemasan</strong></div>
+                    <div class="card-body p-2">
+                        <label class="small d-block">Pilih Salah Satu</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][checklist][packaging]"
+                                value="Thermoformer" required>
+                            <label class="form-check-label">Thermoformer</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][checklist][packaging]"
+                                value="Manual">
+                            <label class="form-check-label">Manual</label>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Sealing Condition 5x --}}
+                <div class="card mb-3">
+                    <div class="card-header p-2"><strong>Hasil Sealing: Kondisi Seal</strong></div>
                     <div class="card-body p-2">
                         <div class="row">
-                            @for($i = 1; $i <= 5; $i++) <div class="col-md-2 mb-2">
-                                <label class="small">{{ $label }} {{ $i }}</label>
-                                <select name="details[0][checklist][{{ $field }}_{{ $i }}]" class="form-control">
-                                    <option value="">Pilih Hasil</option>
+                            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                                <label class="small">Kondisi Seal {{ $i }}</label>
+                                <select name="details[0][checklist][sealing_condition_{{ $i }}]" class="form-control">
                                     <option value="OK">OK</option>
                                     <option value="Tidak OK">Tidak OK</option>
                                 </select>
@@ -93,61 +113,57 @@
                     </div>
                 </div>
         </div>
-        @endforeach
 
+        {{-- Sealing Vacuum 5x --}}
         <div class="card mb-3">
-            <div class="card-header p-2">
-                <strong>Isi Per-Pack</strong>
-            </div>
+            <div class="card-header p-2"><strong>Hasil Sealing: Vacuum</strong></div>
             <div class="card-body p-2">
                 <div class="row">
-                    @for($i = 1; $i <= 5; $i++) <div class="col-md-2 mb-2">
-                        <label class="small">Isi Per-Pack {{ $i }}</label>
-                        <input type="number" name="details[0][checklist][content_per_pack_{{ $i }}]"
-                            class="form-control">
+                    @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                        <label class="small">Vacuum {{ $i }}</label>
+                        <select name="details[0][checklist][sealing_vacuum_{{ $i }}]" class="form-control">
+                            <option value="OK">OK</option>
+                            <option value="Tidak OK">Tidak OK</option>
+                        </select>
                 </div>
                 @endfor
             </div>
         </div>
     </div>
 
+    {{-- Isi Per-Pack 5x --}}
     <div class="card mb-3">
-        <div class="card-header p-2">
-            <strong>Berat Produk Per Plastik</strong>
-        </div>
+        <div class="card-header p-2"><strong>Isi Per-Pack</strong></div>
         <div class="card-body p-2">
-            <div class="row mb-2">
-                <div class="col-md-2">
-                    <label class="small">Standar</label>
-                    <input type="number" step="0.01" name="details[0][checklist][standard_weight]" class="form-control">
-                </div>
-            </div>
             <div class="row">
-                @for($i = 1; $i <= 5; $i++) <div class="col-md-2 mb-2">
-                    <label class="small">Aktual {{ $i }}</label>
-                    <input type="number" step="0.01" name="details[0][checklist][actual_weight_{{ $i }}]"
-                        class="form-control">
+                @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                    <label class="small">Isi Per-Pack {{ $i }}</label>
+                    <input type="number" name="details[0][checklist][content_per_pack_{{ $i }}]" class="form-control">
             </div>
             @endfor
         </div>
     </div>
 </div>
 
+{{-- Berat Produk --}}
 <div class="card mb-3">
+    <div class="card-header p-2"><strong>Berat Produk Per Plastik</strong></div>
     <div class="card-body p-2">
-        <div class="row">
-            <div class="col-md-3">
-                <label>
-                    <input type="checkbox" name="details[0][qc_verif]" value="1"> Verifikasi QC
-                </label>
-            </div>
-            <div class="col-md-3">
-                <label>
-                    <input type="checkbox" name="details[0][kr_verif]" value="1"> Verifikasi KR
-                </label>
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <label class="small">Standar</label>
+                <input type="number" step="0.01" name="details[0][checklist][standard_weight]" class="form-control">
             </div>
         </div>
+        <div class="row">
+            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                <label class="small">Aktual {{ $i }}</label>
+                <input type="number" step="0.01" name="details[0][checklist][actual_weight_{{ $i }}]"
+                    class="form-control">
+        </div>
+        @endfor
     </div>
+</div>
 </div>
 
 <button type="submit" class="btn btn-success">Simpan Report</button>

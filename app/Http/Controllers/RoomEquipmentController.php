@@ -10,6 +10,7 @@ use App\Models\RoomElement;
 use App\Models\Equipment;
 use App\Models\EquipmentPart;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RoomEquipmentController extends Controller
 {
@@ -80,7 +81,15 @@ class RoomEquipmentController extends Controller
 
     public function destroyEquipment($uuid)
     {
-        Equipment::where('uuid', $uuid)->delete();
+        DB::transaction(function () use ($uuid) {
+            // Hapus detail yang berelasi dulu
+            DB::table('detail_equipment_cleanliness')->where('equipment_uuid', $uuid)->delete();
+
+            // Baru hapus equipment
+            Equipment::where('uuid', $uuid)->delete();
+        });
+
         return back()->with('success', 'Mesin/peralatan berhasil dihapus.');
     }
+
 }

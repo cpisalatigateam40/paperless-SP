@@ -140,7 +140,7 @@
 
                             <div class="d-flex" style="gap: 1rem">
                                 <div class="col-md-6">
-                                    <p class="fw-bold mt-3">Hasil Pengecekan Jam 1</p>
+                                    <p class="fw-bold mt-3">Hasil pengecekan awal shift</p>
                                     <div class="mb-2">
                                         <label>Kadar Klorin</label>
                                         <input type="number"
@@ -157,7 +157,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="fw-bold mt-3">Hasil Pengecekan Jam 2</p>
+                                    <p class="fw-bold mt-3">Hasil pengecekan setelah istirahat</p>
                                     <div class="mb-2">
                                         <label>Kadar Klorin</label>
                                         <input type="number"

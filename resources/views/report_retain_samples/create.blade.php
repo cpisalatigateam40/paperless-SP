@@ -2,12 +2,13 @@
 
 @section('content')
 <div class="container-fluid">
-    <h4 class="mb-3">Tambah Laporan Retain Sample</h4>
-
     <form action="{{ route('report_retain_samples.store') }}" method="POST">
         @csrf
 
         <div class="card shadow mb-4">
+            <div class="card-header">
+                <h4 class="mb-3">Tambah Laporan Retain Sample</h4>
+            </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -62,21 +63,26 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label>Nama Produk</label>
-                                <select name="details[0][product_uuid]" class="form-select form-control" required>
-                                    <option value="">Pilih Produk</option>
-                                    @foreach ($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Kode Produksi</label>
-                                <input type="text" name="details[0][production_code]" class="form-control">
+                        <div id="product-fields-wrapper">
+                            <div class="row mb-3 product-field">
+                                <div class="col-md-6">
+                                    <label>Nama Produk</label>
+                                    <select name="details[0][product_uuid]" class="form-select form-control" required>
+                                        <option value="">Pilih Produk</option>
+                                        @foreach ($products as $product)
+                                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Kode Produksi</label>
+                                    <input type="text" name="details[0][production_code]" class="form-control">
+                                </div>
                             </div>
                         </div>
+
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addProductField()">Tambah
+                            Produk</button>
 
 
                         <button type="button" class="btn btn-danger btn-sm remove-detail">Hapus Detail</button>
@@ -123,5 +129,37 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+let productIndex = 1; // Mulai dari 1 karena sudah ada detail[0]
+
+function addProductField() {
+    // Dapatkan container utama
+    const wrapper = document.getElementById('product-fields-wrapper');
+
+    // Buat elemen baru (copy dari template)
+    const newField = document.createElement('div');
+    newField.classList.add('row', 'mb-3', 'product-field');
+    newField.innerHTML = `
+        <div class="col-md-6">
+            <label>Nama Produk</label>
+            <select name="details[${productIndex}][product_uuid]" class="form-select form-control" required>
+                <option value="">Pilih Produk</option>
+                @foreach ($products as $product)
+                <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label>Kode Produksi</label>
+            <input type="text" name="details[${productIndex}][production_code]" class="form-control">
+        </div>
+    `;
+
+    // Tambahkan ke wrapper
+    wrapper.appendChild(newField);
+
+    // Tambahkan index untuk field berikutnya
+    productIndex++;
+}
 </script>
 @endsection

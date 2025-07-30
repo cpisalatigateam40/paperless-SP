@@ -31,6 +31,7 @@
                         <th>Tanggal</th>
                         <th>Shift</th>
                         <th>Area</th>
+                        <th>Section</th>
                         <th>Dibuat oleh</th>
                         <th>Aksi</th>
                     </tr>
@@ -41,6 +42,7 @@
                         <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                         <td>{{ $report->shift }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
+                        <td>{{ $report->section?->section_name }}</td>
                         <td>{{ $report->created_by }}</td>
                         <td>
                             <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $report->id }}">
@@ -105,7 +107,7 @@
                         </td>
                     </tr>
                     <tr id="detail-{{ $report->id }}" class="d-none">
-                        <td colspan="5">
+                        <td colspan="6">
                             <table class="table table-sm table-bordered mb-0">
                                 <thead>
                                     <tr class="text-center align-middle">

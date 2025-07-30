@@ -163,7 +163,16 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->item }}</td>
                 <td style="text-align: center">{{ $item->condition }}</td>
-                <td>{{ $item->notes }}</td>
+                <td>
+                    @php
+                    $notes = json_decode($item->notes, true);
+                    @endphp
+                    @if(is_array($notes))
+                    {{ implode(', ', $notes) }}
+                    @else
+                    {{ $item->notes }}
+                    @endif
+                </td>
                 <td>{{ $item->corrective_action }}</td>
                 <td>
                     <ul class="mb-0">
@@ -184,7 +193,6 @@
                         @endforeach
                     </ul>
                 </td>
-
             </tr>
             @endforeach
             @endforeach

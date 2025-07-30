@@ -125,6 +125,7 @@
             <td style="text-align: left; border: none;">
                 Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
+
         </tr>
     </table>
 

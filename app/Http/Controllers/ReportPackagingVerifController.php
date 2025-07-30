@@ -47,8 +47,8 @@ class ReportPackagingVerifController extends Controller
                 'time' => $detail['time'],
                 'production_code' => $detail['production_code'],
                 'expired_date' => $detail['expired_date'],
-                'qc_verif' => isset($detail['qc_verif']) ? Auth::user()->name : null,
-                'kr_verif' => isset($detail['kr_verif']) ? Auth::user()->name : null,
+                // 'qc_verif' => isset($detail['qc_verif']) ? Auth::user()->name : null,
+                // 'kr_verif' => isset($detail['kr_verif']) ? Auth::user()->name : null,
             ]);
 
             $checklistData = [
@@ -57,18 +57,30 @@ class ReportPackagingVerifController extends Controller
                 'standard_weight' => $detail['checklist']['standard_weight'],
             ];
 
-            $fields = [
-                'in_cutting_manual',
-                'in_cutting_machine',
-                'packaging_thermoformer',
-                'packaging_manual',
-                'sealing_condition',
-                'sealing_vacuum',
-                'content_per_pack',
-                'actual_weight'
-            ];
+            // ✅ Mapping radio In Cutting → hanya kolom _1 yang diisi, _2.._5 null
+            $inCutting = $detail['checklist']['in_cutting'] ?? null;
+            for ($i = 1; $i <= 5; $i++) {
+                $checklistData['in_cutting_manual_' . $i] = ($i == 1 && $inCutting == 'Manual') ? 'OK' : null;
+                $checklistData['in_cutting_machine_' . $i] = ($i == 1 && $inCutting == 'Mesin') ? 'OK' : null;
+            }
 
-            foreach ($fields as $field) {
+            // ✅ Mapping radio Packaging → hanya kolom _1 yang diisi, _2.._5 null
+            $packaging = $detail['checklist']['packaging'] ?? null;
+            for ($i = 1; $i <= 5; $i++) {
+                $checklistData['packaging_thermoformer_' . $i] = ($i == 1 && $packaging == 'Thermoformer') ? 'OK' : null;
+                $checklistData['packaging_manual_' . $i] = ($i == 1 && $packaging == 'Manual') ? 'OK' : null;
+            }
+
+            // ✏ Loop sealing_condition & sealing_vacuum
+            foreach (['sealing_condition', 'sealing_vacuum'] as $field) {
+                for ($i = 1; $i <= 5; $i++) {
+                    $key = $field . '_' . $i;
+                    $checklistData[$key] = $detail['checklist'][$key] ?? null;
+                }
+            }
+
+            // ✏ Loop content_per_pack & actual_weight
+            foreach (['content_per_pack', 'actual_weight'] as $field) {
                 for ($i = 1; $i <= 5; $i++) {
                     $key = $field . '_' . $i;
                     $checklistData[$key] = $detail['checklist'][$key] ?? null;
@@ -111,8 +123,6 @@ class ReportPackagingVerifController extends Controller
                 'time' => $detail['time'],
                 'production_code' => $detail['production_code'],
                 'expired_date' => $detail['expired_date'],
-                'qc_verif' => isset($detail['qc_verif']) ? Auth::user()->name : null,
-                'kr_verif' => isset($detail['kr_verif']) ? Auth::user()->name : null,
             ]);
 
             $checklistData = [
@@ -121,18 +131,30 @@ class ReportPackagingVerifController extends Controller
                 'standard_weight' => $detail['checklist']['standard_weight'],
             ];
 
-            $fields = [
-                'in_cutting_manual',
-                'in_cutting_machine',
-                'packaging_thermoformer',
-                'packaging_manual',
-                'sealing_condition',
-                'sealing_vacuum',
-                'content_per_pack',
-                'actual_weight'
-            ];
+            // ✏ Mapping radio In Cutting: hanya in_cutting_manual_1 atau in_cutting_machine_1 yg "OK", sisanya null
+            $inCutting = $detail['checklist']['in_cutting'] ?? null;
+            for ($i = 1; $i <= 5; $i++) {
+                $checklistData['in_cutting_manual_' . $i] = ($i == 1 && $inCutting == 'Manual') ? 'OK' : null;
+                $checklistData['in_cutting_machine_' . $i] = ($i == 1 && $inCutting == 'Mesin') ? 'OK' : null;
+            }
 
-            foreach ($fields as $field) {
+            // ✏ Mapping radio Packaging: hanya packaging_thermoformer_1 atau packaging_manual_1 yg "OK", sisanya null
+            $packaging = $detail['checklist']['packaging'] ?? null;
+            for ($i = 1; $i <= 5; $i++) {
+                $checklistData['packaging_thermoformer_' . $i] = ($i == 1 && $packaging == 'Thermoformer') ? 'OK' : null;
+                $checklistData['packaging_manual_' . $i] = ($i == 1 && $packaging == 'Manual') ? 'OK' : null;
+            }
+
+            // ✏ Loop sealing_condition & sealing_vacuum
+            foreach (['sealing_condition', 'sealing_vacuum'] as $field) {
+                for ($i = 1; $i <= 5; $i++) {
+                    $key = $field . '_' . $i;
+                    $checklistData[$key] = $detail['checklist'][$key] ?? null;
+                }
+            }
+
+            // ✏ Loop content_per_pack & actual_weight
+            foreach (['content_per_pack', 'actual_weight'] as $field) {
                 for ($i = 1; $i <= 5; $i++) {
                     $key = $field . '_' . $i;
                     $checklistData[$key] = $detail['checklist'][$key] ?? null;

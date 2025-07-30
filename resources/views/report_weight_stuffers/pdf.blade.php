@@ -190,13 +190,13 @@
         </tr>
 
         {{-- Trolley --}}
-        <tr>
+        <!-- <tr>
             <th>Jumlah Trolley</th>
             @foreach($report->details as $detail)
             <td>{{ $detail->townsend?->trolley_total ?? '-' }}</td>
             <td>{{ $detail->hitech?->trolley_total ?? '-' }}</td>
             @endforeach
-        </tr>
+        </tr> -->
 
         {{-- Standar Berat --}}
         <tr>

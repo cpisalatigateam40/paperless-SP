@@ -87,4 +87,9 @@ class Section extends Model
     {
         return $this->hasMany(ReportProcessProd::class, 'section_uuid', 'uuid');
     }
+
+    public function reportRMArrivals()
+    {
+        return $this->hasMany(ReportRMArrival::class, 'section_uuid', 'uuid');
+    }
 }

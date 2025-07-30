@@ -109,7 +109,16 @@
                                 <td class="align-middle">{{ $i + 1 }}</td>
                                 <td class="align-middle">{{ $item->item }}</td>
                                 <td class="align-middle">{{ $item->condition }}</td>
-                                <td class="align-middle">{{ $item->notes }}</td>
+                                <td class="align-middle">
+                                    @php
+                                    $notes = json_decode($item->notes, true);
+                                    @endphp
+                                    @if(is_array($notes))
+                                    {{ implode(', ', $notes) }}
+                                    @else
+                                    {{ $item->notes }}
+                                    @endif
+                                </td>
                                 <td class="align-middle">{{ $item->corrective_action }}</td>
                                 <td class="align-middle">{!! $item->verification ? '✔' : '✘' !!}</td>
                             </tr>

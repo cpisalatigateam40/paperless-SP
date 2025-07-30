@@ -21,6 +21,16 @@
                         <label>Shift</label>
                         <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
                     </div>
+
+                    <div class="col-md-4">
+                        <label>Section</label>
+                        <select name="section_uuid" class="form-control" required>
+                            <option value="">-- Pilih Section --</option>
+                            @foreach($sections as $section)
+                            <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <h5>Detail Pemeriksaan</h5>
