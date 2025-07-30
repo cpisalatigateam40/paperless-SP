@@ -12,6 +12,7 @@ class ReportRmArrival extends Model
     protected $fillable = [
         'uuid',
         'area_uuid',
+        'section_uuid',
         'date',
         'shift',
         'created_by',
@@ -23,6 +24,11 @@ class ReportRmArrival extends Model
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class, 'section_uuid', 'uuid');
     }
 
     public function details()

@@ -142,7 +142,7 @@
                                     $labels = [
                                     'Kecepatan Stuffer (rpm)' => 'speed',
                                     'Ukuran Casing<br><small>(Aktual Panjang, Diameter)</small>' => 'casing',
-                                    'Jumlah Trolley' => 'trolley',
+
                                     'Standar Berat (gr)' => 'standard',
                                     'Berat Aktual (gr)' => 'actual_weight',
                                     'Rata-rata Berat Aktual (gr)' => 'avg',
@@ -174,10 +174,10 @@
                                         <td>{{ $cH?->actual_case_1 ?? '-' }} / {{ $cH?->actual_case_2 ?? '-' }}</td>
                                         @break
 
-                                        @case('trolley')
+                                        <!-- @case('trolley')
                                         <td>{{ $t->trolley_total ?? '-' }}</td>
                                         <td>{{ $h->trolley_total ?? '-' }}</td>
-                                        @break
+                                        @break -->
 
                                         @case('standard')
                                         <td colspan="2">{{ $d->weight_standard ?? '-' }}</td>

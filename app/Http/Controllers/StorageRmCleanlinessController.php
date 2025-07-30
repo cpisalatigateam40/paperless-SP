@@ -75,7 +75,9 @@ class StorageRmCleanlinessController extends Controller
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $condition,
-                        'notes' => $itemInput['notes'] ?? null,
+                        'notes' => isset($itemInput['notes'])
+                            ? (is_array($itemInput['notes']) ? json_encode($itemInput['notes']) : $itemInput['notes'])
+                            : null,
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
@@ -169,7 +171,9 @@ class StorageRmCleanlinessController extends Controller
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $condition,
-                        'notes' => $itemInput['notes'] ?? null,
+                        'notes' => isset($itemInput['notes'])
+                            ? (is_array($itemInput['notes']) ? json_encode($itemInput['notes']) : $itemInput['notes'])
+                            : null,
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);

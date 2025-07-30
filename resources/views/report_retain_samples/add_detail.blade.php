@@ -8,7 +8,6 @@
         <div class="card shadow mb-4">
             <div class="card-header">
                 <h4 class="mb-3">Tambah Detail Laporan Retain Sample</h4>
-
                 <div class="d-flex" style="gap: 4rem;">
                     <p>Tanggal: {{ $report->date }}</p>
                     <p>Shift: {{ $report->shift }}</p>
@@ -16,7 +15,6 @@
                 </div>
             </div>
             <div class="card-body">
-
                 <h6>Detail Produk Retain Sample</h6>
                 <div id="detail-wrapper">
                     <div class="border rounded p-3 mb-3 detail-row">
@@ -45,7 +43,6 @@
                                 <input type="number" step="0.01" name="details[0][suction_temp]" class="form-control">
                             </div>
                         </div>
-
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label>Speed Display</label>
@@ -57,22 +54,27 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label>Nama Produk</label>
-                                <select name="details[0][product_uuid]" class="form-select form-control" required>
-                                    <option value="">Pilih Produk</option>
-                                    @foreach ($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Kode Produksi</label>
-                                <input type="text" name="details[0][production_code]" class="form-control">
+                        <div class="product-wrapper">
+                            <div class="row mb-3 product-row">
+                                <div class="col-md-6">
+                                    <label>Nama Produk</label>
+                                    <select name="details[0][products][0][product_uuid]"
+                                        class="form-select form-control" required>
+                                        <option value="">Pilih Produk</option>
+                                        @foreach ($products as $product)
+                                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Kode Produksi</label>
+                                    <input type="text" name="details[0][products][0][production_code]"
+                                        class="form-control">
+                                </div>
                             </div>
                         </div>
 
+                        <button type="button" class="btn btn-outline-primary btn-sm add-product">Tambah Produk</button>
                         <button type="button" class="btn btn-danger btn-sm remove-detail">Hapus Detail</button>
                     </div>
                 </div>
@@ -89,30 +91,58 @@
 
 @section('script')
 <script>
-let index = 1;
+let detailIndex = 1;
 
+// Tambah detail baru
 document.getElementById('add-detail').addEventListener('click', function() {
     let wrapper = document.getElementById('detail-wrapper');
-    let row = wrapper.querySelector('.detail-row').cloneNode(true);
+    let template = wrapper.querySelector('.detail-row');
+    let newRow = template.cloneNode(true);
 
-    row.querySelectorAll('input, select').forEach(el => {
-        const name = el.getAttribute('name');
-        if (name) {
-            el.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
+    // Ganti semua name: details[0] → details[detailIndex]
+    newRow.querySelectorAll('input, select').forEach(el => {
+        if (el.name) {
+            el.name = el.name.replace(/details\[\d+\]/, `details[${detailIndex}]`);
         }
         el.value = '';
     });
 
-    wrapper.appendChild(row);
-    index++;
+    wrapper.appendChild(newRow);
+    detailIndex++;
 });
 
+// Hapus detail
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('remove-detail')) {
         const rows = document.querySelectorAll('.detail-row');
         if (rows.length > 1) {
             e.target.closest('.detail-row').remove();
         }
+    }
+});
+
+// Tambah produk dalam satu detail
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('add-product')) {
+        let detailRow = e.target.closest('.detail-row');
+        let productWrapper = detailRow.querySelector('.product-wrapper');
+        let productRows = productWrapper.querySelectorAll('.product-row');
+        let productIndex = productRows.length;
+
+        // Ambil detailIndex
+        let firstSelect = productRows[0].querySelector('select');
+        let detailIndexMatch = firstSelect.name.match(/details\[(\d+)\]/);
+        let detailIndex = detailIndexMatch ? detailIndexMatch[1] : '0';
+
+        let newProductRow = productRows[0].cloneNode(true);
+
+        newProductRow.querySelectorAll('select, input').forEach(el => {
+            const field = el.name.includes('product_uuid') ? 'product_uuid' : 'production_code';
+            el.name = `details[${detailIndex}][products][${productIndex}][${field}]`;
+            el.value = '';
+        });
+
+        productWrapper.appendChild(newProductRow);
     }
 });
 </script>

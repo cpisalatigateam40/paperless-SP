@@ -53,7 +53,7 @@ class ReportWeightStufferController extends Controller
                 TownsendStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['townsend']['stuffer_speed'],
-                    'trolley_total' => $detail['townsend']['trolley_total'],
+                    // 'trolley_total' => $detail['townsend']['trolley_total'],
                     'avg_weight' => $detail['townsend']['avg_weight'],
                     'notes' => $detail['townsend']['notes'] ?? null,
                 ]);
@@ -63,7 +63,7 @@ class ReportWeightStufferController extends Controller
                 HitechStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['hitech']['stuffer_speed'],
-                    'trolley_total' => $detail['hitech']['trolley_total'],
+                    // 'trolley_total' => $detail['hitech']['trolley_total'],
                     'avg_weight' => $detail['hitech']['avg_weight'],
                     'notes' => $detail['hitech']['notes'] ?? null,
                 ]);
@@ -127,7 +127,7 @@ class ReportWeightStufferController extends Controller
                 TownsendStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['townsend']['stuffer_speed'],
-                    'trolley_total' => $detail['townsend']['trolley_total'],
+                    // 'trolley_total' => $detail['townsend']['trolley_total'],
                     'avg_weight' => $detail['townsend']['avg_weight'],
                     'notes' => $detail['townsend']['notes'] ?? null,
                 ]);
@@ -137,7 +137,7 @@ class ReportWeightStufferController extends Controller
                 HitechStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['hitech']['stuffer_speed'],
-                    'trolley_total' => $detail['hitech']['trolley_total'],
+                    // 'trolley_total' => $detail['hitech']['trolley_total'],
                     'avg_weight' => $detail['hitech']['avg_weight'],
                     'notes' => $detail['hitech']['notes'] ?? null,
                 ]);

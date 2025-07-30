@@ -54,7 +54,7 @@
                                     <th rowspan="2">Mesin</th>
                                     <th rowspan="2">Speed (rpm)</th>
                                     <th colspan="2">Ukuran Casing</th>
-                                    <th rowspan="2">Jumlah Trolley</th>
+                                    <!-- <th rowspan="2">Jumlah Trolley</th> -->
                                     <th rowspan="2">Standar Berat (gr)</th>
                                     <th colspan="3">Berat Aktual (gr)</th>
                                     <th rowspan="2">Rata-rata</th>
@@ -83,8 +83,8 @@
                                         <input type="number" name="details[0][cases][{{ $loop->index }}][actual_case_2]"
                                             class="form-control form-control-sm">
                                     </td>
-                                    <td><input type="number" name="details[0][{{ $machine }}][trolley_total]"
-                                            class="form-control form-control-sm"></td>
+                                    <!-- <td><input type="number" name="details[0][{{ $machine }}][trolley_total]"
+                                            class="form-control form-control-sm"></td> -->
 
                                     {{-- Weight Standard hanya di baris pertama --}}
                                     @if ($loop->first)

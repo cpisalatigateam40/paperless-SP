@@ -31,7 +31,6 @@
                         <th>Shift</th>
                         <th>Area</th>
                         <th>Dibuat Oleh</th>
-                        <th>Jumlah Detail</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -43,7 +42,6 @@
                         <td>{{ $report->shift }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->created_by }}</td>
-                        <td>{{ $report->details->count() }}</td>
                         <td class="d-flex" style="gap: .2rem;">
                             <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                 data-bs-target="#detail-{{ $report->id }}">
@@ -135,14 +133,30 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($report->details as $detail)
+                                        @forelse ($report->details as $key => $detail)
                                         <tr>
+                                            {{-- Jika baris pertama, tampilkan semua kolom detail --}}
+                                            @if ($key == 0 || (
+                                            $key > 0 && (
+                                            $report->details[$key]->line_type != $report->details[$key-1]->line_type ||
+                                            $report->details[$key]->time_in != $report->details[$key-1]->time_in
+                                            )
+                                            ))
                                             <td>{{ $detail->line_type ?? '-' }}</td>
                                             <td>{{ $detail->time_in ?? '-' }}</td>
                                             <td>{{ $detail->room_temp ?? '-' }}</td>
                                             <td>{{ $detail->suction_temp ?? '-' }}</td>
                                             <td>{{ $detail->display_speed ?? '-' }}</td>
                                             <td>{{ $detail->actual_speed ?? '-' }}</td>
+                                            @else
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            @endif
+
                                             <td>{{ $detail->product->product_name ?? '-' }}</td>
                                             <td>{{ $detail->production_code ?? '-' }}</td>
                                             <td>{{ $detail->signature_in ?? '-' }}</td>
@@ -162,9 +176,9 @@
                                     + Tambah Detail
                                 </a>
                             </div>
-
                         </td>
                     </tr>
+
 
                     @empty
                     <tr>

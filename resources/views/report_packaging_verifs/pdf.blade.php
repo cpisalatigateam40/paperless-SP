@@ -141,7 +141,7 @@
         </tr>
     </table>
 
-    <table>
+    <table class="table table-bordered table-sm text-center align-middle mb-4">
         <tr>
             <th rowspan="2">Jam</th>
             <th rowspan="2">Produk</th>
@@ -165,47 +165,54 @@
         </tr>
 
         @foreach($report->details as $d)
-        @php
-        $checklist = $d->checklist;
-        @endphp
+        @php $checklist = $d->checklist; @endphp
 
-        @for($i = 1; $i <= 5; $i++) <tr>
-            @if($i == 1)
+        @for($i=1; $i<=5; $i++) <tr>
+            @if($i==1)
             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
             <td rowspan="5">{{ $d->production_code }}</td>
             <td rowspan="5">{{ $d->expired_date }}</td>
+
+            {{-- In cutting manual & mesin sama, rowspan --}}
+            <td rowspan="5">{{ $checklist?->in_cutting_manual_1 ?? '-' }}</td>
+            <td rowspan="5">{{ $checklist?->in_cutting_machine_1 ?? '-' }}</td>
+
+            {{-- Packaging thermoformer & manual, rowspan --}}
+            <td rowspan="5">{{ $checklist?->packaging_thermoformer_1 ?? '-' }}</td>
+            <td rowspan="5">{{ $checklist?->packaging_manual_1 ?? '-' }}</td>
             @endif
 
-            <td>{{ $checklist?->{'in_cutting_manual_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'in_cutting_machine_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'packaging_thermoformer_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'packaging_manual_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'sealing_condition_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'sealing_vacuum_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'content_per_pack_' . $i} ?? '-' }}</td>
-            @if($i == 1)
+            {{-- Hasil sealing & isi per-pack, per baris --}}
+            <td>{{ $checklist?->{'sealing_condition_'.$i} ?? '-' }}</td>
+            <td>{{ $checklist?->{'sealing_vacuum_'.$i} ?? '-' }}</td>
+            <td>{{ $checklist?->{'content_per_pack_'.$i} ?? '-' }}</td>
+
+            @if($i==1)
+            {{-- Standard weight sekali saja --}}
             <td rowspan="5">{{ $checklist?->standard_weight ?? '-' }}</td>
             @endif
-            <td>{{ $checklist?->{'actual_weight_' . $i} ?? '-' }}</td>
+
+            {{-- Actual weight --}}
+            <td>{{ $checklist?->{'actual_weight_'.$i} ?? '-' }}</td>
             </tr>
             @endfor
 
-            {{-- Baris QC dan KR --}}
-            <tr>
-                <td colspan="3" class="text-start">
-                    QC: {{ $d->qc_verif ?? '-' }}
-                </td>
-                <td colspan="3" class="text-start">
-                    KR: {{ $d->kr_verif ?? '-' }}
-                </td>
-                <td colspan="7"></td>
-            </tr>
+            {{-- Optional QC & KR --}}
+            <!--
+    <tr>
+        <td colspan="3" class="text-start">QC: {{ $d->qc_verif ?? '-' }}</td>
+        <td colspan="3" class="text-start">KR: {{ $d->kr_verif ?? '-' }}</td>
+        <td colspan="7"></td>
+    </tr>
+    -->
             @endforeach
+
             <tr>
-                <td colspan="13" style="text-align: right; border: none;">QM 05 / 01</td>
+                <td colspan="13" class="text-end" style="border: none;">QM 05 / 01</td>
             </tr>
     </table>
+
 
     <p>Keterangan : √ : OK X : tidak OK</p>
 

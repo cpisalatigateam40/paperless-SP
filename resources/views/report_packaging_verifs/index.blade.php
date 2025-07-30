@@ -111,12 +111,9 @@
                     <tr class="collapse" id="detail-{{ $report->id }}">
                         <td colspan="100%">
                             <div class="table-responsive">
-                                @php
-                                $details = $report->details;
-                                @endphp
+                                @php $details = $report->details; @endphp
 
                                 <table class="table table-bordered table-sm text-center align-middle mb-4">
-                                    {{-- Header atas --}}
                                     <tr>
                                         <th rowspan="2">Jam</th>
                                         <th rowspan="2">Produk</th>
@@ -139,11 +136,8 @@
                                         <th>Aktual</th>
                                     </tr>
 
-                                    {{-- Data detail --}}
-                                    @foreach($details as $d)
-                                    @php
-                                    $checklist = $d->checklist;
-                                    @endphp
+                                    @foreach($report->details as $d)
+                                    @php $checklist = $d->checklist; @endphp
 
                                     @for($i = 1; $i <= 5; $i++) <tr>
                                         @if($i == 1)
@@ -151,45 +145,58 @@
                                         <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
                                         <td rowspan="5">{{ $d->production_code }}</td>
                                         <td rowspan="5">{{ $d->expired_date }}</td>
+
+                                        {{-- In cutting manual & mesin sama, rowspan --}}
+                                        <td rowspan="5">{{ $checklist?->in_cutting_manual_1 ?? '-' }}</td>
+                                        <td rowspan="5">{{ $checklist?->in_cutting_machine_1 ?? '-' }}</td>
+
+                                        {{-- Packaging thermoformer & manual, rowspan --}}
+                                        <td rowspan="5">{{ $checklist?->packaging_thermoformer_1 ?? '-' }}</td>
+                                        <td rowspan="5">{{ $checklist?->packaging_manual_1 ?? '-' }}</td>
                                         @endif
 
-                                        <td>{{ $checklist?->{'in_cutting_manual_' . $i} ?? '-' }}</td>
-                                        <td>{{ $checklist?->{'in_cutting_machine_' . $i} ?? '-' }}</td>
-                                        <td>{{ $checklist?->{'packaging_thermoformer_' . $i} ?? '-' }}</td>
-                                        <td>{{ $checklist?->{'packaging_manual_' . $i} ?? '-' }}</td>
+                                        {{-- Hasil sealing & isi per-pack, per baris --}}
                                         <td>{{ $checklist?->{'sealing_condition_' . $i} ?? '-' }}</td>
                                         <td>{{ $checklist?->{'sealing_vacuum_' . $i} ?? '-' }}</td>
                                         <td>{{ $checklist?->{'content_per_pack_' . $i} ?? '-' }}</td>
+
                                         @if($i == 1)
+                                        {{-- Standard weight sekali saja --}}
                                         <td rowspan="5">{{ $checklist?->standard_weight ?? '-' }}</td>
                                         @endif
+
+                                        {{-- Actual weight --}}
                                         <td>{{ $checklist?->{'actual_weight_' . $i} ?? '-' }}</td>
                     </tr>
                     @endfor
 
-                    {{-- Tambahkan baris QC & KR --}}
-                    <tr>
-                        <td colspan="3" class="text-start">
-                            QC: {{ $d->qc_verif ?? '-' }}
-                        </td>
-                        <td colspan="3" class="text-start">
-                            KR: {{ $d->kr_verif ?? '-' }}
-                        </td>
-                        <td colspan="7"></td>
-                    </tr>
+                    {{-- Optional QC & KR --}}
+                    <!--
+                                                <tr>
+                                                    <td colspan="3" class="text-start">QC: {{ $d->qc_verif ?? '-' }}</td>
+                                                    <td colspan="3" class="text-start">KR: {{ $d->kr_verif ?? '-' }}</td>
+                                                    <td colspan="7"></td>
+                                                </tr>
+                                                -->
                     @endforeach
 
-
             </table>
+
         </div>
+
         <div class="d-flex justify-content-end">
             <a href="{{ route('report_packaging_verifs.add-detail', $report->uuid) }}" class="btn btn-secondary btn-sm">
                 Tambah Detail
             </a>
         </div>
-
         </td>
         </tr>
+
+
+
+
+
+
         @endforeach
         </tbody>
         </table>

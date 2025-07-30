@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h5>Daftar Pemeriksaan Pemasakan Rumah Asap, Showering, dan Cooling Down Maurer</h5>
+            <h5>Daftar Pemeriksaan Maurer</h5>
 
             <a href="{{ route('report_maurer_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
