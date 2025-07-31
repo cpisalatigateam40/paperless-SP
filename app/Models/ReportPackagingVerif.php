@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\UserAreaScope;
 
 class ReportPackagingVerif extends Model
 {
@@ -33,5 +34,10 @@ class ReportPackagingVerif extends Model
     public function section()
     {
         return $this->belongsTo(Section::class, 'section_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

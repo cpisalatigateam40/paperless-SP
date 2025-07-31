@@ -75,7 +75,7 @@
                                 </td>
                                 <td rowspan="5">
                                     <input type="date" name="details[0][expired_date]"
-                                        class="form-control form-control-sm" readonly />
+                                        class="form-control form-control-sm" />
                                 </td>
                                 <td rowspan="5">
                                     <input type="number" name="details[0][long_standard]"

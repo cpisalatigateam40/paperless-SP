@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class ReportRmArrival extends Model
 {
@@ -34,5 +35,10 @@ class ReportRmArrival extends Model
     public function details()
     {
         return $this->hasMany(DetailRmArrival::class, 'report_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

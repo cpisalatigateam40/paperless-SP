@@ -41,67 +41,83 @@
                         <td>{{ $report->details->count() }}</td>
                         <td>{{ $report->created_by ?? '-' }}</td>
                         <td class="d-flex" style="gap: .2rem;">
+                            {{-- Toggle Detail --}}
                             <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
-                                data-bs-target="#detail-{{ $report->id }}">
-                                Lihat Detail
+                                data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
                             </button>
+
+                            {{-- Delete --}}
                             <form action="{{ route('report_prod_loss_vacums.destroy', $report->uuid) }}" method="POST"
                                 onsubmit="return confirm('Hapus laporan ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Hapus</button>
+                                <button class="btn btn-sm btn-danger" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
 
+                            {{-- Known --}}
                             @can('known report')
                             @if(!$report->known_by)
                             <form action="{{ route('report_prod_loss_vacums.known', $report->id) }}" method="POST"
                                 style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-success">Diketahui</button>
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </form>
                             @else
                             <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Diketahui oleh {{ $report->known_by }}
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;"
+                                title="Diketahui oleh">
+                                <i class="fas fa-check"></i> {{ $report->known_by }}
                             </span>
                             @endif
                             @else
                             @if($report->known_by)
                             <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Diketahui oleh {{ $report->known_by }}
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;"
+                                title="Diketahui oleh">
+                                <i class="fas fa-check"></i> {{ $report->known_by }}
                             </span>
                             @endif
                             @endcan
 
+                            {{-- Approve --}}
                             @can('approve report')
                             @if(!$report->approved_by)
                             <form action="{{ route('report_prod_loss_vacums.approve', $report->id) }}" method="POST"
                                 style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
                             </form>
                             @else
                             <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Disetujui oleh {{ $report->approved_by }}
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;"
+                                title="Disetujui oleh">
+                                <i class="fas fa-check"></i> {{ $report->approved_by }}
                             </span>
                             @endif
                             @else
                             @if($report->approved_by)
                             <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Disetujui oleh {{ $report->approved_by }}
+                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;"
+                                title="Disetujui oleh">
+                                <i class="fas fa-check"></i> {{ $report->approved_by }}
                             </span>
                             @endif
                             @endcan
 
+                            {{-- Export PDF --}}
                             <a href="{{ route('report_prod_loss_vacums.export-pdf', $report->uuid) }}"
-                                class="btn btn-sm btn-outline-dark" target="_blank">
-                                🖨 Cetak PDF
+                                class="btn btn-sm btn-outline-dark" target="_blank" title="Cetak PDF">
+                                <i class="fas fa-file-pdf"></i>
                             </a>
-
                         </td>
+
                     </tr>
                     <tr class="collapse" id="detail-{{ $report->id }}">
                         <td colspan="5">

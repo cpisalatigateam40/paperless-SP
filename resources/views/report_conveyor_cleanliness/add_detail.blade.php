@@ -55,7 +55,18 @@
                                         <input type="radio" name="machines[{{ $i }}][status]" value="kotor">
                                     </td>
                                     <td>
-                                        <input type="text" name="machines[{{ $i }}][notes]" class="form-control">
+                                        <select name="machines[{{ $i }}][notes]" class="form-select form-control">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="sisa produk">Sisa produk</option>
+                                            <option value="ada perbaikan remahan besi">Ada perbaikan remahan besi
+                                            </option>
+                                            <option value="potongan plastic (sisa kemasan)">Potongan plastic (sisa
+                                                kemasan)</option>
+                                            <option value="sisa casing (manual/bertingkat)">Sisa casing
+                                                (manual/bertingkat)</option>
+                                            <option value="grease">Grease</option>
+                                            <option value="jelaga">Jelaga</option>
+                                        </select>
                                     </td>
                                     <td>
                                         <input type="text" name="machines[{{ $i }}][corrective_action]"
@@ -104,21 +115,21 @@ document.addEventListener('DOMContentLoaded', function() {
         radio => {
             radio.addEventListener('change', function() {
                 const row = this.closest('tr');
-                const notes = row.querySelector('input[name*="[notes]"]');
+                const notes = row.querySelector('select[name*="[notes]"]');
                 const corrective = row.querySelector('input[name*="[corrective_action]"]');
                 const verification = row.querySelector('select[name*="[verification]"]');
 
                 if (this.value === 'bersih') {
-                    notes.value = '';
-                    corrective.value = '';
-                    notes.setAttribute('readonly', true);
-                    corrective.setAttribute('readonly', true);
-                    verification.value = '1';
+                    if (notes) notes.value = '';
+                    if (corrective) {
+                        corrective.value = '';
+                        corrective.setAttribute('readonly', true);
+                    }
+                    if (verification) verification.value = '1';
                     removeAllFollowups(row);
                 } else {
-                    notes.removeAttribute('readonly');
-                    corrective.removeAttribute('readonly');
-                    verification.value = '0';
+                    if (corrective) corrective.removeAttribute('readonly');
+                    if (verification) verification.value = '0';
                     createFollowup(row);
                 }
             });
@@ -127,11 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('select[name*="[verification]"]').forEach(select => {
         select.addEventListener('change', function() {
             const row = this.closest('tr');
-            if (this.value === '0') {
-                createFollowup(row);
-            } else {
-                removeAllFollowups(row);
-            }
+            if (this.value === '0') createFollowup(row);
+            else removeAllFollowups(row);
         });
     });
 

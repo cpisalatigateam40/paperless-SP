@@ -82,7 +82,7 @@
                             </table>
                         </div>
 
-                        <div class="d-flex justify-content-end mt-3">
+                        <div class="d-flex mt-3">
                             <button type="button" class="btn btn-success btn-sm" onclick="addRow()">+ Tambah
                                 Baris</button>
                         </div>

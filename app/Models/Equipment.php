@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
 class Equipment extends Model
 {
@@ -20,6 +21,8 @@ class Equipment extends Model
         static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
         });
+
+        static::addGlobalScope(new UserAreaScope);
     }
 
     public function parts(): HasMany

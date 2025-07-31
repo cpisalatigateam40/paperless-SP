@@ -60,20 +60,18 @@ class ProcessAreaCleanlinessController extends Controller
                 foreach ($detailInput['items'] as $itemInput) {
                     $itemName = $itemInput['item'];
 
-                    $condition = $itemName === 'Suhu ruang (℃)'
-                        ? 'Suhu: ' . $itemInput['temperature'] . ' °C,'
-                        : $itemInput['condition'];
-
-                    $item = ItemProcessAreaCleanliness::create([
+                    ItemProcessAreaCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
-                        'condition' => $condition,
+                        'condition' => $itemInput['condition'] ?? null,
+                        'temperature_actual' => $itemInput['temperature_actual'] ?? null,
+                        'temperature_display' => $itemInput['temperature_display'] ?? null,
                         'notes' => $itemInput['notes'] ?? null,
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
 
-                    // Simpan followups jika ada
+                    // Simpan followups kalau ada
                     if (!empty($itemInput['followups']) && is_array($itemInput['followups'])) {
                         foreach ($itemInput['followups'] as $followup) {
                             ItemFollowup::create([
@@ -85,6 +83,7 @@ class ProcessAreaCleanlinessController extends Controller
                         }
                     }
                 }
+
             }
 
             DB::commit();
@@ -153,18 +152,17 @@ class ProcessAreaCleanlinessController extends Controller
                 foreach ($detailInput['items'] as $itemInput) {
                     $itemName = $itemInput['item'];
 
-                    $condition = $itemName === 'Suhu ruang (℃)'
-                        ? 'Suhu: ' . $itemInput['temperature'] . ' °C,'
-                        : $itemInput['condition'];
-
                     $item = ItemProcessAreaCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
-                        'condition' => $condition,
+                        'condition' => $itemInput['condition'] ?? null,
+                        'temperature_actual' => $itemInput['temperature_actual'] ?? null,
+                        'temperature_display' => $itemInput['temperature_display'] ?? null,
                         'notes' => $itemInput['notes'] ?? null,
                         'corrective_action' => $itemInput['corrective_action'] ?? null,
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
+
 
                     if (!empty($itemInput['followups']) && is_array($itemInput['followups'])) {
                         foreach ($itemInput['followups'] as $followup) {

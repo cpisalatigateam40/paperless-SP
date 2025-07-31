@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
 class RawMaterial extends Model
 {
@@ -23,6 +24,7 @@ class RawMaterial extends Model
         static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
         });
+        static::addGlobalScope(new UserAreaScope);
     }
 
     public function area()

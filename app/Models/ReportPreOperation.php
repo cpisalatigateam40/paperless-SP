@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
 class ReportPreOperation extends Model
 {
@@ -20,6 +21,7 @@ class ReportPreOperation extends Model
     {
         parent::boot();
         static::creating(fn($model) => $model->uuid = Str::uuid());
+        static::addGlobalScope(new UserAreaScope);
     }
 
     public function area()

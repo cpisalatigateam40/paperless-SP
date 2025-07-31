@@ -51,7 +51,7 @@
                 </div>
                 <div class="mb-3">
                     <label>Best Before</label>
-                    <input type="date" name="details[0][best_before]" class="form-control" readonly>
+                    <input type="date" name="details[0][best_before]" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label>Nomor Program</label>

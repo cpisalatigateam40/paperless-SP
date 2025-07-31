@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class ReportRetain extends Model
 {
@@ -37,5 +38,10 @@ class ReportRetain extends Model
     public function section()
     {
         return $this->belongsTo(Section::class, 'section_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

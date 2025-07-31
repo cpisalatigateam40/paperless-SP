@@ -21,8 +21,7 @@
     td {
         border: 1px solid #000;
         padding: 2px 3px;
-        text-align: left;
-        vertical-align: middle;
+        vertical-align: top;
     }
 
     th {
@@ -30,35 +29,12 @@
         font-weight: bold;
     }
 
-    .text-center {
-        text-align: center;
-    }
-
-    .signature-box {
-        height: 40px;
-        border-bottom: 1px solid #000;
-        margin-top: 20px;
-        width: 60%;
-    }
-
     .no-border {
         border: none !important;
     }
 
-    .mb-2 {
-        margin-bottom: 1rem;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 2rem;
-    }
-
-    .underline {
-        text-decoration: underline;
+    .text-center {
+        text-align: center;
     }
 
     .header {
@@ -74,31 +50,40 @@
         border-collapse: collapse;
     }
 
+    ul,
+    li {
+        margin: 0;
+        padding: 2px;
+        page-break-inside: avoid;
+        list-style-type: none;
+    }
+
+    tr,
+    td,
+    th {
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
     @page {
         margin-top: 80px;
-        size: 210mm 330mm;
-    }
-
-    ul {
-        margin: unset;
-        padding: .5rem;
-    }
-
-    li {
-        list-style-type: none;
+        size: A4;
     }
     </style>
 </head>
 
 <body>
-    {{-- header --}}
+    {{-- Header --}}
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 30%; vertical-align: middle;">
-                    <table style="border: none; border-collapse: collapse;">
+                <td class="no-border" style="width: 30%;">
+                    <table style="border: none;">
                         <tr>
-                            <td class="no-border" style="vertical-align: middle; width: 50px;">
+                            <td class="no-border" style="width: 50px;">
                                 @php
                                 $path = public_path('storage/image/logo.png');
                                 if (file_exists($path)) {
@@ -109,7 +94,7 @@
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
-                            <td class="no-border" style="vertical-align: middle; padding-left: 10px;">
+                            <td class="no-border" style="padding-left: 10px;">
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
                                     CHAROEN<br>POKPHAND<br>INDONESIA PT.<br>Food Division
                                 </div>
@@ -121,21 +106,20 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN KONDISI KEBERSIHAN</h3>
+    <h3 class="text-center">PEMERIKSAAN KONDISI KEBERSIHAN</h3>
 
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td style="text-align: left; border: none;">
-                Hari/Tanggal:
+    <table style="border: none;">
+        <tr>
+            <td class="no-border">Hari/Tanggal:
                 <span style="text-decoration: underline;">
                     {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
                 </span>
             </td>
-            <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
+            <td class="no-border">Shift:
+                <span style="text-decoration: underline;">{{ $report->shift }}</span>
             </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section_name }}</span>
+            <td class="no-border">Area:
+                <span style="text-decoration: underline;">{{ $report->section_name }}</span>
             </td>
         </tr>
     </table>
@@ -161,36 +145,35 @@
             @foreach($detail->items as $i => $item)
             <tr>
                 @if($i === 0)
-                <td rowspan="4">{{ $index + 1 }}</td>
-                <td rowspan="4">{{ $detail->inspection_hour }}</td>
+                <td rowspan="{{ count($detail->items) }}">{{ $index + 1 }}</td>
+                <td rowspan="{{ count($detail->items) }}">{{ $detail->inspection_hour }}</td>
                 @endif
 
                 <td>{{ $item->item }}</td>
 
                 @if(Str::startsWith($item->item, 'Suhu ruang'))
-                <td colspan="2" style="text-align: center">{{ $item->condition }}</td>
+                <td colspan="2" class="text-center">
+                    Actual: {{ $item->temperature_actual ?? '-' }} ℃<br>
+                    Display: {{ $item->temperature_display ?? '-' }} ℃
+                </td>
                 @else
-                <td style="text-align: center">{{ strtolower($item->condition) === 'bersih' ? '✓' : '' }}</td>
-                <td style="text-align: center">{{ strtolower($item->condition) === 'kotor' ? 'x' : '' }}</td>
+                <td class="text-center">{{ strtolower($item->condition) === 'bersih' ? '✓' : '' }}</td>
+                <td class="text-center">{{ strtolower($item->condition) === 'kotor' ? 'x' : '' }}</td>
                 @endif
 
-                <td>{{ $item->notes }}</td>
-                <td>{{ $item->corrective_action }}</td>
-                <td>
-                    <ul class="mb-0">
-                        <li>
-                            <strong>Verifikasi Utama:</strong><br>
-                            Kondisi: {{ $item->verification ? 'OK' : 'Tidak OK' }}<br>
-                            Keterangan: {{ $item->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
-                        </li>
 
-                        @foreach($item->followups as $index => $followup)
-                        <li class="mt-2">
-                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
-                            Kondisi: {{ $followup->verification ? 'OK' : 'Tidak OK' }}<br>
-                            Keterangan: {{ $followup->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $followup->action ?? '-' }}
+                <td>{{ $item->notes ?? '-' }}</td>
+                <td>{{ $item->corrective_action ?? '-' }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <strong>Verifikasi Utama:</strong>
+                            {{ $item->verification ? 'OK' : 'Tidak OK' }}
+                        </li>
+                        @foreach($item->followups as $fIndex => $followup)
+                        <li>
+                            <strong>Koreksi Lanjutan #{{ $fIndex+1 }}:</strong>
+                            {{ $followup->verification ? 'OK' : 'Tidak OK' }}
                         </li>
                         @endforeach
                     </ul>
@@ -199,7 +182,7 @@
             @endforeach
             @endforeach
             <tr>
-                <td colspan="8" style="text-align: right; border: none;">QM 13 / 01</td>
+                <td colspan="8" class="no-border" style="text-align: right;">QM 13 / 01</td>
             </tr>
         </tbody>
     </table>
@@ -207,45 +190,44 @@
 
     <p><strong>Keterangan:</strong></p>
     <ul style="padding-left: 20px;">
-        <li>1. ✓: OK/bersih</li>
-        <li>2. x: Tidak OK/kotor</li>
+        <li>✓: OK/bersih</li>
+        <li>x: Tidak OK/kotor</li>
     </ul>
 
     <br><br>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
-        <tr style="border: none;">
-            <td style="text-align: center; border: none; width: 33%;">
+        <tr>
+            <td class="no-border text-center" style="width: 33%;">
                 Diperiksa oleh:<br><br>
-                <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->created_by }}</strong><br><br>
+                <img src="{{ $createdQr }}" width="80"><br>
+                <strong>{{ $report->created_by }}</strong><br>
                 QC Inspector
             </td>
-            <td style="text-align: center; border: none; width: 33%;">
+            <td class="no-border text-center" style="width: 33%;">
                 Diketahui oleh:<br><br>
                 @if($report->known_by)
-                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->known_by }}</strong><br><br>
+                <img src="{{ $knownQr }}" width="80"><br>
+                <strong>{{ $report->known_by }}</strong><br>
                 @else
-                <div style="height: 120px;"></div>
+                <div style="height: 80px;"></div>
                 <strong>-</strong><br>
                 @endif
                 SPV/Foreman/Lady Produksi
             </td>
-            <td style="text-align: center; border: none; width: 33%;">
+            <td class="no-border text-center" style="width: 33%;">
                 Disetujui oleh:<br><br>
                 @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->approved_by }}</strong><br><br>
+                <img src="{{ $approvedQr }}" width="80"><br>
+                <strong>{{ $report->approved_by }}</strong><br>
                 @else
-                <div style="height: 120px;"></div>
+                <div style="height: 80px;"></div>
                 <strong>-</strong><br>
                 @endif
                 Supervisor QC
             </td>
         </tr>
     </table>
-
 </body>
 
 </html>

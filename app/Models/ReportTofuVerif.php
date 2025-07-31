@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class ReportTofuVerif extends Model
 {
@@ -29,6 +30,7 @@ class ReportTofuVerif extends Model
         static::creating(function ($model) {
             $model->uuid = (string) \Illuminate\Support\Str::uuid();
         });
+        static::addGlobalScope(new UserAreaScope);
     }
 
     public function area()

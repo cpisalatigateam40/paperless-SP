@@ -18,6 +18,8 @@ class ItemProcessAreaCleanliness extends Model
         'notes',
         'corrective_action',
         'verification',
+        'temperature_actual',
+        'temperature_display',
     ];
 
     public function detail()

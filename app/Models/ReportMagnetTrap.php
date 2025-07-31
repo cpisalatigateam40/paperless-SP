@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
 class ReportMagnetTrap extends Model
 {
@@ -29,6 +30,7 @@ class ReportMagnetTrap extends Model
         static::creating(function ($model) {
             $model->uuid = $model->uuid ?? Str::uuid()->toString();
         });
+        static::addGlobalScope(new UserAreaScope);
     }
 
     // Relasi ke Area

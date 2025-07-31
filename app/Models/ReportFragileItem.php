@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class ReportFragileItem extends Model
 {
@@ -30,5 +31,10 @@ class ReportFragileItem extends Model
     public function details()
     {
         return $this->hasMany(DetailFragileItem::class, 'report_fragile_item_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

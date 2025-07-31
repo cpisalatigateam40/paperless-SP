@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\UserAreaScope;
 
 class ReportRepackVerif extends Model
 {
@@ -31,5 +32,10 @@ class ReportRepackVerif extends Model
     public function details()
     {
         return $this->hasMany(DetailRepackVerif::class, 'report_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

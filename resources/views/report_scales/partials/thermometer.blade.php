@@ -5,16 +5,20 @@
                 <th rowspan="3">No</th>
                 <th rowspan="3">Jenis & Kode Thermometer</th>
                 <th colspan="2">Pukul 1
-                    <input type="time" id="thermo_time1" value="{{ \Carbon\Carbon::now()->format('H:i') }}" class="form-control form-control-sm mt-1" {{ $isEdit ? 'disabled' : '' }}>
+                    <input type="time" id="thermo_time1" value="{{ \Carbon\Carbon::now()->format('H:i') }}"
+                        class="form-control form-control-sm mt-1" {{ $isEdit ? 'disabled' : '' }}>
                 </th>
                 <th colspan="2">Pukul 2
-                    <input type="time" id="thermo_time2" value="{{ \Carbon\Carbon::now()->format('H:i') }}" class="form-control form-control-sm mt-1" {{ !$isEdit ? 'disabled' : '' }}>
+                    <input type="time" id="thermo_time2" value="{{ \Carbon\Carbon::now()->format('H:i') }}"
+                        class="form-control form-control-sm mt-1" {{ !$isEdit ? 'disabled' : '' }}>
                 </th>
                 <th rowspan="3">Keterangan</th>
             </tr>
             <tr>
-                <th>0°C</th><th>100°C</th>
-                <th>0°C</th><th>100°C</th>
+                <th>0°C</th>
+                <th>100°C</th>
+                <th>0°C</th>
+                <th>100°C</th>
             </tr>
         </thead>
         <tbody id="thermo-body">
@@ -24,22 +28,26 @@
                     <select name="thermo_data[0][thermometer_uuid]" class="form-select form-control">
                         <option value="">-- Pilih Thermometer --</option>
                         @foreach($thermometers as $t)
-                            <option value="{{ $t->uuid }}">{{ $t->type }} - {{ $t->code }}</option>
+                        <option value="{{ $t->uuid }}">{{ $t->type }} - {{ $t->code }}</option>
                         @endforeach
                     </select>
-                    <input type="hidden" name="thermo_data[0][time_1]" class="thermo-time1" value="08:00" {{ $isEdit ? 'disabled' : '' }}>
-                    <input type="hidden" name="thermo_data[0][time_2]" class="thermo-time2" value="14:00" {{ !$isEdit ? 'disabled' : '' }}>
+                    <input type="hidden" name="thermo_data[0][time_1]" class="thermo-time1" value="08:00"
+                        {{ $isEdit ? 'disabled' : '' }}>
+                    <input type="hidden" name="thermo_data[0][time_2]" class="thermo-time2" value="14:00"
+                        {{ !$isEdit ? 'disabled' : '' }}>
                 </td>
-                <td><input type="number" step="0.01" name="thermo_data[0][p1_0]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
-                <td><input type="number" step="0.01" name="thermo_data[0][p1_100]" class="form-control" {{ $isEdit ? 'disabled' : '' }}></td>
-                <td><input type="number" step="0.01" name="thermo_data[0][p2_0]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
-                <td><input type="number" step="0.01" name="thermo_data[0][p2_100]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="thermo_data[0][p1_0]" class="form-control"
+                        {{ $isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="thermo_data[0][p1_100]" class="form-control"
+                        {{ $isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="thermo_data[0][p2_0]" class="form-control"
+                        {{ !$isEdit ? 'disabled' : '' }}></td>
+                <td><input type="number" step="0.01" name="thermo_data[0][p2_100]" class="form-control"
+                        {{ !$isEdit ? 'disabled' : '' }}></td>
                 <td>
-                    <select name="thermo_data[0][status]" class="form-select form-control">
-                        <option value="1">OK</option>
-                        <option value="0">Tidak OK</option>
-                    </select>
+                    <input type="text" name="thermo_data[0][status]" class="form-control">
                 </td>
+
             </tr>
         </tbody>
     </table>
@@ -75,11 +83,9 @@ document.getElementById('add-thermo-row').addEventListener('click', () => {
         <td><input type="number" step="0.01" name="thermo_data[${thermoRow}][p2_0]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
         <td><input type="number" step="0.01" name="thermo_data[${thermoRow}][p2_100]" class="form-control" {{ !$isEdit ? 'disabled' : '' }}></td>
         <td>
-            <select name="thermo_data[${thermoRow}][status]" class="form-select form-control">
-                <option value="1">OK</option>
-                <option value="0">Tidak OK</option>
-            </select>
+            <input type="text" name="thermo_data[${thermoRow}][status]" class="form-control">
         </td>
+
     `;
 
     tbody.appendChild(row);
@@ -87,11 +93,11 @@ document.getElementById('add-thermo-row').addEventListener('click', () => {
 });
 
 // Sync waktu ke seluruh baris thermometer
-document.getElementById('thermo_time1').addEventListener('input', function () {
+document.getElementById('thermo_time1').addEventListener('input', function() {
     document.querySelectorAll('.thermo-time1').forEach(input => input.value = this.value);
 });
 
-document.getElementById('thermo_time2').addEventListener('input', function () {
+document.getElementById('thermo_time2').addEventListener('input', function() {
     document.querySelectorAll('.thermo-time2').forEach(input => input.value = this.value);
 });
 </script>

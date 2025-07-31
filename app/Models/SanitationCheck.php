@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class SanitationCheck extends Model
 {
@@ -33,5 +34,10 @@ class SanitationCheck extends Model
     public function report()
     {
         return $this->belongsTo(ReportGmpEmployee::class, 'report_gmp_employee_id');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }
