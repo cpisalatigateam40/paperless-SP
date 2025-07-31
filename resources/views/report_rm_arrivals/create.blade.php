@@ -91,9 +91,9 @@
                 </div>
 
                 {{-- Tombol Tambah --}}
-                <!-- <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">
                     + Tambah Pemeriksaan
-                </button> -->
+                </button>
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">Simpan Laporan</button>

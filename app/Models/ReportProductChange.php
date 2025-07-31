@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class ReportProductChange extends Model
 {
@@ -47,5 +48,10 @@ class ReportProductChange extends Model
     public function sections()
     {
         return $this->hasMany(VerificationSection::class, 'report_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

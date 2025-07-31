@@ -87,6 +87,16 @@
     li {
         list-style-type: none;
     }
+
+    tr,
+    td,
+    th {
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
     </style>
 </head>
 
@@ -157,38 +167,24 @@
             @foreach($report->details as $detail)
             @foreach($detail->items as $i => $item)
             <tr>
-                @if($i === 0)
-                <td rowspan="4">{{ $detail->inspection_hour }}</td>
-                @endif
+                <td>{{ $detail->inspection_hour }}</td>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->item }}</td>
-                <td style="text-align: center">{{ $item->condition }}</td>
+                <td class="text-center">{{ $item->condition }}</td>
                 <td>
-                    @php
-                    $notes = json_decode($item->notes, true);
-                    @endphp
+                    @php $notes = json_decode($item->notes, true); @endphp
                     @if(is_array($notes))
                     {{ implode(', ', $notes) }}
                     @else
-                    {{ $item->notes }}
+                    {{ $item->notes ?? '-' }}
                     @endif
                 </td>
-                <td>{{ $item->corrective_action }}</td>
+                <td>{{ $item->corrective_action ?? '-' }}</td>
                 <td>
-                    <ul class="mb-0">
-                        <li>
-                            <strong>Verifikasi Utama:</strong><br>
-                            Kondisi: {{ $item->verification ? 'OK' : 'Tidak OK' }}<br>
-                            Keterangan: {{ $item->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $item->corrective_action ?? '-' }}
-                        </li>
-
+                    <ul>
+                        <li><strong>Utama:</strong> {{ $item->verification ? 'OK' : 'Tidak OK' }}</li>
                         @foreach($item->followups as $index => $followup)
-                        <li class="mt-2">
-                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
-                            Kondisi: {{ $followup->verification ? 'OK' : 'Tidak OK' }}<br>
-                            Keterangan: {{ $followup->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
+                        <li><strong>Lanjutan #{{ $index+1 }}:</strong> {{ $followup->verification ? 'OK' : 'Tidak OK' }}
                         </li>
                         @endforeach
                     </ul>
@@ -197,9 +193,10 @@
             @endforeach
             @endforeach
             <tr>
-                <td colspan="7" style="text-align: right; border: none;">QM 12 / 01</td>
+                <td colspan="7" class="no-border" style="text-align: right;">QM 12 / 01</td>
             </tr>
         </tbody>
+
     </table>
 
     <p><strong>Keterangan:</strong></p>

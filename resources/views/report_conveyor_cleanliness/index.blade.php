@@ -47,70 +47,82 @@
                         <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->section->section_name ?? '-' }}</td>
                         <td>{{ $report->created_by ?? '-' }}</td>
-                        <td>
-                            <button class="btn btn-sm btn-info toggle-detail"
-                                data-target="#detail-{{ $report->id }}">Lihat Detail</button>
+                        <td class="d-flex flex-wrap align-items-center" style="gap: .3rem;">
+                            {{-- Lihat Detail --}}
+                            <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $report->id }}"
+                                title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
 
+                            {{-- Update Laporan --}}
                             <a href="{{ route('report-conveyor-cleanliness.edit', $report->uuid) }}"
-                                class="btn btn-sm btn-warning">
-                                Update Laporan
+                                class="btn btn-sm btn-warning" title="Update Laporan">
+                                <i class="fas fa-edit"></i>
                             </a>
 
+                            {{-- Hapus --}}
                             <form action="{{ route('report-conveyor-cleanliness.destroy', $report->uuid) }}"
-                                method="POST" class="d-inline-block" onsubmit="return confirm('Hapus laporan ini?')">
+                                method="POST" onsubmit="return confirm('Hapus laporan ini?')" class="d-inline-block">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
 
-
+                            {{-- Known --}}
                             @can('known report')
                             @if(!$report->known_by)
                             <form action="{{ route('report-conveyor-cleanliness.known', $report->id) }}" method="POST"
-                                style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
+                                onsubmit="return confirm('Ketahui laporan ini?')" class="d-inline-block">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-success">Diketahui</button>
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </form>
                             @else
-                            <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Diketahui oleh {{ $report->known_by }}
+                            <span class="badge bg-success text-white rounded-pill px-3 py-1" title="Diketahui oleh">
+                                <i class="fas fa-check"></i> {{ $report->known_by }}
                             </span>
                             @endif
                             @else
                             @if($report->known_by)
-                            <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Diketahui oleh {{ $report->known_by }}
+                            <span class="badge bg-success text-white rounded-pill px-3 py-1" title="Diketahui oleh">
+                                <i class="fas fa-check"></i> {{ $report->known_by }}
                             </span>
                             @endif
                             @endcan
 
+                            {{-- Approve --}}
                             @can('approve report')
                             @if(!$report->approved_by)
                             <form action="{{ route('report-conveyor-cleanliness.approve', $report->id) }}" method="POST"
-                                style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
+                                onsubmit="return confirm('Setujui laporan ini?')" class="d-inline-block">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
                             </form>
                             @else
-                            <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Disetujui oleh {{ $report->approved_by }}
+                            <span class="badge bg-success text-white rounded-pill px-3 py-1" title="Disetujui oleh">
+                                <i class="fas fa-check"></i> {{ $report->approved_by }}
                             </span>
                             @endif
                             @else
                             @if($report->approved_by)
-                            <span class="badge bg-success"
-                                style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Disetujui oleh {{ $report->approved_by }}
+                            <span class="badge bg-success text-white rounded-pill px-3 py-1" title="Disetujui oleh">
+                                <i class="fas fa-check"></i> {{ $report->approved_by }}
                             </span>
                             @endif
                             @endcan
 
+                            {{-- Cetak PDF --}}
                             <a href="{{ route('report-conveyor-cleanliness.export-pdf', $report->uuid) }}"
-                                target="_blank" class="btn btn-sm btn-outline-secondary">🖨 Cetak PDF</a>
+                                target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
                         </td>
+
                     </tr>
 
                     <tr id="detail-{{ $report->id }}" class="d-none">

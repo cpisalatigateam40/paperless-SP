@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class QcEquipment extends Model
 {
@@ -26,5 +27,10 @@ class QcEquipment extends Model
     public function detailReports()
     {
         return $this->hasMany(DetailQcEquipment::class, 'qc_equipment_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

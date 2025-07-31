@@ -12,7 +12,8 @@
 
                 <div class="inspection-block border rounded p-3 mb-3 position-relative">
                     <label>Jam Inspeksi:</label>
-                    <input type="time" name="details[0][inspection_hour]" class="form-control mb-3 col-md-5" required>
+                    <input type="time" name="details[0][inspection_hour]" class="form-control mb-3 col-md-5"
+                        value="{{ now()->format('H:i') }}" required>
 
                     <table class="table">
                         <thead>
@@ -44,8 +45,18 @@
                                 </td>
                                 <td class="align-middle">
                                     @if($item === 'Suhu ruang (℃)')
-                                    <input type="number" step="0.1" name="details[0][items][{{ $i }}][temperature]"
-                                        placeholder="℃" class="form-control" required>
+                                    <div class="row">
+                                        <div class="col">
+                                            <input type="number" step="0.1"
+                                                name="details[0][items][{{ $i }}][temperature_actual]"
+                                                placeholder="Actual ℃" class="form-control mb-1" required>
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" step="0.1"
+                                                name="details[0][items][{{ $i }}][temperature_display]"
+                                                placeholder="Display ℃" class="form-control mb-1" required>
+                                        </div>
+                                    </div>
                                     @else
                                     <select name="details[0][items][{{ $i }}][condition]"
                                         class="form-control condition-select" required>
@@ -54,6 +65,7 @@
                                         <option value="Kotor">2. Kotor</option>
                                     </select>
                                     @endif
+
                                 </td>
                                 <td><input type="text" name="details[0][items][{{ $i }}][notes]"
                                         class="form-control notes-input"></td>

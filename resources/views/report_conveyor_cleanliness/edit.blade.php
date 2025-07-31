@@ -81,8 +81,29 @@
                                         value="bersih" {{ $machine->status === 'bersih' ? 'checked' : '' }}></td>
                                 <td><input type="radio" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][status]"
                                         value="kotor" {{ $machine->status === 'kotor' ? 'checked' : '' }}></td>
-                                <td><input type="text" name="machines[{{ $groupIndex }}][{{ $innerIndex }}][notes]"
-                                        value="{{ $machine->notes }}" class="form-control"></td>
+                                <td>
+                                    <select name="machines[{{ $groupIndex }}][{{ $innerIndex }}][notes]"
+                                        class="form-select form-control">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="sisa produk"
+                                            {{ $machine->notes == 'sisa produk' ? 'selected' : '' }}>Sisa produk
+                                        </option>
+                                        <option value="ada perbaikan remahan besi"
+                                            {{ $machine->notes == 'ada perbaikan remahan besi' ? 'selected' : '' }}>Ada
+                                            perbaikan remahan besi</option>
+                                        <option value="potongan plastic (sisa kemasan)"
+                                            {{ $machine->notes == 'potongan plastic (sisa kemasan)' ? 'selected' : '' }}>
+                                            Potongan plastic (sisa kemasan)</option>
+                                        <option value="sisa casing (manual/bertingkat)"
+                                            {{ $machine->notes == 'sisa casing (manual/bertingkat)' ? 'selected' : '' }}>
+                                            Sisa casing (manual/bertingkat)</option>
+                                        <option value="grease" {{ $machine->notes == 'grease' ? 'selected' : '' }}>
+                                            Grease</option>
+                                        <option value="jelaga" {{ $machine->notes == 'jelaga' ? 'selected' : '' }}>
+                                            Jelaga</option>
+                                    </select>
+                                </td>
+
                                 <td><input type="text"
                                         name="machines[{{ $groupIndex }}][{{ $innerIndex }}][corrective_action]"
                                         value="{{ $machine->corrective_action }}" class="form-control"></td>

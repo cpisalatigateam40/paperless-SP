@@ -54,7 +54,7 @@
                         <input type="text" name="details[0][production_code]" class="form-control">
 
                         <label>Best Before</label>
-                        <input type="date" name="details[0][best_before]" class="form-control" readonly>
+                        <input type="date" name="details[0][best_before]" class="form-control">
 
                         <label>Jumlah</label>
                         <input type="number" name="details[0][quantity]" class="form-control">

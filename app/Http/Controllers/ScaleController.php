@@ -27,6 +27,7 @@ class ScaleController extends Controller
             'code' => 'required|string|max:255',
             'type' => 'required|string|max:255',
             'brand' => 'required|string|max:255',
+            'owner' => 'required|string|max:255',
         ]);
 
         $user = Auth::user();
@@ -37,6 +38,7 @@ class ScaleController extends Controller
             'code' => $request->code,
             'type' => $request->type,
             'brand' => $request->brand,
+            'owner' => $request->owner,
             'area_uuid' => $areaUuid,
         ]);
 
@@ -57,12 +59,14 @@ class ScaleController extends Controller
             'code' => 'required|string|max:255',
             'type' => 'required|string|max:255',
             'brand' => 'required|string|max:255',
+            'owner' => 'required|string|max:255',
         ]);
 
         $scale->update([
             'code' => $request->code,
             'type' => $request->type,
             'brand' => $request->brand,
+            'owner' => $request->owner,
         ]);
 
         return redirect()->route('scales.index')->with('success', 'Timbangan berhasil diperbarui.');

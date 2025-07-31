@@ -90,11 +90,9 @@ document.getElementById('add-row').addEventListener('click', function() {
         <td><input type="number" step="0.01" name="data[${rowCount}][p2_5000]" class="form-control" required></td>
         <td><input type="number" step="0.01" name="data[${rowCount}][p2_10000]" class="form-control" required></td>
         <td>
-            <select name="data[${rowCount}][status]" class="form-select" required>
-                <option value="1">OK</option>
-                <option value="0">Tidak OK</option>
-            </select>
+            <input type="text" name="data[${rowCount}][status]" class="form-control" required>
         </td>
+
     `;
 
     tbody.appendChild(row);

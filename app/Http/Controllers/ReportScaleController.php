@@ -64,7 +64,7 @@ class ReportScaleController extends Controller
                     'uuid' => Str::uuid(),
                     'report_scale_uuid' => $report->uuid,
                     'scale_uuid' => $row['scale_uuid'],
-                    'notes' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
+                    'notes' => $row['status'],
                     'time_1' => now()->setTimeFromTimeString($row['time_1'] ?? '08:00'),
                     'time_2' => now()->setTimeFromTimeString($row['time_2'] ?? '14:00'),
                 ]);
@@ -100,7 +100,7 @@ class ReportScaleController extends Controller
                     'thermometer_uuid' => $row['thermometer_uuid'],
                     'time_1' => now()->setTimeFromTimeString($row['time_1'] ?? '08:00'),
                     'time_2' => now()->setTimeFromTimeString($row['time_2'] ?? '14:00'),
-                    'note' => $row['status'] == '1' ? 'OK' : 'Tidak OK',
+                    'notes' => $row['status'],
                 ]);
 
                 foreach ([0, 100] as $temp) {

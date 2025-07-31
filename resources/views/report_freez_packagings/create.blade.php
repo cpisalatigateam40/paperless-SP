@@ -78,7 +78,7 @@ function addDetailRow() {
         </div>
         <div class="col-md-4">
             <label>Best Before</label>
-            <input type="date" name="details[${index}][best_before]" class="form-control" readonly>
+            <input type="date" name="details[${index}][best_before]" class="form-control">
         </div>
     </div>
 

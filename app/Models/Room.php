@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class Room extends Model
 {
@@ -20,6 +21,7 @@ class Room extends Model
         static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
         });
+        static::addGlobalScope(new UserAreaScope);
     }
 
     public function elements(): HasMany
@@ -31,4 +33,6 @@ class Room extends Model
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
+
+    
 }

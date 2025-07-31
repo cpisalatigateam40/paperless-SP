@@ -14,17 +14,26 @@
 
                 <div class="mb-3">
                     <label for="code" class="form-label">Kode Timbangan</label>
-                    <input type="text" name="code" class="form-control" value="{{ old('code', $scale->code) }}" required>
+                    <input type="text" name="code" class="form-control" value="{{ old('code', $scale->code) }}"
+                        required>
                 </div>
 
                 <div class="mb-3">
                     <label for="type" class="form-label">Jenis Timbangan</label>
-                    <input type="text" name="type" class="form-control" value="{{ old('type', $scale->type) }}" required>
+                    <input type="text" name="type" class="form-control" value="{{ old('type', $scale->type) }}"
+                        required>
                 </div>
 
                 <div class="mb-3">
                     <label for="brand" class="form-label">Merek Timbangan</label>
-                    <input type="text" name="brand" class="form-control" value="{{ old('brand', $scale->brand) }}" required>
+                    <input type="text" name="brand" class="form-control" value="{{ old('brand', $scale->brand) }}"
+                        required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="owner" class="form-label">Pemilik</label>
+                    <input type="text" name="owner" class="form-control" value="{{ old('brand', $scale->owner) }}"
+                        required>
                 </div>
 
                 <button class="btn btn-primary">Update</button>

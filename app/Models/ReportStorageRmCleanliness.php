@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class ReportStorageRmCleanliness extends Model
 {
@@ -29,5 +30,10 @@ class ReportStorageRmCleanliness extends Model
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

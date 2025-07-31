@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\UserAreaScope;
 
 class Formula extends Model
 {
@@ -36,5 +37,10 @@ class Formula extends Model
     public function detailReports()
     {
         return $this->hasMany(DetailProcessProd::class, 'formula_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new UserAreaScope);
     }
 }

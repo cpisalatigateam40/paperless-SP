@@ -42,50 +42,61 @@
                         <td>{{ $report->section->section_name ?? '-' }}</td>
                         <td>{{ \Carbon\Carbon::parse($report->month)->format('F Y') }}</td>
                         <td>{{ $report->sampling_point }}</td>
-                        <td>
-                            <button class="btn btn-info btn-sm toggle-detail" data-target="#detail-{{ $report->id }}">
-                                Lihat Detail
+                        <td class="d-flex" style="gap: .2rem;">
+                            {{-- Toggle Detail --}}
+                            <button class="btn btn-info btn-sm toggle-detail" data-target="#detail-{{ $report->id }}"
+                                title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
                             </button>
 
+                            {{-- Update --}}
                             <a href="{{ route('report_chlorine_residues.edit', $report->uuid) }}"
-                                class="btn btn-warning btn-sm">
-                                Update Laporan
+                                class="btn btn-warning btn-sm" title="Update">
+                                <i class="fas fa-pen"></i>
                             </a>
 
+                            {{-- Hapus --}}
                             <form action="{{ route('report_chlorine_residues.destroy', $report->uuid) }}" method="POST"
                                 style="display:inline-block;" onsubmit="return confirm('Hapus?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger btn-sm">Hapus</button>
+                                <button class="btn btn-danger btn-sm" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
 
+                            {{-- Approve --}}
                             @can('approve report')
                             @if(!$report->approved_by)
                             <form action="{{ route('report_chlorine_residues.approve', $report->id) }}" method="POST"
                                 style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
                             </form>
                             @else
                             <span class="badge bg-success"
                                 style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Disetujui oleh {{ $report->approved_by }}
+                                <i class="fas fa-check"></i> {{ $report->approved_by }}
                             </span>
                             @endif
                             @else
                             @if($report->approved_by)
                             <span class="badge bg-success"
                                 style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                Disetujui oleh {{ $report->approved_by }}
+                                <i class="fas fa-check"></i> {{ $report->approved_by }}
                             </span>
                             @endif
                             @endcan
 
+                            {{-- Export PDF --}}
                             <a href="{{ route('report_chlorine_residues.export-pdf', $report->uuid) }}" target="_blank"
-                                class="btn btn-outline-secondary btn-sm">
-                                🖨 Cetak PDF
+                                class="btn btn-outline-secondary btn-sm" title="Cetak PDF">
+                                <i class="fas fa-file-pdf"></i>
                             </a>
                         </td>
+
                     </tr>
 
                     {{-- Detail --}}

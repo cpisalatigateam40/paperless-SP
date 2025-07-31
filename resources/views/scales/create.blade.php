@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-             <h5>Tambah Timbangan</h5>
+            <h5>Tambah Timbangan</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('scales.store') }}" method="POST">
@@ -23,6 +23,11 @@
                 <div class="mb-3">
                     <label for="brand" class="form-label">Merek Timbangan</label>
                     <input type="text" name="brand" class="form-control" value="{{ old('brand') }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="owner" class="form-label">Pemilik</label>
+                    <input type="text" name="owner" class="form-control" value="{{ old('owner') }}">
                 </div>
 
                 <button class="btn btn-success">Simpan</button>

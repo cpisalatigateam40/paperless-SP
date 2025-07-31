@@ -37,15 +37,15 @@
                     <h5 class="mb-3">Detail Inspeksi</h5>
                 </div>
 
-                <button type="button" id="add-inspection" class="btn btn-secondary mr-2">+ Tambah Detail
+                <button type="button" id="add-inspection" class="btn btn-secondary mr-2 d-none">+ Tambah Detail
                     Inspeksi</button>
                 <button type="submit" class="btn btn-primary">Simpan</button>
 
                 <!-- Template -->
                 <template id="inspection-template">
                     <div class="inspection-block border rounded p-3 mb-3 position-relative">
-                        <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection"
-                            style="right: .5rem; top: .5rem;">x</button>
+                        <!-- <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection"
+                            style="right: .5rem; top: .5rem;">x</button> -->
 
                         <label>Jam Inspeksi:</label>
                         <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5"
@@ -83,8 +83,18 @@
                                     </td>
                                     <td>
                                         @if(Str::contains($item, 'Suhu ruang'))
-                                        <input type="number" step="0.1" name="details[0][items][{{ $i }}][temperature]"
-                                            class="form-control" required>
+                                        <div class="row">
+                                            <div class="col">
+                                                <input type="number" step="0.1"
+                                                    name="details[0][items][{{ $i }}][temperature_actual]"
+                                                    class="form-control mb-1" placeholder="Actual" required>
+                                            </div>
+                                            <div class="col">
+                                                <input type="number" step="0.1"
+                                                    name="details[0][items][{{ $i }}][temperature_display]"
+                                                    class="form-control mb-1" placeholder="Display" required>
+                                            </div>
+                                        </div>
                                         @else
                                         <select name="details[0][items][{{ $i }}][condition]"
                                             class="form-control condition-select" required>
@@ -93,6 +103,7 @@
                                             <option value="Kotor">2. Kotor</option>
                                         </select>
                                         @endif
+
                                     </td>
                                     <td><input type="text" name="details[0][items][{{ $i }}][notes]"
                                             class="form-control notes-input"></td>

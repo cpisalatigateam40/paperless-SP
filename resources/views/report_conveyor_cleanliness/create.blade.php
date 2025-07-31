@@ -75,7 +75,19 @@
                                 </td>
                                 <td><input type="radio" name="machines[{{ $i }}][status]" value="bersih"></td>
                                 <td><input type="radio" name="machines[{{ $i }}][status]" value="kotor"></td>
-                                <td><input type="text" name="machines[{{ $i }}][notes]" class="form-control"></td>
+                                <td>
+                                    <select name="machines[{{ $i }}][notes]" class="form-control">
+                                        <option value="">-- Pilih Keterangan --</option>
+                                        <option value="Sisa produk">Sisa produk</option>
+                                        <option value="Ada perbaikan remahan besi">Ada perbaikan remahan besi</option>
+                                        <option value="Potongan plastic (sisa kemasan)">Potongan plastic (sisa kemasan)
+                                        </option>
+                                        <option value="Sisa casing (manual/bertingkat)">Sisa casing (manual/bertingkat)
+                                        </option>
+                                        <option value="Grease">Grease</option>
+                                        <option value="Jelaga">Jelaga</option>
+                                    </select>
+                                </td>
                                 <td><input type="text" name="machines[{{ $i }}][corrective_action]"
                                         class="form-control"></td>
                                 <td>
@@ -119,21 +131,23 @@ document.addEventListener('DOMContentLoaded', function() {
         radio => {
             radio.addEventListener('change', function() {
                 const row = this.closest('tr');
-                const notes = row.querySelector('input[name*="[notes]"]');
+                const notes = row.querySelector('select[name*="[notes]"]');
                 const corrective = row.querySelector('input[name*="[corrective_action]"]');
                 const verification = row.querySelector('select[name*="[verification]"]');
 
                 if (this.value === 'bersih') {
-                    notes.value = '';
-                    corrective.value = '';
-                    notes.setAttribute('readonly', true);
-                    corrective.setAttribute('readonly', true);
-                    verification.value = '1';
+                    // kosongkan nilai
+                    if (notes) notes.value = '';
+                    if (corrective) {
+                        corrective.value = '';
+                        corrective.setAttribute('readonly', true);
+                    }
+                    if (verification) verification.value = '1';
                     removeAllFollowups(row);
                 } else if (this.value === 'kotor') {
-                    notes.removeAttribute('readonly');
-                    corrective.removeAttribute('readonly');
-                    verification.value = '0';
+                    // izinkan isi
+                    if (corrective) corrective.removeAttribute('readonly');
+                    if (verification) verification.value = '0';
                     createFollowup(row); // langsung tambah followup saat pertama kali kotor
                 }
             });
