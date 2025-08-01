@@ -26,6 +26,7 @@ class PremixController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'production_code' => 'required|string|max:255',
+            'producer' => 'nullable|string|max:255',
             'shelf_life' => 'nullable|integer',
         ]);
 
@@ -49,7 +50,8 @@ class PremixController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'production_code' => 'required|string|max:255',
+            'production_code' => 'nullable|string|max:255',
+            'producer' => 'nullable|string|max:255',
             'shelf_life' => 'nullable|integer',
         ]);
 

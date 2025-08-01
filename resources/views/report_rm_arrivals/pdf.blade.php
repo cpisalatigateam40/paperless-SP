@@ -151,7 +151,7 @@
             <tr>
                 <td class="text-center">{{ $detail->time ?? '-' }}</td>
                 <td class="text-left">{{ $detail->rawMaterial->material_name ?? '-' }}</td>
-                <td class="text-left">{{ $detail->rawMaterial->supplier ?? '-' }}</td>
+                <td class="text-left">{{ $detail->supplier ?? '-' }}</td>
                 <td class="text-center">{{ $detail->production_code ?? '-' }}</td>
                 <td class="text-center">{{ $detail->packaging_condition ?? '-' }}</td>
                 <td class="text-center">{{ $detail->temperature ?? '-' }}</td>

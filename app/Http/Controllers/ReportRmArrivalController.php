@@ -36,6 +36,7 @@ class ReportRmArrivalController extends Controller
 
     public function store(Request $request)
     {
+
         $report = ReportRmArrival::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
@@ -50,6 +51,7 @@ class ReportRmArrivalController extends Controller
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
                 'raw_material_uuid' => $detail['raw_material_uuid'],
+                'supplier' => $detail['supplier'] ?? null,
                 'production_code' => $detail['production_code'] ?? null,
                 'time' => $detail['time'],
                 'temperature' => $detail['temperature'],
@@ -105,6 +107,7 @@ class ReportRmArrivalController extends Controller
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
                 'raw_material_uuid' => $detail['raw_material_uuid'],
+                'supplier' => $detail['supplier'] ?? null,
                 'production_code' => $detail['production_code'] ?? null,
                 'time' => $detail['time'] ?? null,
                 'temperature' => $detail['temperature'] ?? null,

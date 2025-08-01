@@ -50,6 +50,10 @@
                     <input type="text" name="details[0][production_code]" class="form-control">
                 </div>
                 <div class="mb-3">
+                    <label>Gramase</label>
+                    <input type="number" name="details[0][gramase]" class="form-control">
+                </div>
+                <div class="mb-3">
                     <label>Best Before</label>
                     <input type="date" name="details[0][best_before]" class="form-control">
                 </div>
@@ -161,6 +165,10 @@ function addDetail() {
         <div class="mb-3">
             <label>Kode Produksi</label>
             <input type="text" name="details[${detailIndex}][production_code]" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Gramase</label>
+            <input type="number" name="details[${detailIndex}][gramase]" class="form-control">
         </div>
         <div class="mb-3">
             <label>Best Before</label>

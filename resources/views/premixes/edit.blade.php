@@ -23,6 +23,11 @@
                 </div>
 
                 <div class="mb-3">
+                    <label>Produsen</label>
+                    <input type="text" name="producer" class="form-control" value="{{ $premix->producer }}">
+                </div>
+
+                <div class="mb-3">
                     <label>Shelf Life (hari)</label>
                     <input type="number" name="shelf_life" class="form-control" value="{{ $premix->shelf_life }}">
                 </div>
