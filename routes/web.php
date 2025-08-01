@@ -149,6 +149,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/import', 'import')->name('import');
         });
 
     // STORAGE RM ROUTES

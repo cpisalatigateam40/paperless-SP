@@ -18,8 +18,12 @@
 
                 <div class="mb-3">
                     <label>Kode Produksi</label>
-                    <input type="text" name="production_code" class="form-control" value="{{ old('production_code') }}"
-                        required>
+                    <input type="text" name="production_code" class="form-control" value="{{ old('production_code') }}">
+                </div>
+
+                <div class="mb-3">
+                    <label>Produsen</label>
+                    <input type="text" name="producer" class="form-control" value="{{ old('producer') }}">
                 </div>
 
                 <div class="mb-3">

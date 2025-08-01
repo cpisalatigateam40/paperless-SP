@@ -14,6 +14,7 @@ class DetailMdProduct extends Model
         'product_uuid',
         'time',
         'production_code',
+        'gramase',
         'best_before',
         'program_number',
         'corrective_action',

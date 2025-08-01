@@ -15,6 +15,7 @@ class Premix extends Model
         'uuid',
         'area_uuid',
         'name',
+        'producer',
         'production_code',
         'shelf_life',
     ];

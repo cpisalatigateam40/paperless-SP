@@ -40,11 +40,19 @@
                         <div class="row align-items-end">
                             <div class="col-md-3">
                                 <label class="form-label">Bahan Baku</label>
-                                <select name="details[0][raw_material_uuid]" class="form-control" required>
+                                <select name="details[0][raw_material_uuid]" class="form-control raw-material-select"
+                                    required>
+                                    <option value="">-- Pilih --</option>
                                     @foreach ($rawMaterials as $material)
-                                    <option value="{{ $material->uuid }}">{{ $material->material_name }}</option>
+                                    <option value="{{ $material->uuid }}" data-supplier="{{ $material->supplier }}">
+                                        {{ $material->material_name }}
+                                    </option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Produsen</label>
+                                <input type="text" name="details[0][supplier]" class="form-control supplier-input">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Kode Produksi</label>
@@ -55,7 +63,7 @@
                                 <input type="time" name="details[0][time]" class="form-control"
                                     value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <label class="form-label">Suhu (°C)</label>
                                 <input type="number" step="0.1" name="details[0][temperature]" class="form-control">
                             </div>
@@ -66,7 +74,7 @@
                                     <option value="x">x</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <label class="form-label">Sensorik</label>
                                 <select name="details[0][sensorial_condition]" class="form-control">
                                     <option value="✓">✓</option>
@@ -90,6 +98,7 @@
                     </div>
                 </div>
 
+
                 {{-- Tombol Tambah --}}
                 <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">
                     + Tambah Pemeriksaan
@@ -109,11 +118,18 @@
         <div class="row align-items-end">
             <div class="col-md-3">
                 <label class="form-label">Bahan Baku</label>
-                <select name="details[__index__][raw_material_uuid]" class="form-control" required>
+                <select name="details[__index__][raw_material_uuid]" class="form-control raw-material-select" required>
+                    <option value="">-- Pilih --</option>
                     @foreach ($rawMaterials as $material)
-                    <option value="{{ $material->uuid }}">{{ $material->material_name }}</option>
+                    <option value="{{ $material->uuid }}" data-supplier="{{ $material->supplier }}">
+                        {{ $material->material_name }}
+                    </option>
                     @endforeach
                 </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Produsen</label>
+                <input type="text" name="details[__index__][supplier]" class="form-control supplier-input">
             </div>
             <div class="col-md-2">
                 <label class="form-label">Kode Produksi</label>
@@ -124,7 +140,7 @@
                 <input type="time" name="details[__index__][time]" class="form-control"
                     value="{{ \Carbon\Carbon::now()->format('H:i') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <label class="form-label">Suhu (°C)</label>
                 <input type="number" step="0.1" name="details[__index__][temperature]" class="form-control">
             </div>
@@ -135,7 +151,7 @@
                     <option value="x">x</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <label class="form-label">Sensorik</label>
                 <select name="details[__index__][sensorial_condition]" class="form-control">
                     <option value="✓">✓</option>
@@ -156,22 +172,54 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('script')
 <script>
 let detailIndex = 1;
 
-document.getElementById('add-detail-btn').addEventListener('click', function() {
-    const template = document.getElementById('detail-template').innerHTML;
-    const newRowHtml = template.replace(/__index__/g, detailIndex);
-    const container = document.getElementById('detail-container');
+// document.getElementById('add-detail-btn').addEventListener('click', function() {
+//     const template = document.getElementById('detail-template').innerHTML;
+//     const newRowHtml = template.replace(/__index__/g, detailIndex);
+//     const container = document.getElementById('detail-container');
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = newRowHtml;
-    container.appendChild(wrapper.firstElementChild);
+//     const wrapper = document.createElement('div');
+//     wrapper.innerHTML = newRowHtml;
+//     container.appendChild(wrapper.firstElementChild);
 
-    detailIndex++;
+//     detailIndex++;
+// });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Fungsi untuk inisialisasi event listener
+    function initRawMaterialSelectEvent(context) {
+        context.querySelectorAll('.raw-material-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                const supplier = this.selectedOptions[0].dataset.supplier || '';
+                const parentRow = this.closest('.detail-row');
+                const supplierInput = parentRow.querySelector('.supplier-input');
+                supplierInput.value = supplier;
+            });
+        });
+    }
+
+    // Init awal untuk row default
+    initRawMaterialSelectEvent(document);
+
+    // Contoh jika ada tombol tambah detail
+    document.getElementById('add-detail-btn')?.addEventListener('click', function() {
+        const container = document.getElementById('detail-container');
+        const template = document.getElementById('detail-template').innerHTML;
+        const index = container.querySelectorAll('.detail-row').length;
+        const html = template.replace(/__index__/g, index);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html.trim();
+        const newRow = tempDiv.firstChild;
+        container.appendChild(newRow);
+        // Init event di row baru
+        initRawMaterialSelectEvent(newRow);
+    });
 });
 </script>
 @endsection
