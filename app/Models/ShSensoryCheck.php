@@ -18,7 +18,8 @@ class ShSensoryCheck extends Model
         'ripeness',
         'aroma',
         'texture',
-        'color'
+        'color',
+        'taste',
     ];
 
     protected static function boot()

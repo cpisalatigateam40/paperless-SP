@@ -110,14 +110,14 @@
                                         <thead class="text-center">
                                             <tr>
                                                 <th>Nama Proses</th>
-                                                <th>Suhu Ruang 1</th>
-                                                <th>Suhu Ruang 2</th>
-                                                <th>RH 1</th>
-                                                <th>RH 2</th>
-                                                <th>Waktu (menit) 1</th>
-                                                <th>Waktu (menit) 2</th>
-                                                <th>Suhu Produk 1</th>
-                                                <th>Suhu Produk 2</th>
+                                                <th>Suhu Ruang Standard</th>
+                                                <th>Suhu Ruang Aktual</th>
+                                                <th>RH Standard</th>
+                                                <th>RH Aktual</th>
+                                                <th>Waktu (menit) Standard</th>
+                                                <th>Waktu (menit) Aktual</th>
+                                                <th>Suhu Produk Standard</th>
+                                                <th>Suhu Produk AKtual</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -154,35 +154,51 @@
                         <div class="card mb-3">
                             <div class="card-header">Lama Proses Total</div>
                             <div class="card-body row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label>Jam Mulai</label>
                                     <input type="time" class="form-control"
-                                        name="details[{{ $i }}][total_process_time][start_time]">
+                                        name="details[{{ $i }}][total_process_time][start_time]"
+                                        onchange="calculateDuration({{ $i }})" id="start_time_{{ $i }}"
+                                        value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label>Jam Selesai</label>
                                     <input type="time" class="form-control"
-                                        name="details[{{ $i }}][total_process_time][end_time]">
+                                        name="details[{{ $i }}][total_process_time][end_time]"
+                                        onchange="calculateDuration({{ $i }})" id="end_time_{{ $i }}"
+                                        value="{{ \Carbon\Carbon::now()->format('H:i') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Total Lama (menit)</label>
+                                    <input type="text" class="form-control" readonly
+                                        name="details[{{ $i }}][total_process_time][duration_display]"
+                                        id="duration_{{ $i }}">
                                 </div>
                             </div>
                         </div>
+
 
                         {{-- Thermocouple --}}
                         <div class="card mb-3">
                             <div class="card-header">Posisi Thermocouple</div>
                             <div class="card-body col-md-6">
-                                @for($t=0;$t<1;$t++) <input type="text" class="form-control mb-2"
-                                    placeholder="Masukkan Posisi"
+                                @for($t=0; $t<1; $t++) <select class="form-control mb-2"
                                     name="details[{{ $i }}][thermocouple_positions][{{ $t }}][position_info]">
+                                    <option value="">-- Pilih --</option>
+                                    <option value="OK">OK</option>
+                                    <option value="Tidak Oke">Tidak Oke</option>
+                                    </select>
                                     @endfor
                             </div>
                         </div>
+
 
                         {{-- Sensory --}}
                         <div class="card mb-3">
                             <div class="card-header">Pemeriksaan Sensorik</div>
                             <div class="card-body row g-3">
-                                @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Tekstur'=>'texture','Warna'=>'color']
+                                @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Tekstur'=>'texture','Warna'=>'color',
+                                'Rasa'=>'taste']
                                 as $label=>$field)
                                 <div class="col">
                                     <label>{{ $label }}</label>
@@ -242,11 +258,13 @@
                                                 <td>Suhu Ruangan / ST (°C)</td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][room_temp_1]">
+                                                        name="details[{{ $i }}][showering_cooling_down][room_temp_1]"
+                                                        placeholder="Suhu ruangan standard">
                                                 </td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][room_temp_2]">
+                                                        name="details[{{ $i }}][showering_cooling_down][room_temp_2]"
+                                                        placeholder="Suhu ruangan aktual">
                                                 </td>
                                                 <td class="bg-light text-center text-muted small">–</td>
                                             </tr>
@@ -256,11 +274,13 @@
                                                 <td>Suhu Produk / CT (°C)</td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_1]">
+                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_1]"
+                                                        placeholder="Suhu produk standard">
                                                 </td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_2]">
+                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_2]"
+                                                        placeholder="Suhu produk aktual">
                                                 </td>
                                                 <td class="bg-light text-center text-muted small">–</td>
                                             </tr>
@@ -270,11 +290,13 @@
                                                 <td>Waktu (menit)</td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][time_minutes_1]">
+                                                        name="details[{{ $i }}][showering_cooling_down][time_minutes_1]"
+                                                        placeholder="Waktu menit 1">
                                                 </td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][time_minutes_2]">
+                                                        name="details[{{ $i }}][showering_cooling_down][time_minutes_2]"
+                                                        placeholder="Waktu menit 2">
                                                 </td>
                                                 <td class="bg-light text-center text-muted small">–</td>
                                             </tr>
@@ -284,15 +306,21 @@
                                                 <td>Suhu pusat produk setelah keluar (°C)</td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_after_exit_1]">
+                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_after_exit_1]"
+                                                        id="temp1_{{ $i }}" oninput="calculateAverage({{ $i }})"
+                                                        placeholder="Suhu pusat produk 1">
                                                 </td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_after_exit_2]">
+                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_after_exit_2]"
+                                                        id="temp2_{{ $i }}" oninput="calculateAverage({{ $i }})"
+                                                        placeholder="Suhu pusat produk 2">
                                                 </td>
                                                 <td>
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_after_exit_3]">
+                                                        name="details[{{ $i }}][showering_cooling_down][product_temp_after_exit_3]"
+                                                        id="temp3_{{ $i }}" oninput="calculateAverage({{ $i }})"
+                                                        placeholder="Suhu pusat produk 3">
                                                 </td>
                                             </tr>
 
@@ -301,7 +329,8 @@
                                                 <td>Suhu rata-rata pusat produk setelah keluar (°C)</td>
                                                 <td colspan="3">
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][showering_cooling_down][avg_product_temp_after_exit]">
+                                                        name="details[{{ $i }}][showering_cooling_down][avg_product_temp_after_exit]"
+                                                        id="avg_temp_{{ $i }}" readonly>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -373,4 +402,50 @@
 <button class="btn btn-success mt-3">Simpan Laporan</button>
 </form>
 </div>
+@endsection
+
+@section('script')
+<script>
+function calculateDuration(i) {
+    let start = document.getElementById('start_time_' + i).value;
+    let end = document.getElementById('end_time_' + i).value;
+
+    if (start && end) {
+        let [startHour, startMin] = start.split(':').map(Number);
+        let [endHour, endMin] = end.split(':').map(Number);
+
+        let startTotal = startHour * 60 + startMin;
+        let endTotal = endHour * 60 + endMin;
+
+        // Jika end < start, berarti lewat tengah malam
+        if (endTotal < startTotal) {
+            endTotal += 24 * 60;
+        }
+
+        let diff = endTotal - startTotal;
+        document.getElementById('duration_' + i).value = diff + ' menit';
+    } else {
+        document.getElementById('duration_' + i).value = '';
+    }
+}
+
+function calculateAverage(i) {
+    let t1 = parseFloat(document.getElementById('temp1_' + i).value) || 0;
+    let t2 = parseFloat(document.getElementById('temp2_' + i).value) || 0;
+    let t3 = parseFloat(document.getElementById('temp3_' + i).value) || 0;
+
+    // Hitung jumlah input yang valid (>0) supaya rata-rata hanya dihitung dari input yang diisi
+    let count = 0;
+    if (document.getElementById('temp1_' + i).value !== '') count++;
+    if (document.getElementById('temp2_' + i).value !== '') count++;
+    if (document.getElementById('temp3_' + i).value !== '') count++;
+
+    let avg = 0;
+    if (count > 0) {
+        avg = (t1 + t2 + t3) / count;
+    }
+
+    document.getElementById('avg_temp_' + i).value = avg.toFixed(2); // Tampilkan 2 desimal
+}
+</script>
 @endsection

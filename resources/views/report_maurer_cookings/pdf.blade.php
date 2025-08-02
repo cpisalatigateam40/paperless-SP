@@ -310,6 +310,15 @@
                 <td>{{ optional($detail->totalProcessTime)->end_time ?? '-' }}</td>
                 @endforeach
             </tr>
+            <tr>
+                <td>Total Duration</td>
+                @foreach ($report->details as $detail)
+                @php
+                $duration = optional($detail->totalProcessTime)->total_duration;
+                @endphp
+                <td>{{ $duration ? $duration . ' menit' : '-' }}</td>
+                @endforeach
+            </tr>
 
             {{-- Posisi Thermocouple --}}
             <tr>
@@ -330,7 +339,8 @@
                 <td></td>
                 @endforeach
             </tr>
-            @foreach(['ripeness' => 'Kematangan', 'aroma' => 'Rasa Aroma', 'texture' => 'Tekstur', 'color' => 'Warna']
+            @foreach(['ripeness' => 'Kematangan', 'aroma' => 'Rasa Aroma', 'texture' => 'Tekstur', 'color' => 'Warna',
+            'taste' => 'Rasa']
             as $field =>
             $label)
             <tr>
