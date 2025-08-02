@@ -101,11 +101,29 @@ class ReportMaurerCookingController extends Controller
 
                 // child: total_process_time
                 if (!empty($detailData['total_process_time']['start_time']) || !empty($detailData['total_process_time']['end_time'])) {
+                    $startTime = $detailData['total_process_time']['start_time'] ?? null;
+                    $endTime = $detailData['total_process_time']['end_time'] ?? null;
+
+                    $duration = null;
+                    if ($startTime && $endTime) {
+                        // Hitung selisih dalam menit
+                        $start = \Carbon\Carbon::createFromFormat('H:i', $startTime);
+                        $end = \Carbon\Carbon::createFromFormat('H:i', $endTime);
+
+                        // Kalau end < start diasumsikan lewat tengah malam
+                        if ($end->lessThan($start)) {
+                            $end->addDay();
+                        }
+
+                        $duration = $start->diffInMinutes($end);
+                    }
+
                     ShTotalProcessTime::create([
                         'uuid' => Str::uuid(),
                         'report_detail_uuid' => $detail->uuid,
-                        'start_time' => $detailData['total_process_time']['start_time'] ?? null,
-                        'end_time' => $detailData['total_process_time']['end_time'] ?? null,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'total_duration' => $duration,
                     ]);
                 }
 
@@ -131,6 +149,7 @@ class ReportMaurerCookingController extends Controller
                         'aroma' => $detailData['sensory_check']['aroma'] ?? null,
                         'texture' => $detailData['sensory_check']['texture'] ?? null,
                         'color' => $detailData['sensory_check']['color'] ?? null,
+                        'taste' => $detailData['sensory_check']['taste'] ?? null,
                     ]);
                 }
 
@@ -262,13 +281,32 @@ class ReportMaurerCookingController extends Controller
 
                 // total_process_time
                 if (!empty($detailData['total_process_time']['start_time']) || !empty($detailData['total_process_time']['end_time'])) {
+                    $startTime = $detailData['total_process_time']['start_time'] ?? null;
+                    $endTime = $detailData['total_process_time']['end_time'] ?? null;
+
+                    $duration = null;
+                    if ($startTime && $endTime) {
+                        // Hitung selisih dalam menit
+                        $start = \Carbon\Carbon::createFromFormat('H:i', $startTime);
+                        $end = \Carbon\Carbon::createFromFormat('H:i', $endTime);
+
+                        // Kalau end < start diasumsikan lewat tengah malam
+                        if ($end->lessThan($start)) {
+                            $end->addDay();
+                        }
+
+                        $duration = $start->diffInMinutes($end);
+                    }
+
                     ShTotalProcessTime::create([
                         'uuid' => Str::uuid(),
                         'report_detail_uuid' => $detail->uuid,
-                        'start_time' => $detailData['total_process_time']['start_time'] ?? null,
-                        'end_time' => $detailData['total_process_time']['end_time'] ?? null,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'total_duration' => $duration,
                     ]);
                 }
+
 
                 // thermocouple_positions
                 if (!empty($detailData['thermocouple_positions'])) {
@@ -292,6 +330,7 @@ class ReportMaurerCookingController extends Controller
                         'aroma' => $detailData['sensory_check']['aroma'] ?? null,
                         'texture' => $detailData['sensory_check']['texture'] ?? null,
                         'color' => $detailData['sensory_check']['color'] ?? null,
+                        'taste' => $detailData['sensory_check']['taste'] ?? null,
                     ]);
                 }
 

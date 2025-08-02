@@ -122,14 +122,14 @@
                                             <thead class="text-center">
                                                 <tr>
                                                     <th>Nama Proses</th>
-                                                    <th>Suhu Ruang 1</th>
-                                                    <th>Suhu Ruang 2</th>
-                                                    <th>RH 1</th>
-                                                    <th>RH 2</th>
-                                                    <th>Waktu (menit) 1</th>
-                                                    <th>Waktu (menit) 2</th>
-                                                    <th>Suhu Produk 1</th>
-                                                    <th>Suhu Produk 2</th>
+                                                    <th>Suhu Ruang Standard</th>
+                                                    <th>Suhu Ruang Aktual</th>
+                                                    <th>RH Standard</th>
+                                                    <th>RH Aktual</th>
+                                                    <th>Waktu (menit) Standard</th>
+                                                    <th>Waktu (menit) Aktual</th>
+                                                    <th>Suhu Produk Standard</th>
+                                                    <th>Suhu Produk AKtual</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -170,20 +170,45 @@
                             <div class="card mb-3">
                                 <div class="card-header">Lama Proses Total</div>
                                 <div class="card-body row g-3">
-                                    <div class="col-md-6">
+                                    @php
+                                    $totalProcessTime = optional($report->details[$i]->totalProcessTime ?? null);
+                                    $startTime = $totalProcessTime->start_time ?? '';
+                                    $endTime = $totalProcessTime->end_time ?? '';
+                                    // Hitung default duration di server side
+                                    $duration = '';
+                                    if ($startTime && $endTime) {
+                                    $start = \Carbon\Carbon::createFromFormat('H:i:s', $startTime);
+                                    $end = \Carbon\Carbon::createFromFormat('H:i:s', $endTime);
+                                    if ($end->lessThan($start)) {
+                                    $end->addDay();
+                                    }
+                                    $duration = $start->diffInMinutes($end) . ' menit';
+                                    }
+                                    @endphp
+
+                                    <div class="col-md-4">
                                         <label>Jam Mulai</label>
                                         <input type="time" class="form-control"
                                             name="details[{{ $i }}][total_process_time][start_time]"
-                                            value="{{ optional($report->details[$i]->totalProcessTime ?? null)->start_time ?? '' }}">
+                                            value="{{ \Carbon\Carbon::parse($startTime)->format('H:i') ?? '' }}"
+                                            onchange="calculateDuration({{ $i }})" id="start_time_{{ $i }}">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label>Jam Selesai</label>
                                         <input type="time" class="form-control"
                                             name="details[{{ $i }}][total_process_time][end_time]"
-                                            value="{{ optional($report->details[$i]->totalProcessTime ?? null)->end_time ?? '' }}">
+                                            value="{{ \Carbon\Carbon::parse($endTime)->format('H:i') ?? '' }}"
+                                            onchange="calculateDuration({{ $i }})" id="end_time_{{ $i }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Total Lama (menit)</label>
+                                        <input type="text" class="form-control" readonly
+                                            name="details[{{ $i }}][total_process_time][duration_display]"
+                                            id="duration_{{ $i }}" value="{{ $duration }}">
                                     </div>
                                 </div>
                             </div>
+
 
 
                             {{-- Posisi Thermocouple --}}
@@ -191,18 +216,27 @@
                                 <div class="card-header">Posisi Thermocouple</div>
                                 <div class="card-body col-md-6">
                                     @php $positions = $detail ? $detail->thermocouplePositions : collect(); @endphp
-                                    @for($t=0; $t<1; $t++) <input type="text" class="form-control mb-2"
-                                        name="details[{{ $i }}][thermocouple_positions][{{ $t }}][position_info]"
-                                        value="{{ $positions[$t]->position_info ?? '' }}">
+                                    @for($t=0; $t<1; $t++) <select class="form-control mb-2"
+                                        name="details[{{ $i }}][thermocouple_positions][{{ $t }}][position_info]">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="OK"
+                                            {{ ($positions[$t]->position_info ?? '') == 'OK' ? 'selected' : '' }}>OK
+                                        </option>
+                                        <option value="Tidak Oke"
+                                            {{ ($positions[$t]->position_info ?? '') == 'Tidak Oke' ? 'selected' : '' }}>
+                                            Tidak Oke</option>
+                                        </select>
                                         @endfor
                                 </div>
                             </div>
+
 
                             {{-- Sensorik --}}
                             <div class="card mb-3">
                                 <div class="card-header">Pemeriksaan Sensorik</div>
                                 <div class="card-body row g-3">
-                                    @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Tekstur'=>'texture','Warna'=>'color']
+                                    @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Tekstur'=>'texture','Warna'=>'color',
+                                    'Rasa'=>'taste']
                                     as $label=>$field)
                                     <div class="col">
                                         <label>{{ $label }}</label>
@@ -255,17 +289,20 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="fw-semibold">SHOWERING</td>
-                                                    <td colspan="3"><input type="text"
-                                                            class="form-control form-control-sm"
+                                                    <td colspan="3">
+                                                        <input type="text" class="form-control form-control-sm"
                                                             name="details[{{ $i }}][showering_cooling_down][showering_time]"
-                                                            value="{{ $scd->showering_time ?? '' }}"></td>
+                                                            value="{{ $scd->showering_time ?? '' }}">
+                                                    </td>
                                                 </tr>
                                                 <tr class="table-secondary text-center fw-semibold">
                                                     <td colspan="4">COOLING DOWN</td>
                                                 </tr>
-                                                @foreach([['label'=>'Suhu Ruangan / ST (°C)','field'=>'room_temp'],
+                                                @foreach([
+                                                ['label'=>'Suhu Ruangan / ST (°C)','field'=>'room_temp'],
                                                 ['label'=>'Suhu Produk / CT (°C)','field'=>'product_temp'],
-                                                ['label'=>'Waktu (menit)','field'=>'time_minutes']] as $item)
+                                                ['label'=>'Waktu (menit)','field'=>'time_minutes']
+                                                ] as $item)
                                                 <tr>
                                                     <td>{{ $item['label'] }}</td>
                                                     <td><input type="number" step="any"
@@ -282,25 +319,33 @@
                                                 <tr>
                                                     <td>Suhu pusat produk setelah keluar (°C)</td>
                                                     @foreach(['product_temp_after_exit_1','product_temp_after_exit_2','product_temp_after_exit_3']
-                                                    as $field)
-                                                    <td><input type="number" step="any"
+                                                    as $key => $field)
+                                                    <td>
+                                                        <input type="number" step="any"
                                                             class="form-control form-control-sm"
                                                             name="details[{{ $i }}][showering_cooling_down][{{ $field }}]"
-                                                            value="{{ $scd ? $scd->$field : '' }}"></td>
+                                                            value="{{ $scd ? $scd->$field : '' }}"
+                                                            id="temp_exit_{{ $i }}_{{ $key+1 }}"
+                                                            oninput="calculateAvgExitTemp({{ $i }})">
+                                                    </td>
                                                     @endforeach
                                                 </tr>
                                                 <tr>
                                                     <td>Suhu rata-rata pusat produk setelah keluar (°C)</td>
-                                                    <td colspan="3"><input type="number" step="any"
+                                                    <td colspan="3">
+                                                        <input type="number" step="any"
                                                             class="form-control form-control-sm"
                                                             name="details[{{ $i }}][showering_cooling_down][avg_product_temp_after_exit]"
-                                                            value="{{ $scd->avg_product_temp_after_exit ?? '' }}"></td>
+                                                            value="{{ $scd->avg_product_temp_after_exit ?? '' }}"
+                                                            id="avg_exit_temp_{{ $i }}" readonly>
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
+
 
                             {{-- Cooking Loss --}}
                             <div class="card mb-3">
@@ -355,4 +400,45 @@
         <button class="btn btn-success mt-3">Update Laporan</button>
     </form>
 </div>
+@endsection
+
+@section('script')
+<script>
+function calculateDuration(i) {
+    let start = document.getElementById('start_time_' + i).value;
+    let end = document.getElementById('end_time_' + i).value;
+
+    if (start && end) {
+        let [startHour, startMin] = start.split(':').map(Number);
+        let [endHour, endMin] = end.split(':').map(Number);
+
+        let startTotal = startHour * 60 + startMin;
+        let endTotal = endHour * 60 + endMin;
+
+        if (endTotal < startTotal) {
+            endTotal += 24 * 60; // lewat tengah malam
+        }
+
+        let diff = endTotal - startTotal;
+        document.getElementById('duration_' + i).value = diff + ' menit';
+    } else {
+        document.getElementById('duration_' + i).value = '';
+    }
+}
+
+function calculateAvgExitTemp(i) {
+    let temps = [];
+    for (let t = 1; t <= 3; t++) {
+        let val = parseFloat(document.getElementById('temp_exit_' + i + '_' + t).value);
+        if (!isNaN(val)) {
+            temps.push(val);
+        }
+    }
+    let avg = 0;
+    if (temps.length > 0) {
+        avg = temps.reduce((a, b) => a + b, 0) / temps.length;
+    }
+    document.getElementById('avg_exit_temp_' + i).value = avg.toFixed(2);
+}
+</script>
 @endsection

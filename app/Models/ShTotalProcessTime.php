@@ -17,6 +17,7 @@ class ShTotalProcessTime extends Model
         'report_detail_uuid',
         'start_time',
         'end_time',
+        'total_duration',
     ];
 
     protected static function boot()
