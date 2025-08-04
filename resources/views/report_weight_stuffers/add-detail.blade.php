@@ -191,5 +191,38 @@ document.addEventListener('change', function(e) {
         }
     }
 });
+
+document.addEventListener('input', function(e) {
+    const tr = e.target.closest('tr');
+    if (!tr) return;
+
+    const weightInputs = [
+        tr.querySelector('input[name*="[actual_weight_1]"]'),
+        tr.querySelector('input[name*="[actual_weight_2]"]'),
+        tr.querySelector('input[name*="[actual_weight_3]"]')
+    ];
+
+    let sum = 0;
+    let count = 0;
+
+    weightInputs.forEach(input => {
+        if (input && input.value !== '') {
+            const v = parseFloat(input.value);
+            if (!isNaN(v)) {
+                sum += v;
+                count++;
+            }
+        }
+    });
+
+    const avgInput = tr.querySelector('input[name*="[avg_weight]"]');
+    if (avgInput) {
+        if (count > 0) {
+            avgInput.value = (sum / count).toFixed(2);
+        } else {
+            avgInput.value = '';
+        }
+    }
+});
 </script>
 @endsection

@@ -18,10 +18,17 @@ class FormulaController extends Controller
 
     public function create()
     {
-        $products = \App\Models\Product::all();
+        $products = \App\Models\Product::all()
+            ->groupBy('product_name')
+            ->map(function ($group) {
+                return $group->first(); // ambil satu produk pertama
+            });
+
         $areas = \App\Models\Area::all();
         return view('formulas.create', compact('products', 'areas'));
     }
+
+
 
     public function store(Request $request)
     {

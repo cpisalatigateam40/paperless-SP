@@ -103,13 +103,13 @@ class ReportWeightStufferController extends Controller
         return back()->with('success', 'Laporan berhasil dihapus.');
     }
 
-    public function addDetail($uuid)
+    public function addDetailForm($uuid)
     {
         $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
         $products = Product::all();
         $standards = StandardStuffer::all();
 
-        return view('report_weight_stuffers.add_detail', compact('report', 'products', 'standards'));
+        return view('report_weight_stuffers.add-detail', compact('report', 'products', 'standards'));
     }
 
 
