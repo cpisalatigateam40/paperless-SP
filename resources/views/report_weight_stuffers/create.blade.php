@@ -24,16 +24,24 @@
             <div class="card detail-block mb-3">
                 <div class="card-header d-flex justify-content-between">
                     <strong>Data Produk</strong>
-                    <!-- <button type="button" class="btn btn-sm btn-danger remove-detail">Hapus</button> -->
+                    {{-- <button type="button" class="btn btn-sm btn-danger remove-detail">Hapus</button> --}}
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label>Nama Produk</label>
-                            <select name="details[0][product_uuid]" class="form-control" required>
+                            <select name="details[0][product_uuid]" class="form-control product-select" required>
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach($products as $product)
-                                <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                @php
+                                $standard = $standards->where('product_uuid', $product->uuid)->first();
+                                @endphp
+                                <option value="{{ $product->uuid }}" @if($standard)
+                                    data-long-min="{{ $standard->long_min }}" data-long-max="{{ $standard->long_max }}"
+                                    data-diameter="{{ $standard->diameter }}"
+                                    data-weight-standard="{{ $standard->weight_max }}" @endif>
+                                    {{ $product->product_name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -43,7 +51,8 @@
                         </div>
                         <div class="col-md-4">
                             <label>Waktu Proses</label>
-                            <input type="time" name="details[0][time]" class="form-control" required>
+                            <input type="time" name="details[0][time]" class="form-control"
+                                value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
                         </div>
                     </div>
 
@@ -54,7 +63,6 @@
                                     <th rowspan="2">Mesin</th>
                                     <th rowspan="2">Speed (rpm)</th>
                                     <th colspan="2">Ukuran Casing</th>
-                                    <!-- <th rowspan="2">Jumlah Trolley</th> -->
                                     <th rowspan="2">Standar Berat (gr)</th>
                                     <th colspan="3">Berat Aktual (gr)</th>
                                     <th rowspan="2">Rata-rata</th>
@@ -68,7 +76,6 @@
                                     <th>3</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 @foreach(['townsend', 'hitech'] as $machine)
                                 <tr>
@@ -83,17 +90,12 @@
                                         <input type="number" name="details[0][cases][{{ $loop->index }}][actual_case_2]"
                                             class="form-control form-control-sm">
                                     </td>
-                                    <!-- <td><input type="number" name="details[0][{{ $machine }}][trolley_total]"
-                                            class="form-control form-control-sm"></td> -->
-
-                                    {{-- Weight Standard hanya di baris pertama --}}
                                     @if ($loop->first)
                                     <td rowspan="2">
                                         <input type="number" step="0.01" name="details[0][weight_standard]"
                                             class="form-control form-control-sm" required>
                                     </td>
                                     @endif
-
                                     <td><input type="number" step="0.01"
                                             name="details[0][weights][{{ $loop->index }}][actual_weight_1]"
                                             class="form-control form-control-sm"></td>
@@ -117,7 +119,7 @@
         </div>
 
         <div class="mb-3">
-            <!-- <button type="button" class="btn btn-secondary" id="addProductDetail">+ Tambah Produk</button> -->
+            {{-- <button type="button" class="btn btn-secondary" id="addProductDetail">+ Tambah Produk</button> --}}
             <button type="submit" class="btn btn-success float-end">Simpan Laporan</button>
         </div>
     </form>
@@ -129,26 +131,21 @@
 let index = 1;
 const template = document.querySelector('.detail-block');
 
-document.getElementById('addProductDetail').addEventListener('click', function() {
+// (1) Clone form detail
+document.getElementById('addProductDetail')?.addEventListener('click', function() {
     const clone = template.cloneNode(true);
 
     clone.querySelectorAll('input, select, textarea').forEach(el => {
         if (!el.name) return;
-
-        // Ganti semua [0] → [index] untuk field utama
         el.name = el.name.replace(/\[0\]/g, `[${index}]`);
-
-        // Kosongkan nilai input
         if (el.type !== 'hidden') el.value = '';
     });
 
-    // Ganti nested index khusus baris Hitech (baris ke-2 tbody)
+    // Baris ke-2 (hitech) index nested weights & cases diubah
     const rows = clone.querySelectorAll('tbody tr');
     if (rows.length >= 2) {
-        const hitechInputs = rows[1].querySelectorAll('input, select, textarea');
+        const hitechInputs = rows[1].querySelectorAll('input');
         hitechInputs.forEach(input => {
-            if (!input.name) return;
-
             input.name = input.name.replace(`[${index}][weights][0]`, `[${index}][weights][1]`);
             input.name = input.name.replace(`[${index}][cases][0]`, `[${index}][cases][1]`);
         });
@@ -158,6 +155,56 @@ document.getElementById('addProductDetail').addEventListener('click', function()
     index++;
 });
 
+// (2) Isi default value saat pilih produk
+document.addEventListener('change', function(e) {
+    if (e.target.matches('.product-select')) {
+        const option = e.target.selectedOptions[0];
+        const cardBody = e.target.closest('.card-body');
+
+        if (option && cardBody) {
+            const weightStandard = option.dataset.weightStandard;
+            const diameter = option.dataset.diameter;
+            const longMax = option.dataset.longMax;
+
+            // Isi default standard
+            const weightStandardInput = cardBody.querySelector('input[name$="[weight_standard]"]');
+            if (weightStandard) {
+                weightStandardInput.value = weightStandard;
+            } else {
+                weightStandardInput.value = '';
+            }
+
+
+            // Isi default panjang
+            cardBody.querySelectorAll('input[name*="[actual_case_1]"]').forEach(input => {
+                if (longMax) input.value = longMax;
+                else input.value = '';
+            });
+
+            // Isi default diameter
+            cardBody.querySelectorAll('input[name*="[actual_case_2]"]').forEach(input => {
+                if (diameter) input.value = diameter;
+                else input.value = '';
+            });
+
+            // Reset field lain (speed, actual_weight, avg_weight, notes)
+            cardBody.querySelectorAll('input').forEach(input => {
+                const name = input.name;
+
+                // Lewati field standar & actual_case yang sudah di-set di atas
+                if (name.endsWith('[weight_standard]')) return;
+                if (name.includes('[actual_case_1]')) return;
+                if (name.includes('[actual_case_2]')) return;
+
+                // Reset semua input lain
+                input.value = '';
+            });
+        }
+    }
+});
+
+
+// (3) Hapus detail jika ada tombol remove-detail (jika kamu aktifkan)
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('remove-detail')) {
         const block = e.target.closest('.detail-block');

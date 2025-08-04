@@ -31,10 +31,18 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label>Nama Produk</label>
-                            <select name="details[0][product_uuid]" class="form-control" required>
+                            <select name="details[0][product_uuid]" class="form-control product-select" required>
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach($products as $product)
-                                <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                @php
+                                $standard = $standards->where('product_uuid', $product->uuid)->first();
+                                @endphp
+                                <option value="{{ $product->uuid }}" @if($standard)
+                                    data-long-min="{{ $standard->long_min }}" data-long-max="{{ $standard->long_max }}"
+                                    data-diameter="{{ $standard->diameter }}"
+                                    data-weight-standard="{{ $standard->weight_max }}" @endif>
+                                    {{ $product->product_name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -129,7 +137,7 @@
 let index = 1;
 const template = document.querySelector('.detail-block');
 
-document.getElementById('addProductDetail').addEventListener('click', function() {
+document.getElementById('addProductDetail')?.addEventListener('click', function() {
     const clone = template.cloneNode(true);
     clone.querySelectorAll('input, select, textarea').forEach(el => {
         if (el.name) el.name = el.name.replace(/\[0\]/g, `[${index}]`);
@@ -144,6 +152,42 @@ document.addEventListener('click', function(e) {
         const block = e.target.closest('.detail-block');
         if (document.querySelectorAll('.detail-block').length > 1) {
             block.remove();
+        }
+    }
+});
+
+document.addEventListener('change', function(e) {
+    if (e.target.matches('.product-select')) {
+        const option = e.target.selectedOptions[0];
+        const cardBody = e.target.closest('.card-body');
+
+        if (option && cardBody) {
+            const weightStandard = option.dataset.weightStandard;
+            const diameter = option.dataset.diameter;
+            const longMax = option.dataset.longMax;
+
+            const weightStandardInput = cardBody.querySelector('input[name$="[weight_standard]"]');
+            if (weightStandard) {
+                weightStandardInput.value = weightStandard;
+            } else {
+                weightStandardInput.value = '';
+            }
+
+            cardBody.querySelectorAll('input[name*="[actual_case_1]"]').forEach(input => {
+                input.value = longMax || '';
+            });
+            cardBody.querySelectorAll('input[name*="[actual_case_2]"]').forEach(input => {
+                input.value = diameter || '';
+            });
+
+            // Reset field lain
+            cardBody.querySelectorAll('input').forEach(input => {
+                const name = input.name;
+                if (name.endsWith('[weight_standard]')) return;
+                if (name.includes('[actual_case_1]')) return;
+                if (name.includes('[actual_case_2]')) return;
+                input.value = '';
+            });
         }
     }
 });

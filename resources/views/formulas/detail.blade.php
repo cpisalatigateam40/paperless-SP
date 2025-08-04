@@ -186,7 +186,7 @@ function addRawMaterial() {
                         <option value="{{ $rm->uuid }}">{{ $rm->material_name }}</option>
                     @endforeach
                 </select>
-                <input type="number" name="raw_material_weight[]" class="form-control" placeholder="Berat (gr)" step="0.01" min="0">
+                <input type="number" name="raw_material_weight[]" class="form-control" placeholder="Berat (kg)" step="0.00000001" min="0">
                 <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeField(this)">Hapus</button>
             </div>
         `;
@@ -202,7 +202,7 @@ function addPremix() {
                         <option value="{{ $premix->uuid }}">{{ $premix->name }}</option>
                     @endforeach
                 </select>
-                <input type="number" name="premix_weight[]" class="form-control" placeholder="Berat (gr)" step="0.01" min="0">
+                <input type="number" name="premix_weight[]" class="form-control" placeholder="Berat (kg)" step="0.00000001" min="0">
                 <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeField(this)">Hapus</button>
             </div>
         `;

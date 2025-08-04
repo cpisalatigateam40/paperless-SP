@@ -13,7 +13,7 @@
             <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Product</th>
@@ -27,7 +27,7 @@
                 <tbody>
                     @foreach ($stuffers as $stuffer)
                     <tr>
-                        <td>{{ $stuffer->product->name ?? '-' }}</td>
+                        <td>{{ $stuffer->product->product_name ?? '-' }}</td>
                         <td>{{ $stuffer->area->name ?? '-' }}</td>
                         <td>{{ $stuffer->long_min }} - {{ $stuffer->long_max }}</td>
                         <td>{{ $stuffer->diameter }}</td>

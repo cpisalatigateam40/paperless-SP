@@ -11,6 +11,7 @@ use App\Models\HitechStuffer;
 use App\Models\CaseStuffer;
 use App\Models\WeightStuffer;
 use App\Models\Product;
+use App\Models\StandardStuffer;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -26,7 +27,9 @@ class ReportWeightStufferController extends Controller
     public function create()
     {
         $products = Product::all();
-        return view('report_weight_stuffers.create', compact('products'));
+        $standards = StandardStuffer::with('product')->get();
+
+        return view('report_weight_stuffers.create', compact('products', 'standards'));
     }
 
     public function store(Request $request)
@@ -53,7 +56,6 @@ class ReportWeightStufferController extends Controller
                 TownsendStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['townsend']['stuffer_speed'],
-                    // 'trolley_total' => $detail['townsend']['trolley_total'],
                     'avg_weight' => $detail['townsend']['avg_weight'],
                     'notes' => $detail['townsend']['notes'] ?? null,
                 ]);
@@ -63,7 +65,6 @@ class ReportWeightStufferController extends Controller
                 HitechStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['hitech']['stuffer_speed'],
-                    // 'trolley_total' => $detail['hitech']['trolley_total'],
                     'avg_weight' => $detail['hitech']['avg_weight'],
                     'notes' => $detail['hitech']['notes'] ?? null,
                 ]);
@@ -102,12 +103,15 @@ class ReportWeightStufferController extends Controller
         return back()->with('success', 'Laporan berhasil dihapus.');
     }
 
-    public function addDetailForm($uuid)
+    public function addDetail($uuid)
     {
         $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
         $products = Product::all();
-        return view('report_weight_stuffers.add-detail', compact('report', 'products'));
+        $standards = StandardStuffer::all();
+
+        return view('report_weight_stuffers.add_detail', compact('report', 'products', 'standards'));
     }
+
 
     public function storeDetail(Request $request, $uuid)
     {
