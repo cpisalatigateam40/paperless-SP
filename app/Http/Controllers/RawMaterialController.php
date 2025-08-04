@@ -109,7 +109,7 @@ class RawMaterialController extends Controller
                 'uuid' => Str::uuid(),
                 'material_name' => $materialName,
                 'supplier' => $supplier,
-                'shelf_life' => is_numeric($shelfLife) ? (int) $shelfLife : null,
+                'shelf_life' => $shelfLife ? str_replace(',', '.', strval($shelfLife)) : null,
                 'area_uuid' => Auth::user()->area_uuid,
             ]);
         }

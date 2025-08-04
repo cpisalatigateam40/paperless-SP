@@ -15,6 +15,14 @@
                     </span>
                 </div>
 
+                <form action="{{ route('premixes.import') }}" method="POST" enctype="multipart/form-data"
+                    class="d-flex align-items-center gap-2">
+                    @csrf
+                    <input type="file" name="file" class="form-control form-control-sm" accept=".xlsx,.xls,.csv"
+                        required style="width: 180px; margin-right: .5rem;">
+                    <button type="submit" class="btn btn-success btn-sm">Import</button>
+                </form>
+
                 <a href="{{ route('premixes.create') }}" class="btn btn-primary btn-sm">Tambah Premix</a>
             </div>
 
@@ -42,7 +50,7 @@
                     <tr>
                         <th class="align-middle">No</th>
                         <th class="align-middle">Nama</th>
-                        <th class="align-middle">Kode Produksi</th>
+                        <!-- <th class="align-middle">Kode Produksi</th> -->
                         <th class="align-middle">Produsen</th>
                         <th class="align-middle">Batas Kadaluarsa (Bulan)</th>
                         <th class="align-middle">Area</th>
@@ -54,7 +62,7 @@
                     <tr>
                         <td class="align-middle">{{ $i + $premixes->firstItem() }}</td>
                         <td class="align-middle">{{ $premix->name }}</td>
-                        <td class="align-middle">{{ $premix->production_code }}</td>
+                        <!-- <td class="align-middle">{{ $premix->production_code }}</td> -->
                         <td class="align-middle">{{ $premix->producer }}</td>
                         <td class="align-middle">{{ $premix->shelf_life ?? '-' }}</td>
                         <td class="align-middle">{{ $premix->area->name ?? '-' }}</td>

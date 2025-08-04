@@ -16,10 +16,10 @@
                     <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
                 </div>
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label>Kode Produksi</label>
                     <input type="text" name="production_code" class="form-control" value="{{ old('production_code') }}">
-                </div>
+                </div> -->
 
                 <div class="mb-3">
                     <label>Produsen</label>
