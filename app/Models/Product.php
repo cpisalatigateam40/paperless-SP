@@ -125,10 +125,16 @@ class Product extends Model
     {
         return $this->hasMany(DetailProcessProd::class, 'product_uuid', 'uuid');
     }
-    
+
     protected static function booted()
     {
         static::addGlobalScope(new UserAreaScope);
     }
+
+    public function standardStuffers()
+    {
+        return $this->hasMany(StandardStuffer::class, 'product_uuid', 'uuid');
+    }
+
 
 }

@@ -45,7 +45,7 @@
                             @endforeach
                         </select>
                         <input type="number" name="raw_material_weight[]" class="form-control" placeholder="Berat (kg)"
-                            step="0.01" min="0">
+                            step="0.00000001" min="0">
                         <button type="button" class="btn btn-danger btn-sm ms-2"
                             onclick="removeField(this)">Hapus</button>
                     </div>
@@ -63,7 +63,7 @@
                             @endforeach
                         </select>
                         <input type="number" name="premix_weight[]" class="form-control" placeholder="Berat (kg)"
-                            step="0.01" min="0">
+                            step="0.00000001" min="0">
                         <button type="button" class="btn btn-danger btn-sm ms-2"
                             onclick="removeField(this)">Hapus</button>
                     </div>

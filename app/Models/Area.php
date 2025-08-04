@@ -229,4 +229,10 @@ class Area extends Model
         return $this->hasMany(ReportProcessProd::class, 'area_uuid', 'uuid');
     }
 
+    public function standardStuffers()
+    {
+        return $this->hasMany(StandardStuffer::class, 'area_uuid', 'uuid');
+    }
+
+
 }
