@@ -32,7 +32,10 @@ class ReportMaurerCookingController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::all()->groupBy('product_name')
+            ->map(function ($group) {
+                return $group->first();
+            });
 
         return view('report_maurer_cookings.create', compact('areas', 'sections', 'products'));
     }

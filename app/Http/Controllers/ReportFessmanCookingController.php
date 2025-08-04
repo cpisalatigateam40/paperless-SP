@@ -30,7 +30,10 @@ class ReportFessmanCookingController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::all()->groupBy('product_name')
+            ->map(function ($group) {
+                return $group->first();
+            });
         $sections = Section::all();
         return view('report_fessman_cookings.create', compact('products', 'sections'));
     }

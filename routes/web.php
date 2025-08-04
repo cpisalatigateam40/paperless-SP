@@ -883,6 +883,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
 
             // AJAX Endpoints
             Route::get('/get-formulas/{productUuid}', 'getFormulas')->name('getFormulas');

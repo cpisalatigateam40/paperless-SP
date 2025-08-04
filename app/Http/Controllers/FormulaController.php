@@ -21,14 +21,12 @@ class FormulaController extends Controller
         $products = \App\Models\Product::all()
             ->groupBy('product_name')
             ->map(function ($group) {
-                return $group->first(); // ambil satu produk pertama
+                return $group->first();
             });
 
         $areas = \App\Models\Area::all();
         return view('formulas.create', compact('products', 'areas'));
     }
-
-
 
     public function store(Request $request)
     {

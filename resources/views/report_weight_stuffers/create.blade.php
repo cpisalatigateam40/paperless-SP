@@ -40,7 +40,7 @@
                                     data-long-min="{{ $standard->long_min }}" data-long-max="{{ $standard->long_max }}"
                                     data-diameter="{{ $standard->diameter }}"
                                     data-weight-standard="{{ $standard->weight_max }}" @endif>
-                                    {{ $product->product_name }}
+                                    {{ $product->product_name }} {{ $product->nett_weight }}
                                 </option>
                                 @endforeach
                             </select>

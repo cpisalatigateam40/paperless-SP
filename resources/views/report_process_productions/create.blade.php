@@ -44,7 +44,7 @@
                     <select name="product_uuid" id="product-select" class="form-control" required>
                         <option value="">-- Pilih Produk --</option>
                         @foreach ($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }} </option>
                         @endforeach
                     </select>
                 </div>

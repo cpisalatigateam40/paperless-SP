@@ -51,7 +51,8 @@
                             <td>
                                 <select name="details[0][product_uuid]" class="form-control">
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}
+                                        {{ $product->nett_weight }}</option>
                                     @endforeach
                                 </select>
                             </td>
