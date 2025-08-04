@@ -46,7 +46,10 @@ class ReportProcessProdController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::all()->groupBy('product_name')
+            ->map(function ($group) {
+                return $group->first();
+            });
         $formulas = Formula::all();
         $formulations = Formulation::all();
 
@@ -304,6 +307,115 @@ class ReportProcessProdController extends Controller
         return $pdf->stream('Laporan_Proses_Produksi_' . $report->date . '.pdf');
     }
 
+    public function edit($uuid)
+    {
+        $report = ReportProcessProd::with([
+            'detail',
+            'detail.product',
+            'detail.formula',
+            'detail.items.formulation.rawMaterial',
+            'detail.items.formulation.premix',
+            'detail.sensoric',
+            'detail.emulsifying',
+            'detail.tumbling',
+            'detail.aging'
+        ])->where('uuid', $uuid)->firstOrFail();
 
+        $detail = $report->detail->first();
+
+        $sections = Section::all();
+        $products = Product::all()->groupBy('product_name')->map(fn($group) => $group->first());
+
+        // Ambil formulas hanya untuk product yang dipilih
+        $formulas = Formula::where('product_uuid', $detail->product_uuid)->get();
+
+        return view('report_process_productions.edit', compact('report', 'detail', 'sections', 'products', 'formulas'));
+    }
+
+
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportProcessProd::where('uuid', $uuid)->firstOrFail();
+
+        // Update Report Utama
+        $report->update([
+            'section_uuid' => $request->section_uuid,
+            'date' => $request->date,
+            'shift' => $request->shift,
+        ]);
+
+        $detail = $report->detail->first();
+        if ($detail) {
+            $detail->update([
+                'product_uuid' => $request->product_uuid,
+                'formula_uuid' => $request->formula_uuid,
+                'production_code' => $request->production_code,
+                'mixing_time' => $request->mixing_time,
+                'rework_kg' => $request->rework_kg,
+                'rework_percent' => $request->rework_percent,
+                'total_material' => $request->total_material,
+            ]);
+
+            // Update Item Formulasi
+            foreach ($request->formulation_uuids ?? [] as $uuidFm) {
+                $item = $detail->items->where('formulation_uuid', $uuidFm)->first();
+                if ($item) {
+                    $item->update([
+                        'actual_weight' => $request->actual_weight[$uuidFm] ?? null,
+                        'sensory' => $request->sensory[$uuidFm] ?? null,
+                        'temperature' => $request->temperature[$uuidFm] ?? null,
+                    ]);
+                } else {
+                    ItemDetailProd::create([
+                        'uuid' => Str::uuid(),
+                        'detail_uuid' => $detail->uuid,
+                        'formulation_uuid' => $uuidFm,
+                        'actual_weight' => $request->actual_weight[$uuidFm] ?? null,
+                        'sensory' => $request->sensory[$uuidFm] ?? null,
+                        'temperature' => $request->temperature[$uuidFm] ?? null,
+                    ]);
+                }
+            }
+
+            // Update Sensorik
+            if ($detail->sensoric) {
+                $detail->sensoric->update([
+                    'homogeneous' => $request->homogeneous,
+                    'stiffness' => $request->stiffness,
+                    'aroma' => $request->aroma,
+                    'foreign_object' => $request->foreign_object,
+                ]);
+            }
+
+            // Update Emulsifying
+            if ($detail->emulsifying) {
+                $detail->emulsifying->update([
+                    'standard_mixture_temp' => $request->standard_mixture_temp,
+                    'actual_mixture_temp_1' => $request->actual_mixture_temp_1,
+                    'actual_mixture_temp_2' => $request->actual_mixture_temp_2,
+                    'actual_mixture_temp_3' => $request->actual_mixture_temp_3,
+                    'average_mixture_temp' => $request->average_mixture_temp,
+                ]);
+            }
+
+            // Update Tumbling
+            if ($detail->tumbling) {
+                $detail->tumbling->update([
+                    'tumbling_process' => $request->tumbling_process,
+                ]);
+            }
+
+            // Update Aging
+            if ($detail->aging) {
+                $detail->aging->update([
+                    'aging_process' => $request->aging_process,
+                    'stuffing_result' => $request->stuffing_result,
+                ]);
+            }
+        }
+
+        return redirect()->route('report_process_productions.index')->with('success', 'Data berhasil diperbarui.');
+    }
 
 }

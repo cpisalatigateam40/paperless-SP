@@ -51,6 +51,11 @@
                                 <i class="fas fa-eye"></i>
                             </button>
 
+                            <a href="{{ route('report_process_productions.edit', $report->uuid) }}"
+                                class="btn btn-warning btn-sm" title="Update Laporan">
+                                <i class="fas fa-pen"></i>
+                            </a>
+
                             {{-- Hapus --}}
                             <form action="{{ route('report_process_productions.destroy', $report->uuid) }}"
                                 method="POST" onsubmit="return confirm('Hapus laporan ini?')">
@@ -269,12 +274,12 @@
                                 <hr> <br><br>
                                 @endforeach
 
-                                <div class="d-flex justify-content-end mt-2">
+                                <!-- <div class="d-flex justify-content-end mt-2">
                                     <a href="{{ route('report_process_productions.add_detail', $report->uuid) }}"
                                         class="btn btn-secondary btn-sm">
                                         + Tambah Detail
                                     </a>
-                                </div>
+                                </div> -->
                             </div>
                         </td>
                     </tr>

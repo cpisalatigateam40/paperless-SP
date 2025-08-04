@@ -45,7 +45,7 @@
                             @foreach ($products as $product)
                             <option value="{{ $product->uuid }}" data-shelf-life="{{ $product->shelf_life }}"
                                 data-created-at="{{ $product->created_at }}">
-                                {{ $product->product_name }}
+                                {{ $product->product_name }} {{ $product->nett_weight }}
                             </option>
                             @endforeach
                         </select>
@@ -85,7 +85,7 @@ function addDetail() {
                 <option value="">-- Pilih Produk --</option>
                 @foreach($products as $product)
                     <option value="{{ $product->uuid }}" data-shelf-life="{{ $product->shelf_life }}" data-created-at="{{ $product->created_at }}">
-                        {{ $product->product_name }}
+                        {{ $product->product_name }} {{ $product->nett_weight }}
                     </option>
                 @endforeach
             </select>

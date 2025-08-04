@@ -64,7 +64,7 @@
                                         <option value="{{ $product->uuid }}"
                                             data-shelf-life="{{ $product->shelf_life }}"
                                             data-created-at="{{ \Carbon\Carbon::today()->toDateString() }}">
-                                            {{ $product->product_name }}
+                                            {{ $product->product_name }} {{ $product->nett_weight }}
                                         </option>
                                         @endforeach
                                     </select>

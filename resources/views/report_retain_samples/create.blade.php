@@ -70,7 +70,8 @@
                                     <select name="details[0][product_uuid]" class="form-select form-control" required>
                                         <option value="">Pilih Produk</option>
                                         @foreach ($products as $product)
-                                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                        <option value="{{ $product->uuid }}">{{ $product->product_name }}
+                                            {{ $product->nett_weight }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -145,7 +146,7 @@ function addProductField() {
             <select name="details[${productIndex}][product_uuid]" class="form-select form-control" required>
                 <option value="">Pilih Produk</option>
                 @foreach ($products as $product)
-                <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                <option value="{{ $product->uuid }}">{{ $product->product_name }} {{ $product->nett_weight }}</option>
                 @endforeach
             </select>
         </div>

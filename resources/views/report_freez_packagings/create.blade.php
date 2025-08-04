@@ -45,7 +45,7 @@ const productOptions = `
         <option value="{{ $product->uuid }}"
             data-shelf-life="{{ $product->shelf_life }}"
             data-created-at="{{ $product->created_at }}">
-            {{ $product->product_name }}
+            {{ $product->product_name }} {{ $product->nett_weight }}
         </option>
     @endforeach
 `;
@@ -97,22 +97,22 @@ function addDetailRow() {
     <div class="row">
         <div class="col-md-6">
             <label>Suhu Awal Produk (°C)</label>
-            <input type="number" step="0.1" name="details[${index}][freezing][start_product_temp]" class="form-control">
+            <input type="number" step="0.0000001" name="details[${index}][freezing][start_product_temp]" class="form-control">
         </div>
         <div class="col-md-6">
             <label>Suhu Akhir Produk (°C)</label>
-            <input type="number" step="0.1" name="details[${index}][freezing][end_product_temp]" class="form-control">
+            <input type="number" step="0.0000001" name="details[${index}][freezing][end_product_temp]" class="form-control">
         </div>
     </div>
 
     <div class="row mt-2">
         <div class="col-md-6">
             <label>Suhu Room IQF (°C)</label>
-            <input type="number" step="0.1" name="details[${index}][freezing][iqf_room_temp]" class="form-control">
+            <input type="number" step="0.0000001" name="details[${index}][freezing][iqf_room_temp]" class="form-control">
         </div>
         <div class="col-md-6">
             <label>Suhu Suction IQF (°C)</label>
-            <input type="number" step="0.1" name="details[${index}][freezing][iqf_suction_temp]" class="form-control">
+            <input type="number" step="0.0000001" name="details[${index}][freezing][iqf_suction_temp]" class="form-control">
         </div>
     </div>
 
