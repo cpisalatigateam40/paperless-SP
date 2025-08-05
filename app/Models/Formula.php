@@ -16,6 +16,7 @@ class Formula extends Model
         'uuid',
         'area_uuid',
         'product_uuid',
+        'product_name',
         'formula_name',
     ];
 

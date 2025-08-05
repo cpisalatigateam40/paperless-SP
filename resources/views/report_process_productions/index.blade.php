@@ -134,7 +134,8 @@
                                     {{-- HEADER PRODUK --}}
                                     <tr>
                                         <th colspan="2">NAMA PRODUK</th>
-                                        <td colspan="3">{{ $detail->product->product_name ?? '-' }}</td>
+                                        <td colspan="3">{{ $detail->product->product_name ?? '-' }}
+                                            {{ $detail->product->nett_weight ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th colspan="2">KODE PRODUKSI</th>

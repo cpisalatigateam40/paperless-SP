@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Formula;
 use App\Models\Formulation;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -12,17 +13,16 @@ class FormulaController extends Controller
 {
     public function index()
     {
-        $formulas = Formula::with(['product', 'area'])->get();
+        $formulas = Formula::with(['product', 'area'])->get()->unique('product_name');
+
         return view('formulas.index', compact('formulas'));
     }
 
     public function create()
     {
-        $products = \App\Models\Product::all()
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
-            ->map(function ($group) {
-                return $group->first();
-            });
+            ->get();
 
         $areas = \App\Models\Area::all();
         return view('formulas.create', compact('products', 'areas'));
@@ -35,10 +35,13 @@ class FormulaController extends Controller
             'product_uuid' => 'nullable|exists:products,uuid',
         ]);
 
+        $product = Product::where('uuid', $request->product_uuid)->first();
+
         Formula::create([
             'uuid' => Str::uuid(),
             'formula_name' => $request->formula_name,
             'product_uuid' => $request->product_uuid,
+            'product_name' => $product?->product_name,
             'area_uuid' => Auth::user()->area_uuid,
         ]);
 
