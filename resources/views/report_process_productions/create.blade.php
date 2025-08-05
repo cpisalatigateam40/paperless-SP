@@ -44,8 +44,11 @@
                     <select name="product_uuid" id="product-select" class="form-control" required>
                         <option value="">-- Pilih Produk --</option>
                         @foreach ($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }} </option>
+                        <option value="{{ $product->uuid }}" data-name="{{ $product->product_name }}">
+                            {{ $product->product_name }} {{ $product->nett_weight }}
+                        </option>
                         @endforeach
+
                     </select>
                 </div>
 
@@ -191,6 +194,40 @@
 
 @section('script')
 <script>
+function initActualWeightListeners() {
+    const weightInputs = document.querySelectorAll('.actual-weight');
+
+    weightInputs.forEach(input => {
+        if (input.dataset.bound === "true") return;
+
+        const standard = parseFloat(input.dataset.standard);
+        const sensorySelect = input.closest('.row').querySelector('.sensory-select');
+
+        // Set nilai awal actual = standard
+        input.value = standard.toFixed(2);
+
+        function updateSensoryBasedOnWeight() {
+            const actual = parseFloat(input.value);
+            if (isNaN(actual)) {
+                sensorySelect.value = "";
+                return;
+            }
+
+            const deviation = Math.abs(actual - standard);
+            const tolerance = standard * 0.05;
+
+            sensorySelect.value = deviation <= tolerance ? 'OK' : 'Tidak OK';
+        }
+
+        updateSensoryBasedOnWeight();
+
+        input.addEventListener('input', updateSensoryBasedOnWeight);
+
+        // Tandai sudah di-bind supaya tidak double
+        input.dataset.bound = "true";
+    });
+}
+
 document.getElementById('product-select').addEventListener('change', function() {
     const productUuid = this.value;
     const formulaSelect = document.getElementById('formula-select');
@@ -227,28 +264,31 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 container.insertAdjacentHTML('beforeend', `<h6><strong>A. BAHAN BAKU</strong></h6>`);
                 data.raw_materials.forEach(fm => {
                     const html = `
-                            <div class="border p-2 mb-2">
-                                <p><strong>${fm.raw_material?.material_name ?? '-'}</strong></p>
-                                <p class="text-muted mb-2">Standard: <strong>${fm.weight} gr</strong></p>
-                                <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <input type="number" step="0.01" name="actual_weight[${fm.uuid}]" class="form-control" placeholder="Berat Aktual (gr)">
+                                    <div class="border p-2 mb-2">
+                                        <p><strong>${fm.raw_material?.material_name ?? '-'}</strong></p>
+                                        <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
+                                        <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <input type="number" step="0.01" 
+                                                    name="actual_weight[${fm.uuid}]" 
+                                                    class="form-control actual-weight" 
+                                                    placeholder="Berat Aktual (kg)"
+                                                    data-standard="${fm.weight}">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
+                                                    <option value="">-- Pilih --</option>
+                                                    <option value="OK">OK</option>
+                                                    <option value="Tidak OK">Tidak OK</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <select name="sensory[${fm.uuid}]" class="form-control">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="OK">OK</option>
-                                            <option value="Tidak OK">Tidak OK</option>
-                                        </select>
-
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                                `;
                     container.insertAdjacentHTML('beforeend', html);
                 });
             }
@@ -260,14 +300,19 @@ document.getElementById('formula-select').addEventListener('change', function() 
                     const html = `
                             <div class="border p-2 mb-2">
                                 <p><strong>${fm.premix?.name ?? '-'}</strong></p>
-                                <p class="text-muted mb-2">Standard: <strong>${fm.weight} gr</strong></p>
+                                <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
                                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <input type="number" step="0.01" name="actual_weight[${fm.uuid}]" class="form-control" placeholder="Berat Aktual (gr)">
+                                        <input type="number" 
+                                            step="0.01" 
+                                            name="actual_weight[${fm.uuid}]" 
+                                            class="form-control actual-weight" 
+                                            placeholder="Berat Aktual (kg)"
+                                            data-standard="${fm.weight}">
                                     </div>
                                     <div class="col-md-4">
-                                        <select name="sensory[${fm.uuid}]" class="form-control">
+                                        <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
                                             <option value="">-- Pilih --</option>
                                             <option value="OK">OK</option>
                                             <option value="Tidak OK">Tidak OK</option>
@@ -281,7 +326,10 @@ document.getElementById('formula-select').addEventListener('change', function() 
                         `;
                     container.insertAdjacentHTML('beforeend', html);
                 });
+
             }
+
+            initActualWeightListeners();
         });
 });
 
@@ -300,6 +348,26 @@ function hitungRataRataSuhu() {
 
 ['actual_mixture_temp_1', 'actual_mixture_temp_2', 'actual_mixture_temp_3'].forEach(id => {
     document.getElementById(id).addEventListener('input', hitungRataRataSuhu);
+});
+
+document.getElementById('product-select').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const productName = selectedOption.getAttribute('data-name');
+
+    if (!productName) return;
+
+    fetch(`/report-process-productions/get-formulas-by-name?product_name=${encodeURIComponent(productName)}`)
+        .then(res => res.json())
+        .then(data => {
+            const formulaSelect = document.getElementById('formula-select');
+            formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
+            data.forEach(formula => {
+                const option = document.createElement('option');
+                option.value = formula.uuid;
+                option.textContent = formula.formula_name;
+                formulaSelect.appendChild(option);
+            });
+        });
 });
 </script>
 @endsection

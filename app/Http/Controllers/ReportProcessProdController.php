@@ -46,10 +46,7 @@ class ReportProcessProdController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all()->groupBy('product_name')
-            ->map(function ($group) {
-                return $group->first();
-            });
+        $products = Product::all();
         $formulas = Formula::all();
         $formulations = Formulation::all();
 
@@ -417,5 +414,17 @@ class ReportProcessProdController extends Controller
 
         return redirect()->route('report_process_productions.index')->with('success', 'Data berhasil diperbarui.');
     }
+
+    public function getFormulasByName(Request $request)
+    {
+        $productName = $request->get('product_name');
+
+        $formulas = \App\Models\Formula::whereHas('product', function ($q) use ($productName) {
+            $q->where('product_name', $productName);
+        })->select('uuid', 'formula_name')->get();
+
+        return response()->json($formulas);
+    }
+
 
 }

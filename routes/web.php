@@ -889,6 +889,8 @@ Route::middleware(['auth'])->group(function () {
             // AJAX Endpoints
             Route::get('/get-formulas/{productUuid}', 'getFormulas')->name('getFormulas');
             Route::get('/get-formulations/{formulaUuid}', 'getFormulations')->name('getFormulations');
+            Route::get('/get-formulas-by-name', 'getFormulasByName')->name('getFormulasByName');
+
         });
 
     Route::prefix('standard-stuffers')->name('standard-stuffers.')->controller(StandardStufferController::class)->group(function () {
