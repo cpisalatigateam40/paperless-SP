@@ -59,6 +59,8 @@ use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\ReportEmulsionMakingController;
 use App\Http\Controllers\ReportProcessProdController;
 use App\Http\Controllers\StandardStufferController;
+use App\Http\Controllers\MaurerStandardController;
+use App\Http\Controllers\FessmanStandardController;
 
 Route::redirect('/', '/login');
 
@@ -902,5 +904,31 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{uuid}', 'destroy')->name('destroy');
         Route::post('/import', 'import')->name('import');
     });
+
+    Route::prefix('maurer-standards')
+        ->name('maurer-standards.')
+        ->controller(MaurerStandardController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
+        });
+
+    Route::prefix('fessman-standards')
+        ->name('fessman-standards.')
+        ->controller(FessmanStandardController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
+        });
 
 });
