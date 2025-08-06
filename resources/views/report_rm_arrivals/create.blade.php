@@ -38,7 +38,7 @@
                     {{-- Baris pertama default --}}
                     <div class="detail-row mb-3 p-3 border rounded bg-light">
                         <div class="row align-items-end">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Bahan Baku</label>
                                 <select name="details[0][raw_material_uuid]" class="form-control raw-material-select"
                                     required>
@@ -50,31 +50,35 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-4">
                                 <label class="form-label">Produsen</label>
                                 <input type="text" name="details[0][supplier]" class="form-control supplier-input">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-4">
                                 <label class="form-label">Kode Produksi</label>
                                 <input type="text" name="details[0][production_code]" class="form-control" required>
                             </div>
-                            <div class="col-md-2">
+
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-3">
                                 <label class="form-label">Jam</label>
                                 <input type="time" name="details[0][time]" class="form-control"
                                     value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-3">
                                 <label class="form-label">Suhu (°C)</label>
                                 <input type="number" step="0.1" name="details[0][temperature]" class="form-control">
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-3">
                                 <label class="form-label">Kemasan</label>
                                 <select name="details[0][packaging_condition]" class="form-control">
                                     <option value="✓">✓</option>
                                     <option value="x">x</option>
                                 </select>
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-3">
                                 <label class="form-label">Sensorik</label>
                                 <select name="details[0][sensorial_condition]" class="form-control">
                                     <option value="✓">✓</option>
@@ -116,7 +120,7 @@
 <div id="detail-template" style="display: none;">
     <div class="detail-row mb-3 p-3 border rounded bg-light">
         <div class="row align-items-end">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label">Bahan Baku</label>
                 <select name="details[__index__][raw_material_uuid]" class="form-control raw-material-select" required>
                     <option value="">-- Pilih --</option>
@@ -127,31 +131,35 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <label class="form-label">Produsen</label>
                 <input type="text" name="details[__index__][supplier]" class="form-control supplier-input">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <label class="form-label">Kode Produksi</label>
                 <input type="text" name="details[__index__][production_code]" class="form-control" required>
             </div>
-            <div class="col-md-2">
+
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-3">
                 <label class="form-label">Jam</label>
                 <input type="time" name="details[__index__][time]" class="form-control"
                     value="{{ \Carbon\Carbon::now()->format('H:i') }}">
             </div>
-            <div class="col-md-1">
+            <div class="col-md-3">
                 <label class="form-label">Suhu (°C)</label>
                 <input type="number" step="0.1" name="details[__index__][temperature]" class="form-control">
             </div>
-            <div class="col-md-1">
+            <div class="col-md-3">
                 <label class="form-label">Kemasan</label>
                 <select name="details[__index__][packaging_condition]" class="form-control">
                     <option value="✓">✓</option>
                     <option value="x">x</option>
                 </select>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-3">
                 <label class="form-label">Sensorik</label>
                 <select name="details[__index__][sensorial_condition]" class="form-control">
                     <option value="✓">✓</option>

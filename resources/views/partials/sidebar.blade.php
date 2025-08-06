@@ -1,7 +1,7 @@
 @php
 $isMasterData =
 Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
-'standard-stuffers*');
+'standard-stuffers*', 'maurer-standards*', 'fessman-standards*');
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -132,6 +132,11 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('formulas.index') }}">Formulasi</a>
                 <a class="collapse-item {{ Request::is('standard-stuffers*') ? 'active' : '' }}"
                     href="{{ route('standard-stuffers.index') }}">Standar Stuffer</a>
+
+                <a class="collapse-item {{ Request::is('maurer-standards*') ? 'active' : '' }}"
+                    href="{{ route('maurer-standards.index') }}">Standar Maurer</a>
+                <a class="collapse-item {{ Request::is('fessman-standards*') ? 'active' : '' }}"
+                    href="{{ route('fessman-standards.index') }}">Standar Fessman</a>
             </div>
         </div>
     </li>
