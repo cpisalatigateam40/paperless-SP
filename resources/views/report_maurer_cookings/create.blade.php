@@ -52,12 +52,12 @@
 
         {{-- Produk --}}
         <div class="accordion" id="produkAccordion">
-            @for($i=0; $i<5; $i++) <div class="accordion-item mb-2">
+            @for($i = 0; $i < 5; $i++) <div class="accordion-item mb-2">
                 <h3 class="accordion-header">
                     <button class="accordion-button collapsed bg-primary bg-gradient text-white fw-semibold"
                         type="button" data-bs-toggle="collapse" data-bs-target="#produk{{ $i }}"
                         style="border: none; border-radius: .5rem; padding: .5rem;">
-                        <i class="bi bi-box-seam me-2"></i> Data Produk #{{ $i+1 }}
+                        <i class="bi bi-box-seam me-2"></i> Data Produk #{{ $i + 1 }}
                     </button>
                 </h3>
                 <div id="produk{{ $i }}" class="accordion-collapse collapse" data-bs-parent="#produkAccordion">
@@ -67,10 +67,12 @@
                         <div class="row g-3 mb-3 card-body">
                             <div class="col-md-4">
                                 <label>Nama Produk</label>
-                                <select name="details[{{ $i }}][product_uuid]" class="form-control">
+                                <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector"
+                                    data-index="{{ $i }}">
                                     <option value="">-- Pilih Produk --</option>
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}
+                                        {{ $product->nett_weight }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -91,14 +93,28 @@
                         {{-- Process Steps --}}
                         @php
                         $steps = [
-                        ['name'=>'SHOWERING','fields'=>['time_minutes_1','time_minutes_2']],
-                        ['name'=>'WARMING','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'DRYINGI','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'DRYINGII','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'DRYINGIII','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'SMOKING','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                        ['name'=>'COOKING','fields'=>['room_temperature_1','room_temperature_2','product_temperature_1','product_temperature_2','time_minutes_1','time_minutes_2','rh_1','rh_2']],
-                        ['name'=>'EVAKUASI','fields'=>['time_minutes_1','time_minutes_2']],
+                        ['name' => 'SHOWERING', 'fields' => ['time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'WARMING', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'DRYINGI', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'DRYINGII', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'DRYINGIII', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'DRYINGIV', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'DRYINGV', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'SMOKING', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                        'time_minutes_1', 'time_minutes_2']],
+                        ['name' => 'COOKINGI', 'fields' => ['room_temperature_1', 'room_temperature_2',
+                        'product_temperature_1', 'product_temperature_2', 'time_minutes_1', 'time_minutes_2', 'rh_1',
+                        'rh_2']],
+                        ['name' => 'COOKINGII', 'fields' => ['room_temperature_1', 'room_temperature_2',
+                        'product_temperature_1', 'product_temperature_2', 'time_minutes_1', 'time_minutes_2', 'rh_1',
+                        'rh_2']],
+                        ['name' => 'EVAKUASI', 'fields' => ['time_minutes_1', 'time_minutes_2']],
                         ];
                         @endphp
 
@@ -121,22 +137,33 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($steps as $index=>$step)
+                                            @foreach($steps as $index => $step)
                                             <tr>
                                                 <td>
                                                     <input type="text" readonly class="form-control form-control-sm"
                                                         name="details[{{ $i }}][process_steps][{{ $index }}][step_name]"
-                                                        value="{{ $step['name'] }}">
+                                                        value="{{ strtoupper(str_replace(' ', '', $step['name'])) }}"
+                                                        data-index="{{ $i }}"
+                                                        data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}">
                                                 </td>
-                                                @foreach(['room_temperature_1','room_temperature_2','rh_1','rh_2',
-                                                'time_minutes_1','time_minutes_2','product_temperature_1','product_temperature_2']
-                                                as $field)
+                                                @foreach([
+                                                'room_temperature_1',
+                                                'room_temperature_2',
+                                                'rh_1',
+                                                'rh_2',
+                                                'time_minutes_1',
+                                                'time_minutes_2',
+                                                'product_temperature_1',
+                                                'product_temperature_2'
+                                                ] as $field)
                                                 <td>
                                                     @if(in_array($field, $step['fields']))
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][process_steps][{{ $index }}][{{ $field }}]">
+                                                        name="details[{{ $i }}][process_steps][{{ $index }}][{{ $field }}]"
+                                                        data-index="{{ $i }}"
+                                                        data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}"
+                                                        data-field="{{ $field }}">
                                                     @else
-                                                    {{-- field tidak aktif, tambahkan input kosong dan disable --}}
                                                     <input type="number" step="any" class="form-control form-control-sm"
                                                         disabled>
                                                     @endif
@@ -144,11 +171,15 @@
                                                 @endforeach
                                             </tr>
                                             @endforeach
+
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- <pre>{{ json_encode($maurerStandardMap, JSON_PRETTY_PRINT) }}</pre> -->
 
                         {{-- Row tambahan LAMA PROSES --}}
                         <div class="card mb-3">
@@ -182,7 +213,7 @@
                         <div class="card mb-3">
                             <div class="card-header">Posisi Thermocouple</div>
                             <div class="card-body col-md-6">
-                                @for($t=0; $t<1; $t++) <select class="form-control mb-2"
+                                @for($t = 0; $t < 1; $t++) <select class="form-control mb-2"
                                     name="details[{{ $i }}][thermocouple_positions][{{ $t }}][position_info]">
                                     <option value="">-- Pilih --</option>
                                     <option value="OK">OK</option>
@@ -197,9 +228,14 @@
                         <div class="card mb-3">
                             <div class="card-header">Pemeriksaan Sensorik</div>
                             <div class="card-body row g-3">
-                                @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Tekstur'=>'texture','Warna'=>'color',
-                                'Rasa'=>'taste']
-                                as $label=>$field)
+                                @foreach([
+                                'Kematangan' => 'ripeness',
+                                'Aroma' => 'aroma',
+                                'Tekstur' => 'texture',
+                                'Warna' => 'color',
+                                'Rasa' => 'taste'
+                                ]
+                                as $label => $field)
                                 <div class="col">
                                     <label>{{ $label }}</label>
                                     <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control">
@@ -351,11 +387,12 @@
                                                 <th style="width: 20%;">Berat Mentah (kg)</th>
                                                 <th style="width: 20%;">Berat Matang (kg)</th>
                                                 <th style="width: 20%;">Loss (kg)</th>
-                                                <th style="width: 20%;">Loss (%)</th>
+                                                <th style="width
+                                               :     20%;">Loss (%)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @for($l=0;$l<1;$l++) <tr>
+                                            @for($l = 0; $l < 1; $l++) <tr>
                                                 <td>
                                                     <input type="text" class="form-control form-control-sm text-center"
                                                         name="details[{{ $i }}][cooking_losses][{{ $l }}][batch_code]"
@@ -402,6 +439,8 @@
 <button class="btn btn-success mt-3">Simpan Laporan</button>
 </form>
 </div>
+
+
 @endsection
 
 @section('script')
@@ -445,7 +484,58 @@ function calculateAverage(i) {
         avg = (t1 + t2 + t3) / count;
     }
 
-    document.getElementById('avg_temp_' + i).value = avg.toFixed(2); // Tampilkan 2 desimal
+    document.getElementById('avg_temp_' + i).value = avg;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const maurerStandards = @json($maurerStandardMap);
+
+    console.log('✅ Maurer Standards loaded:', maurerStandards);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('product-selector')) {
+            const select = e.target;
+            const productUuid = select.value;
+            const index = select.dataset.index;
+
+            console.log(`➡️ Product selected: ${productUuid}`);
+            console.log(`➡️ Data index: ${index}`);
+
+            const relatedInputs = document.querySelectorAll(`input[data-index="${index}"]`);
+            console.log(`🧩 Related inputs found:`, relatedInputs.length);
+
+            if (!maurerStandards[productUuid]) {
+                console.warn(`🚫 No MaurerStandard found for product: ${productUuid}`);
+                relatedInputs.forEach(input => {
+                    if (!input.disabled) input.value = '';
+                });
+                return;
+            }
+
+            relatedInputs.forEach(input => {
+                const step = input.dataset.step;
+                const field = input.dataset.field;
+
+                console.log(`🔍 Input: step="${step}", field="${field}"`);
+
+                if (!step || !field) {
+                    console.warn('⚠️ Missing step or field');
+                    return;
+                }
+
+                const stepData = maurerStandards[productUuid][step];
+                console.log(`📦 Step data for "${step}":`, stepData);
+
+                if (stepData && stepData[field] !== undefined) {
+                    input.value = stepData[field];
+                    console.log(`✅ Set value for [${step}][${field}]: ${stepData[field]}`);
+                } else {
+                    input.value = '';
+                    console.warn(`❓ Data not found for [${step}][${field}]`);
+                }
+            });
+        }
+    });
+});
 </script>
 @endsection

@@ -43,7 +43,7 @@
                         @endphp
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $product->product_name }}</td>
+                            <td>{{ $product->product_name }} {{ $product->nett_weight }}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#{{ $collapseId }}">
