@@ -5,7 +5,7 @@
         @foreach($products as $product)
         <option value="{{ $product->uuid }}"
             {{ old('product_uuid', $standard->product_uuid ?? '') == $product->uuid ? 'selected' : '' }}>
-            {{ $product->product_name }}
+            {{ $product->product_name }} {{ $product->nett_weight }}
         </option>
         @endforeach
     </select>
@@ -62,4 +62,3 @@
         <button type="button" class="btn btn-danger btn-sm mt-3 remove-step">Hapus Step</button>
     </div>
 </div>
-

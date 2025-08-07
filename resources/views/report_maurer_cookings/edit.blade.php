@@ -62,8 +62,13 @@
                 ['name'=>'DRYINGI','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
                 ['name'=>'DRYINGII','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
                 ['name'=>'DRYINGIII','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
+                ['name' => 'DRYINGIV', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                'time_minutes_1', 'time_minutes_2']],
+                ['name' => 'DRYINGV', 'fields' => ['room_temperature_1', 'room_temperature_2', 'rh_1', 'rh_2',
+                'time_minutes_1', 'time_minutes_2']],
                 ['name'=>'SMOKING','fields'=>['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2']],
-                ['name'=>'COOKING','fields'=>['room_temperature_1','room_temperature_2','product_temperature_1','product_temperature_2','time_minutes_1','time_minutes_2','rh_1','rh_2']],
+                ['name'=>'COOKINGI','fields'=>['room_temperature_1','room_temperature_2','product_temperature_1','product_temperature_2','time_minutes_1','time_minutes_2','rh_1','rh_2']],
+                ['name'=>'COOKINGII','fields'=>['room_temperature_1','room_temperature_2','product_temperature_1','product_temperature_2','time_minutes_1','time_minutes_2','rh_1','rh_2']],
                 ['name'=>'EVAKUASI','fields'=>['time_minutes_1','time_minutes_2']],
                 ];
                 @endphp
@@ -86,12 +91,13 @@
                             <div class="row g-3 mb-3 card-body">
                                 <div class="col-md-4">
                                     <label>Nama Produk</label>
-                                    <select name="details[{{ $i }}][product_uuid]" class="form-control">
+                                    <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector"
+                                        data-index="{{ $i }}">
                                         <option value="">-- Pilih Produk --</option>
                                         @foreach($products as $product)
                                         <option value="{{ $product->uuid }}"
                                             {{ $detail && $detail->product_uuid == $product->uuid ? 'selected' : '' }}>
-                                            {{ $product->product_name }}
+                                            {{ $product->product_name }} {{ $product->nett_weight }}
                                         </option>
                                         @endforeach
                                     </select>
@@ -142,7 +148,9 @@
                                                     <td>
                                                         <input type="text" readonly class="form-control form-control-sm"
                                                             name="details[{{ $i }}][process_steps][{{ $index }}][step_name]"
-                                                            value="{{ $step['name'] }}">
+                                                            value="{{ strtoupper(str_replace(' ', '', $step['name'])) }}"
+                                                            data-index="{{ $i }}"
+                                                            data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}">
                                                     </td>
                                                     @foreach(['room_temperature_1','room_temperature_2','rh_1','rh_2','time_minutes_1','time_minutes_2','product_temperature_1','product_temperature_2']
                                                     as $field)
@@ -151,7 +159,10 @@
                                                         <input type="number" step="any"
                                                             class="form-control form-control-sm"
                                                             name="details[{{ $i }}][process_steps][{{ $index }}][{{ $field }}]"
-                                                            value="{{ $stepData ? $stepData->$field : '' }}">
+                                                            value="{{ $stepData ? $stepData->$field : '' }}"
+                                                            data-index="{{ $i }}"
+                                                            data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}"
+                                                            data-field="{{ $field }}">
                                                         @else
                                                         <input type="number" step="any"
                                                             class="form-control form-control-sm" disabled>
@@ -438,7 +449,87 @@ function calculateAvgExitTemp(i) {
     if (temps.length > 0) {
         avg = temps.reduce((a, b) => a + b, 0) / temps.length;
     }
-    document.getElementById('avg_exit_temp_' + i).value = avg.toFixed(2);
+    document.getElementById('avg_exit_temp_' + i).value = avg;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const maurerStandards = @json($maurerStandardMap);
+    const stepDefinitions = @json($steps); // kirim $steps juga
+
+    function createStepRow(stepName, stepIndex, productIndex) {
+        const template = document.querySelector('#step-template').cloneNode(true);
+        template.removeAttribute('id');
+
+        const stepKey = stepName.toUpperCase().replace(/\s+/g, '');
+        const stepConfig = stepDefinitions.find(s => s.name === stepName);
+        const fields = stepConfig?.fields || [];
+
+        // Isi input
+        const inputs = template.querySelectorAll('input');
+        inputs.forEach(input => {
+            let name = input.getAttribute('name');
+            let dataField = input.dataset.field;
+
+            // Ganti placeholder di name dan data attribute
+            name = name.replace(/__index__/g, productIndex)
+                .replace(/__step__/g, stepKey)
+                .replace(/__step_index__/g, stepIndex);
+
+            input.setAttribute('name', name);
+            input.setAttribute('data-index', productIndex);
+            input.setAttribute('data-step', stepKey);
+
+            // step_name
+            if (input.classList.contains('step-name')) {
+                input.value = stepKey;
+                input.readOnly = true;
+            }
+
+            // hanya isi field yang didefinisikan
+            if (input.classList.contains('step-field')) {
+                if (!fields.includes(dataField)) {
+                    input.disabled = true;
+                } else {
+                    input.disabled = false;
+                }
+            }
+        });
+
+        return template;
+    }
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('product-selector')) {
+            const select = e.target;
+            const productUuid = select.value;
+            const index = select.dataset.index;
+
+            const tableBody = document.getElementById('process-steps-body');
+            tableBody.innerHTML = ''; // Kosongkan dulu
+
+            const productSteps = maurerStandards[productUuid];
+            if (!productSteps) return;
+
+            const stepNames = Object.keys(productSteps);
+
+            stepNames.forEach((stepName, i) => {
+                const row = createStepRow(stepName, i, index);
+
+                // Isi nilai dari Maurer
+                const inputs = row.querySelectorAll('input.step-field');
+                inputs.forEach(input => {
+                    const step = input.dataset.step;
+                    const field = input.dataset.field;
+
+                    if (productSteps[step] && productSteps[step][field] !== undefined) {
+                        input.value = productSteps[step][field];
+                    }
+                });
+
+                tableBody.appendChild(row);
+            });
+        }
+    });
+});
 </script>
 @endsection

@@ -13,6 +13,7 @@ use App\Models\ShThermocouplePosition;
 use App\Models\ShSensoryCheck;
 use App\Models\ShoweringCoolingDown;
 use App\Models\CookingLoss;
+use App\Models\MaurerStandard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -32,13 +33,45 @@ class ReportMaurerCookingController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all()->groupBy('product_name')
-            ->map(function ($group) {
-                return $group->first();
-            });
+        $products = Product::all();
 
-        return view('report_maurer_cookings.create', compact('areas', 'sections', 'products'));
+        // Ambil semua data Maurer Standard beserta step-nya
+        $maurerStandards = MaurerStandard::with('processStep')->get();
+
+        // Bangun struktur JSON untuk frontend
+        $maurerStandardMap = [];
+
+        foreach ($maurerStandards as $standard) {
+            $productUuid = $standard->product_uuid;
+            $stepName = optional($standard->processStep)->process_name ?? null;
+
+            if (!$stepName)
+                continue;
+
+            // Normalisasi step name agar cocok dengan data-step di HTML
+            $normalizedStep = strtoupper(str_replace(' ', '', $stepName));
+
+            $maurerStandardMap[$productUuid][$normalizedStep] = [
+                'room_temperature_1' => $standard->st_min,
+                'room_temperature_2' => $standard->st_max,
+                'rh_1' => $standard->rh_min,
+                'rh_2' => $standard->rh_max,
+                'time_minutes_1' => $standard->time_minute,
+                'time_minutes_2' => $standard->time_minute,
+                'product_temperature_1' => $standard->ct_min,
+                'product_temperature_2' => $standard->ct_max,
+            ];
+        }
+
+        return view('report_maurer_cookings.create', [
+            'areas' => $areas,
+            'sections' => $sections,
+            'products' => $products,
+            'maurerStandards' => $maurerStandards,
+            'maurerStandardMap' => $maurerStandardMap, // <- Ini penting
+        ]);
     }
+
 
     public function destroy($uuid)
     {
@@ -218,7 +251,38 @@ class ReportMaurerCookingController extends Controller
         $sections = Section::all();
         $products = Product::all();
 
-        return view('report_maurer_cookings.edit', compact('report', 'sections', 'products'));
+        $maurerStandards = MaurerStandard::with('processStep')->get();
+        $maurerStandardMap = [];
+
+        foreach ($maurerStandards as $standard) {
+            $productUuid = $standard->product_uuid;
+            $stepName = optional($standard->processStep)->process_name ?? null;
+
+            if (!$stepName)
+                continue;
+
+            // Normalisasi step name agar cocok dengan data-step di HTML
+            $normalizedStep = strtoupper(str_replace(' ', '', $stepName));
+
+            $maurerStandardMap[$productUuid][$normalizedStep] = [
+                'room_temperature_1' => $standard->st_min,
+                'room_temperature_2' => $standard->st_max,
+                'rh_1' => $standard->rh_min,
+                'rh_2' => $standard->rh_max,
+                'time_minutes_1' => $standard->time_minute,
+                'time_minutes_2' => $standard->time_minute,
+                'product_temperature_1' => $standard->ct_min,
+                'product_temperature_2' => $standard->ct_max,
+            ];
+        }
+
+        return view('report_maurer_cookings.edit', [
+            'report' => $report,
+            'sections' => $sections,
+            'products' => $products,
+            'maurerStandards' => $maurerStandards,
+            'maurerStandardMap' => $maurerStandardMap, // <- Ini penting
+        ]);
     }
 
     public function update(Request $request, $uuid)

@@ -136,5 +136,11 @@ class Product extends Model
         return $this->hasMany(StandardStuffer::class, 'product_uuid', 'uuid');
     }
 
+    public function maurerStandardProcesses()
+    {
+        return $this->hasMany(MaurerStandard::class, 'product_uuid', 'uuid')->orderBy('order');
+    }
+
+
 
 }

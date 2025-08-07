@@ -136,7 +136,8 @@
                                         <tr>
                                             <td>Nama Produk</td>
                                             @foreach ($report->details as $detail)
-                                            <td> {{ $detail->product->product_name ?? '-' }} </td>
+                                            <td> {{ $detail->product->product_name ?? '-' }}
+                                                {{ $detail->product->nett_weight ?? '-' }} </td>
                                             @endforeach
                                         </tr>
                                         <tr>
@@ -190,17 +191,32 @@
                                         ['db'=>'rh','label'=>'RH (%)'],
                                         ['db'=>'time_minutes','label'=>'Waktu (menit)'],
                                         ]],
-                                        ['no'=>6,'name'=>'SMOKING','fields'=>[
+                                        ['no'=>6,'name'=>'DRYINGIV','fields'=>[
                                         ['db'=>'room_temperature','label'=>'Suhu Ruang (°C)'],
                                         ['db'=>'rh','label'=>'RH (%)'],
                                         ['db'=>'time_minutes','label'=>'Waktu (menit)'],
                                         ]],
-                                        ['no'=>7,'name'=>'COOKING','fields'=>[
+                                        ['no'=>7,'name'=>'DRYINGV','fields'=>[
+                                        ['db'=>'room_temperature','label'=>'Suhu Ruang (°C)'],
+                                        ['db'=>'rh','label'=>'RH (%)'],
+                                        ['db'=>'time_minutes','label'=>'Waktu (menit)'],
+                                        ]],
+                                        ['no'=>8,'name'=>'SMOKING','fields'=>[
+                                        ['db'=>'room_temperature','label'=>'Suhu Ruang (°C)'],
+                                        ['db'=>'rh','label'=>'RH (%)'],
+                                        ['db'=>'time_minutes','label'=>'Waktu (menit)'],
+                                        ]],
+                                        ['no'=>9,'name'=>'COOKINGI','fields'=>[
                                         ['db'=>'room_temperature','label'=>'Suhu Ruang (°C)'],
                                         ['db'=>'product_temperature','label'=>'Suhu Produk (°C)'],
                                         ['db'=>'time_minutes','label'=>'Waktu (menit)'],
                                         ]],
-                                        ['no'=>8,'name'=>'EVAKUASI','fields'=>[
+                                        ['no'=>10,'name'=>'COOKINGII','fields'=>[
+                                        ['db'=>'room_temperature','label'=>'Suhu Ruang (°C)'],
+                                        ['db'=>'product_temperature','label'=>'Suhu Produk (°C)'],
+                                        ['db'=>'time_minutes','label'=>'Waktu (menit)'],
+                                        ]],
+                                        ['no'=>11,'name'=>'EVAKUASI','fields'=>[
                                         ['db'=>'time_minutes','label'=>'Waktu (menit)'],
                                         ]],
                                         ];
