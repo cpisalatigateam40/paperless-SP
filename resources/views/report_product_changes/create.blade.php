@@ -33,7 +33,7 @@ $conditionOptions_3_8 = array_slice($conditionOptions_1_8, 2, 6, true); // dari 
                 </div>
                 <div class="col-md-3 mb-2">
                     <label>Shift</label>
-                    <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
+                    <input type="text" name="shift" class="form-control" required>
                 </div>
                 <div class="col-md-3 mb-2">
                     <label>Produk</label>

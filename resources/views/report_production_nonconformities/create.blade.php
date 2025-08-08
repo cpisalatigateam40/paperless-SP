@@ -18,7 +18,7 @@
                     </div>
                     <div class="mb-3 col-md-6">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" value="{{ getShift() }}">
+                        <input type="text" name="shift" class="form-control">
                     </div>
                 </div>
 

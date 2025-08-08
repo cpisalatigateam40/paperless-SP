@@ -20,7 +20,7 @@
                         </div>
                         <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control" value="{{ getShift() }}" required>
+                            <input type="text" name="shift" class="form-control" required>
                         </div>
                     </div>
 

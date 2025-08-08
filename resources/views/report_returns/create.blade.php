@@ -16,7 +16,7 @@
                 </div>
                 <div class="mb-2">
                     <label for="shift">Shift</label>
-                    <input name="shift" id="shift" class="form-control" value="{{ getShift() }}" required>
+                    <input name="shift" id="shift" class="form-control" required>
                 </div>
 
                 <hr>

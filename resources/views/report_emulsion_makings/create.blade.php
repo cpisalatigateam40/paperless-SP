@@ -19,7 +19,7 @@
                     </div>
                     <div class="col">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" value="{{ getShift() }}">
+                        <input type="text" name="shift" class="form-control">
                     </div>
                 </div>
 
