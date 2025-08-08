@@ -64,10 +64,12 @@
                         <div class="row g-3 card-body">
                             <div class="col-md-4">
                                 <label>Nama Produk</label>
-                                <select name="details[{{ $i }}][product_uuid]" class="form-control">
+                                <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector"
+                                    data-index="{{ $i }}">
                                     <option value="">-- Pilih Produk --</option>
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}
+                                        {{ $product->nett_weight }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -99,27 +101,27 @@
                         {{-- Process Steps --}}
                         @php
                         $steps = [
-                        ['name' => 'DRYING 1', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
+                        ['name' => 'DRYINGI', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                         'room_temp_2']],
-                        ['name' => 'DRYING 2', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
+                        ['name' => 'DRYINGII', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                         'room_temp_2']],
-                        ['name' => 'DRYING 3', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
+                        ['name' => 'DRYINGIII', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                         'room_temp_2']],
-                        ['name' => 'DRYING 4', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
+                        ['name' => 'DRYINGIV', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                         'room_temp_2']],
-                        ['name' => 'DRYING 5', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
+                        ['name' => 'DRYINGV', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                         'room_temp_2']],
                         ['name' => 'DOOR OPENING SECTION 1', 'fields' => []],
                         ['name' => 'PUT CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2']],
-                        ['name' => 'SMOKING 2', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
+                        ['name' => 'SMOKING', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                         'room_temp_2']],
                         [
-                        'name' => 'LP STEAM COOKING 1',
+                        'name' => 'COOKINGI',
                         'fields' => ['time_minutes_1', 'time_minutes_2', 'air_circulation_1', 'air_circulation_2',
                         'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2']
                         ],
                         [
-                        'name' => 'LP STEAM COOKING 2',
+                        'name' => 'COOKINGII',
                         'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
                         'product_temp_2', 'actual_product_temp']
                         ],
@@ -155,7 +157,9 @@
                                                 <td>
                                                     <input type="text" readonly class="form-control form-control-sm"
                                                         name="details[{{ $i }}][process_steps][{{ $index }}][step_name]"
-                                                        value="{{ $step['name'] }}">
+                                                        value="{{ strtoupper(str_replace(' ', '', $step['name'])) }}"
+                                                        data-index="{{ $i }}"
+                                                        data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}">
                                                 </td>
                                                 @foreach(['time_minutes_1', 'time_minutes_2', 'room_temp_1',
                                                 'room_temp_2', 'air_circulation_1', 'air_circulation_2',
@@ -164,7 +168,10 @@
                                                 <td>
                                                     @if(in_array($field, $step['fields']))
                                                     <input type="number" step="any" class="form-control form-control-sm"
-                                                        name="details[{{ $i }}][process_steps][{{ $index }}][{{ $field }}]">
+                                                        name="details[{{ $i }}][process_steps][{{ $index }}][{{ $field }}]"
+                                                        data-index="{{ $i }}"
+                                                        data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}"
+                                                        data-field="{{ $field }}">
                                                     @else
                                                     <input type="number" step="any" class="form-control form-control-sm"
                                                         disabled>
@@ -426,4 +433,59 @@
 <button class="btn btn-success mt-3">Simpan Laporan</button>
 </form>
 </div>
+@endsection
+
+@section('script')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fessmanStandards = @json($fessmanStandardMap);
+
+    console.log('✅ Fessman Standards loaded:', fessmanStandards);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('product-selector')) {
+            const select = e.target;
+            const productUuid = select.value;
+            const index = select.dataset.index;
+
+            console.log(`➡️ Product selected: ${productUuid}`);
+            console.log(`➡️ Data index: ${index}`);
+
+            const relatedInputs = document.querySelectorAll(`input[data-index="${index}"]`);
+            console.log(`🧩 Related inputs found:`, relatedInputs.length);
+
+            if (!fessmanStandards[productUuid]) {
+                console.warn(`🚫 No FessmanStandard found for product: ${productUuid}`);
+                relatedInputs.forEach(input => {
+                    if (!input.disabled) input.value = '';
+                });
+                return;
+            }
+
+            relatedInputs.forEach(input => {
+                const step = input.dataset.step;
+                const field = input.dataset.field;
+
+                console.log(`🔍 Input: step="${step}", field="${field}"`);
+
+                if (!step || !field) {
+                    console.warn('⚠️ Missing step or field');
+                    return;
+                }
+
+                const stepData = fessmanStandards[productUuid][step];
+                console.log(`📦 Step data for "${step}":`, stepData);
+
+                if (stepData && stepData[field] !== undefined) {
+                    input.value = stepData[field];
+                    console.log(`✅ Set value for [${step}][${field}]: ${stepData[field]}`);
+                } else {
+                    input.value = '';
+                    console.warn(`❓ Data not found for [${step}][${field}]`);
+                }
+            });
+        }
+    });
+});
+</script>
 @endsection

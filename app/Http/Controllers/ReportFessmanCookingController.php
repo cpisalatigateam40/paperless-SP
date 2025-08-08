@@ -9,6 +9,8 @@ use App\Models\FsCoolingDown;
 use App\Models\FsSensoryCheck;
 use App\Models\Product;
 use App\Models\Section;
+use App\Models\Area;
+use App\Models\FessmanStandard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -30,12 +32,45 @@ class ReportFessmanCookingController extends Controller
 
     public function create()
     {
-        $products = Product::all()->groupBy('product_name')
-            ->map(function ($group) {
-                return $group->first();
-            });
+        $products = Product::all();
         $sections = Section::all();
-        return view('report_fessman_cookings.create', compact('products', 'sections'));
+        $areas = Area::all();
+
+        // Ambil semua data Maurer Standard beserta step-nya
+        $fessmanStandards = FessmanStandard::with('processStep')->get();
+
+        // Bangun struktur JSON untuk frontend
+        $fessmanStandardMap = [];
+
+        foreach ($fessmanStandards as $standard) {
+            $productUuid = $standard->product_uuid;
+            $stepName = optional($standard->processStep)->process_name ?? null;
+
+            if (!$stepName)
+                continue;
+
+            // Normalisasi step name agar cocok dengan data-step di HTML
+            $normalizedStep = strtoupper(str_replace(' ', '', $stepName));
+
+            $fessmanStandardMap[$productUuid][$normalizedStep] = [
+                'room_temp_1' => $standard->st_min,
+                'room_temp_2' => $standard->st_max,
+                // 'rh_1' => $standard->rh_min,
+                // 'rh_2' => $standard->rh_max,
+                'time_minutes_1' => $standard->time_minute_min,
+                'time_minutes_2' => $standard->time_minute_max,
+                'product_temp_1' => $standard->ct_min,
+                'product_temp_2' => $standard->ct_max,
+            ];
+        }
+
+        return view('report_fessman_cookings.create', [
+            'areas' => $areas,
+            'sections' => $sections,
+            'products' => $products,
+            'fessmanStandards' => $fessmanStandards,
+            'fessmanStandardMap' => $fessmanStandardMap,
+        ]);
     }
 
     public function store(Request $request)
@@ -155,7 +190,38 @@ class ReportFessmanCookingController extends Controller
         $products = Product::all();
         $sections = Section::all();
 
-        return view('report_fessman_cookings.edit', compact('report', 'products', 'sections'));
+        $fessmanStandards = FessmanStandard::with('processStep')->get();
+        $fessmanStandardMap = [];
+
+        foreach ($fessmanStandards as $standard) {
+            $productUuid = $standard->product_uuid;
+            $stepName = optional($standard->processStep)->process_name ?? null;
+
+            if (!$stepName)
+                continue;
+
+            // Normalisasi step name agar cocok dengan data-step di HTML
+            $normalizedStep = strtoupper(str_replace(' ', '', $stepName));
+
+            $fessmanStandardMap[$productUuid][$normalizedStep] = [
+                'room_temp_1' => $standard->st_min,
+                'room_temp_2' => $standard->st_max,
+                // 'rh_1' => $standard->rh_min,
+                // 'rh_2' => $standard->rh_max,
+                'time_minutes_1' => $standard->time_minute_min,
+                'time_minutes_2' => $standard->time_minute_max,
+                'product_temp_1' => $standard->ct_min,
+                'product_temp_2' => $standard->ct_max,
+            ];
+        }
+
+        return view('report_fessman_cookings.edit', [
+            'report' => $report,
+            'sections' => $sections,
+            'products' => $products,
+            'fessmanStandards' => $fessmanStandards,
+            'fessmanStandardMap' => $fessmanStandardMap,
+        ]);
     }
 
     public function update(Request $request, $uuid)
