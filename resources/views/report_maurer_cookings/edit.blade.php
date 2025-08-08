@@ -454,49 +454,8 @@ function calculateAvgExitTemp(i) {
 
 document.addEventListener('DOMContentLoaded', function() {
     const maurerStandards = @json($maurerStandardMap);
-    const stepDefinitions = @json($steps); // kirim $steps juga
 
-    function createStepRow(stepName, stepIndex, productIndex) {
-        const template = document.querySelector('#step-template').cloneNode(true);
-        template.removeAttribute('id');
-
-        const stepKey = stepName.toUpperCase().replace(/\s+/g, '');
-        const stepConfig = stepDefinitions.find(s => s.name === stepName);
-        const fields = stepConfig?.fields || [];
-
-        // Isi input
-        const inputs = template.querySelectorAll('input');
-        inputs.forEach(input => {
-            let name = input.getAttribute('name');
-            let dataField = input.dataset.field;
-
-            // Ganti placeholder di name dan data attribute
-            name = name.replace(/__index__/g, productIndex)
-                .replace(/__step__/g, stepKey)
-                .replace(/__step_index__/g, stepIndex);
-
-            input.setAttribute('name', name);
-            input.setAttribute('data-index', productIndex);
-            input.setAttribute('data-step', stepKey);
-
-            // step_name
-            if (input.classList.contains('step-name')) {
-                input.value = stepKey;
-                input.readOnly = true;
-            }
-
-            // hanya isi field yang didefinisikan
-            if (input.classList.contains('step-field')) {
-                if (!fields.includes(dataField)) {
-                    input.disabled = true;
-                } else {
-                    input.disabled = false;
-                }
-            }
-        });
-
-        return template;
-    }
+    console.log('✅ Maurer Standards loaded:', maurerStandards);
 
     document.addEventListener('change', function(e) {
         if (e.target.classList.contains('product-selector')) {
@@ -504,29 +463,41 @@ document.addEventListener('DOMContentLoaded', function() {
             const productUuid = select.value;
             const index = select.dataset.index;
 
-            const tableBody = document.getElementById('process-steps-body');
-            tableBody.innerHTML = ''; // Kosongkan dulu
+            console.log(`➡️ Product selected: ${productUuid}`);
+            console.log(`➡️ Data index: ${index}`);
 
-            const productSteps = maurerStandards[productUuid];
-            if (!productSteps) return;
+            const relatedInputs = document.querySelectorAll(`input[data-index="${index}"]`);
+            console.log(`🧩 Related inputs found:`, relatedInputs.length);
 
-            const stepNames = Object.keys(productSteps);
-
-            stepNames.forEach((stepName, i) => {
-                const row = createStepRow(stepName, i, index);
-
-                // Isi nilai dari Maurer
-                const inputs = row.querySelectorAll('input.step-field');
-                inputs.forEach(input => {
-                    const step = input.dataset.step;
-                    const field = input.dataset.field;
-
-                    if (productSteps[step] && productSteps[step][field] !== undefined) {
-                        input.value = productSteps[step][field];
-                    }
+            if (!maurerStandards[productUuid]) {
+                console.warn(`🚫 No MaurerStandard found for product: ${productUuid}`);
+                relatedInputs.forEach(input => {
+                    if (!input.disabled) input.value = '';
                 });
+                return;
+            }
 
-                tableBody.appendChild(row);
+            relatedInputs.forEach(input => {
+                const step = input.dataset.step;
+                const field = input.dataset.field;
+
+                console.log(`🔍 Input: step="${step}", field="${field}"`);
+
+                if (!step || !field) {
+                    console.warn('⚠️ Missing step or field');
+                    return;
+                }
+
+                const stepData = maurerStandards[productUuid][step];
+                console.log(`📦 Step data for "${step}":`, stepData);
+
+                if (stepData && stepData[field] !== undefined) {
+                    input.value = stepData[field];
+                    console.log(`✅ Set value for [${step}][${field}]: ${stepData[field]}`);
+                } else {
+                    input.value = '';
+                    console.warn(`❓ Data not found for [${step}][${field}]`);
+                }
             });
         }
     });

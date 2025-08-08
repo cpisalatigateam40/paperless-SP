@@ -235,7 +235,7 @@
             ],
             [
             'no' => 6,
-            'name' => 'SMOKING',
+            'name' => 'DRYINGIV',
             'fields' => [
             [
             'db' => 'room_temperature',
@@ -248,7 +248,33 @@
             ],
             [
             'no' => 7,
-            'name' => 'COOKING',
+            'name' => 'DRYINGV',
+            'fields' => [
+            [
+            'db' => 'room_temperature',
+            'label' => 'Suhu Ruang
+            (°C)'
+            ],
+            ['db' => 'rh', 'label' => 'RH (%)'],
+            ['db' => 'time_minutes', 'label' => 'Waktu (menit)']
+            ]
+            ],
+            [
+            'no' => 8,
+            'name' => 'SMOKING',
+            'fields' => [
+            [
+            'db' => 'room_temperature',
+            'label' => 'Suhu Ruang
+            (°C)'
+            ],
+            ['db' => 'rh', 'label' => 'RH (%)'],
+            ['db' => 'time_minutes', 'label' => 'Waktu (menit)']
+            ]
+            ],
+            [
+            'no' => 9,
+            'name' => 'COOKINGI',
             'fields' => [
             [
             'db' => 'room_temperature',
@@ -263,7 +289,24 @@
             ]
             ]
             ],
-            ['no' => 8, 'name' => 'EVAKUASI', 'fields' => [['db' => 'time_minutes', 'label' => 'Waktu (menit)']]],
+            [
+            'no' => 10,
+            'name' => 'COOKINGII',
+            'fields' => [
+            [
+            'db' => 'room_temperature',
+            'label' => 'Suhu Ruang
+            (°C)'
+            ],
+            ['db' => 'product_temperature', 'label' => 'Suhu Produk (°C)'],
+            [
+            'db' => 'time_minutes',
+            'label' => 'Waktu
+            (menit)'
+            ]
+            ]
+            ],
+            ['no' => 11, 'name' => 'EVAKUASI', 'fields' => [['db' => 'time_minutes', 'label' => 'Waktu (menit)']]],
             ];
             @endphp
 
@@ -293,7 +336,7 @@
 
             {{-- Lama Proses --}}
             <tr>
-                <td>9. LAMA PROSES</td>
+                <td>12. LAMA PROSES</td>
                 @foreach ($report->details as $detail)
                 <td></td>
                 @endforeach
@@ -322,7 +365,7 @@
 
             {{-- Posisi Thermocouple --}}
             <tr>
-                <td>10. POSISI THERMOCOUPLE</td>
+                <td>13. POSISI THERMOCOUPLE</td>
                 @foreach ($report->details as $detail)
                 <td>
                     @foreach ($detail->thermocouplePositions as $pos)
@@ -334,7 +377,7 @@
 
             {{-- Sensorik --}}
             <tr>
-                <td>11. SENSORI</td>
+                <td>14. SENSORI</td>
                 @foreach ($report->details as $detail)
                 <td></td>
                 @endforeach
@@ -356,7 +399,7 @@
 
             {{-- Bisa/Tidak Bisa Di Ulir --}}
             <tr>
-                <td>12. Bisa/Tidak bisa Di Ulir (khusus sosis ayam okey)</td>
+                <td>15. Bisa/Tidak bisa Di Ulir (khusus sosis ayam okey)</td>
                 @foreach ($report->details as $detail)
                 <td>{{ $detail->can_be_twisted === null ? '-' : ($detail->can_be_twisted ? 'Bisa' : 'Tidak Bisa') }}
                 </td>
