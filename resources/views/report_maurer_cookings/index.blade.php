@@ -360,6 +360,7 @@
                                             <td>Suhu Produk /CT (°C)</td>
                                             @foreach ($report->details as $detail)
                                             @php
+                                            $scd = optional($detail->showeringCoolingDown);
                                             $v1 = $scd->product_temp_1 ?? '-';
                                             $v2 = $scd->product_temp_2 ?? '-';
                                             @endphp
@@ -371,6 +372,7 @@
                                             <td>Waktu (menit)</td>
                                             @foreach ($report->details as $detail)
                                             @php
+                                            $scd = optional($detail->showeringCoolingDown);
                                             $v1 = $scd->time_minutes_1 ?? '-';
                                             $v2 = $scd->time_minutes_2 ?? '-';
                                             @endphp
@@ -382,6 +384,7 @@
                                             <td>Suhu pusat produk setelah keluar (°C)</td>
                                             @foreach ($report->details as $detail)
                                             @php
+                                            $scd = optional($detail->showeringCoolingDown);
                                             $v1 = $scd->product_temp_after_exit_1 ?? '-';
                                             $v2 = $scd->product_temp_after_exit_2 ?? '-';
                                             $v3 = $scd->product_temp_after_exit_3 ?? '-';
@@ -393,9 +396,14 @@
                                         <tr>
                                             <td>Suhu rata-rata pusat produk setelah keluar (°C)</td>
                                             @foreach ($report->details as $detail)
+                                            @php
+                                            $scd = optional($detail->showeringCoolingDown);
+                                            @endphp
                                             <td>{{ $scd->avg_product_temp_after_exit ?? '-' }}</td>
                                             @endforeach
                                         </tr>
+
+
 
 
 

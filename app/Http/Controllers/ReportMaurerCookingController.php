@@ -289,7 +289,7 @@ class ReportMaurerCookingController extends Controller
     {
         DB::beginTransaction();
         try {
-            $report = ReportMaurerCooking::where('uuid', $uuid)->firstOrFail();
+            $report = ReportMaurerCooking::with('details')->where('uuid', $uuid)->firstOrFail();
 
             // Update header
             $report->update([
@@ -298,33 +298,57 @@ class ReportMaurerCookingController extends Controller
                 'shift' => $request['shift'],
             ]);
 
-            // Hapus semua detail + child
-            foreach ($report->details as $detail) {
-                $detail->processSteps()->delete();
-                $detail->totalProcessTime()->delete();
-                $detail->thermocouplePositions()->delete();
-                $detail->sensoryCheck()->delete();
-                $detail->showeringCoolingDown()->delete();
-                $detail->cookingLosses()->delete();
-                $detail->delete();
+            // Ambil UUID detail yang dikirim dari form
+            $detailUuidsFromForm = collect($request['details'])->pluck('uuid')->filter()->toArray();
+
+            // Hapus detail yang sudah ada tapi tidak ada di form
+            foreach ($report->details as $existingDetail) {
+                if (!in_array($existingDetail->uuid, $detailUuidsFromForm)) {
+                    $existingDetail->processSteps()->delete();
+                    $existingDetail->totalProcessTime()->delete();
+                    $existingDetail->thermocouplePositions()->delete();
+                    $existingDetail->sensoryCheck()->delete();
+                    $existingDetail->showeringCoolingDown()->delete();
+                    $existingDetail->cookingLosses()->delete();
+                    $existingDetail->delete();
+                }
             }
 
-            // Buat ulang detail + child
+            // Loop semua detail dari form
             foreach ($request['details'] as $detailData) {
                 if (empty($detailData['product_uuid']))
                     continue;
 
-                $detail = DetailMaurerCooking::create([
-                    'uuid' => Str::uuid(),
-                    'report_uuid' => $report->uuid,
-                    'product_uuid' => $detailData['product_uuid'],
-                    'production_code' => $detailData['production_code'] ?? null,
-                    'packaging_weight' => $detailData['packaging_weight'] ?? null,
-                    'trolley_count' => $detailData['trolley_count'] ?? null,
-                    'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
-                ]);
+                // Kalau detail sudah ada → update
+                if (!empty($detailData['uuid'])) {
+                    $detail = DetailMaurerCooking::where('uuid', $detailData['uuid'])->first();
+                    if (!$detail)
+                        continue;
+
+                    $detail->update([
+                        'product_uuid' => $detailData['product_uuid'],
+                        'production_code' => $detailData['production_code'] ?? null,
+                        'packaging_weight' => $detailData['packaging_weight'] ?? null,
+                        'trolley_count' => $detailData['trolley_count'] ?? null,
+                        'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
+                    ]);
+                } else {
+                    // Kalau detail baru → create
+                    $detail = DetailMaurerCooking::create([
+                        'uuid' => Str::uuid(),
+                        'report_uuid' => $report->uuid,
+                        'product_uuid' => $detailData['product_uuid'],
+                        'production_code' => $detailData['production_code'] ?? null,
+                        'packaging_weight' => $detailData['packaging_weight'] ?? null,
+                        'trolley_count' => $detailData['trolley_count'] ?? null,
+                        'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
+                    ]);
+                }
+
+                // =============== CHILD TABLE HANDLING ===============
 
                 // process_steps
+                $detail->processSteps()->delete();
                 if (!empty($detailData['process_steps'])) {
                     foreach ($detailData['process_steps'] as $step) {
                         if (empty($step['step_name']))
@@ -347,21 +371,17 @@ class ReportMaurerCookingController extends Controller
                 }
 
                 // total_process_time
+                $detail->totalProcessTime()->delete();
                 if (!empty($detailData['total_process_time']['start_time']) || !empty($detailData['total_process_time']['end_time'])) {
                     $startTime = $detailData['total_process_time']['start_time'] ?? null;
                     $endTime = $detailData['total_process_time']['end_time'] ?? null;
 
                     $duration = null;
                     if ($startTime && $endTime) {
-                        // Hitung selisih dalam menit
                         $start = \Carbon\Carbon::createFromFormat('H:i', $startTime);
                         $end = \Carbon\Carbon::createFromFormat('H:i', $endTime);
-
-                        // Kalau end < start diasumsikan lewat tengah malam
-                        if ($end->lessThan($start)) {
+                        if ($end->lessThan($start))
                             $end->addDay();
-                        }
-
                         $duration = $start->diffInMinutes($end);
                     }
 
@@ -374,8 +394,8 @@ class ReportMaurerCookingController extends Controller
                     ]);
                 }
 
-
                 // thermocouple_positions
+                $detail->thermocouplePositions()->delete();
                 if (!empty($detailData['thermocouple_positions'])) {
                     foreach ($detailData['thermocouple_positions'] as $pos) {
                         if (!empty($pos['position_info'])) {
@@ -389,6 +409,7 @@ class ReportMaurerCookingController extends Controller
                 }
 
                 // sensory_check
+                $detail->sensoryCheck()->delete();
                 if (!empty($detailData['sensory_check'])) {
                     ShSensoryCheck::create([
                         'uuid' => Str::uuid(),
@@ -402,6 +423,7 @@ class ReportMaurerCookingController extends Controller
                 }
 
                 // showering_cooling_down
+                $detail->showeringCoolingDown()->delete();
                 if (!empty($detailData['showering_cooling_down']['showering_time'])) {
                     ShoweringCoolingDown::create([
                         'uuid' => Str::uuid(),
@@ -421,6 +443,7 @@ class ReportMaurerCookingController extends Controller
                 }
 
                 // cooking_losses
+                $detail->cookingLosses()->delete();
                 if (!empty($detailData['cooking_losses'])) {
                     foreach ($detailData['cooking_losses'] as $loss) {
                         if (!empty($loss['batch_code'])) {
@@ -445,6 +468,7 @@ class ReportMaurerCookingController extends Controller
             return back()->with('error', 'Update gagal: ' . $e->getMessage());
         }
     }
+
 
     public function approve($id)
     {
