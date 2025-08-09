@@ -406,55 +406,85 @@
                 @endforeach
             </tr>
 
-            {{-- Showering & Cooling Down --}}
+            {{-- B. Showering & Cooling Down --}}
             <tr class="table-secondary">
-                <td colspan="{{ 1 + $report->details->count() }}" class="text-start fw-semibold"
-                    style="font-weight: bold;">
+                <td colspan="{{ 1 + $report->details->count() }}" class="text-start fw-semibold">
                     B. Showering & Cooling Down
                 </td>
             </tr>
-            <tr>
+
+            {{-- 1 SHOWERING --}}
+            <tr style="background-color: seashell;">
                 <td>1 SHOWERING</td>
                 @foreach ($report->details as $detail)
-                <td>{{ optional($detail->showeringCoolingDown)->showering_time ?? '-' }}</td>
+                <td>{{ optional($detail->showeringCoolingDown)->showering_time ?? '-' }}
+                </td>
                 @endforeach
             </tr>
-            <tr>
+
+            {{-- 2 COOLING DOWN --}}
+            <tr style="background-color: seashell;">
                 <td>2 COOLING DOWN</td>
                 @foreach ($report->details as $detail)
-                <td></td>
+                <td></td> {{-- kosong karena judul --}}
                 @endforeach
             </tr>
+
             <tr>
                 <td>Suhu Ruangan /ST (°C)</td>
                 @foreach ($report->details as $detail)
-                @php $scd = optional($detail->showeringCoolingDown); @endphp
-                <td>{{ ($scd->room_temp_1 ?? '-') }} / {{ ($scd->room_temp_2 ?? '-') }}</td>
+                @php
+                $scd = optional($detail->showeringCoolingDown);
+                $v1 = $scd->room_temp_1 ?? '-';
+                $v2 = $scd->room_temp_2 ?? '-';
+                @endphp
+                <td>{{ $v1 }} / {{ $v2 }}</td>
                 @endforeach
             </tr>
+
             <tr>
                 <td>Suhu Produk /CT (°C)</td>
                 @foreach ($report->details as $detail)
-                <td>{{ ($scd->product_temp_1 ?? '-') }} / {{ ($scd->product_temp_2 ?? '-') }}</td>
+                @php
+                $scd = optional($detail->showeringCoolingDown);
+                $v1 = $scd->product_temp_1 ?? '-';
+                $v2 = $scd->product_temp_2 ?? '-';
+                @endphp
+                <td>{{ $v1 }} / {{ $v2 }}</td>
                 @endforeach
             </tr>
+
             <tr>
                 <td>Waktu (menit)</td>
                 @foreach ($report->details as $detail)
-                <td>{{ ($scd->time_minutes_1 ?? '-') }} / {{ ($scd->time_minutes_2 ?? '-') }}</td>
+                @php
+                $scd = optional($detail->showeringCoolingDown);
+                $v1 = $scd->time_minutes_1 ?? '-';
+                $v2 = $scd->time_minutes_2 ?? '-';
+                @endphp
+                <td>{{ $v1 }} / {{ $v2 }}</td>
                 @endforeach
             </tr>
+
             <tr>
                 <td>Suhu pusat produk setelah keluar (°C)</td>
                 @foreach ($report->details as $detail)
-                <td>{{ ($scd->product_temp_after_exit_1 ?? '-') }}
-                    / {{ ($scd->product_temp_after_exit_2 ?? '-') }} /
-                    {{ ($scd->product_temp_after_exit_3 ?? '-') }}</td>
+                @php
+                $scd = optional($detail->showeringCoolingDown);
+                $v1 = $scd->product_temp_after_exit_1 ?? '-';
+                $v2 = $scd->product_temp_after_exit_2 ?? '-';
+                $v3 = $scd->product_temp_after_exit_3 ?? '-';
+                @endphp
+                <td>{{ $v1 }} / {{ $v2 }} / {{ $v3 }}</td>
                 @endforeach
             </tr>
+
             <tr>
                 <td>Suhu rata-rata pusat produk setelah keluar (°C)</td>
                 @foreach ($report->details as $detail)
+                @php
+                $scd = optional($detail->showeringCoolingDown);
+                @endphp
                 <td>{{ $scd->avg_product_temp_after_exit ?? '-' }}</td>
                 @endforeach
             </tr>
