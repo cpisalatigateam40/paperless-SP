@@ -18,7 +18,9 @@ class MaurerStandardController extends Controller
             ->get()
             ->groupBy('product_uuid'); // kelompokkan berdasarkan produk
 
-        return view('maurer-standards.index', compact('standards'));
+        $products = Product::all();
+
+        return view('maurer-standards.index', compact('standards', 'products'));
     }
 
 

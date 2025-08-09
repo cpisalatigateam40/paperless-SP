@@ -152,7 +152,7 @@
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $detail->premix->name ?? '-' }}</td>
-                <td>{{ $detail->premix->production_code ?? '-' }}</td>
+                <td>{{ $detail->production_code ?? '-' }}</td>
                 <td class="text-end">{{ $detail->weight }}</td>
                 <td>{{ $detail->used_for_batch }}</td>
                 <td>{{ $detail->notes }}</td>

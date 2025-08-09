@@ -79,10 +79,10 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input type="text" name="agings[0][start_aging]" class="form-control">
+                                <input type="time" name="agings[0][start_aging]" class="form-control">
                             </td>
                             <td>
-                                <input type="text" name="agings[0][finish_aging]" class="form-control">
+                                <input type="time" name="agings[0][finish_aging]" class="form-control">
                             </td>
                             <td>
                                 <select name="agings[0][emulsion_result]" class="form-control">
