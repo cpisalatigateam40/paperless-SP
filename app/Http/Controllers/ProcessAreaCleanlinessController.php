@@ -60,7 +60,7 @@ class ProcessAreaCleanlinessController extends Controller
                 foreach ($detailInput['items'] as $itemInput) {
                     $itemName = $itemInput['item'];
 
-                    ItemProcessAreaCleanliness::create([
+                    $item = ItemProcessAreaCleanliness::create([
                         'detail_uuid' => $detail->uuid,
                         'item' => $itemName,
                         'condition' => $itemInput['condition'] ?? null,
@@ -71,7 +71,6 @@ class ProcessAreaCleanlinessController extends Controller
                         'verification' => $itemInput['verification'] ?? 0,
                     ]);
 
-                    // Simpan followups kalau ada
                     if (!empty($itemInput['followups']) && is_array($itemInput['followups'])) {
                         foreach ($itemInput['followups'] as $followup) {
                             ItemFollowup::create([
@@ -82,6 +81,7 @@ class ProcessAreaCleanlinessController extends Controller
                             ]);
                         }
                     }
+
                 }
 
             }

@@ -331,12 +331,12 @@
                                                 class="form-control" required>
                                         </div>
 
-                                        <button type="button" id="sync-sensor"
+                                        <!-- <button type="button" id="sync-sensor"
                                             class="btn btn-outline-primary mb-3 mt-3 btn-sm w-100 d-flex justify-content-center align-items-center"
                                             style="gap: .5rem;">
                                             <span class="icon">🔄</span>
                                             <span class="label">Sync Data Sensor</span>
-                                        </button>
+                                        </button> -->
 
                                         <p id="sync-status-message" class="text-success text-center"
                                             style="display: none; margin-top: -.5rem;">

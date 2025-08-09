@@ -2,12 +2,15 @@
 
 @section('content')
 <div class="container-fluid">
-    <h4 class="mb-3">Tambah Laporan Loss Vacuum</h4>
+
 
     <form action="{{ route('report_prod_loss_vacums.store') }}" method="POST">
         @csrf
 
         <div class="card shadow mb-3">
+            <div class="card-header">
+                <h4>Tambah Laporan Loss Vacuum</h4>
+            </div>
             <div class="card-body row g-3">
                 <div class="col-md-3">
                     <label>Tanggal</label>
