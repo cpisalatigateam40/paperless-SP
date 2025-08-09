@@ -28,7 +28,7 @@ class RoomEquipmentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'elements' => 'array',
+            'elements' => 'nullable|string',
         ]);
 
         $room = Room::create([
@@ -37,16 +37,23 @@ class RoomEquipmentController extends Controller
             'area_uuid' => Auth::user()->area_uuid,
         ]);
 
-        foreach ($request->elements ?? [] as $element) {
-            RoomElement::create([
-                'uuid' => (string) Str::uuid(),
-                'room_uuid' => $room->uuid,
-                'element_name' => $element
-            ]);
+        $elements = array_map('trim', explode(',', $request->elements));
+
+        foreach ($elements as $element) {
+            if ($element !== '') {
+                RoomElement::create([
+                    'uuid' => (string) Str::uuid(),
+                    'room_uuid' => $room->uuid,
+                    'element_name' => $element
+                ]);
+            }
         }
+
 
         return back()->with('success', 'Ruangan berhasil ditambahkan.');
     }
+
+
 
     public function destroyRoom($uuid)
     {
@@ -59,7 +66,7 @@ class RoomEquipmentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'parts' => 'array',
+            'parts' => 'nullable|string',
         ]);
 
         $equipment = Equipment::create([
@@ -68,12 +75,17 @@ class RoomEquipmentController extends Controller
             'area_uuid' => Auth::user()->area_uuid,
         ]);
 
-        foreach ($request->parts ?? [] as $part) {
-            EquipmentPart::create([
-                'uuid' => (string) Str::uuid(),
-                'equipment_uuid' => $equipment->uuid,
-                'part_name' => $part
-            ]);
+        // Pecah string berdasarkan koma dan trim spasi
+        $parts = array_map('trim', explode(',', $request->parts));
+
+        foreach ($parts as $part) {
+            if ($part !== '') {
+                EquipmentPart::create([
+                    'uuid' => (string) Str::uuid(),
+                    'equipment_uuid' => $equipment->uuid,
+                    'part_name' => $part
+                ]);
+            }
         }
 
         return back()->with('success', 'Mesin/peralatan berhasil ditambahkan.');
