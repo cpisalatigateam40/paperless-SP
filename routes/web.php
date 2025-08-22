@@ -61,7 +61,7 @@ use App\Http\Controllers\ReportProcessProdController;
 use App\Http\Controllers\StandardStufferController;
 use App\Http\Controllers\MaurerStandardController;
 use App\Http\Controllers\FessmanStandardController;
-use App\Http\Controllers\Api\ApiController;
+
 
 Route::redirect('/', '/login');
 
@@ -932,6 +932,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
         });
 
-    Route::post('/api/user-sync', [ApiController::class, 'syncUser']);
-    Route::post('/api/user-desync', [ApiController::class, 'desyncUser']);
+    Route::post('user-sync', [ApiController::class, 'syncUser']);
+    Route::post('user-desync', [ApiController::class, 'desyncUser']);
 });
