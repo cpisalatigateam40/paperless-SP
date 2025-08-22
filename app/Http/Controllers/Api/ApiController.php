@@ -48,13 +48,11 @@ class ApiController extends Controller
             ];
 
 
-            $existingUser = User::withTrashed()->where('uuid', $user['uuid'])->first();
+            $existingUser = User::where('uuid', $user['uuid'])->first();
 
 
             if ($existingUser) {
-                if ($existingUser->trashed()) {
-                    $existingUser->restore();
-                }
+                
                 $existingUser->update($userData);
                 if (!empty($user['project_role']['role'])) {
                     $existingUser->assignRole($user['project_role']['role']);
