@@ -28,15 +28,7 @@ class ApiController extends Controller
             $user = $data['user'];
 
 
-            if (empty($user['department']['plant'])) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Missing department or plant information'
-                ], 400);
-            }
-
-
-            $area = Area::firstWhere('area', $user['department']['plant']);
+            $area = Area::firstWhere('name', $user['department']['plant']);
             if (!$area) {
                 return response()->json([
                     'status' => 'error',
