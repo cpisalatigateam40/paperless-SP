@@ -121,7 +121,7 @@
 
                     </tr>
                     <tr id="detail-{{ $report->id }}" class="d-none">
-                        <td colspan="6">
+                        <td colspan="7">
                             <table class="table table-sm table-bordered mb-0">
                                 <thead>
                                     <tr class="text-center align-middle">
@@ -131,6 +131,7 @@
                                         <th rowspan="2" class="align-middle">Kode Produksi / Expired Date</th>
                                         <th rowspan="2" class="align-middle">Kondisi Kemasan</th>
                                         <th colspan="2" class="align-middle">Kondisi Bahan</th>
+                                        <th rowspan="2" class="align-middle">Kontaminasi</th>
                                         <th rowspan="2" class="align-middle">Problem</th>
                                         <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
                                     </tr>
@@ -149,7 +150,10 @@
                                         <td>{{ $detail->production_code ?? '-' }}</td>
                                         <td class="text-center">{{ $detail->packaging_condition }}</td>
                                         <td class="text-center">{{ $detail->temperature }}</td>
-                                        <td class="text-center">{{ $detail->sensorial_condition }}</td>
+                                        <td class="text-center">Kenampakan: {{ $detail->sensory_appearance }}, Aroma:
+                                            {{ $detail->sensory_aroma }},Warna: {{ $detail->sensory_color }}
+                                        </td>
+                                        <td class="text-center">{{ $detail->contamination }}</td>
                                         <td>{{ $detail->problem ?? '-' }}</td>
                                         <td>{{ $detail->corrective_action ?? '-' }}</td>
                                     </tr>

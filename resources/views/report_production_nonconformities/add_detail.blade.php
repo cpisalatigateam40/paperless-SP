@@ -7,7 +7,8 @@
             <h4>Tambah Detail Ketidaksesuaian untuk Tanggal {{ $report->date }} - Shift {{ $report->shift }}</h4>
         </div>
         <div class="card-body">
-            <form action="{{ route('report_production_nonconformities.store-detail', $report->uuid) }}" method="POST">
+            <form action="{{ route('report_production_nonconformities.store-detail', $report->uuid) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
@@ -43,6 +44,10 @@
                         <option value="Return">Return</option>
                         <option value="Dimusnahkan">Dimusnahkan</option>
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bukti (Foto)</label>
+                    <input type="file" name="evidence" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label>Keterangan</label>

@@ -19,6 +19,10 @@ class DetailRmArrival extends Model
         'temperature',
         'packaging_condition',
         'sensorial_condition',
+        'sensory_appearance',
+        'sensory_aroma',
+        'sensory_color',
+        'contamination',
         'problem',
         'corrective_action',
     ];

@@ -20,6 +20,7 @@ class DetailProductionNonconformity extends Model
         'quantity',
         'hazard_category',
         'disposition',
+        'evidence',
         'remark',
     ];
 

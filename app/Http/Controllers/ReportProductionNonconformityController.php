@@ -35,6 +35,7 @@ class ReportProductionNonconformityController extends Controller
             'details.*.quantity' => 'required|integer',
             'details.*.hazard_category' => 'required|string',
             'details.*.disposition' => 'required|string',
+            'details.*.evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'details.*.remark' => 'nullable|string',
         ]);
 
@@ -48,7 +49,15 @@ class ReportProductionNonconformityController extends Controller
         ]);
 
         // Simpan detail (loop)
-        foreach ($validated['details'] as $detail) {
+        foreach ($validated['details'] as $index => $detail) {
+            $evidencePath = null;
+
+            if (isset($detail['evidence']) && $detail['evidence'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['evidence'];
+                $filename = time() . '_' . $index . '_' . $file->getClientOriginalName();
+                $evidencePath = $file->storeAs('evidence_product_nonconformities', $filename, 'public');
+            }
+            
             DetailProductionNonconformity::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
@@ -57,6 +66,7 @@ class ReportProductionNonconformityController extends Controller
                 'quantity' => $detail['quantity'],
                 'hazard_category' => $detail['hazard_category'],
                 'disposition' => $detail['disposition'],
+                'evidence' => $evidencePath,
                 'remark' => $detail['remark'] ?? null,
             ]);
         }
@@ -120,8 +130,16 @@ class ReportProductionNonconformityController extends Controller
             'quantity' => 'required|integer',
             'hazard_category' => 'required|string',
             'disposition' => 'required|string',
+            'evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'remark' => 'nullable|string',
         ]);
+
+        $evidencePath = null;
+        if ($request->hasFile('evidence')) {
+            $file = $request->file('evidence');
+            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $evidencePath = $file->storeAs('evidence_product_nonconformities', $filename, 'public');
+        }
 
         DetailProductionNonconformity::create([
             'uuid' => Str::uuid(),
@@ -131,6 +149,7 @@ class ReportProductionNonconformityController extends Controller
             'quantity' => $validated['quantity'],
             'hazard_category' => $validated['hazard_category'],
             'disposition' => $validated['disposition'],
+            'evidence' => $evidencePath,
             'remark' => $validated['remark'] ?? null,
         ]);
 

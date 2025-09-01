@@ -138,6 +138,7 @@
                 <th rowspan="2" class="text-center align-middle">Kode Produksi/Expired Date</th>
                 <th rowspan="2" class="text-center align-middle">Kondisi Kemasan</th>
                 <th colspan="2" class="text-center align-middle">Kondisi Bahan</th>
+                <th rowspan="2" class="text-center align-middle">Kontaminasi</th>
                 <th rowspan="2" class="text-left align-middle">Problem</th>
                 <th rowspan="2" class="text-left align-middle">Tindakan Koreksi</th>
             </tr>
@@ -155,17 +156,19 @@
                 <td class="text-center">{{ $detail->production_code ?? '-' }}</td>
                 <td class="text-center">{{ $detail->packaging_condition ?? '-' }}</td>
                 <td class="text-center">{{ $detail->temperature ?? '-' }}</td>
-                <td class="text-center">{{ $detail->sensorial_condition ?? '-' }}</td>
+                <td class="text-center">Kenampakan: {{ $detail->sensory_appearance ?? '-' }}, Aroma:
+                    {{ $detail->sensory_aroma ?? '-' }}, Warna: {{ $detail->sensory_color ?? '-' }}</td>
+                <td class="text-center">{{ $detail->contamination ?? '-' }}</td>
                 <td class="text-left">{{ $detail->problem ?? '-' }}</td>
                 <td class="text-left">{{ $detail->corrective_action ?? '-' }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="9" class="text-center">Tidak ada data pemeriksaan.</td>
+                <td colspan="10" class="text-center">Tidak ada data pemeriksaan.</td>
             </tr>
             @endforelse
             <tr>
-                <td colspan="9" style="text-align: right; border: none;">QM 03 / 02</td>
+                <td colspan="10" style="text-align: right; border: none;">QM 03 / 02</td>
             </tr>
         </tbody>
     </table>

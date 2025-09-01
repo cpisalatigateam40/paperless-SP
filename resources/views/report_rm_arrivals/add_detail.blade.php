@@ -40,25 +40,60 @@
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Jam</label>
                                 <input type="time" name="details[0][time]" class="form-control"
                                     value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Suhu (°C)</label>
                                 <input type="number" step="0.1" name="details[0][temperature]" class="form-control">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Kemasan</label>
                                 <select name="details[0][packaging_condition]" class="form-control">
                                     <option value="✓">✓</option>
                                     <option value="x">x</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <label class="form-label">Sensorik</label>
                                 <select name="details[0][sensorial_condition]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </div> -->
+
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Sensory Kenampakan</label>
+                                <select name="details[0][sensory_appearance]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Sensory Aroma</label>
+                                <select name="details[0][sensory_aroma]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Sensory Color</label>
+                                <select name="details[0][sensory_color]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Kontaminasi</label>
+                                <select name="details[0][contamination]" class="form-control">
                                     <option value="✓">✓</option>
                                     <option value="x">x</option>
                                 </select>
@@ -112,24 +147,56 @@
 
         </div>
         <div class="row mt-3">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label">Jam</label>
                 <input type="time" name="details[__index__][time]" class="form-control">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label">Suhu</label>
                 <input type="number" step="0.1" name="details[__index__][temperature]" class="form-control">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label">Kemasan</label>
                 <select name="details[__index__][packaging_condition]" class="form-control">
                     <option value="✓">✓</option>
                     <option value="x">x</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <!-- <div class="col-md-3">
                 <label class="form-label">Sensorik</label>
                 <select name="details[__index__][sensorial_condition]" class="form-control">
+                    <option value="✓">✓</option>
+                    <option value="x">x</option>
+                </select>
+            </div> -->
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <label class="form-label">Sensori Kenampakan</label>
+                <select name="details[__index__][sensory_appearance]" class="form-control">
+                    <option value="✓">✓</option>
+                    <option value="x">x</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sensori Aroma</label>
+                <select name="details[__index__][sensory_aroma]" class="form-control">
+                    <option value="✓">✓</option>
+                    <option value="x">x</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sensori Warna</label>
+                <select name="details[__index__][sensory_color]" class="form-control">
+                    <option value="✓">✓</option>
+                    <option value="x">x</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label class="form-label">Kontaminasi</label>
+                <select name="details[__index__][contamination]" class="form-control">
                     <option value="✓">✓</option>
                     <option value="x">x</option>
                 </select>

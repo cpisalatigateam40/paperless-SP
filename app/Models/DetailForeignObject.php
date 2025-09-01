@@ -25,6 +25,10 @@ class DetailForeignObject extends Model implements Auditable
         'contaminant_origin',
     ];
 
+    protected $auditEvents = [
+        'updated',
+    ];
+
     public function report()
     {
         return $this->belongsTo(ReportForeignObject::class, 'report_uuid', 'uuid');
@@ -34,4 +38,5 @@ class DetailForeignObject extends Model implements Auditable
     {
         return $this->belongsTo(Product::class, 'product_uuid', 'uuid');
     }
+
 }
