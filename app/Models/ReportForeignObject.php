@@ -31,6 +31,10 @@ class ReportForeignObject extends Model implements Auditable
         'date' => 'date',
     ];
 
+    protected $auditEvents = [
+        'updated',
+    ];
+
     public function details()
     {
         return $this->hasMany(DetailForeignObject::class, 'report_uuid', 'uuid');

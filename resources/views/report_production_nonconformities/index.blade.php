@@ -137,6 +137,7 @@
                                             <th>Jumlah</th>
                                             <th>Kategori Bahaya</th>
                                             <th>Disposisi</th>
+                                            <th class="align-middle">Bukti</th>
                                             <th>Keterangan</th>
                                         </tr>
                                     </thead>
@@ -148,6 +149,14 @@
                                             <td>{{ $detail->quantity }}</td>
                                             <td>{{ $detail->hazard_category }}</td>
                                             <td>{{ $detail->disposition }}</td>
+                                            <td>
+                                                @if($detail->evidence)
+                                                <a href="{{ asset('storage/' . $detail->evidence) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $detail->evidence) }}" alt="Bukti"
+                                                        width="60">
+                                                </a>
+                                                @endif
+                                            </td>
                                             <td>{{ $detail->remark ?? '-' }}</td>
                                         </tr>
                                         @empty

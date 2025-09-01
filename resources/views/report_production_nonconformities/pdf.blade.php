@@ -141,6 +141,7 @@
                     (BIOLOGI, FISIK, KIMIA, ALLERGEN, RADIOLOGI)</th>
                 <th>DISPOSISI <br>
                     (REWORK, REPACK, SORTIR, RETURN, DIMUSNAHKAN)</th>
+                <th class="align-middle">BUKTI (FOTO)</th>
                 <th>KETERANGAN</th>
             </tr>
         </thead>
@@ -153,11 +154,29 @@
                 <td>{{ $detail->quantity }}</td>
                 <td>{{ $detail->hazard_category }}</td>
                 <td>{{ $detail->disposition }}</td>
+                <td class="text-center">
+                    @php
+                    $evidencePath = storage_path('app/public/' . $detail->evidence);
+                    $evidenceBase64 = null;
+
+                    if ($detail->evidence && file_exists($evidencePath)) {
+                    $type = pathinfo($evidencePath, PATHINFO_EXTENSION);
+                    $data = file_get_contents($evidencePath);
+                    $evidenceBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
+                    @endphp
+
+                    @if($evidenceBase64)
+                    <img src="{{ $evidenceBase64 }}" width="50">
+                    @else
+                    -
+                    @endif
+                </td>
                 <td>{{ $detail->remark ?? '-' }}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="7" style="text-align: right; border: none;">QM 31 / 01</td>
+                <td colspan="8" style="text-align: right; border: none;">QM 31 / 01</td>
             </tr>
         </tbody>
     </table>

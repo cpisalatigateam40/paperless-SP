@@ -115,8 +115,8 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('rooms.index') }}">Ruangan, Mesin, dan Peralatan</a>
                 <a class="collapse-item {{ Request::is('fragile-item*') ? 'active' : '' }}"
                     href="{{ route('fragile-item.index') }}">Barang Mudah Pecah</a>
-                <a class="collapse-item {{ Request::is('sharp-tools*') ? 'active' : '' }}"
-                    href="{{ route('sharp_tools.index') }}">Benda Tajam</a>
+                <!-- <a class="collapse-item {{ Request::is('sharp-tools*') ? 'active' : '' }}"
+                    href="{{ route('sharp_tools.index') }}">Benda Tajam</a> -->
                 <!-- <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a> -->
                 <a class="collapse-item {{ Request::is('scales*') ? 'active' : '' }}"
                     href="{{ route('scales.index') }}">Timbangan</a>
@@ -271,10 +271,10 @@ $isKetidaksesuaian = Request::is([
                     Pemeriksaan Metal Detector Produk
                 </a>
 
-                <a class="collapse-item {{ Request::is('report-retain-samples*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-retain-samples*') ? 'active' : '' }}"
                     href="{{ route('report_retain_samples.index') }}">
                     Pendataan Retain Sample ABF/IQF
-                </a>
+                </a> -->
 
                 <a class="collapse-item {{ Request::is('report-product-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_product_verifs.index') }}">
@@ -286,10 +286,10 @@ $isKetidaksesuaian = Request::is([
                     Verifikasi Produk Tofu
                 </a>
 
-                <a class="collapse-item {{ Request::is('report-prod-loss-vacums*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-prod-loss-vacums*') ? 'active' : '' }}"
                     href="{{ route('report_prod_loss_vacums.index') }}">
                     Verifikasi Produk Loss Vacum
-                </a>
+                </a> -->
 
                 <a class="collapse-item {{ Request::is('report-packaging-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_packaging_verifs.index') }}">
@@ -354,10 +354,10 @@ $isKetidaksesuaian = Request::is([
                     Kebersihan Area Proses
                 </a>
 
-                <a class="collapse-item {{ Request::is('report-conveyor-cleanliness*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-conveyor-cleanliness*') ? 'active' : '' }}"
                     href="{{ route('report-conveyor-cleanliness.index') }}">
                     Kebersihan Conveyor Packing
-                </a>
+                </a> -->
 
                 {{-- <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">Report Pemeriksaan dan
                 Sanitasi Setelah Perbaikan Mesin</a> --}}
@@ -367,10 +367,10 @@ $isKetidaksesuaian = Request::is([
                     GMP karyawan & Kontrol Sanitasi
                 </a>
 
-                <a class="collapse-item {{ Request::is('report-chlorine-residues*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-chlorine-residues*') ? 'active' : '' }}"
                     href="{{ route('report_chlorine_residues.index') }}">
                     Air Proses Produksi
-                </a>
+                </a> -->
 
                 {{-- <a class="collapse-item" href="{{ route('report-solvents.index') }}">Report Pembuatan Larutan
                 Cleaning dan Sanitasi</a> --}}
@@ -388,10 +388,10 @@ $isKetidaksesuaian = Request::is([
                 {{-- <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">Report Inventaris
                 Peralatan QC</a> --}}
 
-                <a class="collapse-item {{ Request::is('report-sharp-tools*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-sharp-tools*') ? 'active' : '' }}"
                     href="{{ route('report_sharp_tools.index') }}">
                     Benda Tajam
-                </a>
+                </a> -->
             </div>
         </div>
     </li>

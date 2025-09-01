@@ -7,7 +7,8 @@
             <h4>Tambah Report Ketidaksesuaian Proses Produksi</h4>
         </div>
         <div class="card-body">
-            <form action="{{ route('report_production_nonconformities.store') }}" method="POST">
+            <form action="{{ route('report_production_nonconformities.store') }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
 
                 <div class="d-flex">
@@ -60,6 +61,10 @@
                                 <option value="Return">Return</option>
                                 <option value="Dimusnahkan">Dimusnahkan</option>
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bukti (Foto)</label>
+                            <input type="file" name="details[0][evidence]" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label>Keterangan</label>

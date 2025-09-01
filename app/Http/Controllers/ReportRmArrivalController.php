@@ -40,7 +40,7 @@ class ReportRmArrivalController extends Controller
         $report = ReportRmArrival::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
-            'section_uuid' => $request->section_uuid,  // tambahkan ini
+            'section_uuid' => $request->section_uuid,
             'date' => $request->date,
             'shift' => $request->shift,
             'created_by' => Auth::user()->name,
@@ -56,7 +56,11 @@ class ReportRmArrivalController extends Controller
                 'time' => $detail['time'],
                 'temperature' => $detail['temperature'],
                 'packaging_condition' => $detail['packaging_condition'],
-                'sensorial_condition' => $detail['sensorial_condition'],
+                // 'sensorial_condition' => $detail['sensorial_condition'],
+                'sensory_appearance' => $detail['sensory_appearance'],
+                'sensory_aroma' => $detail['sensory_aroma'],
+                'sensory_color' => $detail['sensory_color'],
+                'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
             ]);
@@ -97,7 +101,11 @@ class ReportRmArrivalController extends Controller
             'details.*.time' => 'nullable',
             'details.*.temperature' => 'nullable|numeric',
             'details.*.packaging_condition' => 'nullable|string',
-            'details.*.sensorial_condition' => 'nullable|string',
+            // 'details.*.sensorial_condition' => 'nullable|string',
+            'details.*.sensory_appearance' => 'nullable|string',
+            'details.*.sensory_aroma' => 'nullable|string',
+            'details.*.sensory_color' => 'nullable|string',
+            'details.*.contamination' => 'nullable|string',
             'details.*.problem' => 'nullable|string',
             'details.*.corrective_action' => 'nullable|string',
         ]);
@@ -112,7 +120,11 @@ class ReportRmArrivalController extends Controller
                 'time' => $detail['time'] ?? null,
                 'temperature' => $detail['temperature'] ?? null,
                 'packaging_condition' => $detail['packaging_condition'] ?? null,
-                'sensorial_condition' => $detail['sensorial_condition'] ?? null,
+                // 'sensorial_condition' => $detail['sensorial_condition'] ?? null,
+                'sensory_appearance' => $detail['sensory_appearance'] ?? null,
+                'sensory_aroma' => $detail['sensory_aroma'] ?? null,
+                'sensory_color' => $detail['sensory_color'] ?? null,
+                'contamination' => $detail['contamination'] ?? null,
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
             ]);
