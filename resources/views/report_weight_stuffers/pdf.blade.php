@@ -137,83 +137,86 @@
     </table>
 
     @php
-    $colspan = $report->details->count() * 2; // 2 kolom per produk (Townsend & Hitech)
+    $details = $report->details;
     @endphp
-
-    <table>
+    <table class="table table-bordered table-sm text-center align-middle mb-4">
+        {{-- Heading baris nama produk --}}
         <tr>
-            <th rowspan="3">Keterangan</th>
-            @foreach($report->details as $detail)
-            <th colspan="2">{{ $detail->product->product_name ?? '-' }}</th>
+            <th class="text-start">Nama Produk</th>
+            @foreach ($details as $d)
+            <th colspan="2">{{ $d->product->product_name ?? '-' }}</th>
             @endforeach
         </tr>
         <tr>
-            @foreach($report->details as $detail)
-            <th colspan="2">{{ $detail->production_code }}</th>
+            <th class="text-start">Kode Produksi</th>
+            @foreach ($details as $d)
+            <td colspan="2">{{ $d->production_code }}</td>
             @endforeach
         </tr>
         <tr>
-            @foreach($report->details as $detail)
-            <th colspan="2">{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</th>
+            <th class="text-start">Waktu Proses</th>
+            @foreach ($details as $d)
+            <td colspan="2">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             @endforeach
         </tr>
-
-        {{-- Label Mesin --}}
         <tr>
-            <th>Mesin Stuffer</th>
-            @foreach($report->details as $detail)
+            <th class="text-start">Mesin Stuffer</th>
+            @foreach ($details as $d)
             <th>Townsend</th>
             <th>Hitech</th>
             @endforeach
         </tr>
 
-        {{-- Kecepatan --}}
-        <tr>
-            <th>Kecepatan Stuffer (rpm)</th>
-            @foreach($report->details as $detail)
-            <td>{{ $detail->townsend?->stuffer_speed ?? '-' }}</td>
-            <td>{{ $detail->hitech?->stuffer_speed ?? '-' }}</td>
-            @endforeach
-        </tr>
+        @php
+        $labels = [
+        'Kecepatan Stuffer (rpm)' => 'speed',
+        'Ukuran Casing<br><small>(Aktual Panjang, Diameter)</small>' => 'casing',
 
-        {{-- Ukuran Casing --}}
+        'Standar Berat (gr)' => 'standard',
+        'Berat Aktual (gr)' => 'actual_weight',
+        'Rata-rata Berat Aktual (gr)' => 'avg',
+
+        'Standar Panjang' => 'standard_long',
+        'Panjang Aktual' => 'actual_long',
+        'Rata-rata Panjang Aktual' => 'avg_long',
+        'Catatan' => 'notes',
+        ];
+        @endphp
+
+        @foreach ($labels as $label => $key)
         <tr>
-            <th>Ukuran Casing<br>(Panjang / Diameter)</th>
-            @foreach($report->details as $detail)
+            <td class="text-start">{!! $label !!}</td>
+            @foreach ($details as $d)
             @php
-            $caseT = $detail->cases->get(0);
-            $caseH = $detail->cases->get(1);
+            $t = $d->townsend;
+            $h = $d->hitech;
+            $cT = $d->cases->get(0);
+            $cH = $d->cases->get(1);
+            $wT = $d->weights->get(0);
+            $wH = $d->weights->get(1);
             @endphp
-            <td>{{ $caseT?->actual_case_1 ?? '-' }} / {{ $caseT?->actual_case_2 ?? '-' }}</td>
-            <td>{{ $caseH?->actual_case_1 ?? '-' }} / {{ $caseH?->actual_case_2 ?? '-' }}</td>
-            @endforeach
-        </tr>
 
-        {{-- Trolley --}}
-        <!-- <tr>
-            <th>Jumlah Trolley</th>
-            @foreach($report->details as $detail)
-            <td>{{ $detail->townsend?->trolley_total ?? '-' }}</td>
-            <td>{{ $detail->hitech?->trolley_total ?? '-' }}</td>
-            @endforeach
-        </tr> -->
+            @switch($key)
+            @case('speed')
+            <td>{{ $t->stuffer_speed ?? '-' }}</td>
+            <td>{{ $h->stuffer_speed ?? '-' }}</td>
+            @break
 
-        {{-- Standar Berat --}}
-        <tr>
-            <th>Standar Berat (gr)</th>
-            @foreach($report->details as $detail)
-            <td colspan="2">{{ $detail->weight_standard ?? '-' }}</td>
-            @endforeach
-        </tr>
+            @case('casing')
+            <td>{{ $cT?->actual_case_1 ?? '-' }} / {{ $cT?->actual_case_2 ?? '-' }}</td>
+            <td>{{ $cH?->actual_case_1 ?? '-' }} / {{ $cH?->actual_case_2 ?? '-' }}</td>
+            @break
 
-        {{-- Berat Aktual --}}
-        <tr>
-            <th>Berat Aktual (gr)</th>
-            @foreach($report->details as $detail)
-            @php
-            $wT = $detail->weights->get(0);
-            $wH = $detail->weights->get(1);
-            @endphp
+            <!-- @case('trolley')
+                                        <td>{{ $t->trolley_total ?? '-' }}</td>
+                                        <td>{{ $h->trolley_total ?? '-' }}</td>
+                                        @break -->
+
+            @case('standard')
+            <td colspan="2">{{ $d->weight_standard ?? '-' }}</td>
+            @break
+
+            @case('actual_weight')
             <td>
                 {{ $wT?->actual_weight_1 ?? '-' }} /
                 {{ $wT?->actual_weight_2 ?? '-' }} /
@@ -224,29 +227,43 @@
                 {{ $wH?->actual_weight_2 ?? '-' }} /
                 {{ $wH?->actual_weight_3 ?? '-' }}
             </td>
-            @endforeach
-        </tr>
+            @break
 
-        {{-- Rata-rata --}}
-        <tr>
-            <th>Rata-rata Berat Aktual (gr)</th>
-            @foreach($report->details as $detail)
-            <td>{{ $detail->townsend?->avg_weight ?? '-' }}</td>
-            <td>{{ $detail->hitech?->avg_weight ?? '-' }}</td>
-            @endforeach
-        </tr>
+            @case('avg')
+            <td>{{ $t->avg_weight ?? '-' }}</td>
+            <td>{{ $h->avg_weight ?? '-' }}</td>
+            @break
 
-        {{-- Catatan --}}
-        <tr>
-            <th>Catatan</th>
-            @foreach($report->details as $detail)
-            <td>{{ $detail->townsend?->notes ?? '-' }}</td>
-            <td>{{ $detail->hitech?->notes ?? '-' }}</td>
+            @case('standard_long')
+            <td colspan="2">{{ $d->long_standard ?? '-' }}</td>
+            @break
+
+            @case('actual_long')
+            <td>
+                {{ $wT?->actual_long_1 ?? '-' }} /
+                {{ $wT?->actual_long_2 ?? '-' }} /
+                {{ $wT?->actual_long_3 ?? '-' }}
+            </td>
+            <td>
+                {{ $wH?->actual_long_1 ?? '-' }} /
+                {{ $wH?->actual_long_2 ?? '-' }} /
+                {{ $wH?->actual_long_3 ?? '-' }}
+            </td>
+            @break
+
+            @case('avg_long')
+            <td>{{ $t->avg_long ?? '-' }}</td>
+            <td>{{ $h->avg_long ?? '-' }}</td>
+            @break
+
+            @case('notes')
+            <td>{{ $t->notes ?? '-' }}</td>
+            <td>{{ $h->notes ?? '-' }}</td>
+            @break
+            @endswitch
             @endforeach
         </tr>
-        <tr>
-            <td colspan="11" style="text-align: right; border: none;">QM 27 / 00</td>
-        </tr>
+        @endforeach
     </table>
 
     <table style="width: 100%; border: none; margin-top: 2rem;">

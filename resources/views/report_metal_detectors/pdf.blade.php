@@ -145,11 +145,15 @@
                 <th rowspan="2">Produk</th>
                 <th rowspan="2">Kode Produksi</th>
                 <th colspan="3">Spesimen</th>
+                <th rowspan="2">Hasil Verifikasi MD Loma</th>
                 <th rowspan="2">Keterangan</th>
+                <th rowspan="2">Ketidaksesuaian</th>
+                <th rowspan="2">Tindakan Koreksi</th>
+                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
             </tr>
             <tr>
                 <th>Fe 1.5 mm</th>
-                <th>Non Fe 2 mm</th>
+                <th>Non Fe 1.5 mm</th>
                 <th>SUS 316 2.5 mm</th>
             </tr>
         </thead>
@@ -163,15 +167,19 @@
                 <td>{{ $detail->result_fe }}</td>
                 <td>{{ $detail->result_non_fe }}</td>
                 <td>{{ $detail->result_sus316 }}</td>
+                <td>{{ $detail->verif_loma }}</td>
                 <td>{{ $detail->notes }}</td>
+                <td>{{ $detail->nonconformity }}</td>
+                <td>{{ $detail->corrective_action }}</td>
+                <td>{{ $detail->verif_after_correct }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="7">Tidak ada detail pemeriksaan</td>
+                <td colspan="11">Tidak ada detail pemeriksaan</td>
             </tr>
             @endforelse
             <tr>
-                <td colspan="7" style="text-align: right; border: none;">QM 10 / 00</td>
+                <td colspan="11" style="text-align: right; border: none;">QM 10 / 00</td>
             </tr>
         </tbody>
     </table>

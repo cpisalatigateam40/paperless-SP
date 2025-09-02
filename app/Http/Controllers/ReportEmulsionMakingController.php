@@ -56,7 +56,8 @@ class ReportEmulsionMakingController extends Controller
                 $detailModel->raw_material_uuid = $detail['raw_material_uuid'];
                 $detailModel->weight = $detail['weight'];
                 $detailModel->temperature = $detail['temperature'];
-                $detailModel->sensory = $detail['sensory'];
+                // $detailModel->sensory = $detail['sensory'];
+                $detailModel->conformity = $detail['conformity'];
                 $detailModel->save();
             }
         }
@@ -70,6 +71,9 @@ class ReportEmulsionMakingController extends Controller
                 $agingModel->start_aging = $aging['start_aging'];
                 $agingModel->finish_aging = $aging['finish_aging'];
                 $agingModel->emulsion_result = $aging['emulsion_result'];
+                $agingModel->sensory_color = $aging['sensory_color'];
+                $agingModel->sensory_texture = $aging['sensory_texture'];
+                $agingModel->temp_after = $aging['temp_after'];
                 $agingModel->save();
             }
         }
@@ -126,8 +130,9 @@ class ReportEmulsionMakingController extends Controller
                 $detailModel->raw_material_uuid = $detail['raw_material_uuid'];
                 $detailModel->weight = $detail['weight'];
                 $detailModel->temperature = $detail['temperature'];
-                $detailModel->sensory = $detail['sensory'];
-                $detailModel->aging_index = $emulsiIndex; // butuh field aging_index di tabel detail
+                // $detailModel->sensory = $detail['sensory'];
+                $detailModel->conformity = $detail['conformity'];
+                $detailModel->aging_index = $emulsiIndex;
                 $detailModel->save();
             }
         }
@@ -141,6 +146,9 @@ class ReportEmulsionMakingController extends Controller
                 $agingModel->start_aging = $aging['start_aging'];
                 $agingModel->finish_aging = $aging['finish_aging'];
                 $agingModel->emulsion_result = $aging['emulsion_result'];
+                $agingModel->sensory_color = $aging['sensory_color'];
+                $agingModel->sensory_texture = $aging['sensory_texture'];
+                $agingModel->temp_after = $aging['temp_after'];
                 $agingModel->save();
             }
         }

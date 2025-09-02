@@ -36,7 +36,7 @@
                         </select>
                     </div>
                     <div class="mb-2 col-md-4">
-                        <label>Hasil Deteksi Non Fe 2 mm</label>
+                        <label>Hasil Deteksi Non Fe 1.5 mm</label>
                         <select name="result_non_fe" class="form-control" required>
                             <option value="√">√ (Terdeteksi)</option>
                             <option value="x">x (Tidak terdeteksi)</option>
@@ -51,8 +51,32 @@
                     </div>
                 </div>
                 <div class="mb-3">
+                    <label>Hasil Verifikasi MD Loma</label>
+                    <select name="verif_loma" class="form-control" required>
+                        <option value="√">√ </option>
+                        <option value="x">x </option>
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label>Keterangan</label>
                     <textarea name="notes" class="form-control"></textarea>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Ketidaksesuaian</label>
+                        <input type="text" name="nonconformity" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Tindakan Koreksi</label>
+                        <input type="text" name="corrective_action" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Verifikasi Setelah Tindakan Koreksi</label>
+                        <select name="verif_after_correct" class="form-control" required>
+                            <option value="√">√ </option>
+                            <option value="x">x </option>
+                        </select>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-success">Simpan Detail</button>

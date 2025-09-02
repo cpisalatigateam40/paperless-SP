@@ -15,7 +15,8 @@ class DetailWeightStuffer extends Model
         'product_uuid',
         'production_code',
         'time',
-        'weight_standard'
+        'weight_standard',
+        'long_standard'
     ];
 
     public function report()

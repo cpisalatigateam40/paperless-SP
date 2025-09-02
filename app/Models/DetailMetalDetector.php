@@ -17,6 +17,10 @@ class DetailMetalDetector extends Model
         'result_fe',
         'result_non_fe',
         'result_sus316',
+        'verif_loma',
+        'nonconformity',
+        'corrective_action',
+        'verif_after_correct',
         'notes',
     ];
 

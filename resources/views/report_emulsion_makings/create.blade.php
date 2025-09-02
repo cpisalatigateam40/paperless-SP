@@ -47,7 +47,8 @@
                             <th>Nama Bahan</th>
                             <th>Berat (kg)</th>
                             <th>Suhu (°C)</th>
-                            <th>Sensori</th>
+                            <!-- <th>Sensori</th> -->
+                            <th>Kesesuaian Formula</th>
                         </tr>
                     </thead>
                     <tbody id="bahan-baku-body">
@@ -66,8 +67,14 @@
                             <td>
                                 <input type="number" step="0.1" name="details[0][temperature]" class="form-control">
                             </td>
+                            <!-- <td>
+                                    <input type="text" name="details[0][sensory]" class="form-control">
+                                </td> -->
                             <td>
-                                <input type="text" name="details[0][sensory]" class="form-control">
+                                <select name="details[0][conformity]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
                             </td>
                         </tr>
                     </tbody>
@@ -82,12 +89,15 @@
                 <hr>
 
                 {{-- Aging --}}
-                <h5 class="mb-2">Aging</h5>
+                <!-- <h5 class="mb-2">Aging</h5> -->
                 <table class="table table-bordered">
                     <thead class="text-center">
                         <tr>
-                            <th>Start Aging</th>
-                            <th>Finish Aging</th>
+                            <th>Waktu Awal Pembuatan Emulsi</th>
+                            <th>Waktu Akhir Pembuatan Emulsi</th>
+                            <th>Sensori Warna</th>
+                            <th>Sensori Texture</th>
+                            <th>Suhu Emulsi After Proses</th>
                             <th>Hasil Emulsi (Sensori)</th>
                         </tr>
                     </thead>
@@ -100,6 +110,22 @@
                             <td>
                                 <input type="time" name="agings[0][finish_aging]" class="form-control"
                                     placeholder="Finish Aging">
+                            </td>
+
+                            <td>
+                                <select name="agings[0][sensory_color]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="agings[0][sensory_texture]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" step="0.1" name="agings[0][temp_after]" class="form-control">
                             </td>
                             <td>
                                 <select name="agings[0][emulsion_result]" class="form-control">
@@ -125,25 +151,28 @@ let rowIdx = 1;
 
 function tambahBaris() {
     let html = `
-        <tr>
-            <td>
-                <select name="details[${rowIdx}][raw_material_uuid]" class="form-control">
-                    <option value="">-- Pilih Bahan --</option>
-                    @foreach($rawMaterials as $material)
-                    <option value="{{ $material->uuid }}">{{ $material->material_name }}</option>
-                    @endforeach
-                </select>
-            </td>
-            <td>
-                <input type="number" step="0.01" name="details[${rowIdx}][weight]" class="form-control">
-            </td>
-            <td>
-                <input type="number" step="0.1" name="details[${rowIdx}][temperature]" class="form-control">
-            </td>
-            <td>
-                <input type="text" name="details[${rowIdx}][sensory]" class="form-control">
-            </td>
-        </tr>`;
+            <tr>
+                <td>
+                    <select name="details[${rowIdx}][raw_material_uuid]" class="form-control">
+                        <option value="">-- Pilih Bahan --</option>
+                        @foreach($rawMaterials as $material)
+                            <option value="{{ $material->uuid }}">{{ $material->material_name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <input type="number" step="0.01" name="details[${rowIdx}][weight]" class="form-control">
+                </td>
+                <td>
+                    <input type="number" step="0.1" name="details[${rowIdx}][temperature]" class="form-control">
+                </td>
+                <td>
+                    <select name="details[${rowIdx}][conformity]" class="form-control">
+                        <option value="✓">✓</option>
+                        <option value="x">x</option>
+                    </select>
+                </td>
+            </tr>`;
     document.getElementById('bahan-baku-body').insertAdjacentHTML('beforeend', html);
     rowIdx++;
 }

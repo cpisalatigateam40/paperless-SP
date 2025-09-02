@@ -142,7 +142,7 @@
                                         <tr>
                                             @foreach($report->header->agings ?? [] as $aging)
                                             <th>Suhu (°C)</th>
-                                            <th>Sensory</th>
+                                            <th>Kesesuaian Formula</th>
                                             @endforeach
                                         </tr>
                                     </thead>
@@ -155,7 +155,7 @@
                                             @foreach($report->header->agings ?? [] as $idx => $aging)
                                             @if($detail->aging_index == $idx)
                                             <td>{{ $detail->temperature ?? '-' }}</td>
-                                            <td>{{ $detail->sensory ?? '-' }}</td>
+                                            <td>{{ $detail->conformity ?? '-' }}</td>
                                             @else
                                             <td>-</td>
                                             <td>-</td>
@@ -167,16 +167,34 @@
 
                                         {{-- Start aging --}}
                                         <tr>
-                                            <td colspan="2">Start aging</td>
+                                            <td colspan="2">Waktu Awal Proses</td>
                                             @foreach($report->header->agings ?? [] as $aging)
                                             <td colspan="2">{{ $aging->start_aging ?? '-' }}</td>
                                             @endforeach
                                         </tr>
                                         {{-- Finish aging --}}
                                         <tr>
-                                            <td colspan="2">Finish aging</td>
+                                            <td colspan="2">Waktu Akhir Proses</td>
                                             @foreach($report->header->agings ?? [] as $aging)
                                             <td colspan="2">{{ $aging->finish_aging ?? '-' }}</td>
+                                            @endforeach
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Sensori Warna</td>
+                                            @foreach($report->header->agings ?? [] as $aging)
+                                            <td colspan="2">{{ $aging->sensory_color ?? '-' }}</td>
+                                            @endforeach
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Sensori Texture</td>
+                                            @foreach($report->header->agings ?? [] as $aging)
+                                            <td colspan="2">{{ $aging->sensory_texture ?? '-' }}</td>
+                                            @endforeach
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Suhu Emulsi After Proses</td>
+                                            @foreach($report->header->agings ?? [] as $aging)
+                                            <td colspan="2">{{ $aging->temp_after ?? '-' }}</td>
                                             @endforeach
                                         </tr>
                                         {{-- Hasil emulsi (sensory) --}}

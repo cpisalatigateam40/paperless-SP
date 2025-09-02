@@ -129,9 +129,13 @@
                                             <th>Produk</th>
                                             <th>Kode Produksi</th>
                                             <th>Fe 1.5 mm</th>
-                                            <th>Non Fe 2 mm</th>
+                                            <th>Non Fe 1.5 mm</th>
                                             <th>SUS 316 2.5 mm</th>
+                                            <th>Hasil Verifikasi MD Loma</th>
                                             <th>Keterangan</th>
+                                            <th>Ketidaksesuaian</th>
+                                            <th>Tindakan Koreksi</th>
+                                            <th>Verifikasi Setelah Tindakan Koreksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -143,11 +147,15 @@
                                             <td>{{ $detail->result_fe }}</td>
                                             <td>{{ $detail->result_non_fe }}</td>
                                             <td>{{ $detail->result_sus316 }}</td>
+                                            <td>{{ $detail->verif_loma }}</td>
                                             <td>{{ $detail->notes }}</td>
+                                            <td>{{ $detail->nonconformity }}</td>
+                                            <td>{{ $detail->corrective_action }}</td>
+                                            <td>{{ $detail->verif_after_correct }}</td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">Tidak ada detail</td>
+                                            <td colspan="11" class="text-center">Tidak ada detail</td>
                                         </tr>
                                         @endforelse
                                     </tbody>

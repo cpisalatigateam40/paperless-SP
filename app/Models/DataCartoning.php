@@ -20,6 +20,13 @@ class DataCartoning extends Model
         'content_binded',
         'carton_weight_standard',
         'carton_weight_actual',
+        'weight_1',
+        'weight_2',
+        'weight_3',
+        'weight_4',
+        'weight_5',
+        'avg_weight',
+        'content_rtg',
     ];
 
     protected static function boot()

@@ -110,24 +110,28 @@
                 <th rowspan="2">Nama Produk</th>
                 <th rowspan="2">Kode Produksi</th>
                 <th rowspan="2">Best Before</th>
-                <th colspan="2">Suhu Produk</th>
+                <th rowspan="2">Tindakan Koreksi</th>
+                <th rowspan="2">Suhu Produk After IQF</th>
                 <th colspan="2">Suhu IQF</th>
                 <th colspan="2">Lama Pembekuan</th>
-                <th rowspan="2">Kode Karton</th>
-                <th colspan="2">Isi tiap Karton</th>
-                <th colspan="2">Berat/Karton (kg)</th>
+                <th colspan="3">Isi tiap Karton</th>
+                <th colspan="7">Berat/Karton (kg)</th>
             </tr>
             <tr>
-                <th>Awal</th>
-                <th>Akhir</th>
                 <th>Room</th>
                 <th>Suction</th>
                 <th>Display</th>
                 <th>Aktual</th>
                 <th>Bag</th>
                 <th>Binded</th>
+                <th>RTG</th>
                 <th>Standar</th>
-                <th>Aktual</th>
+                <th>Berat 1</th>
+                <th>Berat 2</th>
+                <th>Berat 3</th>
+                <th>Berat 4</th>
+                <th>Berat 5</th>
+                <th>Rata-Rata Berat</th>
             </tr>
         </thead>
         <tbody>
@@ -140,9 +144,9 @@
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
+                <td>{{ $detail->corrective_action }}</td>
 
                 {{-- Freezing --}}
-                <td>{{ $detail->freezing->start_product_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->end_product_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->iqf_room_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->iqf_suction_temp ?? '' }}</td>
@@ -150,15 +154,20 @@
                 <td>{{ $detail->freezing->freezing_time_actual ?? '' }}</td>
 
                 {{-- Kartoning --}}
-                <td>{{ $detail->kartoning->carton_code ?? '' }}</td>
                 <td>{{ $detail->kartoning->content_bag ?? '' }}</td>
                 <td>{{ $detail->kartoning->content_binded ?? '' }}</td>
+                <td>{{ $detail->kartoning->content_rtg ?? '' }}</td>
                 <td>{{ $detail->kartoning->carton_weight_standard ?? '' }}</td>
-                <td>{{ $detail->kartoning->carton_weight_actual ?? '' }}</td>
+                <td>{{ $detail->kartoning->weight_1 ?? '' }}</td>
+                <td>{{ $detail->kartoning->weight_2 ?? '' }}</td>
+                <td>{{ $detail->kartoning->weight_3 ?? '' }}</td>
+                <td>{{ $detail->kartoning->weight_4 ?? '' }}</td>
+                <td>{{ $detail->kartoning->weight_5 ?? '' }}</td>
+                <td>{{ $detail->kartoning->avg_weight ?? '' }}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="15" style="text-align: right; border: none;">QM 39 / 02</td>
+                <td colspan="20" style="text-align: right; border: none;">QM 39 / 02</td>
             </tr>
         </tbody>
     </table>

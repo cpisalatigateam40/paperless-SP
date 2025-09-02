@@ -65,15 +65,21 @@
                                     <th colspan="2">Ukuran Casing</th>
                                     <th rowspan="2">Standar Berat (gr)</th>
                                     <th colspan="3">Berat Aktual (gr)</th>
-                                    <th rowspan="2">Rata-rata</th>
+                                    <th rowspan="2">Rata-rata Berat</th>
+                                    <th rowspan="2">Standar Panjang</th>
+                                    <th colspan="3">Panjang Aktual (gr)</th>
+                                    <th rowspan="2">Rata-rata Panjang</th>
                                     <th rowspan="2">Catatan</th>
                                 </tr>
                                 <tr>
                                     <th>Aktual Panjang</th>
                                     <th>Diameter</th>
-                                    <th>1</th>
-                                    <th>2</th>
-                                    <th>3</th>
+                                    <th>Berat 1</th>
+                                    <th>Berat 2</th>
+                                    <th>Berat 3</th>
+                                    <th>Panjang 1</th>
+                                    <th>Panjang 2</th>
+                                    <th>Panjang 3</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,6 +113,28 @@
                                             class="form-control form-control-sm"></td>
                                     <td><input type="number" step="0.01" name="details[0][{{ $machine }}][avg_weight]"
                                             class="form-control form-control-sm"></td>
+
+                                    @if ($loop->first)
+                                    <td rowspan="2">
+                                        <input type="number" step="0.01" name="details[0][long_standard]"
+                                            class="form-control form-control-sm" required>
+                                    </td>
+                                    @endif
+                                    <td><input type="number" step="0.01"
+                                            name="details[0][weights][{{ $loop->index }}][actual_long_1]"
+                                            class="form-control form-control-sm"></td>
+                                    <td><input type="number" step="0.01"
+                                            name="details[0][weights][{{ $loop->index }}][actual_long_2]"
+                                            class="form-control form-control-sm"></td>
+                                    <td><input type="number" step="0.01"
+                                            name="details[0][weights][{{ $loop->index }}][actual_long_3]"
+                                            class="form-control form-control-sm"></td>
+                                    <td><input type="number" step="0.01" name="details[0][{{ $machine }}][avg_long]"
+                                            class="form-control form-control-sm"></td>
+
+
+
+
                                     <td><input type="text" name="details[0][{{ $machine }}][notes]"
                                             class="form-control form-control-sm"></td>
                                 </tr>
@@ -238,6 +266,39 @@ document.addEventListener('input', function(e) {
     });
 
     const avgInput = tr.querySelector('input[name*="[avg_weight]"]');
+    if (avgInput) {
+        if (count > 0) {
+            avgInput.value = (sum / count).toFixed(2);
+        } else {
+            avgInput.value = '';
+        }
+    }
+});
+
+document.addEventListener('input', function(e) {
+    const tr = e.target.closest('tr');
+    if (!tr) return;
+
+    const weightInputs = [
+        tr.querySelector('input[name*="[actual_long_1]"]'),
+        tr.querySelector('input[name*="[actual_long_2]"]'),
+        tr.querySelector('input[name*="[actual_long_3]"]')
+    ];
+
+    let sum = 0;
+    let count = 0;
+
+    weightInputs.forEach(input => {
+        if (input && input.value !== '') {
+            const v = parseFloat(input.value);
+            if (!isNaN(v)) {
+                sum += v;
+                count++;
+            }
+        }
+    });
+
+    const avgInput = tr.querySelector('input[name*="[avg_long]"]');
     if (avgInput) {
         if (count > 0) {
             avgInput.value = (sum / count).toFixed(2);

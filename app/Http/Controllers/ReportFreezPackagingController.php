@@ -55,6 +55,7 @@ class ReportFreezPackagingController extends Controller
                     'best_before' => $detail['best_before'],
                     'start_time' => $detail['start_time'] ?? null,
                     'end_time' => $detail['end_time'] ?? null,
+                    'corrective_action' => $detail['corrective_action'] ?? null,
                 ]);
 
                 $detailModel->freezing()->create([
@@ -76,6 +77,13 @@ class ReportFreezPackagingController extends Controller
                     'content_binded' => $detail['kartoning']['content_binded'] ?? null,
                     'carton_weight_standard' => $detail['kartoning']['carton_weight_standard'] ?? null,
                     'carton_weight_actual' => $detail['kartoning']['carton_weight_actual'] ?? null,
+                    'weight_1' => $detail['kartoning']['weight_1'] ?? null,
+                    'weight_2' => $detail['kartoning']['weight_2'] ?? null,
+                    'weight_3' => $detail['kartoning']['weight_3'] ?? null,
+                    'weight_4' => $detail['kartoning']['weight_4'] ?? null,
+                    'weight_5' => $detail['kartoning']['weight_5'] ?? null,
+                    'avg_weight' => $detail['kartoning']['avg_weight'] ?? null,
+                    'content_rtg' => $detail['kartoning']['content_rtg'] ?? null,
                 ]);
             }
 
@@ -114,11 +122,12 @@ class ReportFreezPackagingController extends Controller
                 'best_before' => $item['best_before'],
                 'start_time' => now()->setTimeFromTimeString($item['start_time']),
                 'end_time' => now()->setTimeFromTimeString($item['end_time']),
+                'corrective_action' => $item['corrective_action'],
             ]);
             $detail->save();
 
             $detail->freezing()->create([
-                'start_product_temp' => $item['freezing']['start_product_temp'],
+                // 'start_product_temp' => $item['freezing']['start_product_temp'],
                 'end_product_temp' => $item['freezing']['end_product_temp'],
                 'iqf_room_temp' => $item['freezing']['iqf_room_temp'],
                 'iqf_suction_temp' => $item['freezing']['iqf_suction_temp'],
@@ -127,11 +136,18 @@ class ReportFreezPackagingController extends Controller
             ]);
 
             $detail->kartoning()->create([
-                'carton_code' => $item['kartoning']['carton_code'],
+                // 'carton_code' => $item['kartoning']['carton_code'],
                 'content_bag' => $item['kartoning']['content_bag'],
                 'content_binded' => $item['kartoning']['content_binded'],
                 'carton_weight_standard' => $item['kartoning']['carton_weight_standard'],
-                'carton_weight_actual' => $item['kartoning']['carton_weight_actual'],
+                // 'carton_weight_actual' => $item['kartoning']['carton_weight_actual'],
+                'weight_1' => $item['kartoning']['weight_1'] ?? null,
+                'weight_2' => $item['kartoning']['weight_2'] ?? null,
+                'weight_3' => $item['kartoning']['weight_3'] ?? null,
+                'weight_4' => $item['kartoning']['weight_4'] ?? null,
+                'weight_5' => $item['kartoning']['weight_5'] ?? null,
+                'avg_weight' => $item['kartoning']['avg_weight'] ?? null,
+                'content_rtg' => $item['kartoning']['content_rtg'] ?? null,
             ]);
         }
 

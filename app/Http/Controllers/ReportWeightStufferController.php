@@ -50,6 +50,7 @@ class ReportWeightStufferController extends Controller
                 'production_code' => $detail['production_code'],
                 'time' => $detail['time'],
                 'weight_standard' => $detail['weight_standard'] ?? null,
+                'long_standard' => $detail['long_standard'] ?? null,
             ]);
 
             if (isset($detail['townsend'])) {
@@ -57,6 +58,7 @@ class ReportWeightStufferController extends Controller
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['townsend']['stuffer_speed'],
                     'avg_weight' => $detail['townsend']['avg_weight'],
+                    'avg_long' => $detail['townsend']['avg_long'],
                     'notes' => $detail['townsend']['notes'] ?? null,
                 ]);
             }
@@ -66,6 +68,7 @@ class ReportWeightStufferController extends Controller
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['hitech']['stuffer_speed'],
                     'avg_weight' => $detail['hitech']['avg_weight'],
+                    'avg_long' => $detail['hitech']['avg_long'],
                     'notes' => $detail['hitech']['notes'] ?? null,
                 ]);
             }
@@ -87,6 +90,9 @@ class ReportWeightStufferController extends Controller
                         'actual_weight_1' => $weight['actual_weight_1'],
                         'actual_weight_2' => $weight['actual_weight_2'],
                         'actual_weight_3' => $weight['actual_weight_3'] ?? null,
+                        'actual_long_1' => $weight['actual_long_1'],
+                        'actual_long_2' => $weight['actual_long_2'],
+                        'actual_long_3' => $weight['actual_long_3'] ?? null,
                     ]);
                 }
             }
@@ -125,6 +131,7 @@ class ReportWeightStufferController extends Controller
                 'production_code' => $detail['production_code'],
                 'time' => $detail['time'],
                 'weight_standard' => $detail['weight_standard'] ?? null,
+                'long_standard' => $detail['long_standard'] ?? null,
             ]);
 
             if (isset($detail['townsend'])) {
@@ -133,6 +140,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['townsend']['stuffer_speed'],
                     // 'trolley_total' => $detail['townsend']['trolley_total'],
                     'avg_weight' => $detail['townsend']['avg_weight'],
+                    'avg_long' => $detail['townsend']['avg_long'],
                     'notes' => $detail['townsend']['notes'] ?? null,
                 ]);
             }
@@ -143,6 +151,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['hitech']['stuffer_speed'],
                     // 'trolley_total' => $detail['hitech']['trolley_total'],
                     'avg_weight' => $detail['hitech']['avg_weight'],
+                    'avg_long' => $detail['hitech']['avg_long'],
                     'notes' => $detail['hitech']['notes'] ?? null,
                 ]);
             }
@@ -164,6 +173,9 @@ class ReportWeightStufferController extends Controller
                         'actual_weight_1' => $weight['actual_weight_1'],
                         'actual_weight_2' => $weight['actual_weight_2'],
                         'actual_weight_3' => $weight['actual_weight_3'] ?? null,
+                        'actual_long_1' => $weight['actual_long_1'],
+                        'actual_long_2' => $weight['actual_long_2'],
+                        'actual_long_3' => $weight['actual_long_3'] ?? null,
                     ]);
                 }
             }

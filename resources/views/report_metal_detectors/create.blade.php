@@ -32,8 +32,8 @@
                 <hr>
                 <h5>Detail Pemeriksaan</h5>
                 <div id="details">
-                    <div class="card p-3 mb-2">
-                        <div class="mb-2">
+                    <div class="card p-3 mb-3">
+                        <div class="mb-3">
                             <label>Produk</label>
                             <select name="details[0][product_uuid]" class="form-control" required>
                                 @foreach($products as $product)
@@ -41,32 +41,32 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label>Jam</label>
                             <input type="time" name="details[0][hour]" class="form-control"
                                 value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label>Kode Produksi</label>
                             <input type="text" name="details[0][production_code]" class="form-control" required>
                         </div>
                         <div class="row">
-                            <div class="mb-2 col-md-4">
+                            <div class="mb-3 col-md-4">
                                 <label>Hasil Deteksi Fe 1.5 mm</label>
                                 <select name="details[0][result_fe]" class="form-control" required>
                                     <option value="√">√ (Terdeteksi)</option>
                                     <option value="x">x (Tidak terdeteksi)</option>
                                 </select>
                             </div>
-                            <div class="mb-2 col-md-4">
-                                <label>Hasil Deteksi Non Fe 2 mm</label>
+                            <div class="mb-3 col-md-4">
+                                <label>Hasil Deteksi Non Fe 1.5mm</label>
                                 <select name="details[0][result_non_fe]" class="form-control" required>
                                     <option value="√">√ (Terdeteksi)</option>
                                     <option value="x">x (Tidak terdeteksi)</option>
                                 </select>
                             </div>
-                            <div class="mb-2 col-md-4">
+                            <div class="mb-3 col-md-4">
                                 <label>Hasil Deteksi SUS 316 2.5 mm</label>
                                 <select name="details[0][result_sus316]" class="form-control" required>
                                     <option value="√">√ (Terdeteksi)</option>
@@ -74,9 +74,33 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
+                            <label>Hasil Verifikasi MD Loma</label>
+                            <select name="details[0][verif_loma]" class="form-control" required>
+                                <option value="√">√ </option>
+                                <option value="x">x </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label>Keterangan</label>
                             <textarea name="details[0][notes]" class="form-control"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Ketidaksesuaian</label>
+                                <input type="text" name="details[0][nonconformity]" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Tindakan Koreksi</label>
+                                <input type="text" name="details[0][corrective_action]" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Verifikasi Setelah Tindakan Koreksi</label>
+                                <select name="details[0][verif_after_correct]" class="form-control" required>
+                                    <option value="√">√ </option>
+                                    <option value="x">x </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -96,54 +120,78 @@ let detailIndex = 1;
 
 function addDetail() {
     let html = `
-    <div class="card p-3 mb-2">
-        <div class="mb-2">
-            <label>Produk</label>
-            <select name="details[${detailIndex}][product_uuid]" class="form-control" required>
-                @foreach($products as $product)
-                <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="mb-2">
-            <label>Jam</label>
-            <input type="time" name="details[${detailIndex}][hour]" class="form-control"
-                   value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
-        </div>
-        <div class="mb-2">
-            <label>Kode Produksi</label>
-            <input type="text" name="details[${detailIndex}][production_code]" class="form-control" required>
-        </div>
-        <div class="row">
-            <div class="mb-2 col-md-4">
-                <label>Hasil Deteksi Fe 1.5 mm</label>
-                <select name="details[${detailIndex}][result_fe]" class="form-control" required>
-                    <option value="√">√ (Terdeteksi)</option>
-                    <option value="x">x (Tidak terdeteksi)</option>
+        <div class="card p-3 mb-3">
+            <div class="mb-3">
+                <label>Produk</label>
+                <select name="details[${detailIndex}][product_uuid]" class="form-control" required>
+                    @foreach($products as $product)
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                    @endforeach
                 </select>
             </div>
-            <div class="mb-2 col-md-4">
-                <label>Hasil Deteksi Non Fe 2 mm</label>
-                <select name="details[${detailIndex}][result_non_fe]" class="form-control" required>
-                    <option value="√">√ (Terdeteksi)</option>
-                    <option value="x">x (Tidak terdeteksi)</option>
+            <div class="mb-3">
+                <label>Jam</label>
+                <input type="time" name="details[${detailIndex}][hour]" class="form-control"
+                       value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
+            </div>
+            <div class="mb-3">
+                <label>Kode Produksi</label>
+                <input type="text" name="details[${detailIndex}][production_code]" class="form-control" required>
+            </div>
+            <div class="row">
+                <div class="mb-3 col-md-4">
+                    <label>Hasil Deteksi Fe 1.5 mm</label>
+                    <select name="details[${detailIndex}][result_fe]" class="form-control" required>
+                        <option value="√">√ (Terdeteksi)</option>
+                        <option value="x">x (Tidak terdeteksi)</option>
+                    </select>
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label>Hasil Deteksi Non Fe 1.5 mm</label>
+                    <select name="details[${detailIndex}][result_non_fe]" class="form-control" required>
+                        <option value="√">√ (Terdeteksi)</option>
+                        <option value="x">x (Tidak terdeteksi)</option>
+                    </select>
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label>Hasil Deteksi SUS 316 2.5 mm</label>
+                    <select name="details[${detailIndex}][result_sus316]" class="form-control" required>
+                        <option value="√">√ (Terdeteksi)</option>
+                        <option value="x">x (Tidak terdeteksi)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label>Hasil Verifikasi MD Loma</label>
+                <select name="details[${detailIndex}][verif_loma]" class="form-control" required>
+                    <option value="√">√ </option>
+                    <option value="x">x </option>
                 </select>
             </div>
-            <div class="mb-2 col-md-4">
-                <label>Hasil Deteksi SUS 316 2.5 mm</label>
-                <select name="details[${detailIndex}][result_sus316]" class="form-control" required>
-                    <option value="√">√ (Terdeteksi)</option>
-                    <option value="x">x (Tidak terdeteksi)</option>
-                </select>
+            <div class="mb-3">
+                <label>Keterangan</label>
+                <textarea name="details[${detailIndex}][notes]" class="form-control"></textarea>
             </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label>Ketidaksesuaian</label>
+                    <input type="text" name="details[${detailIndex}][nonconformity]" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label>Tindakan Koreksi</label>
+                    <input type="text" name="details[${detailIndex}][corrective_action]" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label>Verifikasi Setelah Tindakan Koreksi</label>
+                    <select name="details[${detailIndex}][verif_after_correct]" class="form-control" required>
+                        <option value="√">√ </option>
+                        <option value="x">x </option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Hapus Detail</button>
         </div>
-        <div class="mb-2">
-            <label>Keterangan</label>
-            <textarea name="details[${detailIndex}][notes]" class="form-control"></textarea>
-        </div>
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Hapus Detail</button>
-    </div>
-    `;
+        `;
     document.getElementById('details').insertAdjacentHTML('beforeend', html);
     detailIndex++;
 }

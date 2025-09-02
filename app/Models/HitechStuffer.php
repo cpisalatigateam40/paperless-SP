@@ -14,6 +14,7 @@ class HitechStuffer extends Model
         'stuffer_speed',
         'trolley_total',
         'avg_weight',
+        'avg_long',
         'notes'
     ];
 

@@ -157,6 +157,10 @@
                                     'Standar Berat (gr)' => 'standard',
                                     'Berat Aktual (gr)' => 'actual_weight',
                                     'Rata-rata Berat Aktual (gr)' => 'avg',
+
+                                    'Standar Panjang' => 'standard_long',
+                                    'Panjang Aktual' => 'actual_long',
+                                    'Rata-rata Panjang Aktual' => 'avg_long',
                                     'Catatan' => 'notes',
                                     ];
                                     @endphp
@@ -210,6 +214,28 @@
                                         @case('avg')
                                         <td>{{ $t->avg_weight ?? '-' }}</td>
                                         <td>{{ $h->avg_weight ?? '-' }}</td>
+                                        @break
+
+                                        @case('standard_long')
+                                        <td colspan="2">{{ $d->long_standard ?? '-' }}</td>
+                                        @break
+
+                                        @case('actual_long')
+                                        <td>
+                                            {{ $wT?->actual_long_1 ?? '-' }} /
+                                            {{ $wT?->actual_long_2 ?? '-' }} /
+                                            {{ $wT?->actual_long_3 ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $wH?->actual_long_1 ?? '-' }} /
+                                            {{ $wH?->actual_long_2 ?? '-' }} /
+                                            {{ $wH?->actual_long_3 ?? '-' }}
+                                        </td>
+                                        @break
+
+                                        @case('avg_long')
+                                        <td>{{ $t->avg_long ?? '-' }}</td>
+                                        <td>{{ $h->avg_long ?? '-' }}</td>
                                         @break
 
                                         @case('notes')

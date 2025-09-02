@@ -17,6 +17,9 @@ class AgingEmulsionMaking extends Model
         'start_aging',
         'finish_aging',
         'emulsion_result',
+        'sensory_color',
+        'sensory_texture',
+        'temp_after',
     ];
 
     public function header()

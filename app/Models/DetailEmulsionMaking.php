@@ -18,6 +18,7 @@ class DetailEmulsionMaking extends Model
         'weight',
         'temperature',
         'sensory',
+        'conformity',
         'aging_index'
     ];
 
