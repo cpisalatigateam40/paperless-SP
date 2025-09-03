@@ -142,6 +142,24 @@
                     </div>
                 </div>
 
+                <!-- <div class="row mt-4">
+                    <div class="mb-3 col-md-4">
+                        <label>Sensori Homogenitas</label>
+                        <input type="number" step="0.01" name="sensory_homogenity" class="form-control"
+                            value="{{ old('sensory_homogenity', $detail->sensory_homogenity) }}">
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>Sensori Kekentalan</label>
+                        <input type="number" step="0.01" name="sensory_stiffness" class="form-control"
+                            value="{{ old('sensory_stiffness', $detail->sensory_stiffness) }}">
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>Sensori Aroma</label>
+                        <input type="number" step="0.01" name="sensory_aroma" class="form-control"
+                            value="{{ old('sensory_aroma', $detail->sensory_aroma) }}">
+                    </div>
+                </div> -->
+
                 <hr>
 
                 {{-- EMULSIFYING --}}

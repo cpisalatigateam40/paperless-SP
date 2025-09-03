@@ -18,7 +18,7 @@
                             <th>Jam</th>
                             <th>Produk</th>
                             <th>Kode Produksi</th>
-                            <th>Expired date</th>
+                            <th>Best Before</th>
                         </tr>
                     </thead>
                     <tbody>

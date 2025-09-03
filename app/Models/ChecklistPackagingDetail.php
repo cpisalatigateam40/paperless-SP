@@ -68,6 +68,28 @@ class ChecklistPackagingDetail extends Model
         'actual_weight_3',
         'actual_weight_4',
         'actual_weight_5',
+
+        
+        'standard_long_pcs',
+        'actual_long_pcs_1',
+        'actual_long_pcs_2',
+        'actual_long_pcs_3',
+        'actual_long_pcs_4',
+        'actual_long_pcs_5',
+        'avg_long_pcs',
+        
+        'standard_weight_pcs',
+        'actual_weight_pcs_1',
+        'actual_weight_pcs_2',
+        'actual_weight_pcs_3',
+        'actual_weight_pcs_4',
+        'actual_weight_pcs_5',
+        'avg_weight_pcs',
+        'avg_weight',
+        'verif_md',
+        'notes',
+
+        
     ];
 
 

@@ -130,6 +130,7 @@
                                             <th class="align-middle">Bukti</th>
                                             <th class="align-middle">Tahapan Analisis</th>
                                             <th class="align-middle">Asal Kontaminan</th>
+                                            <th class="align-middle">Keterangan (Untuk Disposisi)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -149,6 +150,7 @@
                                             </td>
                                             <td>{{ $detail->analysis_stage }}</td>
                                             <td>{{ $detail->contaminant_origin }}</td>
+                                            <td>{{ $detail->notes }}</td>
                                         </tr>
                                         @empty
                                         <tr>

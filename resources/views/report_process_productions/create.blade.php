@@ -78,7 +78,8 @@
                     {{-- Diisi otomatis via JS --}}
                 </div>
 
-                <div class="row mt-4">
+                <h5 class="mt-4 font-weight-bold">Penggunaan Rework</h5>
+                <div class=" row mt-4">
                     <div class="mb-3 col-md-4">
                         <label>Rework (kg)</label>
                         <input type="number" step="0.01" name="rework_kg" class="form-control">
@@ -92,6 +93,33 @@
                         <input type="number" step="0.01" name="total_material" class="form-control">
                     </div>
                 </div>
+
+                <!-- <div class="row mt-4">
+                    <div class="col-md-4">
+                        <label>Sensori Homogenitas</label>
+                        <select name="sensory_homogenity" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="√">√</option>
+                            <option value="x">x</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Sensori Kekentalan</label>
+                        <select name="sensory_stiffness" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="√">√</option>
+                            <option value="x">x</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Sensori Aroma</label>
+                        <select name="sensory_aroma" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="√">√</option>
+                            <option value="x">x</option>
+                        </select>
+                    </div>
+                </div> -->
 
                 <hr>
 

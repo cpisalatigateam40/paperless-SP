@@ -206,6 +206,18 @@
                                         <th colspan="2">TOTAL BAHAN (kg)</th>
                                         <td colspan="3">{{ $detail->total_material ?? '-' }}</td>
                                     </tr>
+                                    <!-- <tr>
+                                        <th colspan="2">Sensori Homogenitas</th>
+                                        <td colspan="3">{{ $detail->sensory_homogenity ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="2">Sensori Kekentalan</th>
+                                        <td colspan="3">{{ $detail->sensory_stiffness ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="2">Sensori Aroma</th>
+                                        <td colspan="3">{{ $detail->sensory_aroma ?? '-' }}</td>
+                                    </tr> -->
 
                                     {{-- EMULSIFYING --}}
                                     <tr class="table-secondary fw-bold">

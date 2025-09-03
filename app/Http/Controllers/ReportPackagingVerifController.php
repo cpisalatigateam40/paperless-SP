@@ -55,6 +55,24 @@ class ReportPackagingVerifController extends Controller
                 'uuid' => Str::uuid(),
                 'detail_uuid' => $detailModel->uuid,
                 'standard_weight' => $detail['checklist']['standard_weight'],
+                'standard_long_pcs' => $detail['checklist']['standard_long_pcs'],
+                'actual_long_pcs_1' => $detail['checklist']['actual_long_pcs_1'],
+                'actual_long_pcs_2' => $detail['checklist']['actual_long_pcs_2'],
+                'actual_long_pcs_3' => $detail['checklist']['actual_long_pcs_3'],
+                'actual_long_pcs_4' => $detail['checklist']['actual_long_pcs_4'],
+                'actual_long_pcs_5' => $detail['checklist']['actual_long_pcs_5'],
+                'avg_long_pcs' => $detail['checklist']['avg_long_pcs'],
+                
+                'standard_weight_pcs' => $detail['checklist']['standard_weight_pcs'],
+                'actual_weight_pcs_1' => $detail['checklist']['actual_weight_pcs_1'],
+                'actual_weight_pcs_2' => $detail['checklist']['actual_weight_pcs_2'],
+                'actual_weight_pcs_3' => $detail['checklist']['actual_weight_pcs_3'],
+                'actual_weight_pcs_4' => $detail['checklist']['actual_weight_pcs_4'],
+                'actual_weight_pcs_5' => $detail['checklist']['actual_weight_pcs_5'],
+                'avg_weight_pcs' => $detail['checklist']['avg_weight_pcs'],
+                'avg_weight' => $detail['checklist']['avg_weight'],
+                'verif_md' => $detail['checklist']['verif_md'],
+                'notes' => $detail['checklist']['notes'],
             ];
 
             // ✅ Mapping radio In Cutting → hanya kolom _1 yang diisi, _2.._5 null
@@ -129,6 +147,24 @@ class ReportPackagingVerifController extends Controller
                 'uuid' => Str::uuid(),
                 'detail_uuid' => $detailModel->uuid,
                 'standard_weight' => $detail['checklist']['standard_weight'],
+                'standard_long_pcs' => $detail['checklist']['standard_long_pcs'],
+                'actual_long_pcs_1' => $detail['checklist']['actual_long_pcs_1'],
+                'actual_long_pcs_2' => $detail['checklist']['actual_long_pcs_2'],
+                'actual_long_pcs_3' => $detail['checklist']['actual_long_pcs_3'],
+                'actual_long_pcs_4' => $detail['checklist']['actual_long_pcs_4'],
+                'actual_long_pcs_5' => $detail['checklist']['actual_long_pcs_5'],
+                'avg_long_pcs' => $detail['checklist']['avg_long_pcs_5'],
+                
+                'standard_weight_pcs' => $detail['checklist']['standard_weight_pcs'],
+                'actual_weight_pcs_1' => $detail['checklist']['actual_weight_pcs_1'],
+                'actual_weight_pcs_2' => $detail['checklist']['actual_weight_pcs_2'],
+                'actual_weight_pcs_3' => $detail['checklist']['actual_weight_pcs_3'],
+                'actual_weight_pcs_4' => $detail['checklist']['actual_weight_pcs_4'],
+                'actual_weight_pcs_5' => $detail['checklist']['actual_weight_pcs_5'],
+                'avg_weight_pcs' => $detail['checklist']['avg_weight_pcs'],
+                'avg_weight' => $detail['checklist']['avg_weight'],
+                'verif_md' => $detail['checklist']['verif_md'],
+                'notes' => $detail['checklist']['notes'],
             ];
 
             // ✏ Mapping radio In Cutting: hanya in_cutting_manual_1 atau in_cutting_machine_1 yg "OK", sisanya null

@@ -61,17 +61,21 @@
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Bukti (Foto)</label>
                                     <input type="file" name="details[0][evidence]" class="form-control">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Tahapan Analisis</label>
                                     <input type="text" name="details[0][analysis_stage]" class="form-control">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label">Asal Kontaminan</label>
                                     <input type="text" name="details[0][contaminant_origin]" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Keterangan (Untuk Disposisi)</label>
+                                    <input type="text" name="details[0][notes]" class="form-control">
                                 </div>
                             </div>
                         </div>

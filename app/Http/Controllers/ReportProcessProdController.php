@@ -76,6 +76,9 @@ class ReportProcessProdController extends Controller
             'rework_kg' => $request->rework_kg,
             'rework_percent' => $request->rework_percent,
             'total_material' => $request->total_material,
+            'sensory_homogenity' => $request->sensory_homogenity,
+            'sensory_stiffness' => $request->sensory_stiffness,
+            'sensory_aroma' => $request->sensory_aroma,
         ]);
 
         // Simpan Item Formulasi
@@ -183,6 +186,9 @@ class ReportProcessProdController extends Controller
             'rework_kg' => $request->rework_kg,
             'rework_percent' => $request->rework_percent,
             'total_material' => $request->total_material,
+            'sensory_homogenity' => $request->sensory_homogenity,
+            'sensory_stiffness' => $request->sensory_stiffness,
+            'sensory_aroma' => $request->sensory_aroma,
         ]);
 
         foreach ($request->formulation_uuids ?? [] as $uuid) {
@@ -352,6 +358,9 @@ class ReportProcessProdController extends Controller
                 'rework_kg' => $request->rework_kg,
                 'rework_percent' => $request->rework_percent,
                 'total_material' => $request->total_material,
+                'sensory_homogenity' => $request->sensory_homogenity,
+                'sensory_stiffness' => $request->sensory_stiffness,
+                'sensory_aroma' => $request->sensory_aroma,
             ]);
 
             // Update Item Formulasi

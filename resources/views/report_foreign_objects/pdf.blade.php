@@ -147,6 +147,7 @@
                 <th class="align-middle">Bukti (Foto)</th>
                 <th class="align-middle">Tahapan</th>
                 <th class="align-middle">Analisis Asal Kontaminan</th>
+                <th class="align-middle">Keterangan (Untuk Disposisi)</th>
             </tr>
         </thead>
         <tbody>
@@ -176,10 +177,11 @@
                 </td>
                 <td>{{ $detail->analysis_stage }}</td>
                 <td>{{ $detail->contaminant_origin }}</td>
+                <td>{{ $detail->notes }}</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="7" style="text-align: right; border: none;">QM 09 / 00</td>
+                <td colspan="8" style="text-align: right; border: none;">QM 09 / 00</td>
             </tr>
         </tbody>
     </table>

@@ -48,6 +48,7 @@ class ReportForeignObjectController extends Controller
             'details.*.evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'details.*.analysis_stage' => 'nullable|string',
             'details.*.contaminant_origin' => 'nullable|string',
+            'details.*.notes' => 'nullable|string',
         ]);
 
         $report = ReportForeignObject::create([
@@ -78,6 +79,7 @@ class ReportForeignObjectController extends Controller
                 'evidence' => $evidencePath,
                 'analysis_stage' => $detail['analysis_stage'] ?? null,
                 'contaminant_origin' => $detail['contaminant_origin'] ?? null,
+                'notes' => $detail['notes'] ?? null,
             ]);
         }
 
@@ -104,6 +106,7 @@ class ReportForeignObjectController extends Controller
             'evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'analysis_stage' => 'nullable|string',
             'contaminant_origin' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         $evidencePath = null;
@@ -123,6 +126,7 @@ class ReportForeignObjectController extends Controller
             'evidence' => $evidencePath,
             'analysis_stage' => $request->analysis_stage,
             'contaminant_origin' => $request->contaminant_origin,
+            'notes' => $request->notes,
         ]);
 
         return redirect()->route('report-foreign-objects.index')->with('success', 'Detail berhasil ditambahkan');

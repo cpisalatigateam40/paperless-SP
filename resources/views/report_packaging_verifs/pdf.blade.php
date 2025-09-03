@@ -146,12 +146,16 @@
             <th rowspan="2">Jam</th>
             <th rowspan="2">Produk</th>
             <th rowspan="2">Kode Produksi</th>
-            <th rowspan="2">Expired date</th>
+            <th rowspan="2">Best Before</th>
             <th colspan="2">In cutting</th>
             <th colspan="2">Proses Pengemasan</th>
             <th colspan="2">Hasil Sealing</th>
             <th rowspan="2">Isi Per-Pack</th>
-            <th colspan="2">Berat Produk Per Plastik (gr)</th>
+            <th colspan="3">Panjang Produk Per Pcs</th>
+            <th colspan="3">Berat Produk Per Pcs</th>
+            <th colspan="3">Berat Produk Per Pack (gr)</th>
+            <th rowspan="2">Verifikasi MD</th>
+            <th rowspan="2">Keterangan</th>
         </tr>
         <tr>
             <th>Manual</th>
@@ -162,13 +166,20 @@
             <th>Vacum</th>
             <th>Standar</th>
             <th>Aktual</th>
+            <th>Rata-Rata</th>
+            <th>Standar</th>
+            <th>Aktual</th>
+            <th>Rata-Rata</th>
+            <th>Standar</th>
+            <th>Aktual</th>
+            <th>Rata-Rata</th>
         </tr>
 
         @foreach($report->details as $d)
         @php $checklist = $d->checklist; @endphp
 
-        @for($i=1; $i<=5; $i++) <tr>
-            @if($i==1)
+        @for($i = 1; $i <= 5; $i++) <tr>
+            @if($i == 1)
             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
             <td rowspan="5">{{ $d->production_code }}</td>
@@ -184,33 +195,49 @@
             @endif
 
             {{-- Hasil sealing & isi per-pack, per baris --}}
-            <td>{{ $checklist?->{'sealing_condition_'.$i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'sealing_vacuum_'.$i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'content_per_pack_'.$i} ?? '-' }}</td>
+            <td>{{ $checklist?->{'sealing_condition_' . $i} ?? '-' }}</td>
+            <td>{{ $checklist?->{'sealing_vacuum_' . $i} ?? '-' }}</td>
+            <td>{{ $checklist?->{'content_per_pack_' . $i} ?? '-' }}</td>
 
-            @if($i==1)
-            {{-- Standard weight sekali saja --}}
-            <td rowspan="5">{{ $checklist?->standard_weight ?? '-' }}</td>
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->standard_long_pcs ?? '-' }}</td>
+            @endif
+            <td>{{ $checklist?->{'actual_long_pcs_' . $i} ?? '-' }}</td>
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->avg_long_pcs ?? '-' }}</td>
             @endif
 
-            {{-- Actual weight --}}
-            <td>{{ $checklist?->{'actual_weight_'.$i} ?? '-' }}</td>
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->standard_weight_pcs ?? '-' }}</td>
+            @endif
+            <td>{{ $checklist?->{'actual_weight_pcs_' . $i} ?? '-' }}</td>
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->avg_weight_pcs ?? '-' }}</td>
+            @endif
+
+
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->standard_weight ?? '-' }}</td>
+            @endif
+            <td>{{ $checklist?->{'actual_weight_' . $i} ?? '-' }}</td>
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->avg_weight ?? '-' }}</td>
+            @endif
+
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->verif_md ?? '-' }}</td>
+            @endif
+            @if($i == 1)
+            <td rowspan="5">{{ $checklist?->notes ?? '-' }}</td>
+            @endif
             </tr>
             @endfor
-
-            {{-- Optional QC & KR --}}
-            <!--
-    <tr>
-        <td colspan="3" class="text-start">QC: {{ $d->qc_verif ?? '-' }}</td>
-        <td colspan="3" class="text-start">KR: {{ $d->kr_verif ?? '-' }}</td>
-        <td colspan="7"></td>
-    </tr>
-    -->
             @endforeach
 
             <tr>
-                <td colspan="13" class="text-end" style="border: none;">QM 05 / 01</td>
+                <td colspan="22" class="text-end" style="border: none;">QM 05 / 01</td>
             </tr>
+
     </table>
 
 

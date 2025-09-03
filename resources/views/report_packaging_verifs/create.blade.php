@@ -41,7 +41,7 @@
                             <th>Jam</th>
                             <th>Produk</th>
                             <th>Kode Produksi</th>
-                            <th>Expired date</th>
+                            <th>Best Before</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -146,9 +146,57 @@
     </div>
 </div>
 
+<div class="card mb-3">
+    <div class="card-header p-2"><strong>Panjang Produk Per Pcs</strong></div>
+    <div class="card-body p-2">
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <label class="small">Standar</label>
+                <input type="number" step="0.01" name="details[0][checklist][standard_long_pcs]" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                <label class="small">Aktual {{ $i }}</label>
+                <input type="number" step="0.01" name="details[0][checklist][actual_long_pcs_{{ $i }}]"
+                    class="form-control actual-input">
+        </div>
+        @endfor
+        <div class="col-md-2">
+            <label class="small">Rata-Rata Panjang</label>
+            <input type="number" step="0.01" name="details[0][checklist][avg_long_pcs]" class="form-control"
+                id="avg-long-pcs" readonly>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header p-2"><strong>Berat Produk Per Pcs</strong></div>
+    <div class="card-body p-2">
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <label class="small">Standar</label>
+                <input type="number" step="0.01" name="details[0][checklist][standard_weight_pcs]" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                <label class="small">Aktual {{ $i }}</label>
+                <input type="number" step="0.01" name="details[0][checklist][actual_weight_pcs_{{ $i }}]"
+                    class="form-control actual-input-wpcs">
+        </div>
+        @endfor
+        <div class="col-md-2">
+            <label class="small">Rata-Rata Berat</label>
+            <input type="number" step="0.01" name="details[0][checklist][avg_weight_pcs]" class="form-control"
+                id="avg-weight-pcs" readonly>
+        </div>
+    </div>
+</div>
+
 {{-- Berat Produk --}}
 <div class="card mb-3">
-    <div class="card-header p-2"><strong>Berat Produk Per Plastik</strong></div>
+    <div class="card-header p-2"><strong>Berat Produk Per Pack</strong></div>
     <div class="card-body p-2">
         <div class="row mb-2">
             <div class="col-md-2">
@@ -160,9 +208,31 @@
             @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
                 <label class="small">Aktual {{ $i }}</label>
                 <input type="number" step="0.01" name="details[0][checklist][actual_weight_{{ $i }}]"
-                    class="form-control">
+                    class="form-control actual-input-w">
         </div>
         @endfor
+        <div class="col-md-2">
+            <label class="small">Rata-Rata Berat</label>
+            <input type="number" step="0.01" name="details[0][checklist][avg_weight]" class="form-control"
+                id="avg-weight" readonly>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3 mt-3">
+    <div class="card-body p-2 row">
+        <div class="col-md-6">
+            <label class="small">Hasil Verifikasi MD</label>
+            <select name="details[0][checklist][verif_md]" class="form-control">
+                <option value="OK">OK</option>
+                <option value="Tidak OK">Tidak OK</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="small">Keterangan</label>
+            <input type="text" name="details[0][checklist][notes]" class="form-control">
+        </div>
+
     </div>
 </div>
 </div>
@@ -172,4 +242,83 @@
 </div>
 </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const actualInputs = document.querySelectorAll('.actual-input');
+    const avgInput = document.getElementById('avg-long-pcs');
+
+    function calculateAverage() {
+        let sum = 0;
+        let count = 0;
+
+        actualInputs.forEach(input => {
+            const value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                sum += value;
+                count++;
+            }
+        });
+
+        const avg = count > 0 ? (sum / count).toFixed(2) : '';
+        avgInput.value = avg;
+    }
+
+    actualInputs.forEach(input => {
+        input.addEventListener('input', calculateAverage);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const actualInputs = document.querySelectorAll('.actual-input-wpcs');
+    const avgInput = document.getElementById('avg-weight-pcs');
+
+    function calculateAverage() {
+        let sum = 0;
+        let count = 0;
+
+        actualInputs.forEach(input => {
+            const value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                sum += value;
+                count++;
+            }
+        });
+
+        const avg = count > 0 ? (sum / count).toFixed(2) : '';
+        avgInput.value = avg;
+    }
+
+    actualInputs.forEach(input => {
+        input.addEventListener('input', calculateAverage);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const actualInputs = document.querySelectorAll('.actual-input-w');
+    const avgInput = document.getElementById('avg-weight');
+
+    function calculateAverage() {
+        let sum = 0;
+        let count = 0;
+
+        actualInputs.forEach(input => {
+            const value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                sum += value;
+                count++;
+            }
+        });
+
+        const avg = count > 0 ? (sum / count).toFixed(2) : '';
+        avgInput.value = avg;
+    }
+
+    actualInputs.forEach(input => {
+        input.addEventListener('input', calculateAverage);
+    });
+});
+</script>
 @endsection

@@ -21,7 +21,10 @@ class DetailProcessProd extends Model
         'mixing_time',
         'rework_kg',
         'rework_percent',
-        'total_material'
+        'total_material',
+        'sensory_homogenity',
+        'sensory_stiffness',
+        'sensory_aroma',
     ];
 
     protected static function booted()
