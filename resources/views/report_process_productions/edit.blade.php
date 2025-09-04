@@ -97,13 +97,13 @@
                     <p class="text-muted mb-2">Standard: <strong>{{ $item->formulation?->weight }} gr</strong></p>
                     <input type="hidden" name="formulation_uuids[]" value="{{ $item->formulation_uuid }}">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <input type="number" step="0.01" name="actual_weight[{{ $item->formulation_uuid }}]"
                                 class="form-control"
                                 value="{{ old('actual_weight.'.$item->formulation_uuid, $item->actual_weight) }}"
                                 placeholder="Berat Aktual (gr)">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <select name="sensory[{{ $item->formulation_uuid }}]" class="form-control">
                                 <option value="">-- Pilih --</option>
                                 <option value="OK"
@@ -114,7 +114,12 @@
                                     Tidak OK</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <input type="text" name="prod_code[{{ $item->formulation_uuid }}]"
+                                value="{{ old('prod_code.'.$item->formulation_uuid, $item->prod_code) }}"
+                                class="form-control" placeholder="Kode Produksi">
+                        </div>
+                        <div class="col-md-3">
                             <input type="number" step="0.1" name="temperature[{{ $item->formulation_uuid }}]"
                                 class="form-control"
                                 value="{{ old('temperature.'.$item->formulation_uuid, $item->temperature) }}"
@@ -124,6 +129,7 @@
                 </div>
                 @endforeach
 
+                <h5 class="mt-4 font-weight-bold">Penggunaan Rework</h5>
                 <div class="row mt-4">
                     <div class="mb-3 col-md-4">
                         <label>Rework (kg)</label>
@@ -142,23 +148,43 @@
                     </div>
                 </div>
 
-                <!-- <div class="row mt-4">
+                <div class="row">
                     <div class="mb-3 col-md-4">
                         <label>Sensori Homogenitas</label>
-                        <input type="number" step="0.01" name="sensory_homogenity" class="form-control"
-                            value="{{ old('sensory_homogenity', $detail->sensory_homogenity) }}">
+                        <select name="sensory_homogenity" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="√"
+                                {{ old('sensory_homogenity', $detail->sensory_homogenity)=='√' ? 'selected' : '' }}>√
+                            </option>
+                            <option value="x"
+                                {{ old('sensory_homogenity', $detail->sensory_homogenity)=='x' ? 'selected' : '' }}>
+                                x</option>
+                        </select>
                     </div>
                     <div class="mb-3 col-md-4">
                         <label>Sensori Kekentalan</label>
-                        <input type="number" step="0.01" name="sensory_stiffness" class="form-control"
-                            value="{{ old('sensory_stiffness', $detail->sensory_stiffness) }}">
+                        <select name="sensory_stiffness" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="√"
+                                {{ old('sensory_stiffness', $detail->sensory_stiffness)=='√' ? 'selected' : '' }}>√
+                            </option>
+                            <option value="x"
+                                {{ old('sensory_stiffness', $detail->sensory_stiffness)=='x' ? 'selected' : '' }}>
+                                x</option>
+                        </select>
                     </div>
                     <div class="mb-3 col-md-4">
                         <label>Sensori Aroma</label>
-                        <input type="number" step="0.01" name="sensory_aroma" class="form-control"
-                            value="{{ old('sensory_aroma', $detail->sensory_aroma) }}">
+                        <select name="sensory_aroma" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="√" {{ old('sensory_aroma', $detail->sensory_aroma)=='√' ? 'selected' : '' }}>
+                                √
+                            </option>
+                            <option value="x" {{ old('sensory_aroma', $detail->sensory_aroma)=='x' ? 'selected' : '' }}>
+                                x</option>
+                        </select>
                     </div>
-                </div> -->
+                </div>
 
                 <hr>
 

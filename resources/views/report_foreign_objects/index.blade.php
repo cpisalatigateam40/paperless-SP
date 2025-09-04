@@ -130,7 +130,10 @@
                                             <th class="align-middle">Bukti</th>
                                             <th class="align-middle">Tahapan Analisis</th>
                                             <th class="align-middle">Asal Kontaminan</th>
-                                            <th class="align-middle">Keterangan (Untuk Disposisi)</th>
+                                            <th class="align-middle">Keterangan</th>
+                                            <th class="align-middle">Paraf QC</th>
+                                            <th class="align-middle">Paraf Produksi</th>
+                                            <th class="align-middle">Paraf Engineering</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -151,14 +154,35 @@
                                             <td>{{ $detail->analysis_stage }}</td>
                                             <td>{{ $detail->contaminant_origin }}</td>
                                             <td>{{ $detail->notes }}</td>
+
+                                            {{-- Tambahan kolom paraf --}}
+                                            <td>
+                                                @if($detail->qc_paraf)
+                                                <img src="{{ asset('storage/' . $detail->qc_paraf) }}" alt="QC"
+                                                    width="60">
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($detail->production_paraf)
+                                                <img src="{{ asset('storage/' . $detail->production_paraf) }}"
+                                                    alt="Produksi" width="60">
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($detail->engineering_paraf)
+                                                <img src="{{ asset('storage/' . $detail->engineering_paraf) }}"
+                                                    alt="Engineering" width="60">
+                                                @endif
+                                            </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">Tidak ada detail</td>
+                                            <td colspan="11" class="text-center">Tidak ada detail</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
+
                             </div>
 
                             <div class="mt-2 d-flex justify-content-end">

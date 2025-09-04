@@ -111,10 +111,11 @@
                 <th rowspan="2">Kode Produksi</th>
                 <th rowspan="2">Best Before</th>
                 <th rowspan="2">Tindakan Koreksi</th>
+                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
                 <th rowspan="2">Suhu Produk After IQF</th>
                 <th colspan="2">Suhu IQF</th>
                 <th colspan="2">Lama Pembekuan</th>
-                <th colspan="3">Isi tiap Karton</th>
+                <th colspan="4">Isi tiap Karton</th>
                 <th colspan="7">Berat/Karton (kg)</th>
             </tr>
             <tr>
@@ -122,6 +123,7 @@
                 <th>Suction</th>
                 <th>Display</th>
                 <th>Aktual</th>
+                <th>Kondisi Karton</th>
                 <th>Bag</th>
                 <th>Binded</th>
                 <th>RTG</th>
@@ -145,6 +147,7 @@
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
                 <td>{{ $detail->corrective_action }}</td>
+                <td>{{ $detail->verif_after }}</td>
 
                 {{-- Freezing --}}
                 <td>{{ $detail->freezing->end_product_temp ?? '' }}</td>
@@ -154,6 +157,7 @@
                 <td>{{ $detail->freezing->freezing_time_actual ?? '' }}</td>
 
                 {{-- Kartoning --}}
+                <td>{{ $detail->kartoning->carton_condition ?? '' }}</td>
                 <td>{{ $detail->kartoning->content_bag ?? '' }}</td>
                 <td>{{ $detail->kartoning->content_binded ?? '' }}</td>
                 <td>{{ $detail->kartoning->content_rtg ?? '' }}</td>
@@ -167,7 +171,7 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="20" style="text-align: right; border: none;">QM 39 / 02</td>
+                <td colspan="22" style="text-align: right; border: none;">QM 39 / 02</td>
             </tr>
         </tbody>
     </table>

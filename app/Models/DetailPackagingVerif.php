@@ -17,6 +17,9 @@ class DetailPackagingVerif extends Model
         'expired_date',
         'qc_verif',
         'kr_verif',
+        'upload_md',
+        'upload_qr',
+        'upload_ed',
     ];
 
     public function report()

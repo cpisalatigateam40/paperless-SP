@@ -7,7 +7,7 @@
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
-        font-size: 10px;
+        font-size: 9px;
         margin-top: 30px;
     }
 
@@ -76,6 +76,8 @@
 
     @page {
         margin-top: 80px;
+        padding: 0 !important;
+
     }
 
     ul {
@@ -145,8 +147,11 @@
         <tr>
             <th rowspan="2">Jam</th>
             <th rowspan="2">Produk</th>
-            <th rowspan="2">Kode Produksi</th>
-            <th rowspan="2">Best Before</th>
+            <th rowspan="2">MD BPOM</th>
+            <th rowspan="2">QR Code</th>
+            <th rowspan="2">Kode Produksi & Best Before</th>
+            <!-- <th rowspan="2">Kode Produksi</th>
+            <th rowspan="2">Best Before</th> -->
             <th colspan="2">In cutting</th>
             <th colspan="2">Proses Pengemasan</th>
             <th colspan="2">Hasil Sealing</th>
@@ -182,8 +187,62 @@
             @if($i == 1)
             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
-            <td rowspan="5">{{ $d->production_code }}</td>
-            <td rowspan="5">{{ $d->expired_date }}</td>
+            <td rowspan="5">
+                @php
+                $mdPath = storage_path('app/public/' . $d->upload_md);
+                $mdBase64 = null;
+
+                if ($d->upload_md && file_exists($mdPath)) {
+                $type = pathinfo($mdPath, PATHINFO_EXTENSION);
+                $data = file_get_contents($mdPath);
+                $mdBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+                @endphp
+
+                @if($mdBase64)
+                <img src="{{ $mdBase64 }}" width="50">
+                @else
+                -
+                @endif
+            </td>
+            <td rowspan="5">
+                @php
+                $qrPath = storage_path('app/public/' . $d->upload_qr);
+                $qrBase64 = null;
+
+                if ($d->upload_qr && file_exists($qrPath)) {
+                $type = pathinfo($qrPath, PATHINFO_EXTENSION);
+                $data = file_get_contents($qrPath);
+                $qrBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+                @endphp
+
+                @if($qrBase64)
+                <img src="{{ $qrBase64 }}" width="50">
+                @else
+                -
+                @endif
+            </td>
+            <td rowspan="5">
+                @php
+                $edPath = storage_path('app/public/' . $d->upload_ed);
+                $edBase64 = null;
+
+                if ($d->upload_ed && file_exists($edPath)) {
+                $type = pathinfo($edPath, PATHINFO_EXTENSION);
+                $data = file_get_contents($edPath);
+                $edBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+                @endphp
+
+                @if($edBase64)
+                <img src="{{ $edBase64 }}" width="50">
+                @else
+                -
+                @endif
+            </td>
+            <!-- <td rowspan="5">{{ $d->production_code }}</td>
+            <td rowspan="5">{{ $d->expired_date }}</td> -->
 
             {{-- In cutting manual & mesin sama, rowspan --}}
             <td rowspan="5">{{ $checklist?->in_cutting_manual_1 ?? '-' }}</td>
@@ -235,7 +294,7 @@
             @endforeach
 
             <tr>
-                <td colspan="22" class="text-end" style="border: none;">QM 05 / 01</td>
+                <td colspan="23" class="text-end" style="border: none;">QM 05 / 01</td>
             </tr>
 
     </table>

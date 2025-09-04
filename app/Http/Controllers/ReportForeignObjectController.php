@@ -34,8 +34,37 @@ class ReportForeignObjectController extends Controller
         return view('report_foreign_objects.create', compact('areas', 'sections', 'products'));
     }
 
+    private function saveSignature($base64Image, $prefix)
+    {
+        if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+            $image = substr($base64Image, strpos($base64Image, ',') + 1);
+            $type = strtolower($type[1]); // png, jpg, dll
+
+            $image = base64_decode($image);
+            if ($image === false) {
+                return null;
+            }
+
+            $fileName = $prefix . '_' . time() . '.' . $type;
+            $filePath = 'signatures/' . $fileName;
+
+            if (!Storage::disk('public')->exists('signatures')) {
+                Storage::disk('public')->makeDirectory('signatures');
+            }
+
+            Storage::disk('public')->put($filePath, $image);
+
+            return $filePath;
+        }
+
+        return null;
+    }
+
+
+
     public function store(Request $request)
     {
+        // dd($request->details);
         $request->validate([
             'date' => 'required|date',
             'shift' => 'required|string',
@@ -49,6 +78,9 @@ class ReportForeignObjectController extends Controller
             'details.*.analysis_stage' => 'nullable|string',
             'details.*.contaminant_origin' => 'nullable|string',
             'details.*.notes' => 'nullable|string',
+            'details.*.qc_paraf' => 'nullable|string',
+            'details.*.production_paraf' => 'nullable|string',
+            'details.*.engineering_paraf' => 'nullable|string',
         ]);
 
         $report = ReportForeignObject::create([
@@ -69,6 +101,22 @@ class ReportForeignObjectController extends Controller
                 $evidencePath = $file->storeAs('evidence_foreign_objects', $filename, 'public');
             }
 
+            // === Simpan paraf tanda tangan digital ===
+            $qcParafPath = null;
+            if (!empty($detail['qc_paraf'])) {
+                $qcParafPath = $this->saveSignature($detail['qc_paraf'], "qc_{$index}");
+            }
+
+            $productionParafPath = null;
+            if (!empty($detail['production_paraf'])) {
+                $productionParafPath = $this->saveSignature($detail['production_paraf'], "production_{$index}");
+            }
+
+            $engineeringParafPath = null;
+            if (!empty($detail['engineering_paraf'])) {
+                $engineeringParafPath = $this->saveSignature($detail['engineering_paraf'], "engineering_{$index}");
+            }
+
             DetailForeignObject::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
@@ -80,6 +128,9 @@ class ReportForeignObjectController extends Controller
                 'analysis_stage' => $detail['analysis_stage'] ?? null,
                 'contaminant_origin' => $detail['contaminant_origin'] ?? null,
                 'notes' => $detail['notes'] ?? null,
+                'qc_paraf' => $qcParafPath,
+                'production_paraf' => $productionParafPath,
+                'engineering_paraf' => $engineeringParafPath,
             ]);
         }
 
@@ -107,6 +158,9 @@ class ReportForeignObjectController extends Controller
             'analysis_stage' => 'nullable|string',
             'contaminant_origin' => 'nullable|string',
             'notes' => 'nullable|string',
+            'qc_paraf' => 'nullable|string',
+            'production_paraf' => 'nullable|string',
+            'engineering_paraf' => 'nullable|string',
         ]);
 
         $evidencePath = null;
@@ -114,6 +168,22 @@ class ReportForeignObjectController extends Controller
             $file = $request->file('evidence');
             $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $evidencePath = $file->storeAs('evidence_foreign_objects', $filename, 'public');
+        }
+
+        // === Simpan paraf tanda tangan digital ===
+        $qcParafPath = null;
+        if (!empty($request->qc_paraf)) {
+            $qcParafPath = $this->saveSignature($request->qc_paraf, "qc");
+        }
+
+        $productionParafPath = null;
+        if (!empty($request->production_paraf)) {
+            $productionParafPath = $this->saveSignature($request->production_paraf, "production");
+        }
+
+        $engineeringParafPath = null;
+        if (!empty($request->engineering_paraf)) {
+            $engineeringParafPath = $this->saveSignature($request->engineering_paraf, "engineering");
         }
 
         DetailForeignObject::create([
@@ -127,10 +197,14 @@ class ReportForeignObjectController extends Controller
             'analysis_stage' => $request->analysis_stage,
             'contaminant_origin' => $request->contaminant_origin,
             'notes' => $request->notes,
+            'qc_paraf' => $qcParafPath,
+            'production_paraf' => $productionParafPath,
+            'engineering_paraf' => $engineeringParafPath,
         ]);
 
         return redirect()->route('report-foreign-objects.index')->with('success', 'Detail berhasil ditambahkan');
     }
+
 
     public function destroy($uuid)
     {

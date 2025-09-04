@@ -147,7 +147,10 @@
                 <th class="align-middle">Bukti (Foto)</th>
                 <th class="align-middle">Tahapan</th>
                 <th class="align-middle">Analisis Asal Kontaminan</th>
-                <th class="align-middle">Keterangan (Untuk Disposisi)</th>
+                <th class="align-middle">Keterangan</th>
+                <th class="align-middle">Paraf QC</th>
+                <th class="align-middle">Paraf Produksi</th>
+                <th class="align-middle">Paraf Engineering</th>
             </tr>
         </thead>
         <tbody>
@@ -178,10 +181,64 @@
                 <td>{{ $detail->analysis_stage }}</td>
                 <td>{{ $detail->contaminant_origin }}</td>
                 <td>{{ $detail->notes }}</td>
+                <td>
+                    @php
+                    $qcBase64 = null;
+                    if ($detail->qc_paraf) {
+                    $qcPath = storage_path('app/public/' . $detail->qc_paraf);
+                    if (file_exists($qcPath)) {
+                    $type = pathinfo($qcPath, PATHINFO_EXTENSION);
+                    $data = file_get_contents($qcPath);
+                    $qcBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
+                    }
+                    @endphp
+
+                    @if($qcBase64)
+                    <img src="{{ $qcBase64 }}" alt="QC" width="60">
+                    @endif
+                </td>
+
+                <td>
+                    @php
+                    $prodBase64 = null;
+                    if ($detail->production_paraf) {
+                    $prodPath = storage_path('app/public/' . $detail->production_paraf);
+                    if (file_exists($prodPath)) {
+                    $type = pathinfo($prodPath, PATHINFO_EXTENSION);
+                    $data = file_get_contents($prodPath);
+                    $prodBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
+                    }
+                    @endphp
+
+                    @if($prodBase64)
+                    <img src="{{ $prodBase64 }}" alt="Produksi" width="60">
+                    @endif
+                </td>
+
+                <td>
+                    @php
+                    $engBase64 = null;
+                    if ($detail->engineering_paraf) {
+                    $engPath = storage_path('app/public/' . $detail->engineering_paraf);
+                    if (file_exists($engPath)) {
+                    $type = pathinfo($engPath, PATHINFO_EXTENSION);
+                    $data = file_get_contents($engPath);
+                    $engBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
+                    }
+                    @endphp
+
+                    @if($engBase64)
+                    <img src="{{ $engBase64 }}" alt="Engineering" width="60">
+                    @endif
+                </td>
+
             </tr>
             @endforeach
             <tr>
-                <td colspan="8" style="text-align: right; border: none;">QM 09 / 00</td>
+                <td colspan="11" style="text-align: right; border: none;">QM 09 / 00</td>
             </tr>
         </tbody>
     </table>

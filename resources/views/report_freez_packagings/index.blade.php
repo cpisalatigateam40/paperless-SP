@@ -136,6 +136,7 @@
                                                 <th rowspan="2">Kode Produksi</th>
                                                 <th rowspan="2">Best Before</th>
                                                 <th rowspan="2">Tindakan Koreksi</th>
+                                                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
 
                                                 <th colspan="8">PEMBEKUAN</th>
                                                 <th colspan="8">KARTONING</th>
@@ -148,6 +149,7 @@
                                                 <th>Lama Pembekuan Display</th>
                                                 <th>Lama Pembekuan Aktual</th>
 
+                                                <th>Kondisi Karton</th>
                                                 <th>Isi Bag</th>
                                                 <th>Isi Binded</th>
                                                 <th>Isi RTG</th>
@@ -173,6 +175,7 @@
                                                 <td class="align-middle">{{ $detail->production_code ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->best_before ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->corrective_action ?? '-' }}</td>
+                                                <td class="align-middle">{{ $detail->verif_after ?? '-' }}</td>
 
                                                 {{-- Freezing --}}
                                                 <td class="align-middle">
@@ -189,6 +192,9 @@
                                                     {{ $detail->freezing->freezing_time_actual ?? '-' }}</td>
 
                                                 {{-- Kartoning --}}
+                                                <td class="align-middle">
+                                                    {{ $detail->kartoning->carton_condition ?? '-' }}
+                                                </td>
                                                 <td class="align-middle">{{ $detail->kartoning->content_bag ?? '-' }}
                                                 </td>
                                                 <td class="align-middle">{{ $detail->kartoning->content_binded ?? '-' }}

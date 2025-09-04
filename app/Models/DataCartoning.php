@@ -27,6 +27,7 @@ class DataCartoning extends Model
         'weight_5',
         'avg_weight',
         'content_rtg',
+        'carton_condition',
     ];
 
     protected static function boot()

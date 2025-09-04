@@ -259,7 +259,7 @@ $isKetidaksesuaian = Request::is([
 
                 <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
                     href="{{ route('report_lab_samples.index') }}">
-                    Pembuatan Sample Laboratorium
+                    Verifikasi Pengambilan Sample
                 </a>
 
                 {{-- <a class="collapse-item" href="{{ route('report_retains.index') }}">Retained Sample Report</a> --}}
@@ -276,10 +276,10 @@ $isKetidaksesuaian = Request::is([
                     Pendataan Retain Sample ABF/IQF
                 </a> -->
 
-                <a class="collapse-item {{ Request::is('report-product-verifs*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-product-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_product_verifs.index') }}">
                     Verifikasi Produk
-                </a>
+                </a> -->
 
                 <a class="collapse-item {{ Request::is('report-tofu-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_tofu_verifs.index') }}">

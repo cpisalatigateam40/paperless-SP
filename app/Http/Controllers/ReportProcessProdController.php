@@ -89,6 +89,7 @@ class ReportProcessProdController extends Controller
                 'formulation_uuid' => $uuid,
                 'actual_weight' => $request->actual_weight[$uuid] ?? null,
                 'sensory' => $request->sensory[$uuid] ?? null,
+                'prod_code' => $request->prod_code[$uuid] ?? null,
                 'temperature' => $request->temperature[$uuid] ?? null,
             ]);
         }
@@ -198,6 +199,7 @@ class ReportProcessProdController extends Controller
                 'formulation_uuid' => $uuid,
                 'actual_weight' => $request->actual_weight[$uuid] ?? null,
                 'sensory' => $request->sensory[$uuid] ?? null,
+                'prod_code' => $request->prod_code[$uuid] ?? null,
                 'temperature' => $request->temperature[$uuid] ?? null,
             ]);
         }
@@ -379,6 +381,7 @@ class ReportProcessProdController extends Controller
                         'formulation_uuid' => $uuidFm,
                         'actual_weight' => $request->actual_weight[$uuidFm] ?? null,
                         'sensory' => $request->sensory[$uuidFm] ?? null,
+                        'prod_code' => $request->prod_code[$uuidFm] ?? null,
                         'temperature' => $request->temperature[$uuidFm] ?? null,
                     ]);
                 }

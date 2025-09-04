@@ -56,6 +56,7 @@ class ReportFreezPackagingController extends Controller
                     'start_time' => $detail['start_time'] ?? null,
                     'end_time' => $detail['end_time'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
+                    'verif_after' => $detail['verif_after'] ?? null,
                 ]);
 
                 $detailModel->freezing()->create([
@@ -84,6 +85,7 @@ class ReportFreezPackagingController extends Controller
                     'weight_5' => $detail['kartoning']['weight_5'] ?? null,
                     'avg_weight' => $detail['kartoning']['avg_weight'] ?? null,
                     'content_rtg' => $detail['kartoning']['content_rtg'] ?? null,
+                    'carton_condition' => $detail['kartoning']['carton_condition'] ?? null,
                 ]);
             }
 
@@ -123,6 +125,7 @@ class ReportFreezPackagingController extends Controller
                 'start_time' => now()->setTimeFromTimeString($item['start_time']),
                 'end_time' => now()->setTimeFromTimeString($item['end_time']),
                 'corrective_action' => $item['corrective_action'],
+                'verif_after' => $item['verif_after'],
             ]);
             $detail->save();
 
@@ -148,6 +151,7 @@ class ReportFreezPackagingController extends Controller
                 'weight_5' => $item['kartoning']['weight_5'] ?? null,
                 'avg_weight' => $item['kartoning']['avg_weight'] ?? null,
                 'content_rtg' => $item['kartoning']['content_rtg'] ?? null,
+                'carton_condition' => $item['kartoning']['carton_condition'] ?? null,
             ]);
         }
 

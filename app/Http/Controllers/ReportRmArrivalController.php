@@ -19,10 +19,12 @@ class ReportRmArrivalController extends Controller
     {
         $reports = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
             ->orderByDesc('date')
-            ->get();
+            ->get()
+            ->groupBy(fn($report) => $report->section?->section_name ?? 'Tanpa Section');
 
         return view('report_rm_arrivals.index', compact('reports'));
     }
+
 
     public function create()
     {

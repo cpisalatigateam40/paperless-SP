@@ -94,7 +94,7 @@
                     </div>
                 </div>
 
-                <!-- <div class="row mt-4">
+                <div class="row">
                     <div class="col-md-4">
                         <label>Sensori Homogenitas</label>
                         <select name="sensory_homogenity" class="form-control">
@@ -119,7 +119,7 @@
                             <option value="x">x</option>
                         </select>
                     </div>
-                </div> -->
+                </div>
 
                 <hr>
 
@@ -297,21 +297,24 @@ document.getElementById('formula-select').addEventListener('change', function() 
                                         <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
                                         <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                                         <div class="row">
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <input type="number" step="0.01" 
                                                     name="actual_weight[${fm.uuid}]" 
                                                     class="form-control actual-weight" 
                                                     placeholder="Berat Aktual (kg)"
                                                     data-standard="${fm.weight}">
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
                                                     <option value="">-- Pilih --</option>
                                                     <option value="OK">OK</option>
                                                     <option value="Tidak OK">Tidak OK</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
+                                                <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+                                            </div>
+                                            <div class="col-md-3">
                                                 <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
                                             </div>
                                         </div>
@@ -331,7 +334,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                                 <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
                                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <input type="number" 
                                             step="0.01" 
                                             name="actual_weight[${fm.uuid}]" 
@@ -339,14 +342,17 @@ document.getElementById('formula-select').addEventListener('change', function() 
                                             placeholder="Berat Aktual (kg)"
                                             data-standard="${fm.weight}">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
                                             <option value="">-- Pilih --</option>
                                             <option value="OK">OK</option>
                                             <option value="Tidak OK">Tidak OK</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+                                    </div>
+                                    <div class="col-md-3">
                                         <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
                                     </div>
                                 </div>

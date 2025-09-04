@@ -39,16 +39,42 @@ class ReportPackagingVerifController extends Controller
             'created_by' => Auth::user()->name,
         ]);
 
-        foreach ($request->details as $detail) {
+        foreach ($request->details as $index => $detail) {
+            $uploadMd = null;
+            $uploadQr = null;
+            $uploadEd = null;
+
+            // Upload MD
+            if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_md'];
+                $filename = time() . '_md_' . $index . '_' . $file->getClientOriginalName();
+                $uploadMd = $file->storeAs('upload_packaging', $filename, 'public');
+            }
+
+            // Upload QR
+            if (isset($detail['upload_qr']) && $detail['upload_qr'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_qr'];
+                $filename = time() . '_qr_' . $index . '_' . $file->getClientOriginalName();
+                $uploadQr = $file->storeAs('upload_packaging', $filename, 'public');
+            }
+
+            // Upload ED
+            if (isset($detail['upload_ed']) && $detail['upload_ed'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_ed'];
+                $filename = time() . '_ed_' . $index . '_' . $file->getClientOriginalName();
+                $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
+            }
+
             $detailModel = DetailPackagingVerif::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
                 'product_uuid' => $detail['product_uuid'],
                 'time' => $detail['time'],
-                'production_code' => $detail['production_code'],
-                'expired_date' => $detail['expired_date'],
-                // 'qc_verif' => isset($detail['qc_verif']) ? Auth::user()->name : null,
-                // 'kr_verif' => isset($detail['kr_verif']) ? Auth::user()->name : null,
+                // 'production_code' => $detail['production_code'],
+                // 'expired_date' => $detail['expired_date'],
+                'upload_md' => $uploadMd,
+                'upload_qr' => $uploadQr,
+                'upload_ed' => $uploadEd,
             ]);
 
             $checklistData = [
@@ -62,7 +88,7 @@ class ReportPackagingVerifController extends Controller
                 'actual_long_pcs_4' => $detail['checklist']['actual_long_pcs_4'],
                 'actual_long_pcs_5' => $detail['checklist']['actual_long_pcs_5'],
                 'avg_long_pcs' => $detail['checklist']['avg_long_pcs'],
-                
+
                 'standard_weight_pcs' => $detail['checklist']['standard_weight_pcs'],
                 'actual_weight_pcs_1' => $detail['checklist']['actual_weight_pcs_1'],
                 'actual_weight_pcs_2' => $detail['checklist']['actual_weight_pcs_2'],
@@ -133,7 +159,32 @@ class ReportPackagingVerifController extends Controller
     {
         $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
 
-        foreach ($request->details as $detail) {
+        foreach ($request->details as $index => $detail) {
+            $uploadMd = null;
+            $uploadQr = null;
+            $uploadEd = null;
+
+            // Upload MD
+            if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_md'];
+                $filename = time() . '_md_' . $index . '_' . $file->getClientOriginalName();
+                $uploadMd = $file->storeAs('upload_packaging', $filename, 'public');
+            }
+
+            // Upload QR
+            if (isset($detail['upload_qr']) && $detail['upload_qr'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_qr'];
+                $filename = time() . '_qr_' . $index . '_' . $file->getClientOriginalName();
+                $uploadQr = $file->storeAs('upload_packaging', $filename, 'public');
+            }
+
+            // Upload ED
+            if (isset($detail['upload_ed']) && $detail['upload_ed'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_ed'];
+                $filename = time() . '_ed_' . $index . '_' . $file->getClientOriginalName();
+                $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
+            }
+
             $detailModel = DetailPackagingVerif::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
@@ -141,6 +192,9 @@ class ReportPackagingVerifController extends Controller
                 'time' => $detail['time'],
                 'production_code' => $detail['production_code'],
                 'expired_date' => $detail['expired_date'],
+                'upload_md' => $uploadMd,
+                'upload_qr' => $uploadQr,
+                'upload_ed' => $uploadEd,
             ]);
 
             $checklistData = [
@@ -154,7 +208,7 @@ class ReportPackagingVerifController extends Controller
                 'actual_long_pcs_4' => $detail['checklist']['actual_long_pcs_4'],
                 'actual_long_pcs_5' => $detail['checklist']['actual_long_pcs_5'],
                 'avg_long_pcs' => $detail['checklist']['avg_long_pcs_5'],
-                
+
                 'standard_weight_pcs' => $detail['checklist']['standard_weight_pcs'],
                 'actual_weight_pcs_1' => $detail['checklist']['actual_weight_pcs_1'],
                 'actual_weight_pcs_2' => $detail['checklist']['actual_weight_pcs_2'],

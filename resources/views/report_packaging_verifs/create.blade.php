@@ -8,7 +8,7 @@
         </div>
 
         <div class="card-body">
-            <form method="POST" action="{{ route('report_packaging_verifs.store') }}">
+            <form method="POST" action="{{ route('report_packaging_verifs.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="row mb-3">
@@ -40,8 +40,8 @@
                         <tr>
                             <th>Jam</th>
                             <th>Produk</th>
-                            <th>Kode Produksi</th>
-                            <th>Best Before</th>
+                            <!-- <th>Kode Produksi</th>
+                            <th>Best Before</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -56,11 +56,34 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td><input type="text" name="details[0][production_code]" class="form-control"></td>
-                            <td><input type="date" name="details[0][expired_date]" class="form-control"></td>
+                            <!-- <td><input type="text" name="details[0][production_code]" class="form-control"></td>
+                            <td><input type="date" name="details[0][expired_date]" class="form-control"></td> -->
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="card mt-3 mb-3">
+                    <div class="card-header p-2">
+                        <strong>Upload Foto</strong>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Upload MD BPOM</label>
+                                <input type="file" name="details[0][upload_md]" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Upload QR Code</label>
+                                <input type="file" name="details[0][upload_qr]" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Upload Kode Produksi & Best Before</label>
+                                <input type="file" name="details[0][upload_ed]" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
                 {{-- In Cutting hanya 1 --}}
                 <div class="card mb-3">

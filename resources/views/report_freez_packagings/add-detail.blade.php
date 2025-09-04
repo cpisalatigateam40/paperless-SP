@@ -113,6 +113,15 @@ function addDetailRow() {
     <h6 class="mt-5 mb-3" style="font-weight: bold;">Kartoning</h6>
     <div class="row">
         <div class="col-md-4">
+            <label class="form-label">Verifikasi Kondisi Karton</label>
+            <select name="details[${index}][kartoning][carton_condition]" class="form-control">
+                <option value="✓">✓</option>
+                <option value="x">x</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
             <label>Isi Bag</label>
             <input type="number" name="details[${index}][kartoning][content_bag]" class="form-control">
         </div>
@@ -161,6 +170,13 @@ function addDetailRow() {
         <div class="col-md-4">
             <label>Tindakan Koreksi</label>
             <input type="text" name="details[${index}][corrective_action]" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Verifikasi Setelah Tindakan Koreksi</label>
+            <select name="details[${index}][verif_after]" class="form-control">
+                <option value="✓">✓</option>
+                <option value="x">x</option>
+            </select>
         </div>
     </div>
 </div>

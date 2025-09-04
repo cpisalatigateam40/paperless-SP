@@ -132,8 +132,11 @@
                                         <tr>
                                             <th rowspan="2">Jam</th>
                                             <th rowspan="2">Produk</th>
-                                            <th rowspan="2">Kode Produksi</th>
-                                            <th rowspan="2">Best Before</th>
+                                            <th rowspan="2">Upload MD BPOM</th>
+                                            <th rowspan="2">Upload QR Code</th>
+                                            <th rowspan="2">Upload Kode Produksi & Best Before</th>
+                                            <!-- <th rowspan="2">Kode Produksi</th>
+                                                    <th rowspan="2">Best Before</th> -->
                                             <th colspan="2">In cutting</th>
                                             <th colspan="2">Proses Pengemasan</th>
                                             <th colspan="2">Hasil Sealing</th>
@@ -169,8 +172,32 @@
                                             @if($i == 1)
                                             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
                                             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
-                                            <td rowspan="5">{{ $d->production_code }}</td>
-                                            <td rowspan="5">{{ $d->expired_date }}</td>
+                                            <td rowspan="5">
+                                                @if($d->upload_md)
+                                                <a href="{{ asset('storage/' . $d->upload_md) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $d->upload_md) }}" alt="Bukti"
+                                                        width="60">
+                                                </a>
+                                                @endif
+                                            </td>
+                                            <td rowspan="5">
+                                                @if($d->upload_qr)
+                                                <a href="{{ asset('storage/' . $d->upload_qr) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $d->upload_qr) }}" alt="Bukti"
+                                                        width="60">
+                                                </a>
+                                                @endif
+                                            </td>
+                                            <td rowspan="5">
+                                                @if($d->upload_ed)
+                                                <a href="{{ asset('storage/' . $d->upload_ed) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $d->upload_ed) }}" alt="Bukti"
+                                                        width="60">
+                                                </a>
+                                                @endif
+                                            </td>
+                                            <!-- <td rowspan="5">{{ $d->production_code }}</td>
+                                                                <td rowspan="5">{{ $d->expired_date }}</td> -->
 
                                             {{-- In cutting manual & mesin sama, rowspan --}}
                                             <td rowspan="5">{{ $checklist?->in_cutting_manual_1 ?? '-' }}</td>

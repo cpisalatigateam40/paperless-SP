@@ -18,6 +18,7 @@ class ItemDetailProd extends Model
         'formulation_uuid',
         'actual_weight',
         'sensory',
+        'prod_code',
         'temperature'
     ];
 

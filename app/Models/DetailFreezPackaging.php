@@ -21,6 +21,7 @@ class DetailFreezPackaging extends Model
         'production_code',
         'best_before',
         'corrective_action',
+        'verif_after',
     ];
 
     protected static function boot()
