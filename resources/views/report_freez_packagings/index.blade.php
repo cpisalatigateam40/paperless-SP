@@ -138,8 +138,8 @@
                                                 <th rowspan="2">Tindakan Koreksi</th>
                                                 <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
 
-                                                <th colspan="8">PEMBEKUAN</th>
-                                                <th colspan="8">KARTONING</th>
+                                                <th colspan="5">PEMBEKUAN</th>
+                                                <th colspan="12">KARTONING</th>
 
                                             </tr>
                                             <tr>
