@@ -85,6 +85,11 @@
         background-color: #eaecf4 !important;
         color: #6e707e !important;
     }
+
+    th,
+    td {
+        vertical-align: middle !important;
+    }
     </style>
 
     @yield('style')

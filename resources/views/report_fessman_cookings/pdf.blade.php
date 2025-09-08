@@ -274,17 +274,12 @@
             'AIR COOLING WITH SHOWER INTER 2',
             'OUT TRANSPORT',
             'SUHU PRODUK KELUAR',
-            'COOKING LOSS'
             ];
             $coolingFields = [
             ['db' => 'time_minutes', 'label' => 'Waktu (menit)'],
             ['db' => 'rh', 'label' => 'RH (%)'],
             ['db' => 'product_temp_after_exit', 'label' => 'Suhu Pusat Produk Setelah Keluar (°C)'],
             ['db' => 'avg_product_temp_after_exit', 'label' => 'Suhu Rata-rata Pusat Produk'],
-            ['db' => 'raw_weight', 'label' => 'Berat Mentah'],
-            ['db' => 'cooked_weight', 'label' => 'Berat Matang'],
-            ['db' => 'loss_kg', 'label' => 'Loss (kg)'],
-            ['db' => 'loss_percent', 'label' => 'Loss (%)'],
             ];
             @endphp
 

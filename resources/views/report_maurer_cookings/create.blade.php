@@ -376,7 +376,7 @@
                         </div>
 
                         {{-- Cooking Losses --}}
-                        <div class="card mb-3">
+                        <!-- <div class="card mb-3">
                             <div class="card-header">C. Cooking Loss</div>
                             <div class="card-body p-2">
                                 <div class="table-responsive">
@@ -428,7 +428,7 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>

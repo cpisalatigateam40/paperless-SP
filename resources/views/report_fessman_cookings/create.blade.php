@@ -239,8 +239,7 @@
                         'avg_product_temp_after_exit'
                         ]
                         ],
-                        ['name' => 'COOKING LOSS', 'fields' => ['raw_weight', 'cooked_weight', 'loss_kg',
-                        'loss_percent']],
+
                         ];
                         @endphp
 

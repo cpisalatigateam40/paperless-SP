@@ -141,6 +141,12 @@ class Product extends Model
         return $this->hasMany(MaurerStandard::class, 'product_uuid', 'uuid')->orderBy('order');
     }
 
+    public function basoCookings()
+    {
+        return $this->hasMany(ReportBasoCooking::class, 'product_uuid', 'uuid');
+    }
+
+
 
 
 }

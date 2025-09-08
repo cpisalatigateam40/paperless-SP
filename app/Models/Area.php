@@ -234,5 +234,11 @@ class Area extends Model
         return $this->hasMany(StandardStuffer::class, 'area_uuid', 'uuid');
     }
 
+    public function basoCookings()
+    {
+        return $this->hasMany(ReportBasoCooking::class, 'area_uuid', 'uuid');
+    }
+
+
 
 }

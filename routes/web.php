@@ -61,6 +61,7 @@ use App\Http\Controllers\ReportProcessProdController;
 use App\Http\Controllers\StandardStufferController;
 use App\Http\Controllers\MaurerStandardController;
 use App\Http\Controllers\FessmanStandardController;
+use App\Http\Controllers\ReportBasoCookingController;
 
 
 Route::redirect('/', '/login');
@@ -930,6 +931,23 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
+        });
+
+    Route::prefix('report-baso-cookings')
+        ->name('report_baso_cookings.')
+        ->controller(ReportBasoCookingController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/add-detail/{reportUuid}', [ReportBasoCookingController::class, 'addDetail'])->name('add_detail');
+            Route::post('/add-detail/{reportUuid}', [ReportBasoCookingController::class, 'storeDetail'])->name('store_detail');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::post('user-sync', [ApiController::class, 'syncUser']);

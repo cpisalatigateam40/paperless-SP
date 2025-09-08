@@ -490,7 +490,7 @@
             </tr>
 
             {{-- Cooking Loss --}}
-            <tr class="table-secondary">
+            <!-- <tr class="table-secondary">
                 <td colspan="{{ 1 + $report->details->count() }}" class="text-start fw-semibold"
                     style="font-weight: bold;">
                     C. Cooking Loss
@@ -545,7 +545,7 @@
                     @endforeach
                 </td>
                 @endforeach
-            </tr>
+            </tr> -->
 
             <tr>
                 <td colspan="5" style="text-align: right; border: none;">QM 06 / 01</td>
