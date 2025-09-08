@@ -16,7 +16,8 @@ class DetailWeightStuffer extends Model
         'production_code',
         'time',
         'weight_standard',
-        'long_standard'
+        'long_standard',
+        'machine',
     ];
 
     public function report()
@@ -46,6 +47,6 @@ class DetailWeightStuffer extends Model
 
     public function weights()
     {
-        return $this->hasMany(WeightStuffer::class, 'stuffer_id');
+         return $this->hasMany(WeightStufferMeasurement::class, 'stuffer_id');
     }
 }

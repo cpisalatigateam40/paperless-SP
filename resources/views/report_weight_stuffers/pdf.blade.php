@@ -144,26 +144,25 @@
         <tr>
             <th class="text-start">Nama Produk</th>
             @foreach ($details as $d)
-            <th colspan="2">{{ $d->product->product_name ?? '-' }}</th>
+            <th>{{ $d->product->product_name ?? '-' }}</th>
             @endforeach
         </tr>
         <tr>
             <th class="text-start">Kode Produksi</th>
             @foreach ($details as $d)
-            <td colspan="2">{{ $d->production_code }}</td>
+            <td>{{ $d->production_code }}</td>
             @endforeach
         </tr>
         <tr>
             <th class="text-start">Waktu Proses</th>
             @foreach ($details as $d)
-            <td colspan="2">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
+            <td>{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             @endforeach
         </tr>
         <tr>
             <th class="text-start">Mesin Stuffer</th>
             @foreach ($details as $d)
-            <th>Townsend</th>
-            <th>Hitech</th>
+            <td>{{ $d->townsend ? 'Townsend' : 'Hitech' }}</td>
             @endforeach
         </tr>
 
@@ -171,11 +170,9 @@
         $labels = [
         'Kecepatan Stuffer (rpm)' => 'speed',
         'Ukuran Casing<br><small>(Aktual Panjang, Diameter)</small>' => 'casing',
-
         'Standar Berat (gr)' => 'standard',
         'Berat Aktual (gr)' => 'actual_weight',
         'Rata-rata Berat Aktual (gr)' => 'avg',
-
         'Standar Panjang' => 'standard_long',
         'Panjang Aktual' => 'actual_long',
         'Rata-rata Panjang Aktual' => 'avg_long',
@@ -188,77 +185,59 @@
             <td class="text-start">{!! $label !!}</td>
             @foreach ($details as $d)
             @php
-            $t = $d->townsend;
-            $h = $d->hitech;
-            $cT = $d->cases->get(0);
-            $cH = $d->cases->get(1);
-            $wT = $d->weights->get(0);
-            $wH = $d->weights->get(1);
+            // pilih mesin sesuai data yang ada
+            $stuffer = $d->townsend ?? $d->hitech;
+            $case = $d->cases->first();
+            $weight = $d->weights->first();
             @endphp
 
             @switch($key)
             @case('speed')
-            <td>{{ $t->stuffer_speed ?? '-' }}</td>
-            <td>{{ $h->stuffer_speed ?? '-' }}</td>
+            <td>{{ $stuffer?->stuffer_speed ?? '-' }}</td>
             @break
 
             @case('casing')
-            <td>{{ $cT?->actual_case_1 ?? '-' }} / {{ $cT?->actual_case_2 ?? '-' }}</td>
-            <td>{{ $cH?->actual_case_1 ?? '-' }} / {{ $cH?->actual_case_2 ?? '-' }}</td>
+            <td>{{ $case?->actual_case_1 ?? '-' }} / {{ $case?->actual_case_2 ?? '-' }}</td>
             @break
 
-            <!-- @case('trolley')
-                                        <td>{{ $t->trolley_total ?? '-' }}</td>
-                                        <td>{{ $h->trolley_total ?? '-' }}</td>
-                                        @break -->
-
             @case('standard')
-            <td colspan="2">{{ $d->weight_standard ?? '-' }}</td>
+            <td>{{ $d->weight_standard ?? '-' }}</td>
             @break
 
             @case('actual_weight')
             <td>
-                {{ $wT?->actual_weight_1 ?? '-' }} /
-                {{ $wT?->actual_weight_2 ?? '-' }} /
-                {{ $wT?->actual_weight_3 ?? '-' }}
-            </td>
-            <td>
-                {{ $wH?->actual_weight_1 ?? '-' }} /
-                {{ $wH?->actual_weight_2 ?? '-' }} /
-                {{ $wH?->actual_weight_3 ?? '-' }}
+                @if($d->weights->count() > 0)
+                {{ $d->weights->pluck('actual_weight')->filter()->implode(' / ') }}
+                @else
+                -
+                @endif
             </td>
             @break
 
             @case('avg')
-            <td>{{ $t->avg_weight ?? '-' }}</td>
-            <td>{{ $h->avg_weight ?? '-' }}</td>
+            <td>{{ $stuffer?->avg_weight ?? '-' }}</td>
             @break
 
             @case('standard_long')
-            <td colspan="2">{{ $d->long_standard ?? '-' }}</td>
+            <td>{{ $d->long_standard ?? '-' }}</td>
             @break
 
             @case('actual_long')
             <td>
-                {{ $wT?->actual_long_1 ?? '-' }} /
-                {{ $wT?->actual_long_2 ?? '-' }} /
-                {{ $wT?->actual_long_3 ?? '-' }}
-            </td>
-            <td>
-                {{ $wH?->actual_long_1 ?? '-' }} /
-                {{ $wH?->actual_long_2 ?? '-' }} /
-                {{ $wH?->actual_long_3 ?? '-' }}
+                @if($d->weights->count() > 0)
+                {{ $d->weights->pluck('actual_long')->filter()->implode(' / ') }}
+                @else
+                -
+                @endif
             </td>
             @break
 
             @case('avg_long')
-            <td>{{ $t->avg_long ?? '-' }}</td>
-            <td>{{ $h->avg_long ?? '-' }}</td>
+            <td>{{ $stuffer?->avg_long ?? '-' }}</td>
             @break
 
             @case('notes')
-            <td>{{ $t->notes ?? '-' }}</td>
-            <td>{{ $h->notes ?? '-' }}</td>
+            <td>{{ $stuffer?->notes ?? '-' }}</td>
             @break
             @endswitch
             @endforeach

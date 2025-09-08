@@ -130,8 +130,8 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('premixes.index') }}">Premix</a>
                 <a class="collapse-item {{ Request::is('formulas*') ? 'active' : '' }}"
                     href="{{ route('formulas.index') }}">Formulasi</a>
-                <a class="collapse-item {{ Request::is('standard-stuffers*') ? 'active' : '' }}"
-                    href="{{ route('standard-stuffers.index') }}">Standar Stuffer</a>
+                <!-- <a class="collapse-item {{ Request::is('standard-stuffers*') ? 'active' : '' }}"
+                    href="{{ route('standard-stuffers.index') }}">Standar Stuffer</a> -->
 
                 <a class="collapse-item {{ Request::is('maurer-standards*') ? 'active' : '' }}"
                     href="{{ route('maurer-standards.index') }}">Standar Maurer</a>
