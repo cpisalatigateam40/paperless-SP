@@ -4,28 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Scopes\UserAreaScope;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
-class ReportBasoCooking extends Model
+class ReportPasteur extends Model
 {
     use HasFactory;
 
-    protected $table = 'report_baso_cookings';
+    protected $table = 'report_pasteurs';
+
     protected $fillable = [
         'uuid',
         'area_uuid',
         'date',
         'shift',
-        'product_uuid',
-        'std_core_temp',
-        'std_weight',
-        'set_boiling_1',
-        'set_boiling_2',
         'created_by',
         'known_by',
         'approved_by',
         'approved_at',
+        'problem',
+        'corrective_action',
     ];
 
     protected static function boot()
@@ -41,15 +39,9 @@ class ReportBasoCooking extends Model
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 
-    // Relasi ke Product
-    public function product()
-    {
-        return $this->belongsTo(Product::class, 'product_uuid', 'uuid');
-    }
-
     // Relasi ke Detail
     public function details()
     {
-        return $this->hasMany(DetailBasoCooking::class, 'report_uuid', 'uuid');
+        return $this->hasMany(DetailPasteur::class, 'report_uuid', 'uuid');
     }
 }

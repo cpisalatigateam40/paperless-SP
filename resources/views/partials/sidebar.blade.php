@@ -9,11 +9,12 @@ Request::is('report-premixes*') ||
 Request::is('report-metal-detectors*') ||
 Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
-Request::is('report-baso-cookings*') ||
 Request::is('report-process-productions*');
 $isCooking =
 Request::is('report-maurer-cookings*') ||
-Request::is('report-fessman-cookings*');
+Request::is('report-fessman-cookings*') ||
+Request::is('report-baso-cookings*') ||
+Request::is('report-rtg-steamers*');
 $isPacking =
 Request::is('report-lab-samples*') ||
 Request::is('report-md-products*') ||
@@ -22,6 +23,8 @@ Request::is('report-product-verifs*') ||
 Request::is('report-tofu-verifs*') ||
 Request::is('report-prod-loss-vacums*') ||
 Request::is('report-packaging-verifs*');
+$isPasteurizing =
+Request::is('report-pasteurs*');
 $isCartoning =
 Request::is('report-freez-packagings*');
 $isNonProses = Request::is([
@@ -220,10 +223,7 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_process_productions.index') }}">
                     Verifikasi Proses Produksi
                 </a>
-                <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
-                    href="{{ route('report_baso_cookings.index') }}">
-                    Verifikasi Pemasakan Baso
-                </a>
+
             </div>
         </div>
     </li>
@@ -244,6 +244,14 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-fessman-cookings*') ? 'active' : '' }}"
                     href="{{ route('report_fessman_cookings.index') }}">
                     Fessman
+                </a>
+                <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
+                    href="{{ route('report_baso_cookings.index') }}">
+                    Verifikasi Pemasakan Baso
+                </a>
+                <a class="collapse-item {{ Request::is('report-rtg-steamers*') ? 'active' : '' }}"
+                    href="{{ route('report_rtg_steamers.index') }}">
+                    Pemeriksaan Pemasakan Dengan Steamer
                 </a>
             </div>
         </div>
@@ -299,6 +307,23 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-packaging-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_packaging_verifs.index') }}">
                     Verifikasi Pemeriksaan Kemasan Plastik
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item {{ $isPasteurizing ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesPasteurizing"
+            aria-expanded="{{ $isPasteurizing ? 'true' : 'false' }}" aria-controls="collapsePagesPasteurizing">
+            <i class="fas fa-fire"></i>
+            <span>Pasteurizing</span>
+        </a>
+        <div id="collapsePagesPasteurizing" class="collapse {{ $isPasteurizing ? 'show' : '' }}"
+            aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('report-pasteurs*') ? 'active' : '' }}"
+                    href="{{ route('report_pasteurs.index') }}">
+                    Pemeriksaan Pasteurisasi
                 </a>
             </div>
         </div>

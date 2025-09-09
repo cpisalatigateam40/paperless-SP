@@ -146,6 +146,11 @@ class Product extends Model
         return $this->hasMany(ReportBasoCooking::class, 'product_uuid', 'uuid');
     }
 
+    public function reportRtgSteamers()
+    {
+        return $this->hasMany(ReportRtgSteamer::class, 'product_uuid', 'uuid');
+    }
+
 
 
 

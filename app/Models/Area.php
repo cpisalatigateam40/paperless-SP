@@ -239,6 +239,11 @@ class Area extends Model
         return $this->hasMany(ReportBasoCooking::class, 'area_uuid', 'uuid');
     }
 
+    public function reportRtgSteamers()
+    {
+        return $this->hasMany(ReportRtgSteamer::class, 'area_uuid', 'uuid');
+    }
+
 
 
 }
