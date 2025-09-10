@@ -9,6 +9,7 @@ Request::is('report-premixes*') ||
 Request::is('report-metal-detectors*') ||
 Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
+Request::is('report-sauces*') ||
 Request::is('report-process-productions*');
 $isCooking =
 Request::is('report-maurer-cookings*') ||
@@ -222,6 +223,10 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-process-productions*') ? 'active' : '' }}"
                     href="{{ route('report_process_productions.index') }}">
                     Verifikasi Proses Produksi
+                </a>
+                <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
+                    href="{{ route('report_sauces.index') }}">
+                    Pemasakan Produk Di Steam Kettle
                 </a>
 
             </div>
