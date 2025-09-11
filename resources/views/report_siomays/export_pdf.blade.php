@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Pemasakan Produk Di Steam Kettle</title>
+    <title>Laporan Pemeriksaan Pembuatan Kulit Siomay, Gioza & Mandu</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";

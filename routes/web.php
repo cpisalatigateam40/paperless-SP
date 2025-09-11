@@ -65,6 +65,7 @@ use App\Http\Controllers\ReportBasoCookingController;
 use App\Http\Controllers\ReportRtgSteamerController;
 use App\Http\Controllers\ReportPasteurController;
 use App\Http\Controllers\ReportSauceController;
+use App\Http\Controllers\ReportSiomayController;
 
 
 Route::redirect('/', '/login');
@@ -1003,8 +1004,21 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+            Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
+            Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
+        });
 
-            // detail
+    Route::prefix('report-siomays')
+        ->name('report_siomays.')
+        ->controller(ReportSiomayController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
             Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
         });

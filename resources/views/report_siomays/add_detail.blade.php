@@ -4,10 +4,10 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Tambah Detail Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Tambah Detail Laporan Pemeriksaan Pembuatan Kulit Siomay, Gioza & Mandu</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('report_sauces.store_detail', $report->uuid) }}" method="POST">
+            <form action="{{ route('report_siomays.store_detail', $report->uuid) }}" method="POST">
                 @csrf
 
                 <h6 class="mt-2">Detail Proses</h6>
@@ -130,7 +130,7 @@
 
                 <div class="mt-3">
                     <button type="submit" class="btn btn-success">Simpan Detail</button>
-                    <a href="{{ route('report_sauces.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ route('report_siomays.index') }}" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>

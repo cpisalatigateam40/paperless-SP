@@ -4,13 +4,53 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Tambah Detail Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Tambah Laporan Pemeriksaan Pembuatan Kulit Siomay, Gioza & Mandu</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('report_sauces.store_detail', $report->uuid) }}" method="POST">
+            <form action="{{ route('report_siomays.store') }}" method="POST">
                 @csrf
 
-                <h6 class="mt-2">Detail Proses</h6>
+                {{-- HEADER REPORT --}}
+                <h6>Header Laporan</h6>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="date" class="form-control"
+                            value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Shift</label>
+                        <input type="text" id="shift" name="shift" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Produk</label>
+                        <select name="product_uuid" class="form-control" required>
+                            <option value="">-- pilih produk --</option>
+                            @foreach($products as $product)
+                            <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Kode Produksi</label>
+                        <input type="text" name="production_code" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Waktu Start</label>
+                        <input type="time" name="start_time" class="form-control"
+                            value="{{ \Carbon\Carbon::now()->format('H:i') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Waktu Stop</label>
+                        <input type="time" name="end_time" class="form-control"
+                            value="{{ \Carbon\Carbon::now()->format('H:i') }}">
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Detail Proses</h6>
 
                 <div class="row mb-4">
                     <div class="col-md-6">
@@ -43,6 +83,7 @@
                         </div>
                     </div>
                 </div>
+
                 <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
                     Baku</button>
 
@@ -54,8 +95,10 @@
                     </select>
                 </div>
 
-                {{-- DETAIL PROSES --}}
+                {{-- DETAIL PROSES (1x input, bukan repeater) --}}
+
                 <div class="row mb-2">
+
                     <div class="col-md-3">
                         <label class="form-label">Lama Proses (menit)</label>
                         <input type="number" step="0.01" name="details[0][duration]" class="form-control">
@@ -88,12 +131,14 @@
                             <label class="form-check-label" for="mixingOff0">Off</label>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="row mb-2">
                     <div class="col-md-3">
                         <label class="form-label">Warna</label>
                         <select name="details[0][color]" class="form-control" required>
+
                             <option value="OK">OK</option>
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
@@ -101,6 +146,7 @@
                     <div class="col-md-3">
                         <label class="form-label">Aroma</label>
                         <select name="details[0][aroma]" class="form-control" required>
+
                             <option value="OK">OK</option>
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
@@ -108,6 +154,7 @@
                     <div class="col-md-3">
                         <label class="form-label">Rasa</label>
                         <select name="details[0][taste]" class="form-control" required>
+
                             <option value="OK">OK</option>
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
@@ -115,11 +162,13 @@
                     <div class="col-md-3">
                         <label class="form-label">Tekstur</label>
                         <select name="details[0][texture]" class="form-control" required>
+
                             <option value="OK">OK</option>
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
                     </div>
                 </div>
+
 
                 <div class="row mb-2">
                     <div class="col-md-6">
@@ -129,8 +178,8 @@
                 </div>
 
                 <div class="mt-3">
-                    <button type="submit" class="btn btn-success">Simpan Detail</button>
-                    <a href="{{ route('report_sauces.index') }}" class="btn btn-secondary">Batal</a>
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <a href="{{ route('report_siomays.index') }}" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
@@ -153,9 +202,11 @@ function addRawMaterial() {
                 </select>
             </div>
             <div class="col-md-6">
-                <input type="number" step="0.01" name="details[0][raw_materials][${rmIndex}][amount]" class="form-control" placeholder="Berat (kg)">
+                <input type="number" step="0.01" name="details[0][raw_materials][${rmIndex}][amount]" class="form-control"
+                       placeholder="Berat (kg)">
             </div>
-        </div>`;
+        </div>
+        `;
     wrapper.insertAdjacentHTML('beforeend', html);
     rmIndex++;
 }

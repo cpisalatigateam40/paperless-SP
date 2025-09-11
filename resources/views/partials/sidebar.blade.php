@@ -10,6 +10,7 @@ Request::is('report-metal-detectors*') ||
 Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
 Request::is('report-sauces*') ||
+Request::is('report-siomays*') ||
 Request::is('report-process-productions*');
 $isCooking =
 Request::is('report-maurer-cookings*') ||
@@ -227,6 +228,10 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
                     href="{{ route('report_sauces.index') }}">
                     Pemasakan Produk Di Steam Kettle
+                </a>
+                <a class="collapse-item {{ Request::is('report-siomays*') ? 'active' : '' }}"
+                    href="{{ route('report_siomays.index') }}">
+                    Pembuatan Kulit Siomay
                 </a>
 
             </div>

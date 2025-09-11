@@ -4,8 +4,8 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Laporan Pemasakan Produk Di Steam Kettle</h5>
-            <a href="{{ route('report_sauces.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
+            <h5>Laporan Pemeriksaan Pembuatan Kulit Siomay, Gioza & Mandu</h5>
+            <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
         </div>
         <div class="card-body">
             @if(session('success'))
@@ -39,7 +39,7 @@
                                 data-bs-target="#detail-{{ $r->id }}" title="Lihat Detail">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <form action="{{ route('report_sauces.destroy', $r->uuid) }}" method="POST"
+                            <form action="{{ route('report_siomays.destroy', $r->uuid) }}" method="POST"
                                 onsubmit="return confirm('Yakin hapus laporan ini?')">
                                 @csrf
                                 @method('DELETE')
@@ -48,7 +48,7 @@
                             {{-- Known --}}
                             @can('known report')
                             @if(!$r->known_by)
-                            <form action="{{ route('report_sauces.known', $r->id) }}" method="POST"
+                            <form action="{{ route('report_siomays.known', $r->id) }}" method="POST"
                                 style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
@@ -73,7 +73,7 @@
                             {{-- Approve --}}
                             @can('approve report')
                             @if(!$r->approved_by)
-                            <form action="{{ route('report_sauces.approve', $r->id) }}" method="POST"
+                            <form action="{{ route('report_siomays.approve', $r->id) }}" method="POST"
                                 style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-success" title="Approve">
@@ -95,7 +95,7 @@
                             @endif
                             @endcan
 
-                            <a href="{{ route('report_sauces.export_pdf', $r->uuid) }}"
+                            <a href="{{ route('report_siomays.export_pdf', $r->uuid) }}"
                                 class="btn btn-outline-secondary btn-sm" title="Export PDF" target="_blank">
                                 <i class="fas fa-file-pdf"></i>
                             </a>
@@ -192,7 +192,7 @@
                                 </table>
                             </div>
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('report_sauces.add_detail', $r->uuid) }}"
+                                <a href="{{ route('report_siomays.add_detail', $r->uuid) }}"
                                     class="btn btn-sm btn-outline-secondary mt-2" title="Tambah Detail">
                                     Tambah Detail
                                 </a>
