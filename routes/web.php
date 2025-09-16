@@ -68,7 +68,9 @@ use App\Http\Controllers\ReportSauceController;
 use App\Http\Controllers\ReportSiomayController;
 
 
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
