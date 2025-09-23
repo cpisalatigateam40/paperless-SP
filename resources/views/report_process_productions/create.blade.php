@@ -280,94 +280,183 @@ document.getElementById('product-select').addEventListener('change', function() 
     })
 });
 
+// document.getElementById('formula-select').addEventListener('change', function() {
+//     const formulaUuid = this.value;
+//     const container = document.getElementById('formulation-container');
+//     container.innerHTML = '';
+
+//     if (!formulaUuid) return;
+
+//     fetch(`/report-process-productions/get-formulations/${formulaUuid}`)
+//         .then(res => res.json())
+//         .then(data => {
+//             if (data.raw_materials.length) {
+//                 container.insertAdjacentHTML('beforeend', `<h6><strong>A. BAHAN BAKU</strong></h6>`);
+//                 data.raw_materials.forEach(fm => {
+//                     const html = `
+//                                     <div class="border p-2 mb-2">
+//                                         <p><strong>${fm.raw_material?.material_name ?? '-'}</strong></p>
+//                                         <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
+//                                         <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
+//                                         <div class="row">
+//                                             <div class="col-md-3">
+//                                                 <input type="number" step="0.01" 
+//                                                     name="actual_weight[${fm.uuid}]" 
+//                                                     class="form-control actual-weight" 
+//                                                     placeholder="Berat Aktual (kg)"
+//                                                     data-standard="${fm.weight}">
+//                                             </div>
+//                                             <div class="col-md-3">
+//                                                 <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
+//                                                     <option value="">-- Pilih --</option>
+//                                                     <option value="OK">OK</option>
+//                                                     <option value="Tidak OK">Tidak OK</option>
+//                                                 </select>
+//                                             </div>
+//                                             <div class="col-md-3">
+//                                                 <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+//                                             </div>
+//                                             <div class="col-md-3">
+//                                                 <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
+//                                             </div>
+//                                         </div>
+//                                     </div>
+//                                 `;
+//                     container.insertAdjacentHTML('beforeend', html);
+//                 });
+//             }
+
+//             if (data.premixes.length) {
+//                 container.insertAdjacentHTML('beforeend',
+//                     `<h6 class="mt-4"><strong>B. PREMIX / BAHAN TAMBAHAN</strong></h6>`);
+//                 data.premixes.forEach(fm => {
+//                     const html = `
+//                             <div class="border p-2 mb-2">
+//                                 <p><strong>${fm.premix?.name ?? '-'}</strong></p>
+//                                 <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
+//                                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
+//                                 <div class="row">
+//                                     <div class="col-md-3">
+//                                         <input type="number" 
+//                                             step="0.01" 
+//                                             name="actual_weight[${fm.uuid}]" 
+//                                             class="form-control actual-weight" 
+//                                             placeholder="Berat Aktual (kg)"
+//                                             data-standard="${fm.weight}">
+//                                     </div>
+//                                     <div class="col-md-3">
+//                                         <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
+//                                             <option value="">-- Pilih --</option>
+//                                             <option value="OK">OK</option>
+//                                             <option value="Tidak OK">Tidak OK</option>
+//                                         </select>
+//                                     </div>
+//                                     <div class="col-md-3">
+//                                         <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+//                                     </div>
+//                                     <div class="col-md-3">
+//                                         <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         `;
+//                     container.insertAdjacentHTML('beforeend', html);
+//                 });
+
+//             }
+
+//             initActualWeightListeners();
+//         });
+// });
+
 document.getElementById('formula-select').addEventListener('change', function() {
     const formulaUuid = this.value;
     const container = document.getElementById('formulation-container');
+    const getFormulationsUrl = @json(route('report_process_productions.getFormulations', ['formulaUuid' => 'FORMULA_UUID_PLACEHOLDER']));
+
     container.innerHTML = '';
 
     if (!formulaUuid) return;
 
-    fetch(`/report-process-productions/get-formulations/${formulaUuid}`)
+    fetch(getFormulationsUrl.replace('FORMULA_UUID_PLACEHOLDER', formulaUuid))
         .then(res => res.json())
         .then(data => {
             if (data.raw_materials.length) {
                 container.insertAdjacentHTML('beforeend', `<h6><strong>A. BAHAN BAKU</strong></h6>`);
                 data.raw_materials.forEach(fm => {
                     const html = `
-                                    <div class="border p-2 mb-2">
-                                        <p><strong>${fm.raw_material?.material_name ?? '-'}</strong></p>
-                                        <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
-                                        <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <input type="number" step="0.01" 
-                                                    name="actual_weight[${fm.uuid}]" 
-                                                    class="form-control actual-weight" 
-                                                    placeholder="Berat Aktual (kg)"
-                                                    data-standard="${fm.weight}">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
-                                                    <option value="">-- Pilih --</option>
-                                                    <option value="OK">OK</option>
-                                                    <option value="Tidak OK">Tidak OK</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
+                        <div class="border p-2 mb-2">
+                            <p><strong>${fm.raw_material?.material_name ?? '-'}</strong></p>
+                            <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
+                            <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="number" step="0.01" 
+                                        name="actual_weight[${fm.uuid}]" 
+                                        class="form-control actual-weight" 
+                                        placeholder="Berat Aktual (kg)"
+                                        data-standard="${fm.weight}">
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="OK">OK</option>
+                                        <option value="Tidak OK">Tidak OK</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
+                                </div>
+                            </div>
+                        </div>
+                    `;
                     container.insertAdjacentHTML('beforeend', html);
                 });
             }
 
             if (data.premixes.length) {
-                container.insertAdjacentHTML('beforeend',
-                    `<h6 class="mt-4"><strong>B. PREMIX / BAHAN TAMBAHAN</strong></h6>`);
+                container.insertAdjacentHTML('beforeend', `<h6 class="mt-4"><strong>B. PREMIX / BAHAN TAMBAHAN</strong></h6>`);
                 data.premixes.forEach(fm => {
                     const html = `
-                            <div class="border p-2 mb-2">
-                                <p><strong>${fm.premix?.name ?? '-'}</strong></p>
-                                <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
-                                <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <input type="number" 
-                                            step="0.01" 
-                                            name="actual_weight[${fm.uuid}]" 
-                                            class="form-control actual-weight" 
-                                            placeholder="Berat Aktual (kg)"
-                                            data-standard="${fm.weight}">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="OK">OK</option>
-                                            <option value="Tidak OK">Tidak OK</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
-                                    </div>
+                        <div class="border p-2 mb-2">
+                            <p><strong>${fm.premix?.name ?? '-'}</strong></p>
+                            <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
+                            <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="number" step="0.01" 
+                                        name="actual_weight[${fm.uuid}]" 
+                                        class="form-control actual-weight" 
+                                        placeholder="Berat Aktual (kg)"
+                                        data-standard="${fm.weight}">
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="OK">OK</option>
+                                        <option value="Tidak OK">Tidak OK</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
                                 </div>
                             </div>
-                        `;
+                        </div>
+                    `;
                     container.insertAdjacentHTML('beforeend', html);
                 });
-
             }
 
             initActualWeightListeners();
         });
 });
+
 
 function hitungRataRataSuhu() {
     const temp1 = parseFloat(document.getElementById('actual_mixture_temp_1').value) || 0;
@@ -386,24 +475,51 @@ function hitungRataRataSuhu() {
     document.getElementById(id).addEventListener('input', hitungRataRataSuhu);
 });
 
+// document.getElementById('product-select').addEventListener('change', function() {
+//     const selectedOption = this.options[this.selectedIndex];
+//     const productName = selectedOption.getAttribute('data-name');
+
+//     if (!productName) return;
+
+//     fetch(`/report-process-productions/get-formulas-by-name?product_name=${encodeURIComponent(productName)}`)
+//         .then(res => res.json())
+//         .then(data => {
+//             const formulaSelect = document.getElementById('formula-select');
+//             formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
+//             data.forEach(formula => {
+//                 const option = document.createElement('option');
+//                 option.value = formula.uuid;
+//                 option.textContent = formula.formula_name;
+//                 formulaSelect.appendChild(option);
+//             });
+//         });
+// });
+
 document.getElementById('product-select').addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
     const productName = selectedOption.getAttribute('data-name');
+    const formulaSelect = document.getElementById('formula-select');
+    const formulationContainer = document.getElementById('formulation-container');
+
+    // definisikan route dengan placeholder
+    const getFormulasUrl = @json(route('report_process_productions.getFormulasByName', ['productName' => 'PRODUCT_NAME_PLACEHOLDER']));
+
+    formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
+    formulationContainer.innerHTML = '';
 
     if (!productName) return;
 
-    fetch(`/report-process-productions/get-formulas-by-name?product_name=${encodeURIComponent(productName)}`)
+    fetch(getFormulasUrl.replace('PRODUCT_NAME_PLACEHOLDER', encodeURIComponent(productName)))
         .then(res => res.json())
         .then(data => {
-            const formulaSelect = document.getElementById('formula-select');
-            formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
             data.forEach(formula => {
-                const option = document.createElement('option');
-                option.value = formula.uuid;
-                option.textContent = formula.formula_name;
-                formulaSelect.appendChild(option);
+                const opt = document.createElement('option');
+                opt.value = formula.uuid;
+                opt.textContent = formula.formula_name;
+                formulaSelect.appendChild(opt);
             });
         });
 });
+
 </script>
 @endsection
