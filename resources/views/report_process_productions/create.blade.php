@@ -260,22 +260,24 @@ document.getElementById('product-select').addEventListener('change', function() 
     const productUuid = this.value;
     const formulaSelect = document.getElementById('formula-select');
     const formulationContainer = document.getElementById('formulation-container');
+    const getFormulasUrl = @json(route('report_process_productions.getFormulas', ['productUuid' => 'PRODUCT_UUID_PLACEHOLDER']));
 
     formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
     formulationContainer.innerHTML = '';
 
     if (!productUuid) return;
 
-    fetch(`/report-process-productions/get-formulas/${productUuid}`)
-        .then(res => res.json())
-        .then(data => {
-            data.formulas.forEach(formula => {
-                const opt = document.createElement('option');
-                opt.value = formula.uuid;
-                opt.textContent = formula.formula_name;
-                formulaSelect.appendChild(opt);
-            });
-        });
+
+    fetch(getFormulasUrl.replace('PRODUCT_UUID_PLACEHOLDER', productUuid))
+    .then(res => res.json())
+    .then(data => {
+        data.formulas.forEach(formula => {
+            const opt = document.createElement('option');
+            opt.value = formula.uuid;
+            opt.textContent = formula.formula_name;
+            formulaSelect.appendChild(opt);
+        });
+    })
 });
 
 document.getElementById('formula-select').addEventListener('change', function() {
