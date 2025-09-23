@@ -475,51 +475,29 @@ function hitungRataRataSuhu() {
     document.getElementById(id).addEventListener('input', hitungRataRataSuhu);
 });
 
-// document.getElementById('product-select').addEventListener('change', function() {
-//     const selectedOption = this.options[this.selectedIndex];
-//     const productName = selectedOption.getAttribute('data-name');
-
-//     if (!productName) return;
-
-//     fetch(`/report-process-productions/get-formulas-by-name?product_name=${encodeURIComponent(productName)}`)
-//         .then(res => res.json())
-//         .then(data => {
-//             const formulaSelect = document.getElementById('formula-select');
-//             formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
-//             data.forEach(formula => {
-//                 const option = document.createElement('option');
-//                 option.value = formula.uuid;
-//                 option.textContent = formula.formula_name;
-//                 formulaSelect.appendChild(option);
-//             });
-//         });
-// });
-
 document.getElementById('product-select').addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
     const productName = selectedOption.getAttribute('data-name');
-    const formulaSelect = document.getElementById('formula-select');
-    const formulationContainer = document.getElementById('formulation-container');
-
-    // definisikan route dengan placeholder
-    const getFormulasUrl = @json(route('report_process_productions.getFormulasByName', ['productName' => 'PRODUCT_NAME_PLACEHOLDER']));
-
-    formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
-    formulationContainer.innerHTML = '';
 
     if (!productName) return;
 
-    fetch(getFormulasUrl.replace('PRODUCT_NAME_PLACEHOLDER', encodeURIComponent(productName)))
+    const url = @json(route('report_process_productions.getFormulasByName')) + '?product_name=' + encodeURIComponent(productName);
+
+    fetch(url)
         .then(res => res.json())
         .then(data => {
+            const formulaSelect = document.getElementById('formula-select');
+            formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
             data.forEach(formula => {
-                const opt = document.createElement('option');
-                opt.value = formula.uuid;
-                opt.textContent = formula.formula_name;
-                formulaSelect.appendChild(opt);
+                const option = document.createElement('option');
+                option.value = formula.uuid;
+                option.textContent = formula.formula_name;
+                formulaSelect.appendChild(option);
             });
         });
 });
+
+
 
 </script>
 @endsection
