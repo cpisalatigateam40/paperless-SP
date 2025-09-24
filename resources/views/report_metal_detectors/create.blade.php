@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Tambah Report Metal Detector</h4>
+            <h4>Tambah Laporan Verifikasi Metal Detector Adonan</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_metal_detectors.store') }}" method="POST">
@@ -19,7 +19,7 @@
                     <label>Shift</label>
                     <input type="text" name="shift" class="form-control" required>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label>Section</label>
                     <select name="section_uuid" class="form-control">
                         <option value="">-- Pilih Section --</option>
@@ -27,7 +27,7 @@
                         <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
                         @endforeach
                     </select>
-                </div>
+                </div> -->
 
                 <hr>
                 <h5>Detail Pemeriksaan</h5>

@@ -16,7 +16,7 @@ class MaurerStandardController extends Controller
     {
         $standards = MaurerStandard::with(['product', 'processStep.area'])
             ->get()
-            ->groupBy('product_uuid'); // kelompokkan berdasarkan produk
+            ->groupBy('product_uuid');
 
         $products = Product::all();
 

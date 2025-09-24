@@ -29,7 +29,13 @@
                 <div class="row mb-3">
                     <div class="col">
                         <label>Jenis Emulsi</label>
-                        <input type="text" name="emulsion_type" class="form-control">
+                        <select name="emulsion_type" class="form-control">
+                            <option value="">--Pilih Emulsi--</option>
+                            <option value="Emulsi Oil">Emulsi Oil</option>
+                            <option value="Emulsi Skin">Emulsi Skin</option>
+                            <option value="Emulsi Gel">Emulsi Gel</option>
+                            <option value="Emulsi GMB">Emulsi GMB</option>
+                        </select>
                     </div>
                     <div class="col">
                         <label>Kode Produksi</label>

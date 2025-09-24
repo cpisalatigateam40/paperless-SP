@@ -18,7 +18,22 @@ class ReportMetalDetectorController extends Controller
 {
     public function index()
     {
-        $reports = ReportMetalDetector::with(['area', 'section', 'details.product'])->latest()->get();
+        $reports = ReportMetalDetector::with(['area', 'section', 'details.product'])
+            ->latest()
+            ->get()
+            ->map(function ($report) {
+                $report->ketidaksesuaian = $report->details->filter(function ($d) {
+                    return in_array('x', [
+                        $d->result_fe,
+                        $d->result_non_fe,
+                        $d->result_sus316,
+                        $d->verif_loma,
+                    ]);
+                })->count();
+
+                return $report;
+            });
+            
         return view('report_metal_detectors.index', compact('reports'));
     }
 

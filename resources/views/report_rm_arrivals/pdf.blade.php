@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Laporan Kedatangan Bahan Baku</title>
+    <title>Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang</title>
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
@@ -112,7 +112,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN KEDATANGAN BAHAN BAKU CHILLROOM</h3>
+    <h3 class="mb-2 text-center">PEMERIKSAAN KEDATANGAN BAHAN BAKU DAN BAHAN PENUNJANG</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -134,6 +134,7 @@
             <tr>
                 <th rowspan="2" class="text-center align-middle">Jam</th>
                 <th rowspan="2" class="text-left align-middle">Raw Material</th>
+                <th rowspan="2" class="text-left align-middle">Kondisi RM</th>
                 <th rowspan="2" class="text-left align-middle">Produsen/Supplier</th>
                 <th rowspan="2" class="text-center align-middle">Kode Produksi/Expired Date</th>
                 <th rowspan="2" class="text-center align-middle">Kondisi Kemasan</th>
@@ -152,7 +153,8 @@
             <tr>
                 <td class="text-center">{{ $detail->time ?? '-' }}</td>
                 <td class="text-left">{{ $detail->rawMaterial->material_name ?? '-' }}</td>
-                <td class="text-left">{{ $detail->supplier ?? '-' }}</td>
+                <td class="text-left">{{ $detail->rm_condition }}</td>
+                <td class="text-left">{{ implode(', ', explode(',', $detail->supplier)) }}</td>
                 <td class="text-center">{{ $detail->production_code ?? '-' }}</td>
                 <td class="text-center">{{ $detail->packaging_condition ?? '-' }}</td>
                 <td class="text-center">{{ $detail->temperature ?? '-' }}</td>
@@ -164,11 +166,11 @@
             </tr>
             @empty
             <tr>
-                <td colspan="10" class="text-center">Tidak ada data pemeriksaan.</td>
+                <td colspan="11" class="text-center">Tidak ada data pemeriksaan.</td>
             </tr>
             @endforelse
             <tr>
-                <td colspan="10" style="text-align: right; border: none;">QM 03 / 02</td>
+                <td colspan="11" style="text-align: right; border: none;">QM 03 / 02</td>
             </tr>
         </tbody>
     </table>

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Tambah Laporan RTG Steamer</h4>
+            <h4>Tambah Laporan Pemasakan Dengan Steamer</h4>
         </div>
         <div class="card-body">
 
@@ -14,46 +14,48 @@
 
                 {{-- HEADER --}}
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Tanggal</label>
                         <input type="date" name="date" class="form-control"
                             value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Shift</label>
                         <input type="text" id="shift" name="shift" class="form-control" required>
                     </div>
-                    <div class="col-md-4">
-                        <label>Produk</label>
-                        <select name="product_uuid" class="form-control" required>
-                            <option value="">-- pilih produk --</option>
-                            @foreach($products as $product)
-                            <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+
                 </div>
 
                 <hr>
-                <h5>Detail Steamer</h5>
+
 
                 <div id="detailWrapper">
                     <div class="detail-block border rounded p-3 mb-3">
                         <div class="row mb-2">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <label>Produk</label>
+                                <select name="product_uuid" class="form-control" required>
+                                    <option value="">-- pilih produk --</option>
+                                    @foreach($products as $product)
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-3">
                                 <label>Steamer</label>
                                 <input type="text" name="details[0][steamer]" class="form-control">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>Kode Produksi</label>
                                 <input type="text" name="details[0][production_code]" class="form-control">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label>Jumlah Trolly</label>
                                 <input type="number" name="details[0][trolley_count]" class="form-control">
                             </div>
                         </div>
 
+                        <h5 class="mt-4">Streaming</h5>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label>Suhu Ruang (°C)</label>
@@ -82,7 +84,7 @@
                             </div>
                         </div>
 
-                        <h6 class="mt-3">Sensori</h6>
+                        <h5 class="mt-4">Sensori</h5>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label>Kematangan</label>
@@ -124,7 +126,7 @@
                         </div>
 
 
-                        <h6 class="mt-3">Paraf</h6>
+                        <!-- <h6 class="mt-3">Paraf</h6>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label class="form-label">Paraf QC</label>
@@ -143,12 +145,9 @@
                                 <button type="button"
                                     class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
                             </div>
-                        </div>
+                        </div> -->
 
-                        <div class="text-end">
-                            <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeDetail(this)">Hapus
-                                Detail</button>
-                        </div>
+
                     </div>
                 </div>
 

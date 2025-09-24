@@ -28,7 +28,8 @@
                 <h6>Bahan Baku</h6>
                 <div id="raw-materials-wrapper">
                     <div class="row mb-2 raw-material-item">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label">Bahan Baku</label>
                             <select name="details[0][raw_materials][0][raw_material_uuid]" class="form-control"
                                 required>
                                 <option value="">-- pilih bahan baku --</option>
@@ -37,59 +38,26 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label">Berat (Kg)</label>
                             <input type="number" step="0.01" name="details[0][raw_materials][0][amount]"
                                 class="form-control" placeholder="Berat (kg)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sensory</label>
+                            <select name="details[0][raw_materials][0][sensory]" class="form-control" required>
+                                <option value="OK">OK</option>
+                                <option value="Tidak OK">Tidak OK</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
                     Baku</button>
 
-                <div class="mb-4">
-                    <label class="form-label">Sensory</label>
-                    <select name="details[0][raw_materials][0][sensory]" class="form-control" required>
-                        <option value="OK">OK</option>
-                        <option value="Tidak OK">Tidak OK</option>
-                    </select>
-                </div>
+
 
                 {{-- DETAIL PROSES --}}
-                <div class="row mb-2">
-                    <div class="col-md-3">
-                        <label class="form-label">Lama Proses (menit)</label>
-                        <input type="number" step="0.01" name="details[0][duration]" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Pressure (Bar)</label>
-                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Target Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Actual Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control">
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label d-block">Mixing Paddle</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="on"
-                                id="mixingOn0">
-                            <label class="form-check-label" for="mixingOn0">On</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="off"
-                                id="mixingOff0">
-                            <label class="form-check-label" for="mixingOff0">Off</label>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="row mb-2">
                     <div class="col-md-3">
                         <label class="form-label">Warna</label>
@@ -121,6 +89,45 @@
                     </div>
                 </div>
 
+                <div class="row mb-4 mt-4">
+                    <div class="col-md-6">
+                        <label class="form-label d-block">Mixing Paddle</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="on"
+                                id="mixingOn0">
+                            <label class="form-check-label" for="mixingOn0">On</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="off"
+                                id="mixingOff0">
+                            <label class="form-check-label" for="mixingOff0">Off</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Lama Proses (menit)</label>
+                        <input type="number" step="0.01" name="details[0][duration]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Pressure (Bar)</label>
+                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Target Temperature (&deg;C)</label>
+                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Actual Temperature (&deg;C)</label>
+                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control">
+                    </div>
+                </div>
+
+
+
+
+
                 <div class="row mb-2">
                     <div class="col-md-6">
                         <label class="form-label">Catatan</label>
@@ -144,7 +151,7 @@ function addRawMaterial() {
     let wrapper = document.getElementById('raw-materials-wrapper');
     let html = `
         <div class="row mb-2 raw-material-item">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <select name="details[0][raw_materials][${rmIndex}][raw_material_uuid]" class="form-control" required>
                     <option value="">-- pilih bahan baku --</option>
                     @foreach($rawMaterials as $rm)
@@ -152,8 +159,14 @@ function addRawMaterial() {
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <input type="number" step="0.01" name="details[0][raw_materials][${rmIndex}][amount]" class="form-control" placeholder="Berat (kg)">
+            </div>
+            <div class="col-md-4">
+                <select name="details[0][raw_materials][${rmIndex}][sensory]" class="form-control" required>
+                    <option value="OK">OK</option>
+                    <option value="Tidak OK">Tidak OK</option>
+                </select>
             </div>
         </div>`;
     wrapper.insertAdjacentHTML('beforeend', html);

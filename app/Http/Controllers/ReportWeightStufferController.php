@@ -78,7 +78,7 @@ class ReportWeightStufferController extends Controller
                 foreach ($detail['cases'] as $case) {
                     CaseStuffer::create([
                         'stuffer_id' => $detailModel->id,
-                        'actual_case_1' => $case['actual_case_1'],
+                        // 'actual_case_1' => $case['actual_case_1'],
                         'actual_case_2' => $case['actual_case_2'],
                     ]);
                 }
@@ -164,7 +164,7 @@ class ReportWeightStufferController extends Controller
                 foreach ($detail['cases'] as $case) {
                     CaseStuffer::create([
                         'stuffer_id' => $detailModel->id,
-                        'actual_case_1' => $case['actual_case_1'] ?? null,
+                        // 'actual_case_1' => $case['actual_case_1'] ?? null,
                         'actual_case_2' => $case['actual_case_2'] ?? null,
                     ]);
                 }

@@ -14,6 +14,7 @@ class DetailRmArrival extends Model
         'report_uuid',
         'raw_material_uuid',
         'supplier',
+        'rm_condition',
         'time',
         'production_code',
         'temperature',

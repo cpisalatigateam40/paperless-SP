@@ -6,26 +6,26 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="text-gray-800 mb-0">Data User</h5>
             <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm">
-                 Tambah User
+                Tambah User
             </a>
         </div>
 
         <div class="card-body">
             <div class="table-responsive">
                 @if(session('success'))
-                    <div id="success-alert" class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
+                <div id="success-alert" class="alert alert-success">
+                    {{ session('success') }}
+                </div>
                 @endif
 
                 @if ($errors->any())
-                    <div id="error-alert" class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div id="error-alert" class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
                 <table class="table table-bordered table-hover">
                     <thead class="thead-light">
@@ -50,7 +50,8 @@
                             <td>{{ $user->area->name ?? '-' }}</td>
                             <td class="d-flex" style="gap: .5rem;">
                                 <a href="{{ route('users.edit', $user->uuid) }}" class="btn btn-primary btn-sm">Edit</a>
-                                <form action="{{ route('users.destroy', $user->uuid) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                <form action="{{ route('users.destroy', $user->uuid) }}" method="POST"
+                                    onsubmit="return confirm('Yakin ingin menghapus user ini?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
@@ -61,14 +62,20 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="mt-3">
+                {{ $users->links('pagination::bootstrap-5') }}
+            </div>
         </div>
+
+
     </div>
 </div>
 @endsection
 
 @section('script')
 <script>
-    $(document).ready(function() {
+$(document).ready(function() {
     setTimeout(() => {
         $('#success-alert').fadeOut('slow');
         $('#error-alert').fadeOut('slow');

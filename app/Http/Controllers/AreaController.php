@@ -9,7 +9,7 @@ class AreaController extends Controller
 {
     public function index()
     {
-        $areas = Area::all();
+        $areas = Area::paginate(10);
         return view('areas.area', compact('areas'));
     }
 

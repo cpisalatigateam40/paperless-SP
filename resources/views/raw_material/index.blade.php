@@ -77,6 +77,10 @@
                     </tbody>
 
                 </table>
+
+                <div class="mt-3">
+                    {{ $rawMaterials->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
 

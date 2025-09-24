@@ -78,11 +78,7 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label>Ukuran Casing - Panjang</label>
-                            <input type="number" name="details[0][cases][0][actual_case_1]" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label>Ukuran Casing - Diameter</label>
+                            <label>Diameter Casing (mm)</label>
                             <input type="number" name="details[0][cases][0][actual_case_2]" class="form-control">
                         </div>
                     </div>
@@ -100,51 +96,6 @@
                         </div>
                     </div>
 
-                    <!-- <div class="row g-3 mb-3">
-                        <div class="col-md-3">
-                            <label>Berat 1</label>
-                            <input type="number" step="0.01" name="details[0][weights][0][actual_weight_1]"
-                                class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Berat 2</label>
-                            <input type="number" step="0.01" name="details[0][weights][0][actual_weight_2]"
-                                class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Berat 3</label>
-                            <input type="number" step="0.01" name="details[0][weights][0][actual_weight_3]"
-                                class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Rata-rata Berat</label>
-                            <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control"
-                                readonly>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-3">
-                            <label>Panjang 1</label>
-                            <input type="number" step="0.01" name="details[0][weights][0][actual_long_1]"
-                                class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Panjang 2</label>
-                            <input type="number" step="0.01" name="details[0][weights][0][actual_long_2]"
-                                class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Panjang 3</label>
-                            <input type="number" step="0.01" name="details[0][weights][0][actual_long_3]"
-                                class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Rata-rata Panjang</label>
-                            <input type="number" step="0.01" name="details[0][avg_long]" class="form-control" readonly>
-                        </div>
-                    </div> -->
-
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label class="fw-bold">Berat Aktual (gr)</label>
@@ -160,6 +111,7 @@
                             + Tambah Berat
                         </button>
                     </div>
+
                     <div class="col-md-3 mb-3">
                         <label>Rata-rata Berat</label>
                         <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control" readonly>
@@ -180,6 +132,7 @@
                             + Tambah Panjang
                         </button>
                     </div>
+
                     <div class="col-md-3 mb-3">
                         <label>Rata-rata Panjang</label>
                         <input type="number" step="0.01" name="details[0][avg_long]" class="form-control" readonly>
@@ -187,11 +140,6 @@
                 </div>
 
             </div>
-
-
-
-
-
         </div>
 </div>
 
@@ -207,135 +155,6 @@
 
 @section('script')
 <script>
-// let index = 1;
-// const template = document.querySelector('.detail-block');
-
-// (1) Clone form detail
-// document.getElementById('addProductDetail')?.addEventListener('click', function() {
-//     const clone = template.cloneNode(true);
-
-//     clone.querySelectorAll('input, select, textarea').forEach(el => {
-//         if (!el.name) return;
-//         el.name = el.name.replace(/\[0\]/g, `[${index}]`);
-//         if (el.type !== 'hidden') el.value = '';
-//     });
-
-//     // Baris ke-2 (hitech) index nested weights & cases diubah
-//     const rows = clone.querySelectorAll('tbody tr');
-//     if (rows.length >= 2) {
-//         const hitechInputs = rows[1].querySelectorAll('input');
-//         hitechInputs.forEach(input => {
-//             input.name = input.name.replace(`[${index}][weights][0]`, `[${index}][weights][1]`);
-//             input.name = input.name.replace(`[${index}][cases][0]`, `[${index}][cases][1]`);
-//         });
-//     }
-
-//     document.getElementById('productDetails').appendChild(clone);
-//     index++;
-// });
-
-// (2) Isi default value saat pilih produk
-// document.addEventListener('change', function(e) {
-//     if (e.target.matches('.product-select')) {
-//         const option = e.target.selectedOptions[0];
-//         const cardBody = e.target.closest('.card-body');
-
-//         if (option && cardBody) {
-//             const weightStandard = option.dataset.weightStandard;
-//             const diameter = option.dataset.diameter;
-//             const longMax = option.dataset.longMax;
-
-//             // Isi default standard
-//             const weightStandardInput = cardBody.querySelector('input[name$="[weight_standard]"]');
-//             if (weightStandard) {
-//                 weightStandardInput.value = weightStandard;
-//             } else {
-//                 weightStandardInput.value = '';
-//             }
-
-
-//             // Isi default panjang
-//             cardBody.querySelectorAll('input[name*="[actual_case_1]"]').forEach(input => {
-//                 if (longMax) input.value = longMax;
-//                 else input.value = '';
-//             });
-
-//             // Isi default diameter
-//             cardBody.querySelectorAll('input[name*="[actual_case_2]"]').forEach(input => {
-//                 if (diameter) input.value = diameter;
-//                 else input.value = '';
-//             });
-
-//             // Reset field lain (speed, actual_weight, avg_weight, notes)
-//             cardBody.querySelectorAll('input').forEach(input => {
-//                 const name = input.name;
-
-//                 // Lewati field standar & actual_case yang sudah di-set di atas
-//                 if (name.endsWith('[weight_standard]')) return;
-//                 if (name.includes('[actual_case_1]')) return;
-//                 if (name.includes('[actual_case_2]')) return;
-
-//                 // Reset semua input lain
-//                 input.value = '';
-//             });
-//         }
-//     }
-// });
-
-
-// (3) Hapus detail jika ada tombol remove-detail (jika kamu aktifkan)
-// document.addEventListener('click', function(e) {
-//     if (e.target.classList.contains('remove-detail')) {
-//         const block = e.target.closest('.detail-block');
-//         if (document.querySelectorAll('.detail-block').length > 1) {
-//             block.remove();
-//         }
-//     }
-// });
-
-// document.addEventListener('input', function(e) {
-//     const block = e.target.closest('.detail-block');
-//     if (!block) return;
-
-//     // daftar konfigurasi field
-//     const configs = [{
-//             prefix: 'weight',
-//             avg: 'avg_weight',
-//             count: 3
-//         },
-//         {
-//             prefix: 'long',
-//             avg: 'avg_long',
-//             count: 3
-//         }
-//     ];
-
-//     configs.forEach(cfg => {
-//         const inputs = [];
-//         for (let i = 1; i <= cfg.count; i++) {
-//             inputs.push(block.querySelector(`input[name*="[actual_${cfg.prefix}_${i}]"]`));
-//         }
-
-//         let sum = 0;
-//         let count = 0;
-
-//         inputs.forEach(input => {
-//             if (input && input.value !== '') {
-//                 const v = parseFloat(input.value);
-//                 if (!isNaN(v)) {
-//                     sum += v;
-//                     count++;
-//                 }
-//             }
-//         });
-
-//         const avgInput = block.querySelector(`input[name*="[${cfg.avg}]"]`);
-//         if (avgInput) {
-//             avgInput.value = count > 0 ? (sum / count).toFixed(2) : '';
-//         }
-//     });
-// });
-
 document.addEventListener('click', function(e) {
     // Tambah Berat
     if (e.target.classList.contains('add-weight')) {

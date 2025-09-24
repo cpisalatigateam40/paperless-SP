@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Report Metal Detector</title>
+    <title>Laporan Verifikasi Metal Detector Adonan</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -119,7 +119,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN METAL DETECTOR ADONAN</h3>
+    <h3 class="mb-2 text-center">LAPORAN VERIFIKASI METAL DETECTOR ADONAN</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">
@@ -131,9 +131,6 @@
             </td>
             <td style="text-align: left; border: none;">
                 Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section->section_name }}</span>
             </td>
         </tr>
     </table>

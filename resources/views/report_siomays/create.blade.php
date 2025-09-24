@@ -11,18 +11,21 @@
                 @csrf
 
                 {{-- HEADER REPORT --}}
-                <h6>Header Laporan</h6>
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label">Tanggal</label>
                         <input type="date" name="date" class="form-control"
                             value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Shift</label>
                         <input type="text" id="shift" name="shift" class="form-control" required>
                     </div>
-                    <div class="col-md-4">
+
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-3">
                         <label>Produk</label>
                         <select name="product_uuid" class="form-control" required>
                             <option value="">-- pilih produk --</option>
@@ -31,19 +34,16 @@
                             @endforeach
                         </select>
                     </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Kode Produksi</label>
                         <input type="text" name="production_code" class="form-control">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Waktu Start</label>
                         <input type="time" name="start_time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Waktu Stop</label>
                         <input type="time" name="end_time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
@@ -65,10 +65,10 @@
                 </div>
 
                 {{-- RAW MATERIALS --}}
-                <h6>Bahan Baku</h6>
                 <div id="raw-materials-wrapper">
                     <div class="row mb-2 raw-material-item">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label">Bahan Baku</label>
                             <select name="details[0][raw_materials][0][raw_material_uuid]" class="form-control"
                                 required>
                                 <option value="">-- pilih bahan baku --</option>
@@ -77,9 +77,17 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label">Berat (kg)</label>
                             <input type="number" step="0.01" name="details[0][raw_materials][0][amount]"
                                 class="form-control" placeholder="Berat (kg)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sensory</label>
+                            <select name="details[0][raw_materials][0][sensory]" class="form-control" required>
+                                <option value="OK">OK</option>
+                                <option value="Tidak OK">Tidak OK</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -87,52 +95,13 @@
                 <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
                     Baku</button>
 
-                <div class="mb-4">
-                    <label class="form-label">Sensory</label>
-                    <select name="details[0][raw_materials][0][sensory]" class="form-control" required>
-                        <option value="OK">OK</option>
-                        <option value="Tidak OK">Tidak OK</option>
-                    </select>
-                </div>
+
 
                 {{-- DETAIL PROSES (1x input, bukan repeater) --}}
 
-                <div class="row mb-2">
 
-                    <div class="col-md-3">
-                        <label class="form-label">Lama Proses (menit)</label>
-                        <input type="number" step="0.01" name="details[0][duration]" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Pressure (Bar)</label>
-                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Target Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Actual Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control">
-                    </div>
-                </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label d-block">Mixing Paddle</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="on"
-                                id="mixingOn0">
-                            <label class="form-check-label" for="mixingOn0">On</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="off"
-                                id="mixingOff0">
-                            <label class="form-check-label" for="mixingOff0">Off</label>
-                        </div>
-                    </div>
 
-                </div>
 
                 <div class="row mb-2">
                     <div class="col-md-3">
@@ -169,6 +138,43 @@
                     </div>
                 </div>
 
+                <div class="row mb-4 mt-4">
+                    <div class="col-md-6">
+                        <label class="form-label d-block">Mixing Paddle</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="on"
+                                id="mixingOn0">
+                            <label class="form-check-label" for="mixingOn0">On</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="off"
+                                id="mixingOff0">
+                            <label class="form-check-label" for="mixingOff0">Off</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row mb-2">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Lama Proses (menit)</label>
+                        <input type="number" step="0.01" name="details[0][duration]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Pressure (Bar)</label>
+                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Target Temperature (&deg;C)</label>
+                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Actual Temperature (&deg;C)</label>
+                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control">
+                    </div>
+                </div>
+
 
                 <div class="row mb-2">
                     <div class="col-md-6">
@@ -193,7 +199,7 @@ function addRawMaterial() {
     let wrapper = document.getElementById('raw-materials-wrapper');
     let html = `
         <div class="row mb-2 raw-material-item">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <select name="details[0][raw_materials][${rmIndex}][raw_material_uuid]" class="form-control" required>
                     <option value="">-- pilih bahan baku --</option>
                     @foreach($rawMaterials as $rm)
@@ -201,9 +207,15 @@ function addRawMaterial() {
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <input type="number" step="0.01" name="details[0][raw_materials][${rmIndex}][amount]" class="form-control"
                        placeholder="Berat (kg)">
+            </div>
+            <div class="col-md-4">
+                <select name="details[0][raw_materials][${rmIndex}][sensory]" class="form-control" required>
+                    <option value="OK">OK</option>
+                    <option value="Tidak OK">Tidak OK</option>
+                </select>
             </div>
         </div>
         `;

@@ -13,7 +13,7 @@ class FormulaController extends Controller
 {
     public function index()
     {
-        $formulas = Formula::with(['product', 'area'])->get();
+        $formulas = Formula::with(['product', 'area'])->paginate(10);
 
         return view('formulas.index', compact('formulas'));
     }

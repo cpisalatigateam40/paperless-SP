@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Laporan RTG Steamer</title>
+    <title> Laporan Pemasakan Dengan Steamer</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -217,7 +217,7 @@
                 <td>{{ $detail->sensory_color }}</td>
                 @endforeach
             </tr>
-            <tr>
+            <!-- <tr>
                 <th>Paraf QC</th>
                 @foreach ($report->details as $detail)
                 <td>
@@ -260,7 +260,7 @@
                     @endif
                 </td>
                 @endforeach
-            </tr>
+            </tr> -->
         </tbody>
     </table>
 

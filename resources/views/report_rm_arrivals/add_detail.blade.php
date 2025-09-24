@@ -28,18 +28,39 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Produsen</label>
-                                <input type="text" name="details[0][supplier]" class="form-control supplier-input"
-                                    readonly>
+                                <label class="form-label">Kondisi RM</label>
+                                <select name="details[0][rm_condition]" class="form-control">
+                                    <option value="Fresh (F)">Fresh (F)</option>
+                                    <option value="Thawing (Th)">Thawing (Th)</option>
+                                    <option value="Frozen (Fr)">Frozen (Fr)</option>
+                                </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Kode Produksi</label>
-                                <input type="text" name="details[0][production_code]" class="form-control" required>
+                                <label class="form-label">Produsen</label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    @php
+                                    $suppliers = ['Salatiga', 'Pemalang', 'Sragen', 'Madiun', 'Banyumas'];
+                                    @endphp
+                                    @foreach($suppliers as $supplier)
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="details[0][supplier][]"
+                                            value="{{ $supplier }}" id="supplier_0_{{ $supplier }}">
+                                        <label class="form-check-label" for="supplier_0_{{ $supplier }}">
+                                            {{ $supplier }}
+                                        </label>
+                                    </div>
+                                    @endforeach
+                                </div>
                             </div>
+
 
                         </div>
 
                         <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Kode Produksi</label>
+                                <input type="text" name="details[0][production_code]" class="form-control" required>
+                            </div>
                             <div class="col-md-4">
                                 <label class="form-label">Jam</label>
                                 <input type="time" name="details[0][time]" class="form-control"
@@ -49,13 +70,7 @@
                                 <label class="form-label">Suhu (°C)</label>
                                 <input type="number" step="0.1" name="details[0][temperature]" class="form-control">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Kemasan</label>
-                                <select name="details[0][packaging_condition]" class="form-control">
-                                    <option value="✓">✓</option>
-                                    <option value="x">x</option>
-                                </select>
-                            </div>
+
                             <!-- <div class="col-md-3">
                                 <label class="form-label">Sensorik</label>
                                 <select name="details[0][sensorial_condition]" class="form-control">
@@ -67,6 +82,13 @@
                         </div>
 
                         <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Kemasan</label>
+                                <select name="details[0][packaging_condition]" class="form-control">
+                                    <option value="✓">✓</option>
+                                    <option value="x">x</option>
+                                </select>
+                            </div>
                             <div class="col-md-4">
                                 <label class="form-label">Sensory Kenampakan</label>
                                 <select name="details[0][sensory_appearance]" class="form-control">
@@ -81,6 +103,10 @@
                                     <option value="x">x</option>
                                 </select>
                             </div>
+
+                        </div>
+
+                        <div class="row mt-3">
                             <div class="col-md-4">
                                 <label class="form-label">Sensory Color</label>
                                 <select name="details[0][sensory_color]" class="form-control">
@@ -88,9 +114,6 @@
                                     <option value="x">x</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="row mt-3">
                             <div class="col-md-3">
                                 <label class="form-label">Kontaminasi</label>
                                 <select name="details[0][contamination]" class="form-control">
@@ -137,16 +160,38 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label">Produsen</label>
-                <input type="text" name="details[__index__][supplier]" class="form-control supplier-input" readonly>
+                <label class="form-label">Kondisi RM</label>
+                <select name="details[__index__][rm_condition]" class="form-control">
+                    <option value="Fresh (F)">Fresh (F)</option>
+                    <option value="Thawing (Th)">Thawing (Th)</option>
+                    <option value="Frozen (Fr)">Frozen (Fr)</option>
+                </select>
             </div>
+            <div class="col-md-4">
+                <label class="form-label">Produsen</label>
+                <div class="d-flex flex-wrap gap-3">
+                    @php
+                    $suppliers = ['Salatiga', 'Pemalang', 'Sragen', 'Madiun', 'Banyumas'];
+                    @endphp
+                    @foreach($suppliers as $supplier)
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="details[__index__][supplier][]"
+                            value="{{ $supplier }}" id="supplier__index__{{ $supplier }}">
+                        <label class="form-check-label" for="supplier__index__{{ $supplier }}">
+                            {{ $supplier }}
+                        </label>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row mt-3">
             <div class="col-md-4">
                 <label class="form-label">Kode Produksi</label>
                 <input type="text" name="details[__index__][production_code]" class="form-control" required>
             </div>
-
-        </div>
-        <div class="row mt-3">
             <div class="col-md-4">
                 <label class="form-label">Jam</label>
                 <input type="time" name="details[__index__][time]" class="form-control">
@@ -155,13 +200,7 @@
                 <label class="form-label">Suhu</label>
                 <input type="number" step="0.1" name="details[__index__][temperature]" class="form-control">
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Kemasan</label>
-                <select name="details[__index__][packaging_condition]" class="form-control">
-                    <option value="✓">✓</option>
-                    <option value="x">x</option>
-                </select>
-            </div>
+
             <!-- <div class="col-md-3">
                 <label class="form-label">Sensorik</label>
                 <select name="details[__index__][sensorial_condition]" class="form-control">
@@ -171,6 +210,13 @@
             </div> -->
         </div>
         <div class="row mt-4">
+            <div class="col-md-4">
+                <label class="form-label">Kemasan</label>
+                <select name="details[__index__][packaging_condition]" class="form-control">
+                    <option value="✓">✓</option>
+                    <option value="x">x</option>
+                </select>
+            </div>
             <div class="col-md-4">
                 <label class="form-label">Sensori Kenampakan</label>
                 <select name="details[__index__][sensory_appearance]" class="form-control">
@@ -185,6 +231,9 @@
                     <option value="x">x</option>
                 </select>
             </div>
+
+        </div>
+        <div class="row mt-3">
             <div class="col-md-4">
                 <label class="form-label">Sensori Warna</label>
                 <select name="details[__index__][sensory_color]" class="form-control">
@@ -192,8 +241,6 @@
                     <option value="x">x</option>
                 </select>
             </div>
-        </div>
-        <div class="row mt-3">
             <div class="col-md-4">
                 <label class="form-label">Kontaminasi</label>
                 <select name="details[__index__][contamination]" class="form-control">

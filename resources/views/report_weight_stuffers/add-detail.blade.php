@@ -77,10 +77,10 @@
                     </div>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <label>Ukuran Casing - Panjang</label>
                             <input type="number" name="details[0][cases][0][actual_case_1]" class="form-control">
-                        </div>
+                        </div> -->
                         <div class="col-md-6">
                             <label>Ukuran Casing - Diameter</label>
                             <input type="number" name="details[0][cases][0][actual_case_2]" class="form-control">

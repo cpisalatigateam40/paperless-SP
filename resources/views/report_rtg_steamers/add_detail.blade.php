@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Tambah Detail RTG Steamer</h4>
+            <h4>Tambah Detail Laporan Pemasakan Dengan Steamer</h4>
         </div>
         <div class="card-body">
 
@@ -12,7 +12,7 @@
                 id="steamers-form" enctype="multipart/form-data">
                 @csrf
 
-                <h5>Detail Steamer</h5>
+
 
                 <div id="detailWrapper">
                     <div class="detail-block border rounded p-3 mb-3">
@@ -31,6 +31,7 @@
                             </div>
                         </div>
 
+                        <h5 class="mt-4">Streaming</h5>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label>Suhu Ruang (°C)</label>
@@ -59,7 +60,7 @@
                             </div>
                         </div>
 
-                        <h6 class="mt-3">Sensori</h6>
+                        <h5 class="mt-4">Sensori</h5>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label>Kematangan</label>
@@ -100,7 +101,7 @@
                             </div>
                         </div>
 
-                        <h6 class="mt-3">Paraf</h6>
+                        <!-- <h6 class="mt-3">Paraf</h6>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label class="form-label">Paraf QC</label>
@@ -119,7 +120,7 @@
                                 <button type="button"
                                     class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- <div class="text-end">
                             <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeDetail(this)">Hapus

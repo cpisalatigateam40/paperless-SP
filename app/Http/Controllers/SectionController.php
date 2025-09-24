@@ -10,7 +10,7 @@ class SectionController extends Controller
 {
     public function index()
     {
-        $sections = Section::with('area')->get();
+        $sections = Section::with('area')->paginate(10);
         return view('section.section', compact('sections'));
     }
 

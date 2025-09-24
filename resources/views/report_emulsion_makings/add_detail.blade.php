@@ -15,12 +15,12 @@
                     <div class="col">
                         <label>Jenis Emulsi</label>
                         <input type="text" name="emulsion_type" value="{{ $report->header->emulsion_type ?? '' }}"
-                            class="form-control">
+                            class="form-control" readonly>
                     </div>
                     <div class="col">
                         <label>Kode Produksi</label>
                         <input type="text" name="production_code" value="{{ $report->header->production_code ?? '' }}"
-                            class="form-control">
+                            class="form-control" readonly>
                     </div>
                 </div>
 
@@ -70,7 +70,6 @@
                 <hr>
 
                 {{-- Aging --}}
-                <h5 class="mb-2">Aging</h5>
                 <table class="table table-bordered">
                     <thead class="text-center">
                         <tr>

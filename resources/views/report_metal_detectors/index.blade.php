@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Report Metal Detector</h4>
+            <h4>Daftar Laporan Verifikasi Metal Detector Adonan</h4>
             <a href="{{ route('report_metal_detectors.create') }}" class="btn btn-sm btn-primary">Tambah Report</a>
         </div>
         <div class="card-body">
@@ -29,8 +29,9 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
-                        <th>Section</th>
+                        <th>Ketidaksesuaian</th>
                         <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
@@ -40,8 +41,15 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
-                        <td>{{ $report->section->section_name ?? '-' }}</td>
+                        <td>
+                            @if ($report->ketidaksesuaian > 0)
+                            Ada
+                            @else
+                            -
+                            @endif
+                        </td>
                         <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .2rem;">
                             {{-- Toggle Detail --}}
@@ -120,7 +128,7 @@
                     </tr>
 
                     <tr class="collapse" id="detail-{{ $report->id }}">
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="table-responsive">
                                 <table class="table table-sm table-bordered mb-0">
                                     <thead>

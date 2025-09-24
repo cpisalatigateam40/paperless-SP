@@ -169,7 +169,7 @@
         @php
         $labels = [
         'Kecepatan Stuffer (rpm)' => 'speed',
-        'Ukuran Casing<br><small>(Aktual Panjang, Diameter)</small>' => 'casing',
+        'Ukuran Casing<br><small>(Aktual Diameter)</small>' => 'casing',
         'Standar Berat (gr)' => 'standard',
         'Berat Aktual (gr)' => 'actual_weight',
         'Rata-rata Berat Aktual (gr)' => 'avg',
@@ -197,7 +197,7 @@
             @break
 
             @case('casing')
-            <td>{{ $case?->actual_case_1 ?? '-' }} / {{ $case?->actual_case_2 ?? '-' }}</td>
+            <td>{{ $case?->actual_case_2 ?? '-' }}</td>
             @break
 
             @case('standard')

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-middle">
-            <h5>Laporan Kedatangan Bahan Baku</h5>
+            <h5>Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang</h5>
             <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
         </div>
 
@@ -43,8 +43,9 @@
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Shift</th>
+                                <th>Waktu</th>
                                 <th>Area</th>
-                                <th>Section</th>
+                                <th>Ketidaksesuaian</th>
                                 <th>Dibuat oleh</th>
                                 <th>Aksi</th>
                             </tr>
@@ -54,8 +55,15 @@
                             <tr>
                                 <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                                 <td>{{ $report->shift }}</td>
+                                <td>{{ $report->created_at->format('H:i') }}</td>
                                 <td>{{ $report->area->name ?? '-' }}</td>
-                                <td>{{ $report->section?->section_name }}</td>
+                                <td>
+                                    @if ($report->ketidaksesuaian > 0)
+                                    Ada
+                                    @else
+                                    -
+                                    @endif
+                                </td>
                                 <td>{{ $report->created_by }}</td>
                                 <td>
                                     {{-- Toggle Detail --}}
@@ -141,6 +149,7 @@
                                             <tr class="text-center align-middle">
                                                 <th rowspan="2" class="align-middle">Jam</th>
                                                 <th rowspan="2" class="align-middle">Raw Material</th>
+                                                <th rowspan="2" class="align-middle">Kondisi RM</th>
                                                 <th rowspan="2" class="align-middle">Produsen / Supplier</th>
                                                 <th rowspan="2" class="align-middle">Kode Produksi / Expired Date</th>
                                                 <th rowspan="2" class="align-middle">Kondisi Kemasan</th>
@@ -160,7 +169,8 @@
                                             <tr>
                                                 <td class="text-center">{{ $detail->time ?? '-' }}</td>
                                                 <td>{{ $detail->rawMaterial->material_name ?? '-' }}</td>
-                                                <td>{{ $detail->supplier ?? '-' }}</td>
+                                                <td class="text-center">{{ $detail->rm_condition }}</td>
+                                                <td>{{ implode(', ', explode(',', $detail->supplier)) }}</td>
                                                 <td>{{ $detail->production_code ?? '-' }}</td>
                                                 <td class="text-center">{{ $detail->packaging_condition }}</td>
                                                 <td class="text-center">{{ $detail->temperature }}</td>

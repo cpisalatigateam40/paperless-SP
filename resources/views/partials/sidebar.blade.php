@@ -203,7 +203,7 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-rm-arrivals*') ? 'active' : '' }}"
                     href="{{ route('report_rm_arrivals.index') }}">
-                    Pemeriksaan Kedatangan Bahan Baku Chillroom
+                    Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang
                 </a>
                 <a class="collapse-item {{ Request::is('report-premixes*') ? 'active' : '' }}"
                     href="{{ route('report-premixes.index') }}">

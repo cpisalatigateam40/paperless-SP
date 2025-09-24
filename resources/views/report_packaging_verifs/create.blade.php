@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Tambah Report Packaging Verif</h4>
+            <h4>Tambah Verifikasi Kemasan Plastik</h4>
         </div>
 
         <div class="card-body">
@@ -21,7 +21,7 @@
                         <label>Shift</label>
                         <input type="text" name="shift" class="form-control" required>
                     </div>
-                    <div class="col">
+                    <!-- <div class="col">
                         <label>Section</label>
                         <select name="section_uuid" class="form-control">
                             <option value="">-- Pilih Section --</option>
@@ -29,7 +29,7 @@
                             <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> -->
                 </div>
 
                 <hr>
@@ -153,118 +153,125 @@
                 @endfor
             </div>
         </div>
-    </div>
 
-    {{-- Isi Per-Pack 5x --}}
-    <div class="card mb-3">
-        <div class="card-header p-2"><strong>Isi Per-Pack</strong></div>
-        <div class="card-body p-2">
-            <div class="row">
-                @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
-                    <label class="small">Isi Per-Pack {{ $i }}</label>
-                    <input type="number" name="details[0][checklist][content_per_pack_{{ $i }}]" class="form-control">
-            </div>
-            @endfor
-        </div>
-    </div>
-</div>
-
-<div class="card mb-3">
-    <div class="card-header p-2"><strong>Panjang Produk Per Pcs</strong></div>
-    <div class="card-body p-2">
-        <div class="row mb-2">
-            <div class="col-md-2">
-                <label class="small">Standar</label>
-                <input type="number" step="0.01" name="details[0][checklist][standard_long_pcs]" class="form-control">
-            </div>
-        </div>
-        <div class="row">
-            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
-                <label class="small">Aktual {{ $i }}</label>
-                <input type="number" step="0.01" name="details[0][checklist][actual_long_pcs_{{ $i }}]"
-                    class="form-control actual-input">
-        </div>
-        @endfor
-        <div class="col-md-2">
-            <label class="small">Rata-Rata Panjang</label>
-            <input type="number" step="0.01" name="details[0][checklist][avg_long_pcs]" class="form-control"
-                id="avg-long-pcs" readonly>
-        </div>
-    </div>
-</div>
-
-<div class="card mb-3">
-    <div class="card-header p-2"><strong>Berat Produk Per Pcs</strong></div>
-    <div class="card-body p-2">
-        <div class="row mb-2">
-            <div class="col-md-2">
-                <label class="small">Standar</label>
-                <input type="number" step="0.01" name="details[0][checklist][standard_weight_pcs]" class="form-control">
+        <div class="card mb-3">
+            <div class="card-header p-2"><strong>Panjang Produk Per Pcs</strong></div>
+            <div class="card-body p-2">
+                <div class="row mb-2">
+                    <div class="col-md-2">
+                        <label class="small">Standar</label>
+                        <input type="number" step="0.01" name="details[0][checklist][standard_long_pcs]"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                        <label class="small">Aktual {{ $i }}</label>
+                        <input type="number" step="0.01" name="details[0][checklist][actual_long_pcs_{{ $i }}]"
+                            class="form-control actual-input">
+                </div>
+                @endfor
+                <div class="col-md-2">
+                    <label class="small">Rata-Rata Panjang</label>
+                    <input type="number" step="0.01" name="details[0][checklist][avg_long_pcs]" class="form-control"
+                        id="avg-long-pcs" readonly>
+                </div>
             </div>
         </div>
-        <div class="row">
-            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
-                <label class="small">Aktual {{ $i }}</label>
-                <input type="number" step="0.01" name="details[0][checklist][actual_weight_pcs_{{ $i }}]"
-                    class="form-control actual-input-wpcs">
-        </div>
-        @endfor
-        <div class="col-md-2">
-            <label class="small">Rata-Rata Berat</label>
-            <input type="number" step="0.01" name="details[0][checklist][avg_weight_pcs]" class="form-control"
-                id="avg-weight-pcs" readonly>
-        </div>
-    </div>
-</div>
 
-{{-- Berat Produk --}}
-<div class="card mb-3">
-    <div class="card-header p-2"><strong>Berat Produk Per Pack</strong></div>
-    <div class="card-body p-2">
-        <div class="row mb-2">
-            <div class="col-md-2">
-                <label class="small">Standar</label>
-                <input type="number" step="0.01" name="details[0][checklist][standard_weight]" class="form-control">
+        <div class="card mb-3">
+            <div class="card-header p-2"><strong>Berat Produk Per Pcs</strong></div>
+            <div class="card-body p-2">
+                <div class="row mb-2">
+                    <div class="col-md-2">
+                        <label class="small">Standar</label>
+                        <input type="number" step="0.01" name="details[0][checklist][standard_weight_pcs]"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                        <label class="small">Aktual {{ $i }}</label>
+                        <input type="number" step="0.01" name="details[0][checklist][actual_weight_pcs_{{ $i }}]"
+                            class="form-control actual-input-wpcs">
+                </div>
+                @endfor
+                <div class="col-md-2">
+                    <label class="small">Rata-Rata Berat</label>
+                    <input type="number" step="0.01" name="details[0][checklist][avg_weight_pcs]" class="form-control"
+                        id="avg-weight-pcs" readonly>
+                </div>
             </div>
         </div>
-        <div class="row">
-            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
-                <label class="small">Aktual {{ $i }}</label>
-                <input type="number" step="0.01" name="details[0][checklist][actual_weight_{{ $i }}]"
-                    class="form-control actual-input-w">
+
+        {{-- Isi Per-Pack 5x --}}
+        <div class="card mb-3">
+            <div class="card-header p-2"><strong>Isi Per-Pack</strong></div>
+            <div class="card-body p-2">
+                <div class="row">
+                    @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                        <label class="small">Isi Per-Pack {{ $i }}</label>
+                        <input type="number" name="details[0][checklist][content_per_pack_{{ $i }}]"
+                            class="form-control">
+                </div>
+                @endfor
+            </div>
         </div>
-        @endfor
-        <div class="col-md-2">
-            <label class="small">Rata-Rata Berat</label>
-            <input type="number" step="0.01" name="details[0][checklist][avg_weight]" class="form-control"
-                id="avg-weight" readonly>
+
+        {{-- Berat Produk --}}
+        <div class="card mb-3">
+            <div class="card-header p-2"><strong>Berat Produk Per Pack</strong></div>
+            <div class="card-body p-2">
+                <div class="row mb-2">
+                    <div class="col-md-2">
+                        <label class="small">Standar</label>
+                        <input type="number" step="0.01" name="details[0][checklist][standard_weight]"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                        <label class="small">Aktual {{ $i }}</label>
+                        <input type="number" step="0.01" name="details[0][checklist][actual_weight_{{ $i }}]"
+                            class="form-control actual-input-w">
+                </div>
+                @endfor
+                <div class="col-md-2">
+                    <label class="small">Rata-Rata Berat</label>
+                    <input type="number" step="0.01" name="details[0][checklist][avg_weight]" class="form-control"
+                        id="avg-weight" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3 mt-3">
+            <div class="card-body p-2 row">
+                <div class="col-md-6">
+                    <label class="small">Hasil Verifikasi MD</label>
+                    <select name="details[0][checklist][verif_md]" class="form-control">
+                        <option value="OK">OK</option>
+                        <option value="Tidak OK">Tidak OK</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="small">Keterangan</label>
+                    <input type="text" name="details[0][checklist][notes]" class="form-control">
+                </div>
+            </div>
         </div>
     </div>
+
+    <button type="submit" class="btn btn-success">Simpan Report</button>
+    </form>
 </div>
-
-<div class="card mb-3 mt-3">
-    <div class="card-body p-2 row">
-        <div class="col-md-6">
-            <label class="small">Hasil Verifikasi MD</label>
-            <select name="details[0][checklist][verif_md]" class="form-control">
-                <option value="OK">OK</option>
-                <option value="Tidak OK">Tidak OK</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="small">Keterangan</label>
-            <input type="text" name="details[0][checklist][notes]" class="form-control">
-        </div>
-
-    </div>
+</div>
 </div>
 </div>
 
-<button type="submit" class="btn btn-success">Simpan Report</button>
-</form>
+
 </div>
-</div>
-</div>
+
+
 @endsection
 
 @section('script')

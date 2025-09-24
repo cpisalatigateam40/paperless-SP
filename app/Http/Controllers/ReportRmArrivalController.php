@@ -20,10 +20,24 @@ class ReportRmArrivalController extends Controller
         $reports = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
             ->orderByDesc('date')
             ->get()
+            ->map(function ($report) {
+                $report->ketidaksesuaian = $report->details->filter(function ($d) {
+                    return in_array('x', [
+                        $d->packaging_condition,
+                        $d->sensory_appearance,
+                        $d->sensory_aroma,
+                        $d->sensory_color,
+                        $d->contamination,
+                    ]);
+                })->count();
+
+                return $report;
+            })
             ->groupBy(fn($report) => $report->section?->section_name ?? 'Tanpa Section');
 
         return view('report_rm_arrivals.index', compact('reports'));
     }
+
 
 
     public function create()
@@ -31,7 +45,10 @@ class ReportRmArrivalController extends Controller
         return view('report_rm_arrivals.create', [
             'areas' => Area::all(),
             'rawMaterials' => RawMaterial::all(),
-            'sections' => Section::all(),
+            'sections' => Section::whereIn('uuid', [
+            'b435deed-4255-491b-9f21-e758ffc4551b',
+            'd70f9b36-3044-4d7d-99d9-50fba677b4b7'
+        ])->get(),
         ]);
     }
 
@@ -53,7 +70,10 @@ class ReportRmArrivalController extends Controller
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
                 'raw_material_uuid' => $detail['raw_material_uuid'],
-                'supplier' => $detail['supplier'] ?? null,
+                'supplier'           => isset($detail['supplier']) 
+                              ? implode(',', $detail['supplier']) 
+                              : null,
+                'rm_condition' => $detail['rm_condition'],
                 'production_code' => $detail['production_code'] ?? null,
                 'time' => $detail['time'],
                 'temperature' => $detail['temperature'],
@@ -117,7 +137,10 @@ class ReportRmArrivalController extends Controller
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
                 'raw_material_uuid' => $detail['raw_material_uuid'],
-                'supplier' => $detail['supplier'] ?? null,
+                'supplier'           => isset($detail['supplier']) 
+                              ? implode(',', $detail['supplier']) 
+                              : null,
+                'rm_condition' => $detail['rm_condition'] ?? null,
                 'production_code' => $detail['production_code'] ?? null,
                 'time' => $detail['time'] ?? null,
                 'temperature' => $detail['temperature'] ?? null,
