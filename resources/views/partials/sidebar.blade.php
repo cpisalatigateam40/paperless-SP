@@ -27,6 +27,7 @@ Request::is('report-prod-loss-vacums*') ||
 Request::is('report-packaging-verifs*');
 $isPasteurizing =
 Request::is('report-pasteurs*');
+Request::is('report-waterbaths*');
 $isCartoning =
 Request::is('report-freez-packagings*');
 $isNonProses = Request::is([
@@ -333,7 +334,12 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-pasteurs*') ? 'active' : '' }}"
                     href="{{ route('report_pasteurs.index') }}">
-                    Pemeriksaan Pasteurisasi
+                    Pemeriksaan Pasteurisasi Retort Chamber
+                </a>
+
+                <a class="collapse-item {{ Request::is('report-waterbaths*') ? 'active' : '' }}"
+                    href="{{ route('report_waterbaths.index') }}">
+                    Pemeriksaan Pasteurisasi Waterbath
                 </a>
             </div>
         </div>

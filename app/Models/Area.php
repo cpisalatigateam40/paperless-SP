@@ -244,6 +244,13 @@ class Area extends Model
         return $this->hasMany(ReportRtgSteamer::class, 'area_uuid', 'uuid');
     }
 
+    public function reportWaterbaths()
+    {
+        return $this->hasMany(ReportWaterbath::class, 'area_uuid', 'uuid');
+    }
 
-
+    public function detailWaterbaths()
+    {
+        return $this->hasMany(DetailWaterbath::class, 'product_uuid', 'uuid');
+    }
 }
