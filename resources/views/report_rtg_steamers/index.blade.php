@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="m-0">Laporan Pemasakan Dengan Steamer</h4>
+            <h4 class="m-0">Laporan Verifikasi Pemasakan Dengan Steamer</h4>
             <a href="{{ route('report_rtg_steamers.create') }}" class="btn btn-primary btn-sm">+ Tambah Laporan</a>
         </div>
         <div class="card-body">
@@ -19,8 +19,9 @@
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
-                            <th>Produk</th>
+                            <th>Waktu</th>
                             <th>Area</th>
+                            <th>Produk</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -30,8 +31,9 @@
                             <td class="text-center">{{ $i + $reports->firstItem() }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
-                            <td>{{ $report->product->product_name ?? '-' }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
+                            <td>{{ $report->product->product_name ?? '-' }}</td>
                             <td class="text-center">
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
@@ -103,7 +105,7 @@
                         </tr>
                         {{-- Detail Collapse --}}
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="table-responsive">
                                     <table class="table table-bordered align-middle small text-center">
                                         <tbody>

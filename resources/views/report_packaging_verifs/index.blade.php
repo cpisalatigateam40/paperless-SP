@@ -31,6 +31,7 @@
                         <tr>
                             <th>Tanggal</th>
                             <th>Shift</th>
+                            <th>Waktu</th>
                             <th>Area</th>
                             <th>Dibuat oleh</th>
                             <th>Action</th>
@@ -41,6 +42,7 @@
                         <tr>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ optional($report->area)->name }}</td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">

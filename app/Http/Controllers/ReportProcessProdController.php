@@ -46,7 +46,9 @@ class ReportProcessProdController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $formulas = Formula::all();
         $formulations = Formulation::all();
 
@@ -70,6 +72,7 @@ class ReportProcessProdController extends Controller
             'uuid' => Str::uuid(),
             'report_uuid' => $report->uuid,
             'product_uuid' => $request->product_uuid,
+            'rework_product_uuid' => $request->rework_product_uuid,
             'formula_uuid' => $request->formula_uuid,
             'production_code' => $request->production_code,
             'mixing_time' => $request->mixing_time,
@@ -79,6 +82,7 @@ class ReportProcessProdController extends Controller
             'sensory_homogenity' => $request->sensory_homogenity,
             'sensory_stiffness' => $request->sensory_stiffness,
             'sensory_aroma' => $request->sensory_aroma,
+            'gramase' => $request->gramase,
         ]);
 
         // Simpan Item Formulasi
@@ -181,6 +185,7 @@ class ReportProcessProdController extends Controller
             'uuid' => Str::uuid(),
             'report_uuid' => $report->uuid,
             'product_uuid' => $request->product_uuid,
+            'rework_product_uuid' => $request->rework_product_uuid,
             'formula_uuid' => $request->formula_uuid,
             'production_code' => $request->production_code,
             'mixing_time' => $request->mixing_time,
@@ -190,6 +195,7 @@ class ReportProcessProdController extends Controller
             'sensory_homogenity' => $request->sensory_homogenity,
             'sensory_stiffness' => $request->sensory_stiffness,
             'sensory_aroma' => $request->sensory_aroma,
+            'gramase' => $request->gramase,
         ]);
 
         foreach ($request->formulation_uuids ?? [] as $uuid) {
@@ -201,6 +207,7 @@ class ReportProcessProdController extends Controller
                 'sensory' => $request->sensory[$uuid] ?? null,
                 'prod_code' => $request->prod_code[$uuid] ?? null,
                 'temperature' => $request->temperature[$uuid] ?? null,
+                
             ]);
         }
 

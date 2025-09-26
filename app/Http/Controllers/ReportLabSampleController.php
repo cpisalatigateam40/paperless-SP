@@ -26,7 +26,9 @@ class ReportLabSampleController extends Controller
     public function create()
     {
         $areas = Area::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_lab_samples.create', compact('areas', 'products'));
     }
 
@@ -52,6 +54,7 @@ class ReportLabSampleController extends Controller
                     'best_before' => $detail['best_before'],
                     'quantity' => $detail['quantity'],
                     'notes' => $detail['notes'],
+                    'gramase' => $detail['gramase'],
                 ]);
             }
         });
@@ -70,7 +73,9 @@ class ReportLabSampleController extends Controller
     public function createDetail($report_uuid)
     {
         $report = ReportLabSample::where('uuid', $report_uuid)->with('details')->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_lab_samples.add_detail', compact('report', 'products'));
     }
 
@@ -95,6 +100,7 @@ class ReportLabSampleController extends Controller
             'best_before' => $request->best_before,
             'quantity' => $request->quantity,
             'notes' => $request->notes,
+            'gramase' => $request->gramase,
         ]);
 
         return redirect()->route('report_lab_samples.index')->with('success', 'Detail berhasil ditambahkan');

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4 class="mb-4">Buat Laporan Pembekuan & Pengemasan Karton Box</h4>
+            <h4 class="mb-4">Buat Laporan Verifikasi Pembekuan IQF & Pengemasan Karton Box</h4>
         </div>
 
         <div class="card-body">

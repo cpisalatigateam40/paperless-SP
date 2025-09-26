@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Edit Laporan Pemasakan Maurer</h4>
+            <h4>Edit Laporan Verifikasi Pemasakan Maurer</h4>
         </div>
     </div>
 

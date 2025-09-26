@@ -7,7 +7,7 @@
 
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between">
-                <h4>Buat Laporan Pemeriksaan Premix</h4>
+                <h4>Buat Laporan Verifikasi Premix</h4>
             </div>
             <div class="card-body">
                 <div class="row" style="margin-bottom: 2rem;">

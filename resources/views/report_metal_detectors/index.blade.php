@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Laporan Verifikasi Metal Detector Adonan</h4>
+            <h4>Laporan Verifikasi Metal Detector Adonan</h4>
             <a href="{{ route('report_metal_detectors.create') }}" class="btn btn-sm btn-primary">Tambah Report</a>
         </div>
         <div class="card-body">

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Daftar Laporan Pengecekan Pasteurisasi Waterbath</h4>
+            <h4>Laporan Verifikasi Pasteurisasi Waterbath</h4>
             <a href="{{ route('report_waterbaths.create') }}" class="btn btn-primary">Tambah Laporan</a>
         </div>
         <div class="card-body">
@@ -17,6 +17,7 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
                         <th>Dibuat Oleh</th>
                         <th>Aksi</th>
@@ -27,6 +28,7 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .2rem;">

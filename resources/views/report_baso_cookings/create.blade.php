@@ -8,7 +8,7 @@
 
         <div class="card shadow mb-4">
             <div class="card-header">
-                <h5 class="mb-0">Tambah Laporan Baso Cooking</h5>
+                <h5 class="mb-0">Tambah Laporan Verifikasi Pemasakan Baso</h5>
             </div>
             <div class="card-body">
                 {{-- HEADER REPORT --}}

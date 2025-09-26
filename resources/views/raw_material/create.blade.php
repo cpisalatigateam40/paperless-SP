@@ -14,14 +14,14 @@
                     <label for="material_name" class="form-label">Nama Material</label>
                     <input type="text" name="material_name" id="material_name" class="form-control" required>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="supplier" class="form-label">Produsen</label>
                     <input type="text" name="supplier" id="supplier" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="shelf_life" class="form-label">Batas Kadaluarsa (Bulan)</label>
                     <input type="number" name="shelf_life" id="shelf_life" class="form-control" min="0">
-                </div>
+                </div> -->
                 <button type="submit" class="btn btn-primary">Simpan</button>
                 <a href="{{ route('raw-materials.index') }}" class="btn btn-secondary">Kembali</a>
             </form>

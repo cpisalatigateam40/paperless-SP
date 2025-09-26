@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Laporan Pemeriksaan Premix</h4>
+            <h4>Laporan Verifikasi Premix</h4>
             <a href="{{ route('report-premixes.create') }}" class="btn btn-primary btn-sm">Buat Laporan</a>
         </div>
 
@@ -31,7 +31,9 @@
                         <th class="align-middle">No</th>
                         <th class="align-middle">Tanggal</th>
                         <th class="align-middle">Shift</th>
+                        <th class="align-middle">Waktu</th>
                         <th class="align-middle">Area</th>
+                        <th class="align-middle">Dibuat Oleh</th>
                         <th class="align-middle text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -41,7 +43,9 @@
                         <td class="align-middle">{{ $i + $reports->firstItem() }}</td>
                         <td class="align-middle">{{ $report->date->format('d-m-Y') }}</td>
                         <td class="align-middle">{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td class="align-middle">{{ $report->area->name ?? '-' }}</td>
+                        <td>{{ $report->created_by }}</td>
                         <td class="align-middle">
                             {{-- Toggle Detail --}}
                             <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $report->id }}"
@@ -119,7 +123,7 @@
                     </tr>
 
                     <tr id="detail-{{ $report->id }}" class="d-none">
-                        <td colspan="5">
+                        <td colspan="7">
                             <table class="table table-sm table-bordered mb-0">
                                 <thead class="text-center">
                                     <tr>

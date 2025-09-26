@@ -17,6 +17,7 @@ class DetailLabSample extends Model
         'best_before',
         'quantity',
         'notes',
+        'gramase',
     ];
 
     // Relasi ke report

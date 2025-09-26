@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Laporan Pemeriksaan Kontaminasi</h4>
+            <h4>Laporan Verifikasi Kontaminasi Bneda Asing</h4>
             <a href="{{ route('report-foreign-objects.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
         <div class="card-body">
@@ -28,8 +28,10 @@
                     <tr>
                         <th class="align-middle">Tanggal</th>
                         <th class="align-middle">Shift</th>
+                        <th class="align-middle">Waktu</th>
                         <th class="align-middle">Area</th>
                         <th class="align-middle">Section</th>
+                        <th class="align-middle">Dibuat Oleh</th>
                         <th class="align-middle">Aksi</th>
                     </tr>
                 </thead>
@@ -38,8 +40,10 @@
                     <tr>
                         <td>{{ $report->date->format('d-m-Y') }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->section->section_name ?? '-' }}</td>
+                        <td>{{ $report->created_by }}</td>
                         <td class="d-flex align-items-center" style="gap: .2rem;">
                             {{-- Toggle Detail --}}
                             <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
@@ -118,7 +122,7 @@
                     </tr>
 
                     <tr class="collapse" id="detail-{{ $report->id }}">
-                        <td colspan="5">
+                        <td colspan="7">
                             <div class="table-responsive">
                                 <table class="table table-sm table-bordered mb-0">
                                     <thead>

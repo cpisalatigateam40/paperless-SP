@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Tambah Laporan Pemeriksaan Pembuatan Kulit Siomay, Gioza & Mandu</h5>
+            <h5>Tambah Laporan Verifikasi Pembuatan Kulit Siomay, Gioza & Mandu</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('report_siomays.store') }}" method="POST">

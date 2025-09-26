@@ -8,7 +8,7 @@
 
         <div class="card shadow mb-4">
             <div class="card-header">
-                <h5 class="mb-0">Tambah Detail Laporan Baso Cooking</h5>
+                <h5 class="mb-0">Tambah Detail Laporan Verifikasi Pemasakan Baso</h5>
                 <small class="text-muted">Report: {{ $report->date }} | Shift: {{ $report->shift }} | Produk:
                     {{ $report->product->product_name ?? '-' }}</small>
             </div>

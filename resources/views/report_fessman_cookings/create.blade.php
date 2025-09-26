@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Buat Laporan Pemasakan Fessman</h4>
+            <h4>Tambah Laporan Verifikasi Pemasakan Fessman</h4>
         </div>
     </div>
 

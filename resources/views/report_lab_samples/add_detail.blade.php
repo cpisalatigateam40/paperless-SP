@@ -9,26 +9,37 @@
         <div class="card-body">
             <form action="{{ route('report_lab_samples.details.store', $report->uuid) }}" method="POST">
                 @csrf
-                <div class="mb-2">
-                    <label>Nama Produk</label>
-                    <select name="product_uuid" class="form-control" required onchange="updateExpiredDate(this)">
-                        <option value="">-- Pilih Produk --</option>
-                        @foreach($products as $product)
-                        <option value="{{ $product->uuid }}" data-shelf-life="{{ $product->shelf_life }}"
-                            data-created-at="{{ $product->created_at }}">
-                            {{ $product->product_name }}
-                        </option>
-                        @endforeach
-                    </select>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Nama Produk</label>
+                        <select name="product_uuid" class="form-control" required onchange="updateExpiredDate(this)">
+                            <option value="">-- Pilih Produk --</option>
+                            @foreach($products as $product)
+                            <option value="{{ $product->uuid }}" data-shelf-life="{{ $product->shelf_life }}"
+                                data-created-at="{{ $product->created_at }}">
+                                {{ $product->product_name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Gramase</label>
+                        <input type="number" step="0.01" name="gramase" class="form-control"
+                            placeholder="Masukkan gramase" required>
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <label>Kode Produksi</label>
-                    <input type="text" name="production_code" class="form-control" required>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Kode Produksi</label>
+                        <input type="text" name="production_code" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Best Before</label>
+                        <input type="date" name="best_before" class="form-control" required>
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <label>Best Before</label>
-                    <input type="date" name="best_before" class="form-control" readonly required>
-                </div>
+
                 <div class="mb-2">
                     <label>Jumlah</label>
                     <input type="number" name="quantity" class="form-control" required>

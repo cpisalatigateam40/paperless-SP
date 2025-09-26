@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Form Kondisi Ruang Penyimpanan Bahan Baku dan Penunjang</h5>
+            <h5>Buat Laporan Verifikasi Kebersihan Ruang Penyimpanan</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('cleanliness.store') }}" method="POST">

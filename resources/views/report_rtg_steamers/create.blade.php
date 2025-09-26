@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Tambah Laporan Pemasakan Dengan Steamer</h4>
+            <h4>Tambah Laporan Verifikasi Pemasakan Dengan Steamer</h4>
         </div>
         <div class="card-body">
 

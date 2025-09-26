@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Form Verifikasi Pembuatan Emulsi</h4>
+            <h4>Tambah Verifikasi Pembuatan Emulsi</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_emulsion_makings.store') }}" method="POST">

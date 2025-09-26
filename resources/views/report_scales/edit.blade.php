@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Edit Laporan Pemeriksaan Timbangan & Thermometer</h5>
+            <h5>Edit Laporan Verifikasi Timbangan & Thermometer</h5>
         </div>
 
         <div class="card-body">
@@ -16,7 +16,8 @@
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <label for="date">Tanggal</label>
-                        <input type="date" name="date" class="form-control" value="{{ date('Y-m-d', strtotime($report->date)) }}" required>
+                        <input type="date" name="date" class="form-control"
+                            value="{{ date('Y-m-d', strtotime($report->date)) }}" required>
                     </div>
                     <div class="col-md-3">
                         <label for="shift">Shift</label>
@@ -38,16 +39,16 @@
                     {{-- Timbangan Tab --}}
                     <div class="tab-pane fade show active" id="scale">
                         @include('report_scales.partials.edit_scale', [
-                            'details' => $report->details,
-                            'scales' => $scales
+                        'details' => $report->details,
+                        'scales' => $scales
                         ])
                     </div>
 
                     {{-- Thermometer Tab --}}
                     <div class="tab-pane fade" id="thermometer">
                         @include('report_scales.partials.edit_thermometer', [
-                            'details' => $report->thermometerDetails,
-                            'thermometers' => $thermometers
+                        'details' => $report->thermometerDetails,
+                        'thermometers' => $thermometers
                         ])
                     </div>
                 </div>
@@ -62,34 +63,33 @@
 </div>
 
 <script>
-    // TIMBANGAN
-    document.getElementById('scale-time1')?.addEventListener('change', function () {
-        const val = this.value;
-        document.querySelectorAll('input[name^="data"][name$="[time_1]"]').forEach(el => el.value = val);
-    });
+// TIMBANGAN
+document.getElementById('scale-time1')?.addEventListener('change', function() {
+    const val = this.value;
+    document.querySelectorAll('input[name^="data"][name$="[time_1]"]').forEach(el => el.value = val);
+});
 
-    document.getElementById('scale-time2')?.addEventListener('change', function () {
-        const val = this.value;
-        document.querySelectorAll('input[name^="data"][name$="[time_2]"]').forEach(el => el.value = val);
-    });
+document.getElementById('scale-time2')?.addEventListener('change', function() {
+    const val = this.value;
+    document.querySelectorAll('input[name^="data"][name$="[time_2]"]').forEach(el => el.value = val);
+});
 
-    // THERMOMETER
-    document.getElementById('thermo-time1')?.addEventListener('change', function () {
-        const val = this.value;
-        document.querySelectorAll('input[name^="thermo_data"][name$="[time_1]"]').forEach(el => el.value = val);
-    });
+// THERMOMETER
+document.getElementById('thermo-time1')?.addEventListener('change', function() {
+    const val = this.value;
+    document.querySelectorAll('input[name^="thermo_data"][name$="[time_1]"]').forEach(el => el.value = val);
+});
 
-    document.getElementById('thermo-time2')?.addEventListener('change', function () {
-        const val = this.value;
-        document.querySelectorAll('input[name^="thermo_data"][name$="[time_2]"]').forEach(el => el.value = val);
-    });
+document.getElementById('thermo-time2')?.addEventListener('change', function() {
+    const val = this.value;
+    document.querySelectorAll('input[name^="thermo_data"][name$="[time_2]"]').forEach(el => el.value = val);
+});
 
-    // Jalankan awal untuk set semua value waktu
-    document.getElementById('scale-time1')?.dispatchEvent(new Event('change'));
-    document.getElementById('scale-time2')?.dispatchEvent(new Event('change'));
-    document.getElementById('thermo-time1')?.dispatchEvent(new Event('change'));
-    document.getElementById('thermo-time2')?.dispatchEvent(new Event('change'));
+// Jalankan awal untuk set semua value waktu
+document.getElementById('scale-time1')?.dispatchEvent(new Event('change'));
+document.getElementById('scale-time2')?.dispatchEvent(new Event('change'));
+document.getElementById('thermo-time1')?.dispatchEvent(new Event('change'));
+document.getElementById('thermo-time2')?.dispatchEvent(new Event('change'));
 </script>
 
 @endsection
-

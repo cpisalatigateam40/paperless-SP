@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Pemeriksaan Metal Detector Produk</h4>
+            <h4>Laporan Verifikasi Metal Detector Produk</h4>
             <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Report</a>
         </div>
         <div class="card-body">
@@ -29,6 +29,7 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
                         <th>Dibuat Oleh</th>
                         <th>Aksi</th>
@@ -39,6 +40,7 @@
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name }}</td>
                         <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .2rem;">

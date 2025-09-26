@@ -3,6 +3,7 @@
         <tr>
             <th>Tanggal</th>
             <th>Shift</th>
+            <th>Waktu</th>
             <th>Area</th>
             <th>Dibuat Oleh</th>
             <th>Aksi</th>
@@ -13,7 +14,8 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
             <td>{{ $report->shift }}</td>
-            <td>{{ $report->section_name }}</td>
+            <td>{{ $report->created_at->format('H:i') }}</td>
+            <td>{{ $report->area->name }}</td>
             <td>{{ $report->created_by }}</td>
             <td class="d-flex" style="gap: .3rem;">
                 {{-- Lihat Detail --}}
@@ -87,7 +89,7 @@
         </tr>
 
         <tr class="collapse" id="detail-{{ $report->id }}">
-            <td colspan="5">
+            <td colspan="6">
                 <strong>Area:</strong> {{ $report->area->name ?? '-' }} <br>
 
                 @if($report->approved_by)

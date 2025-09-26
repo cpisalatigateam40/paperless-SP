@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Laporan Pembekuan IQF & Pengemasan Karton Box</h4>
+            <h4>Laporan Verifikasi Pembekuan IQF & Pengemasan Karton Box</h4>
             <a href="{{ route('report_freez_packagings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
 
@@ -32,6 +32,7 @@
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
+                            <th>Waktu</th>
                             <th>Area</th>
                             <th>Dibuat Oleh</th>
                             <th>Aksi</th>
@@ -43,6 +44,7 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">

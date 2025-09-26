@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Report Lab Samples</h4>
+            <h4>Laporan Verifikasi Lab Sample</h4>
             <a href="{{ route('report_lab_samples.create') }}" class="btn btn-sm btn-primary">Tambah Data</a>
         </div>
         <div class="card-body">
@@ -29,9 +29,10 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
                         <th>Sample Storage</th>
-                        <th>Diperiksa</th>
+                        <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -40,6 +41,7 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->storage }}</td>
                         <td>{{ $report->created_by }}</td>
@@ -124,13 +126,14 @@
                     </tr>
 
                     <tr class="collapse" id="detail-{{ $report->id }}">
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="table-responsive mt-2">
                                 <table class="table table-sm table-bordered">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No</th>
                                             <th>Nama Produk</th>
+                                            <th>Gramase</th>
                                             <th>Kode Produksi</th>
                                             <th>Best Before</th>
                                             <th>Jumlah</th>
@@ -142,6 +145,7 @@
                                         <tr>
                                             <td class="text-center">{{ $j + 1 }}</td>
                                             <td>{{ $detail->product->product_name ?? '-' }}</td>
+                                            <td>{{ $detail->gramase }}</td>
                                             <td>{{ $detail->production_code }}</td>
                                             <td>{{ $detail->best_before }}</td>
                                             <td>{{ $detail->quantity }}</td>

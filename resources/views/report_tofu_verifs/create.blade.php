@@ -7,7 +7,9 @@
 
         {{-- HEADER --}}
         <div class="card mb-4">
-            <div class="card-header">Informasi Umum</div>
+            <div class="card-header">
+                <h5>Tambah Laporan Verifikasi Produk Tofu</h5>
+            </div>
             <div class="card-body row g-3">
                 <div class="col-md-3">
                     <label>Tanggal</label>

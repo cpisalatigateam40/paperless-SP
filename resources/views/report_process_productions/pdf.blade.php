@@ -141,9 +141,6 @@
             <td style="text-align: left; border: none;">
                 Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section->section_name }}</span>
-            </td>
         </tr>
     </table>
 
@@ -152,6 +149,10 @@
         <tr>
             <th colspan="2">NAMA PRODUK</th>
             <td colspan="4">{{ $detail->product->product_name ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th colspan="2">GRAMASE</th>
+            <td colspan="4">{{ $detail->gramase ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">KODE PRODUKSI</th>
@@ -217,6 +218,10 @@
         <tr>
             <th colspan="2">REWORK (kg/%)</th>
             <td colspan="4">{{ $detail->rework_kg ?? '-' }} / {{ $detail->rework_percent ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th colspan="2">PRODUK REWORK</th>
+            <td colspan="4">{{ $detail->reworkProduct->product_name ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">TOTAL BAHAN (kg)</th>

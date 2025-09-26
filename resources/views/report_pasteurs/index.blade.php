@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Laporan Pasteurisasi</h4>
+            <h4 class="mb-0">Laporan Verifikasi Pasteurisasi</h4>
             <a href="{{ route('report_pasteurs.create') }}" class="btn btn-primary btn-sm">Tambah Report</a>
         </div>
         <div class="card-body">
@@ -17,7 +17,9 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
+                        <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -26,7 +28,9 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
+                        <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .4rem;">
                             {{-- Toggle Detail --}}
                             <button class="btn btn-info btn-sm" data-bs-toggle="collapse"

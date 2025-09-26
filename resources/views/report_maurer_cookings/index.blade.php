@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h5>Daftar Pemeriksaan Maurer</h5>
+            <h5>Laporan Verifikasi Pemasakan Maurer</h5>
 
             <a href="{{ route('report_maurer_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
@@ -29,10 +29,11 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Area</th>
-                        <th>Section</th>
+                        <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
+                        <th>Area</th>
+                        <th>Dibuat Oleh</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -40,9 +41,10 @@
                     @forelse ($reports as $report)
                     <tr>
                         <td>{{ $report->date }}</td>
-                        <td>{{ $report->area->name ?? '-' }}</td>
-                        <td>{{ $report->section->section_name ?? '-' }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
+                        <td>{{ $report->area->name ?? '-' }}</td>
+                        <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .2rem;">
                             {{-- Toggle Detail --}}
                             <button type="button" class="btn btn-sm btn-info" onclick="toggleDetail({{ $report->id }})"

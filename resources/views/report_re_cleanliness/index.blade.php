@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Daftar Laporan Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan</h4>
+            <h4>Laporan Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan</h4>
             <a href="{{ route('report-re-cleanliness.create') }}" class="btn btn-sm btn-primary">+ Buat Laporan</a>
         </div>
         <div class="card-body">
@@ -28,9 +28,9 @@
                 <thead>
                     <tr>
                         <th>Tanggal</th>
+                        <th>Waktu</th>
                         <th>Area</th>
-                        <th>Pemeriksa</th>
-                        <th>Dibuat</th>
+                        <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -38,9 +38,9 @@
                     @forelse ($reports as $report)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($report->date)->format('d/m/Y') }}</td>
-                        <td>{{ optional($report->area)->name }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
+                        <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->created_by }}</td>
-                        <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>
                         <td class="d-flex" style="gap: .3rem;">
                             {{-- Toggle Detail --}}
                             <button class="btn btn-sm btn-info" onclick="toggleDetail('{{ $report->uuid }}')"

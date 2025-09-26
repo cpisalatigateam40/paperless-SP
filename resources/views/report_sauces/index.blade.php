@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Laporan Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Laporan Verifikasi Pemasakan Produk Di Steam Kettle</h5>
             <a href="{{ route('report_sauces.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
         </div>
         <div class="card-body">
@@ -18,8 +18,8 @@
                         <th>No</th>
                         <th>Tanggal</th>
                         <th>Shift</th>
-                        <th>Produk</th>
                         <th>Waktu</th>
+                        <th>Area</th>
                         <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
@@ -30,8 +30,8 @@
                         <td>{{ $i+1 }}</td>
                         <td>{{ $r->date }}</td>
                         <td>{{ $r->shift }}</td>
-                        <td>{{ $r->product->product_name ?? '-' }}</td>
-                        <td>{{ $r->start_time }} - {{ $r->end_time }}</td>
+                        <td>{{ $r->created_at->format('H:i') }}</td>
+                        <td>{{ $r->area->name ?? '-' }}</td>
                         <td>{{ $r->created_by }}</td>
                         <td class="d-flex" style="gap: .3rem;">
                             {{-- Toggle Detail --}}

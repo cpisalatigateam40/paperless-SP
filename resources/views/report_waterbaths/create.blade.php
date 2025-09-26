@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Tambah Laporan Pengecekan Pasteurisasi Waterbath</h4>
+            <h4>Tambah Laporan Verifikasi Pasteurisasi Waterbath</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_waterbaths.store') }}" method="POST">

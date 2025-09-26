@@ -16,6 +16,7 @@ class DetailProcessProd extends Model
         'uuid',
         'report_uuid',
         'product_uuid',
+        'rework_product_uuid',
         'formula_uuid',
         'production_code',
         'mixing_time',
@@ -25,6 +26,7 @@ class DetailProcessProd extends Model
         'sensory_homogenity',
         'sensory_stiffness',
         'sensory_aroma',
+        'gramase',
     ];
 
     protected static function booted()
@@ -73,4 +75,10 @@ class DetailProcessProd extends Model
     {
         return $this->hasOne(ProcessAging::class, 'detail_uuid', 'uuid');
     }
+
+    public function reworkProduct()
+    {
+        return $this->belongsTo(Product::class, 'rework_product_uuid', 'uuid');
+    }
+
 }

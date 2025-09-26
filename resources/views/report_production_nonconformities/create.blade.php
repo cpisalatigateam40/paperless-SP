@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Tambah Report Ketidaksesuaian Proses Produksi</h4>
+            <h4>Tambah Laporan Verifikasi Ketidaksesuaian Proses Produksi</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_production_nonconformities.store') }}" method="POST"

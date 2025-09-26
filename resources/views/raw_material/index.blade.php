@@ -48,9 +48,9 @@
                         <tr>
                             <th>No</th>
                             <th>Material</th>
-                            <th>Produsen</th>
+                            <!-- <th>Produsen</th> -->
                             <th>Area</th>
-                            <th>Batas Kadaluarsa (Bulan)</th>
+                            <!-- <th>Batas Kadaluarsa (Bulan)</th> -->
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -59,9 +59,9 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $material->material_name }}</td>
-                            <td>{{ $material->supplier }}</td>
+                            <!-- <td>{{ $material->supplier }}</td> -->
                             <td>{{ $material->area->name ?? '-' }}</td>
-                            <td>{{ $material->shelf_life ?? '-' }}</td>
+                            <!-- <td>{{ $material->shelf_life ?? '-' }}</td> -->
                             <td>
                                 <a href="{{ route('raw-materials.edit', $material->uuid) }}"
                                     class="btn btn-warning btn-sm">Edit</a>

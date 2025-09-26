@@ -3,7 +3,8 @@
         <tr>
             <th>Tanggal</th>
             <th>Shift</th>
-            <th>Ruangan</th>
+            <th>Waktu</th>
+            <th>Area</th>
             <th>Dibuat Oleh</th>
             <th>Aksi</th>
         </tr>
@@ -13,7 +14,8 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
             <td>{{ $report->shift }}</td>
-            <td>{{ $report->room_name }}</td>
+            <td>{{ $report->created_at->format('H:i') }}</td>
+            <td>{{ $report->area->name ?? '-' }}</td>
             <td>{{ $report->created_by }}</td>
             <td class="d-flex" style="gap: .3rem;">
                 {{-- Toggle Detail --}}

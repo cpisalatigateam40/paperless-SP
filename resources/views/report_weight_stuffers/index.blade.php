@@ -28,8 +28,9 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
+                        <th>Area</th>
                         <th>Dibuat Oleh</th>
-                        <th>Jumlah Produk</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -38,8 +39,9 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
+                        <td>{{ $report->area->name ?? '-' }}</td>
                         <td>{{ $report->created_by }}</td>
-                        <td>{{ $report->details->count() }}</td>
                         <td class="d-flex" style="gap: .2rem;">
                             {{-- Toggle Detail --}}
                             <button class="btn btn-info btn-sm" data-bs-toggle="collapse"

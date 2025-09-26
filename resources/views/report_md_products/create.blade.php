@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4 class="mb-4">Tambah Pemeriksaan Metal Detector Produk</h4>
+            <h4 class="mb-4">Tambah Laporan Verifikasi Metal Detector Produk</h4>
         </div>
         <div class="card-body">
             <form method="POST" action="{{ route('report_md_products.store') }}">

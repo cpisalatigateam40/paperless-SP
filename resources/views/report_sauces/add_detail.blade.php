@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Tambah Detail Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Tambah Detail Verifikasi Pemasakan Produk Di Steam Kettle</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('report_sauces.store_detail', $report->uuid) }}" method="POST">

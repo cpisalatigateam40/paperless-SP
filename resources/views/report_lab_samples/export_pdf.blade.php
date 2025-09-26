@@ -173,6 +173,7 @@
             <tr>
                 <th>No</th>
                 <th>Nama Produk</th>
+                <th>Gramase</th>
                 <th>Kode Produksi</th>
                 <th>Best Before</th>
                 <th>Jumlah</th>
@@ -184,6 +185,7 @@
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
+                <td>{{ $detail->gramase }}</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
                 <td>{{ $detail->quantity }}</td>

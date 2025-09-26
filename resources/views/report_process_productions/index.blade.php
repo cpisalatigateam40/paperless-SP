@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Laporan Proses Produksi</h4>
+            <h4>Laporan Verifikasi Proses Produksi</h4>
             <a href="{{ route('report_process_productions.create') }}" class="btn btn-primary btn-sm">+ Tambah
                 Laporan</a>
         </div>
@@ -30,8 +30,8 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
-                        <th>Seksi</th>
                         <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
@@ -41,8 +41,8 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ $report->area->name ?? '-' }}</td>
-                        <td>{{ $report->section->section_name ?? '-' }}</td>
                         <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .2rem;">
                             {{-- Toggle Detail --}}
@@ -135,7 +135,11 @@
                                     <tr>
                                         <th colspan="2">NAMA PRODUK</th>
                                         <td colspan="4">{{ $detail->product->product_name ?? '-' }}
-                                            {{ $detail->product->nett_weight ?? '-' }}</td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="2">GRAMASE</th>
+                                        <td colspan="4">{{ $detail->gramase ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th colspan="2">KODE PRODUKSI</th>
@@ -205,6 +209,10 @@
 
                                         <td colspan="4">{{ $detail->rework_kg ?? '-' }} /
                                             {{ $detail->rework_percent ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="2">PRODUK REWORK</th>
+                                        <td colspan="4">{{ $detail->reworkProduct->product_name ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th colspan="2">TOTAL BAHAN (kg)</th>

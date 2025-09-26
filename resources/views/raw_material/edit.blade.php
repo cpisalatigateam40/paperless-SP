@@ -17,7 +17,7 @@
                         value="{{ $rawMaterial->material_name }}" required>
                 </div>
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="supplier" class="form-label">Produsen</label>
                     <input type="text" name="supplier" id="supplier" class="form-control"
                         value="{{ $rawMaterial->supplier }}">
@@ -27,7 +27,7 @@
                     <label for="shelf_life" class="form-label">Batas Kadaluarsa (Bulan)</label>
                     <input type="number" name="shelf_life" id="shelf_life" class="form-control"
                         value="{{ $rawMaterial->shelf_life }}">
-                </div>
+                </div> -->
 
                 <button type="submit" class="btn btn-primary">Update</button>
                 <a href="{{ route('raw-materials.index') }}" class="btn btn-secondary">Kembali</a>

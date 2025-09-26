@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Daftar Report Ketidaksesuaian Proses Produksi</h4>
+            <h4>Laporan Verifikasi Ketidaksesuaian Proses Produksi</h4>
             <a href="{{ route('report_production_nonconformities.create') }}" class="btn btn-sm btn-primary">
                 + Tambah Report
             </a>
@@ -33,9 +33,9 @@
                         <tr>
                             <th>Tanggal</th>
                             <th>Shift</th>
-                            <th>Dibuat Oleh</th>
-                            <th>Jumlah Temuan</th>
+                            <th>Waktu</th>
                             <th>Area</th>
+                            <th>Dibuat Oleh</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -44,9 +44,9 @@
                         <tr>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
-                            <td>{{ $report->created_by }}</td>
-                            <td>{{ $report->details->count() }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ optional($report->area)->name ?? '-' }}</td>
+                            <td>{{ $report->created_by }}</td>
                             <td class="d-flex align-items-center" style="gap: .2rem;">
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm toggle-detail"

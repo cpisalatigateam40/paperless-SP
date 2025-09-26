@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Report Pembuatan Emulsi</h4>
+            <h4>Laporan Verifikasi Pembuatan Emulsi</h4>
             <a href="{{ route('report_emulsion_makings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
 
@@ -30,7 +30,9 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Shift</th>
+                        <th>Waktu</th>
                         <th>Area</th>
+                        <th>Dibuat Oleh</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -39,7 +41,9 @@
                     <tr>
                         <td>{{ $report->date }}</td>
                         <td>{{ $report->shift }}</td>
+                        <td>{{ $report->created_at->format('H:i') }}</td>
                         <td>{{ optional($report->area)->name }}</td>
+                        <td>{{ $report->created_by }}</td>
                         <td class="d-flex" style="gap: .2rem;">
                             {{-- Toggle Detail --}}
                             <button class="btn btn-info btn-sm" data-bs-toggle="collapse"

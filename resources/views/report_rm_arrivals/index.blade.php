@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-middle">
-            <h5>Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang</h5>
+            <h5>Laporan Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang</h5>
             <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
         </div>
 

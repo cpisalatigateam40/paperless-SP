@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Daftar Laporan GMP Karyawan & Kontrol Sanitasi</h5>
+            <h5> Laporan Verifikasi GMP Karyawan & Kontrol Sanitasi</h5>
             <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
 
@@ -32,6 +32,7 @@
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
+                            <th>Waktu</th>
                             <th>Area</th>
                             <th>Dibuat oleh</th>
                             <th>Aksi</th>
@@ -43,6 +44,7 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
                             <td> {{ $report->details->first()->section_name ?? '-' }}</td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex flex-wrap align-items-center" style="gap: .3rem;">
@@ -134,7 +136,7 @@
 
                         {{-- Detail Row --}}
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="6">
+                            <td colspan="7">
                                 <strong>Area:</strong> {{ $report->area->name ?? '-' }}<br><br>
 
                                 <h6 class="fw-bold mt-4">GMP Karyawan</h6>

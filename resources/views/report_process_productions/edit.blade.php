@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Edit Laporan Proses Produksi</h4>
+            <h4>Edit Laporan Verifikasi Proses Produksi</h4>
         </div>
         <div class="card-body">
 
@@ -18,26 +18,13 @@
 
                 {{-- HEADER --}}
                 <div class="row">
-                    <div class="mb-3 col-md-4">
-                        <label>Section</label>
-                        <select name="section_uuid" class="form-control" required>
-                            <option value="">-- Pilih Section --</option>
-                            @foreach ($sections as $section)
-                            <option value="{{ $section->uuid }}"
-                                {{ old('section_uuid', $report->section_uuid) == $section->uuid ? 'selected' : '' }}>
-                                {{ $section->section_name }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-6">
                         <label>Tanggal</label>
                         <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}"
                             required>
                     </div>
 
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-6">
                         <label>Shift</label>
                         <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}"
                             required>
@@ -48,43 +35,57 @@
 
                 {{-- DETAIL PRODUK --}}
                 <h5 class="mt-4 font-weight-bold">Detail Produk</h5>
-                <div class="mb-3">
-                    <label>Produk</label>
-                    <select name="product_uuid" id="product-select" class="form-control" required>
-                        <option value="">-- Pilih Produk --</option>
-                        @foreach ($products as $product)
-                        <option value="{{ $product->uuid }}"
-                            {{ old('product_uuid', $detail->product_uuid) == $product->uuid ? 'selected' : '' }}>
-                            {{ $product->product_name }}
-                        </option>
-                        @endforeach
-                    </select>
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <label>Produk</label>
+                        <select name="product_uuid" id="product-select" class="form-control select2" required>
+                            <option value="">-- Pilih Produk --</option>
+                            @foreach ($products as $product)
+                            <option value="{{ $product->uuid }}"
+                                {{ old('product_uuid', $detail->product_uuid) == $product->uuid ? 'selected' : '' }}>
+                                {{ $product->product_name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label>Formula</label>
-                    <select name="formula_uuid" id="formula-select" class="form-control" required>
-                        <option value="">-- Pilih Formula --</option>
-                        @foreach($formulas as $formula)
-                        <option value="{{ $formula->uuid }}"
-                            {{ old('formula_uuid', $detail->formula_uuid) == $formula->uuid ? 'selected' : '' }}>
-                            {{ $formula->formula_name }}
-                        </option>
-                        @endforeach
-                    </select>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Gramase</label>
+                        <input type="number" step="0.01" name="gramase" class="form-control"
+                            value="{{ old('gramase', $detail->gramase) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Kode Produksi</label>
+                        <input type="text" name="production_code" class="form-control"
+                            value="{{ old('production_code', $detail->production_code) }}">
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label>Kode Produksi</label>
-                    <input type="text" name="production_code" class="form-control"
-                        value="{{ old('production_code', $detail->production_code) }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label>Formula</label>
+                        <select name="formula_uuid" id="formula-select" class="form-control" required>
+                            <option value="">-- Pilih Formula --</option>
+                            @foreach($formulas as $formula)
+                            <option value="{{ $formula->uuid }}"
+                                {{ old('formula_uuid', $detail->formula_uuid) == $formula->uuid ? 'selected' : '' }}>
+                                {{ $formula->formula_name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Waktu Mixing</label>
+                        <input type="text" name="mixing_time" class="form-control"
+                            value="{{ old('mixing_time', $detail->mixing_time) }}">
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label>Waktu Mixing</label>
-                    <input type="text" name="mixing_time" class="form-control"
-                        value="{{ old('mixing_time', $detail->mixing_time) }}">
-                </div>
+
 
                 <hr>
 
@@ -131,17 +132,30 @@
 
                 <h5 class="mt-4 font-weight-bold">Penggunaan Rework</h5>
                 <div class="row mt-4">
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-3">
                         <label>Rework (kg)</label>
                         <input type="number" step="0.01" name="rework_kg" class="form-control"
                             value="{{ old('rework_kg', $detail->rework_kg) }}">
                     </div>
-                    <div class="mb-3 col-md-4">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Produk Rework</label>
+                        <select name="rework_product_uuid" class="form-control select2">
+                            <option value="">-- Pilih Produk Rework --</option>
+                            @foreach ($products as $product)
+                            <option value="{{ $product->uuid }}"
+                                {{ old('rework_product_uuid', $detail->rework_product_uuid) == $product->uuid ? 'selected' : '' }}>
+                                {{ $product->product_name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3 col-md-3">
                         <label>Rework (%)</label>
                         <input type="number" step="0.01" name="rework_percent" class="form-control"
                             value="{{ old('rework_percent', $detail->rework_percent) }}">
                     </div>
-                    <div class="mb-3 col-md-4">
+                    <div class="mb-3 col-md-3">
                         <label>Total Bahan (kg)</label>
                         <input type="number" step="0.01" name="total_material" class="form-control"
                             value="{{ old('total_material', $detail->total_material) }}">

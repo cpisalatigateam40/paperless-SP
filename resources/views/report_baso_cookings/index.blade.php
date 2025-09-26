@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Laporan Pemeriksaan Pemasakan Baso</h5>
+            <h5 class="mb-0">Laporan Verifikasi Pemasakan Baso</h5>
             <a href="{{ route('report_baso_cookings.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
         </div>
 
@@ -19,11 +19,14 @@
                         <tr>
                             <th>Tanggal</th>
                             <th>Shift</th>
+                            <th>Waktu</th>
+                            <th>Area</th>
                             <th>Produk</th>
                             <th>STD Suhu Pusat</th>
                             <th>STD Berat akhir/potong</th>
                             <th>Set suhu tangki perebusan 1</th>
                             <th>Set suhu tangki perebusan 2</th>
+                            <th>Dibuat Oleh</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -32,11 +35,14 @@
                         <tr>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
+                            <td>{{ $report->area->name ?? '-' }}</td>
                             <td>{{ $report->product->product_name ?? '-' }}</td>
                             <td>{{ $report->std_core_temp ?? '-' }}</td>
                             <td>{{ $report->std_weight ?? '-' }}</td>
                             <td>{{ $report->set_boiling_1 ?? '-' }}</td>
                             <td>{{ $report->set_boiling_2 ?? '-' }}</td>
+                            <td>{{ $report->created_by }}</td>
                             <td class="d-flex align-items-center" style="gap: .2rem;">
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
@@ -109,7 +115,7 @@
                             </td>
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="8">
+                            <td colspan="11">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm text-center align-middle">
                                         <thead class="table-secondary">

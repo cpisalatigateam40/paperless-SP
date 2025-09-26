@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Tofu Product Verification Reports</h5>
+            <h5 class="mb-0">Laporan Verifikasi Produk Tofu</h5>
             <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">+ New Report</a>
         </div>
         <div class="card-body">
@@ -25,14 +25,16 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-sm table-bordered align-middle">
+                <table class="table  table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Date</th>
+                            <th>Tanggal</th>
                             <th>Shift</th>
-                            <th>Created By</th>
-                            <th>Actions</th>
+                            <th>Waktu</th>
+                            <th>Area</th>
+                            <th>Dibuat Oleh</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,6 +43,8 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
+                            <td>{{ $report->area->name ?? '-' }}</td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">
                                 {{-- Toggle Detail --}}
@@ -128,7 +132,7 @@
 
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="table-responsive mt-2">
                                     @php
                                     $products = $report->productInfos;

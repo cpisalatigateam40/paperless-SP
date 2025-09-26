@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4 class="mb-0">Tambah Detail Laporan Pasteurisasi</h4>
+            <h4 class="mb-0">Tambah Detail Laporan Verifikasi Pasteurisasi</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_pasteurs.store_detail', $report->uuid) }}" method="POST" id="pasteur-form"
