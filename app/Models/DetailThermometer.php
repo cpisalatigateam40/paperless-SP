@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailThermometer extends Model
+class DetailThermometer extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_thermometers';
 
@@ -19,6 +21,10 @@ class DetailThermometer extends Model
         'time_1',
         'time_2',
         'note',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected $casts = [

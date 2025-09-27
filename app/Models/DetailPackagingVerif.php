@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailPackagingVerif extends Model
+class DetailPackagingVerif extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'detail_packaging_verifs';
 
     protected $fillable = [
@@ -20,6 +23,10 @@ class DetailPackagingVerif extends Model
         'upload_md',
         'upload_qr',
         'upload_ed',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function report()

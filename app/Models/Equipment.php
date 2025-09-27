@@ -7,14 +7,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Equipment extends Model
+class Equipment extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'equipments';
 
     protected $fillable = ['uuid', 'name', 'area_uuid'];
+
+    protected $auditEvents = [
+        'updated',
+    ];
 
     protected static function booted()
     {

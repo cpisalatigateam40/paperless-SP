@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailScale extends Model
+class DetailScale extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_scales';
 
@@ -19,6 +21,10 @@ class DetailScale extends Model
         'time_1',
         'time_2',
         'notes',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function booted()

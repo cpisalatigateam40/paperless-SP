@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DataFreezing extends Model
+class DataFreezing extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'data_freezings';
 
@@ -21,6 +23,10 @@ class DataFreezing extends Model
         'iqf_suction_temp',
         'freezing_time_display',
         'freezing_time_actual',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

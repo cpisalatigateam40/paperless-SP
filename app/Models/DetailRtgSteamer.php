@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailRtgSteamer extends Model
+class DetailRtgSteamer extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_rtg_steamers';
 
@@ -29,6 +31,10 @@ class DetailRtgSteamer extends Model
         'sensory_color',
         'qc_paraf',
         'production_paraf',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     // Relasi ke Report

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class PositionMdProduct extends Model
+class PositionMdProduct extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'position_md_products';
 
     protected $fillable = [
@@ -14,6 +17,10 @@ class PositionMdProduct extends Model
         'specimen',
         'position',
         'status',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected $casts = [

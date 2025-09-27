@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailGmpEmployee extends Model
+class DetailGmpEmployee extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_gmp_employees';
 
@@ -20,6 +22,10 @@ class DetailGmpEmployee extends Model
         'notes',
         'corrective_action',
         'verification',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function report()

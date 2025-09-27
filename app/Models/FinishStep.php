@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FinishStep extends Model
+class FinishStep extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'finish_steps';
 
@@ -17,6 +19,10 @@ class FinishStep extends Model
         'step_uuid',
         'product_core_temp',
         'sortation',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

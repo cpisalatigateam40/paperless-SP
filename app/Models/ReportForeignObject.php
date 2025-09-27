@@ -26,14 +26,15 @@ class ReportForeignObject extends Model implements Auditable
         'approved_at',
     ];
 
+    protected $auditEvents = [
+        'updated',
+    ];
+
     protected $casts = [
         'approved_at' => 'datetime',
         'date' => 'date',
     ];
 
-    protected $auditEvents = [
-        'updated',
-    ];
 
     public function details()
     {

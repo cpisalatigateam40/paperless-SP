@@ -140,10 +140,10 @@ $isKetidaksesuaian = Request::is([
                 <!-- <a class="collapse-item {{ Request::is('standard-stuffers*') ? 'active' : '' }}"
                     href="{{ route('standard-stuffers.index') }}">Standar Stuffer</a> -->
 
-                <a class="collapse-item {{ Request::is('maurer-standards*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('maurer-standards*') ? 'active' : '' }}"
                     href="{{ route('maurer-standards.index') }}">Standar Maurer</a>
                 <a class="collapse-item {{ Request::is('fessman-standards*') ? 'active' : '' }}"
-                    href="{{ route('fessman-standards.index') }}">Standar Fessman</a>
+                    href="{{ route('fessman-standards.index') }}">Standar Fessman</a> -->
             </div>
         </div>
     </li>

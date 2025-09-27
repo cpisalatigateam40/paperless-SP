@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportLabSample extends Model
+class ReportLabSample extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'uuid',
@@ -21,6 +23,10 @@ class ReportLabSample extends Model
         'accepted_by',
         'approved_by',
         'approved_at',
+    ];
+    
+    protected $auditEvents = [
+        'updated',
     ];
 
     // Relasi ke detail_lab_samples

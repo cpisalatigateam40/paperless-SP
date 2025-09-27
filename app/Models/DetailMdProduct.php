@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailMdProduct extends Model
+class DetailMdProduct extends Model implements Auditable
 {
+
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'detail_md_products';
 
     protected $fillable = [
@@ -19,6 +23,10 @@ class DetailMdProduct extends Model
         'program_number',
         'corrective_action',
         'verification',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected $casts = [

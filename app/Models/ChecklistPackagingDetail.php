@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ChecklistPackagingDetail extends Model
+class ChecklistPackagingDetail extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'checklist_packaging_details';
 
     protected $fillable = [
@@ -88,8 +91,15 @@ class ChecklistPackagingDetail extends Model
         'avg_weight',
         'verif_md',
         'notes',
+        'sampling_amount',
+        'unit',
+        'sampling_result',
 
         
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
 

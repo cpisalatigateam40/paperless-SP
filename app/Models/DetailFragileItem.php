@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailFragileItem extends Model
+class DetailFragileItem extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_fragile_items';
 
@@ -20,6 +22,10 @@ class DetailFragileItem extends Model
         'time_start',
         'time_end',
         'notes',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

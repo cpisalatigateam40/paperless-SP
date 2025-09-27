@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class RmSiomay extends Model
+class RmSiomay extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'rm_siomays';
     protected $fillable = [
@@ -16,6 +18,10 @@ class RmSiomay extends Model
         'raw_material_uuid',
         'amount',
         'sensory',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function detail()

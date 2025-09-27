@@ -151,6 +151,7 @@
             <th rowspan="2">Best Before</th> -->
             <th colspan="2">In cutting</th>
             <th colspan="2">Proses Pengemasan</th>
+            <th colspan="2">Sampling Kemasan</th>
             <th colspan="2">Hasil Sealing</th>
             <th rowspan="2">Isi Per-Pack</th>
             <th colspan="3">Panjang Produk Per Pcs</th>
@@ -164,6 +165,8 @@
             <th>Mesin</th>
             <th>Thermoformer</th>
             <th>Manual</th>
+            <th>Jumlah Sampling</th>
+            <th>Hasil Sampling</th>
             <th>Kondisi Seal</th>
             <th>Vacum</th>
             <th>Standar</th>
@@ -248,6 +251,10 @@
             {{-- Packaging thermoformer & manual, rowspan --}}
             <td rowspan="5">{{ $checklist?->packaging_thermoformer_1 ?? '-' }}</td>
             <td rowspan="5">{{ $checklist?->packaging_manual_1 ?? '-' }}</td>
+
+            <td rowspan="5">{{ $checklist?->sampling_amount ?? '-' }}
+                {{ $checklist?->unit ?? '-' }}</td>
+            <td rowspan="5">{{ $checklist?->sampling_result ?? '-' }}</td>
             @endif
 
             {{-- Hasil sealing & isi per-pack, per baris --}}
@@ -291,7 +298,7 @@
             @endforeach
 
             <tr>
-                <td colspan="23" class="text-end" style="border: none;">QM 05 / 01</td>
+                <td colspan="25" class="text-end" style="border: none;">QM 05 / 01</td>
             </tr>
 
     </table>

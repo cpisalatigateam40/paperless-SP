@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportWeightStuffer extends Model
+class ReportWeightStuffer extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'uuid',
@@ -19,6 +21,10 @@ class ReportWeightStuffer extends Model
         'known_by',
         'approved_by',
         'approved_at',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function area()

@@ -7,14 +7,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Room extends Model
+class Room extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'rooms';
 
     protected $fillable = ['uuid', 'name', 'area_uuid'];
+
+    protected $auditEvents = [
+        'updated',
+    ];
 
     protected static function booted()
     {

@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportMdProduct extends Model
+class ReportMdProduct extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'report_md_products';
 
     protected $fillable = [
@@ -18,6 +21,10 @@ class ReportMdProduct extends Model
         'known_by',
         'approved_by',
         'approved_at',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected $casts = [

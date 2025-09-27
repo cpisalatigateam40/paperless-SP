@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailMetalDetector extends Model
+
+class DetailMetalDetector extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'detail_metal_detectors';
 
     protected $fillable = [
@@ -22,6 +25,11 @@ class DetailMetalDetector extends Model
         'corrective_action',
         'verif_after_correct',
         'notes',
+    ];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'date' => 'date',
     ];
 
     public function report()

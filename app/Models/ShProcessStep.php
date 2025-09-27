@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ShProcessStep extends Model
+class ShProcessStep extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'sh_process_steps';
 
@@ -24,6 +26,10 @@ class ShProcessStep extends Model
         'time_minutes_2',
         'product_temperature_1',
         'product_temperature_2'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

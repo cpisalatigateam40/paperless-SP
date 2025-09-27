@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportTofuVerif extends Model
+class ReportTofuVerif extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_tofu_verifs';
 
@@ -32,6 +34,10 @@ class ReportTofuVerif extends Model
         });
         static::addGlobalScope(new UserAreaScope);
     }
+
+    protected $auditEvents = [
+        'updated',
+    ];
 
     public function area()
     {

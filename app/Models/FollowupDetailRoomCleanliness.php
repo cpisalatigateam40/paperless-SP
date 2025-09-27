@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FollowupDetailRoomCleanliness extends Model
+class FollowupDetailRoomCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'followup_detail_room_cleanliness';
 
@@ -16,6 +18,10 @@ class FollowupDetailRoomCleanliness extends Model
         'notes',
         'corrective_action',
         'verification'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function detail()

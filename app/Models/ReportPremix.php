@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportPremix extends Model
+class ReportPremix extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'uuid',
@@ -26,6 +28,11 @@ class ReportPremix extends Model
         'date' => 'date',
         'approved_at' => 'datetime',
     ];
+
+    protected $auditEvents = [
+        'updated',
+    ];
+
 
     protected static function boot()
     {

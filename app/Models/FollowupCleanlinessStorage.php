@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FollowupCleanlinessStorage extends Model
+class FollowupCleanlinessStorage extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'followup_cleanliness_storage';
 
     protected $fillable = [
@@ -13,6 +16,10 @@ class FollowupCleanlinessStorage extends Model
         'notes',
         'corrective_action',
         'verification',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function item()

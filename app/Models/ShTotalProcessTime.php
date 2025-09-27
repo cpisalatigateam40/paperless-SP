@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ShTotalProcessTime extends Model
+class ShTotalProcessTime extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'sh_total_process_times';
 
@@ -18,6 +20,10 @@ class ShTotalProcessTime extends Model
         'start_time',
         'end_time',
         'total_duration',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

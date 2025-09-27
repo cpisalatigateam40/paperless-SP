@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FsSensoryCheck extends Model
+class FsSensoryCheck extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'fs_sensory_checks';
 
@@ -21,6 +23,10 @@ class FsSensoryCheck extends Model
         'texture',
         'color',
         'can_be_twisted',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

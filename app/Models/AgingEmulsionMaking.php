@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class AgingEmulsionMaking extends Model
+class AgingEmulsionMaking extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'aging_emulsion_makings';
 
@@ -20,6 +22,10 @@ class AgingEmulsionMaking extends Model
         'sensory_color',
         'sensory_texture',
         'temp_after',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function header()

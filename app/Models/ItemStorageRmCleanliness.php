@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ItemStorageRmCleanliness extends Model
+class ItemStorageRmCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'item_storage_rm_cleanliness';
     protected $fillable = [
@@ -17,6 +19,10 @@ class ItemStorageRmCleanliness extends Model
         'notes',
         'corrective_action',
         'verification'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function detail()

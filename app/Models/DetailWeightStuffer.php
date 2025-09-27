@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailWeightStuffer extends Model
+class DetailWeightStuffer extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'uuid',
@@ -18,6 +20,10 @@ class DetailWeightStuffer extends Model
         'weight_standard',
         'long_standard',
         'machine',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function report()

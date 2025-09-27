@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FollowupSanitation extends Model
+class FollowupSanitation extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+    
     protected $table = 'followup_sanitations';
 
     protected $fillable = [
@@ -13,6 +16,10 @@ class FollowupSanitation extends Model
         'notes',
         'action',
         'verification',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function sanitationArea()

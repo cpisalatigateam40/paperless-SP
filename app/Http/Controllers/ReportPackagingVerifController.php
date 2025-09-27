@@ -99,6 +99,9 @@ class ReportPackagingVerifController extends Controller
                 'avg_weight' => $detail['checklist']['avg_weight'],
                 'verif_md' => $detail['checklist']['verif_md'],
                 'notes' => $detail['checklist']['notes'],
+                'sampling_amount' => $detail['checklist']['sampling_amount'],
+                'unit' => $detail['checklist']['unit'],
+                'sampling_result' => $detail['checklist']['sampling_result'],
             ];
 
             // ✅ Mapping radio In Cutting → hanya kolom _1 yang diisi, _2.._5 null
@@ -190,8 +193,6 @@ class ReportPackagingVerifController extends Controller
                 'report_uuid' => $report->uuid,
                 'product_uuid' => $detail['product_uuid'],
                 'time' => $detail['time'],
-                // 'production_code' => $detail['production_code'],
-                // 'expired_date' => $detail['expired_date'],
                 'upload_md' => $uploadMd,
                 'upload_qr' => $uploadQr,
                 'upload_ed' => $uploadEd,
@@ -219,6 +220,9 @@ class ReportPackagingVerifController extends Controller
                 'avg_weight' => $detail['checklist']['avg_weight'],
                 'verif_md' => $detail['checklist']['verif_md'],
                 'notes' => $detail['checklist']['notes'],
+                'sampling_amount' => $detail['checklist']['sampling_amount'],
+                'unit' => $detail['checklist']['unit'],
+                'sampling_result' => $detail['checklist']['sampling_result'],
             ];
 
             // ✏ Mapping radio In Cutting: hanya in_cutting_manual_1 atau in_cutting_machine_1 yg "OK", sisanya null
@@ -317,7 +321,7 @@ class ReportPackagingVerifController extends Controller
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
         ])
-            ->setPaper('a4', 'landscape');
+            ->setPaper([0, 0, 1200, 595]);
 
         return $pdf->stream('report-packaging-' . $report->date . '.pdf');
     }

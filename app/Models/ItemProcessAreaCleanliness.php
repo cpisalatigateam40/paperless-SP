@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ItemProcessAreaCleanliness extends Model
+class ItemProcessAreaCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'item_process_area_cleanliness';
 
@@ -20,6 +22,10 @@ class ItemProcessAreaCleanliness extends Model
         'verification',
         'temperature_actual',
         'temperature_display',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function detail()

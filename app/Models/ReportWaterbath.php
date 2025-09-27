@@ -5,15 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportWaterbath extends Model
+class ReportWaterbath extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_waterbaths';
+    
     protected $fillable = [
         'uuid', 'area_uuid', 'date', 'shift', 'created_by',
         'known_by', 'approved_by', 'approved_at'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     // Relasi ke Area

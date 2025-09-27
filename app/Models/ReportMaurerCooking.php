@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportMaurerCooking extends Model
+class ReportMaurerCooking extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_maurer_cookings';
 
@@ -23,6 +25,10 @@ class ReportMaurerCooking extends Model
         'known_by',
         'approved_by',
         'approved_at'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

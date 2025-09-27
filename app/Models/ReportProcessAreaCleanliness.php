@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportProcessAreaCleanliness extends Model
+class ReportProcessAreaCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_process_area_cleanliness';
 
@@ -21,6 +23,10 @@ class ReportProcessAreaCleanliness extends Model
         'created_by',
         'known_by',
         'approved_by',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function area()

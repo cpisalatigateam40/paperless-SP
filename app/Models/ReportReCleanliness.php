@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportReCleanliness extends Model
+class ReportReCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_re_cleanliness';
 
@@ -22,6 +24,10 @@ class ReportReCleanliness extends Model
         'known_by',
         'approved_by',
         'approved_at'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function booted()

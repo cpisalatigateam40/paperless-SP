@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportPasteur extends Model
+class ReportPasteur extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_pasteurs';
 
@@ -24,6 +26,10 @@ class ReportPasteur extends Model
         'approved_at',
         'problem',
         'corrective_action',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

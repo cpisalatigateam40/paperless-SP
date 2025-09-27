@@ -137,10 +137,9 @@
                                             <th rowspan="2">Upload MD BPOM</th>
                                             <th rowspan="2">Upload QR Code</th>
                                             <th rowspan="2">Upload Kode Produksi & Best Before</th>
-                                            <!-- <th rowspan="2">Kode Produksi</th>
-                                                    <th rowspan="2">Best Before</th> -->
                                             <th colspan="2">In cutting</th>
                                             <th colspan="2">Proses Pengemasan</th>
+                                            <th colspan="2">Sampling Kemasan</th>
                                             <th colspan="2">Hasil Sealing</th>
                                             <th rowspan="2">Isi Per-Pack</th>
                                             <th colspan="3">Panjang Produk Per Pcs</th>
@@ -154,6 +153,11 @@
                                             <th>Mesin</th>
                                             <th>Thermoformer</th>
                                             <th>Manual</th>
+
+                                            <th>Jumlah Sampling</th>
+                                            <th>Hasil Sampling</th>
+
+
                                             <th>Kondisi Seal</th>
                                             <th>Vacum</th>
                                             <th>Standar</th>
@@ -198,8 +202,6 @@
                                                 </a>
                                                 @endif
                                             </td>
-                                            <!-- <td rowspan="5">{{ $d->production_code }}</td>
-                                                                <td rowspan="5">{{ $d->expired_date }}</td> -->
 
                                             {{-- In cutting manual & mesin sama, rowspan --}}
                                             <td rowspan="5">{{ $checklist?->in_cutting_manual_1 ?? '-' }}</td>
@@ -208,6 +210,10 @@
                                             {{-- Packaging thermoformer & manual, rowspan --}}
                                             <td rowspan="5">{{ $checklist?->packaging_thermoformer_1 ?? '-' }}</td>
                                             <td rowspan="5">{{ $checklist?->packaging_manual_1 ?? '-' }}</td>
+
+                                            <td rowspan="5">{{ $checklist?->sampling_amount ?? '-' }}
+                                                {{ $checklist?->unit ?? '-' }}</td>
+                                            <td rowspan="5">{{ $checklist?->sampling_result ?? '-' }}</td>
                                             @endif
 
                                             {{-- Hasil sealing & isi per-pack, per baris --}}

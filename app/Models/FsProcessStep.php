@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FsProcessStep extends Model
+class FsProcessStep extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'fs_process_steps';
 
@@ -25,6 +27,10 @@ class FsProcessStep extends Model
         'product_temp_1',
         'product_temp_2',
         'actual_product_temp',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

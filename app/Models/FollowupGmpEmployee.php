@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class FollowupGmpEmployee extends Model
+class FollowupGmpEmployee extends Model implements Auditable
 
 {
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'followup_gmp_employee';
     
@@ -15,6 +17,10 @@ class FollowupGmpEmployee extends Model
         'notes',
         'action',
         'verification',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function detail()

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class BasoTemperature extends Model
+class BasoTemperature extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'baso_temperatures';
     protected $fillable = [
@@ -21,6 +23,10 @@ class BasoTemperature extends Model
         'baso_temp_4',
         'baso_temp_5',
         'avg_baso_temp',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     // Relasi ke Detail

@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailFreezPackaging extends Model
+class DetailFreezPackaging extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_freez_packagings';
 
@@ -22,6 +24,10 @@ class DetailFreezPackaging extends Model
         'best_before',
         'corrective_action',
         'verif_after',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

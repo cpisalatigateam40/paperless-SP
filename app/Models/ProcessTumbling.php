@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ProcessTumbling extends Model
+class ProcessTumbling extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'process_tumblings';
 
@@ -16,6 +18,10 @@ class ProcessTumbling extends Model
         'uuid',
         'detail_uuid',
         'tumbling_process'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function booted()

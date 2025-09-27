@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class TofuDefectVerif extends Model
+class TofuDefectVerif extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'tofu_defect_verifs';
 
@@ -18,6 +20,10 @@ class TofuDefectVerif extends Model
         'turus',
         'total',
         'percentage'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

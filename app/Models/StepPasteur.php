@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class StepPasteur extends Model
+class StepPasteur extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'step_pasteurs';
 
@@ -18,6 +20,10 @@ class StepPasteur extends Model
         'step_name',
         'step_order',
         'step_type',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

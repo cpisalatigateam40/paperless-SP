@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class MeasurementScale extends Model
+class MeasurementScale extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'measurement_scales';
 
@@ -18,6 +20,9 @@ class MeasurementScale extends Model
         'inspection_time_index',
         'standard_weight',
         'measured_value',
+    ];
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function booted()

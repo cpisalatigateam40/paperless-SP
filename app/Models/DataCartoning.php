@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DataCartoning extends Model
+class DataCartoning extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'data_cartonings';
 
@@ -28,6 +30,10 @@ class DataCartoning extends Model
         'avg_weight',
         'content_rtg',
         'carton_condition',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailBasoCooking extends Model
+class DetailBasoCooking extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_baso_cookings';
     protected $fillable = [
@@ -26,6 +28,10 @@ class DetailBasoCooking extends Model
         'final_weight',
         'qc_paraf',
         'prod_paraf',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     // Relasi ke Report

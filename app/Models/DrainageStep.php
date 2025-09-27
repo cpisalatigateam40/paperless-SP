@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DrainageStep extends Model
+class DrainageStep extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'drainage_steps';
 
@@ -17,6 +19,10 @@ class DrainageStep extends Model
         'step_uuid',
         'start_time',
         'end_time',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

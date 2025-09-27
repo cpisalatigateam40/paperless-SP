@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class SanitationCheck extends Model
+class SanitationCheck extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'sanitation_checks';
 
@@ -19,6 +21,10 @@ class SanitationCheck extends Model
         'hour_2',
         'verification',
         'report_gmp_employee_id'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function area()

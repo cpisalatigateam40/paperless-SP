@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailProductionNonconformity extends Model
+class DetailProductionNonconformity extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_production_nonconformities';
 
@@ -22,6 +24,10 @@ class DetailProductionNonconformity extends Model
         'disposition',
         'evidence',
         'remark',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function booted()

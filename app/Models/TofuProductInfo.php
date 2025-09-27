@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class TofuProductInfo extends Model
+class TofuProductInfo extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'tofu_product_infos';
 
@@ -17,6 +19,10 @@ class TofuProductInfo extends Model
         'production_code',
         'expired_date',
         'sample_amount'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

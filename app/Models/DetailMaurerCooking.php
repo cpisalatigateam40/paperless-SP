@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailMaurerCooking extends Model
+class DetailMaurerCooking extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'detail_maurer_cookings';
 
@@ -20,6 +22,10 @@ class DetailMaurerCooking extends Model
         'packaging_weight',
         'trolley_count',
         'can_be_twisted'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     protected static function boot()

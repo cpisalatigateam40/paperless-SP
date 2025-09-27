@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Scopes\UserAreaScope;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportMetalDetector extends Model
+class ReportMetalDetector extends Model implements Auditable
 {
     protected $table = 'report_metal_detectors';
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'uuid',
@@ -20,6 +22,11 @@ class ReportMetalDetector extends Model
         'approved_by',
         'approved_at',
     ];
+    
+    protected $auditEvents = [
+        'updated',
+    ];
+    
 
     public function details()
     {

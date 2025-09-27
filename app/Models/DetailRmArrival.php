@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class DetailRmArrival extends Model
+class DetailRmArrival extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'uuid',
@@ -26,6 +28,10 @@ class DetailRmArrival extends Model
         'contamination',
         'problem',
         'corrective_action',
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function report()

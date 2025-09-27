@@ -6,14 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class RoomElement extends Model
+class RoomElement extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'room_elements';
 
     protected $fillable = ['uuid', 'room_uuid', 'element_name'];
+
+    protected $auditEvents = [
+        'updated',
+    ];
 
     protected static function booted()
     {

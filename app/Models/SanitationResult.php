@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class SanitationResult extends Model
+class SanitationResult extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'sanitation_results';
 
@@ -18,6 +20,10 @@ class SanitationResult extends Model
         'temperature',
         'notes',
         'corrective_action'
+    ];
+
+    protected $auditEvents = [
+        'updated',
     ];
 
     public function sanitationArea()

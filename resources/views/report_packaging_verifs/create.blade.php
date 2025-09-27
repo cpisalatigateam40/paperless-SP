@@ -21,15 +21,6 @@
                         <label>Shift</label>
                         <input type="text" name="shift" class="form-control" required>
                     </div>
-                    <!-- <div class="col">
-                        <label>Section</label>
-                        <select name="section_uuid" class="form-control">
-                            <option value="">-- Pilih Section --</option>
-                            @foreach($sections as $section)
-                            <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
-                            @endforeach
-                        </select>
-                    </div> -->
                 </div>
 
                 <hr>
@@ -40,8 +31,6 @@
                         <tr>
                             <th>Jam</th>
                             <th>Produk</th>
-                            <!-- <th>Kode Produksi</th>
-                            <th>Best Before</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -56,8 +45,6 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <!-- <td><input type="text" name="details[0][production_code]" class="form-control"></td>
-                            <td><input type="date" name="details[0][expired_date]" class="form-control"></td> -->
                         </tr>
                     </tbody>
                 </table>
@@ -121,6 +108,30 @@
                     </div>
                 </div>
 
+                <div class="card mb-3">
+                    <div class="card-header p-2"><strong>Sampling Kemasan</strong></div>
+                    <div class="card-body p-2 row">
+                        <div class="col-md-4">
+                            <label class="small">Jumlah Sampling</label>
+                            <input type="number" name="details[0][checklist][sampling_amount]" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small">Satuan</label>
+                            <select name="details[0][checklist][unit]" class="form-control">
+                                <option value="kemasan">kemasan</option>
+                                <option value="pack">pack</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small">Hasil Sampling</label>
+                            <select name="details[0][checklist][sampling_result]" class="form-control">
+                                <option value="OK">OK</option>
+                                <option value="Tidak OK">Tidak OK</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Sealing Condition 5x --}}
                 <div class="card mb-3">
                     <div class="card-header p-2"><strong>Hasil Sealing: Kondisi Seal</strong></div>
@@ -160,8 +171,7 @@
                 <div class="row mb-2">
                     <div class="col-md-2">
                         <label class="small">Standar</label>
-                        <input type="number" step="0.01" name="details[0][checklist][standard_long_pcs]"
-                            class="form-control">
+                        <input type="text" name="details[0][checklist][standard_long_pcs]" class="form-control">
                     </div>
                 </div>
                 <div class="row">
@@ -185,8 +195,7 @@
                 <div class="row mb-2">
                     <div class="col-md-2">
                         <label class="small">Standar</label>
-                        <input type="number" step="0.01" name="details[0][checklist][standard_weight_pcs]"
-                            class="form-control">
+                        <input type="text" name="details[0][checklist][standard_weight_pcs]" class="form-control">
                     </div>
                 </div>
                 <div class="row">
@@ -210,7 +219,7 @@
             <div class="card-body p-2">
                 <div class="row">
                     @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
-                        <label class="small">Isi Per-Pack {{ $i }}</label>
+                        <label class="small">Aktual {{ $i }}</label>
                         <input type="number" name="details[0][checklist][content_per_pack_{{ $i }}]"
                             class="form-control">
                 </div>
@@ -225,8 +234,7 @@
                 <div class="row mb-2">
                     <div class="col-md-2">
                         <label class="small">Standar</label>
-                        <input type="number" step="0.01" name="details[0][checklist][standard_weight]"
-                            class="form-control">
+                        <input type="text" name="details[0][checklist][standard_weight]" class="form-control">
                     </div>
                 </div>
                 <div class="row">
