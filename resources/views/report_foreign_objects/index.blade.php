@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Laporan Verifikasi Kontaminasi Bneda Asing</h4>
+            <h4>Laporan Verifikasi Kontaminasi Benda Asing</h4>
             <a href="{{ route('report-foreign-objects.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
         <div class="card-body">

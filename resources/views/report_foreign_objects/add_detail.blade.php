@@ -8,7 +8,7 @@
 
         <div class="card shadow mb-3">
             <div class="card-header d-flex justify-content-between">
-                <h5>Tambah Detail Laporan Verifikasi Kontaminasi Bneda Asing</h5>
+                <h5>Tambah Detail Laporan Verifikasi Kontaminasi Benda Asing</h5>
 
             </div>
             <div class="card-body">
