@@ -140,12 +140,13 @@
                                                 <th rowspan="2">Tindakan Koreksi</th>
                                                 <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
 
-                                                <th colspan="5">PEMBEKUAN</th>
+                                                <th colspan="6">PEMBEKUAN</th>
                                                 <th colspan="12">KARTONING</th>
 
                                             </tr>
                                             <tr>
                                                 <th>Suhu Akhir</th>
+                                                <th>Standar Suhu</th>
                                                 <th>Suhu IQF Room</th>
                                                 <th>Suhu IQF Suction</th>
                                                 <th>Lama Pembekuan Display</th>
@@ -182,6 +183,9 @@
                                                 {{-- Freezing --}}
                                                 <td class="align-middle">
                                                     {{ $detail->freezing->end_product_temp ?? '-' }}
+                                                </td>
+                                                <td class="align-middle">
+                                                    {{ $detail->freezing->standard_temp ?? '-' }}
                                                 </td>
                                                 <td class="align-middle">{{ $detail->freezing->iqf_room_temp ?? '-' }}
                                                 </td>

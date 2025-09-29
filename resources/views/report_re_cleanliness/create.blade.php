@@ -32,20 +32,29 @@
                     {{-- Tab Ruangan --}}
                     <div class="tab-pane fade show active" id="roomTab">
                         @foreach ($rooms as $room)
-                        <div class="mb-3 border cleanliness-item">
+                        <div class="mb-3 border cleanliness-item" data-uuid="{{ $room->uuid }}">
                             {{-- Judul, diklik untuk toggle --}}
                             <h6 class="fw-bold m-3" style="cursor: pointer;" onclick="toggleSection(this)">
                                 {{ $room->name }}
                             </h6>
 
+                            {{-- Check All untuk ruangan ini --}}
+                            <div class="m-3">
+                                <label>
+                                    <input type="checkbox" class="checkall-room" data-room="{{ $room->uuid }}">
+                                    Centang Semua
+                                </label>
+                            </div>
+
                             {{-- Form yang disembunyikan --}}
                             <div class="form-wrapper" style="display: none; margin-top: 1rem; padding: 1rem;">
                                 <input type="hidden" name="rooms[{{ $room->uuid }}][name]" value="{{ $room->name }}">
-                                <div class="row">
+                                <div class="row room-elements-{{ $room->uuid }}">
                                     @foreach ($room->elements as $element)
                                     <div class="col-md-4 mb-4">
                                         <label>
-                                            <input type="checkbox" onchange="toggleCleanlinessFields(this)"
+                                            <input type="checkbox" class="element-checkbox"
+                                                data-room="{{ $room->uuid }}" onchange="toggleCleanlinessFields(this)"
                                                 name="rooms[{{ $room->uuid }}][elements][{{ $element->uuid }}][condition]"
                                                 value="clean">
                                             {{ $element->element_name }}
@@ -78,19 +87,30 @@
                     {{-- Tab Equipment --}}
                     <div class="tab-pane fade" id="equipmentTab">
                         @foreach ($equipments as $equipment)
-                        <div class="mb-3 border cleanliness-item">
+                        <div class="mb-3 border cleanliness-item" data-uuid="{{ $equipment->uuid }}">
                             <h6 class="fw-bold m-3" style="cursor: pointer;" onclick="toggleSection(this)">
                                 {{ $equipment->name }}
                             </h6>
 
+                            {{-- Check All untuk equipment ini --}}
+                            <div class="m-3">
+                                <label>
+                                    <input type="checkbox" class="checkall-equipment"
+                                        data-equipment="{{ $equipment->uuid }}">
+                                    Centang Semua Part
+                                </label>
+                            </div>
+
                             <div class="form-wrapper" style="display: none; margin-top: 1rem; padding: 1rem;">
                                 <input type="hidden" name="equipments[{{ $equipment->uuid }}][name]"
                                     value="{{ $equipment->name }}">
-                                <div class="row">
+                                <div class="row equipment-parts-{{ $equipment->uuid }}">
                                     @foreach ($equipment->parts as $part)
                                     <div class="col-md-4 mb-4">
                                         <label>
-                                            <input type="checkbox" onchange="toggleCleanlinessFields(this)"
+                                            <input type="checkbox" class="part-checkbox"
+                                                data-equipment="{{ $equipment->uuid }}"
+                                                onchange="toggleCleanlinessFields(this)"
                                                 name="equipments[{{ $equipment->uuid }}][parts][{{ $part->uuid }}][condition]"
                                                 value="clean">
                                             {{ $part->part_name }}
@@ -111,7 +131,6 @@
                                                 <option value="Tidak OK">Tidak OK</option>
                                             </select>
                                             <div class="followup-wrapper mt-2"></div>
-
                                         </div>
                                     </div>
                                     @endforeach
@@ -132,63 +151,41 @@
 
 @section('script')
 <script>
-function toggleRoomElementFields(checkbox) {
-    let container = checkbox.closest('.col-md-4');
-    let notes = container.querySelector('.notes');
-    let corrective = container.querySelector('.corrective_action');
-    let verification = container.querySelector('.verification');
-
-    if (checkbox.checked) {
-        // Bersih
-        notes.disabled = true;
-        corrective.disabled = true;
-        verification.value = "OK";
-    } else {
-        // Kotor
-        notes.disabled = false;
-        corrective.disabled = false;
-        verification.value = "";
-    }
-}
-
 function toggleSection(headerEl) {
     const wrapper = headerEl.nextElementSibling;
-    if (wrapper.style.display === 'none') {
-        wrapper.style.display = 'block';
-    } else {
-        wrapper.style.display = 'none';
-    }
+    // safer toggle
+    if (!wrapper) return;
+    wrapper.style.display = (wrapper.style.display === 'block') ? 'none' : 'block';
 }
 
 function toggleCleanlinessFields(checkbox) {
     const container = checkbox.closest('.col-md-4');
+    if (!container) return;
     const fields = container.querySelector('.cleanliness-fields');
-    const notes = fields.querySelector('.notes');
-    const corrective = fields.querySelector('.corrective_action');
-    const verification = fields.querySelector('.verification');
+    if (fields) fields.style.display = 'block';
 
-    fields.style.display = 'block';
+    const notes = container.querySelector('.notes');
+    const corrective = container.querySelector('.corrective_action');
+    const verification = container.querySelector('.verification');
 
     if (checkbox.checked) {
-        notes.disabled = true;
-        corrective.disabled = true;
-        verification.value = 'OK';
+        if (notes) notes.disabled = true;
+        if (corrective) corrective.disabled = true;
+        if (verification) verification.value = 'OK';
     } else {
-        notes.disabled = false;
-        corrective.disabled = false;
-        verification.value = '';
+        if (notes) {
+            notes.disabled = false;
+            notes.value = notes.value ?? notes.value;
+        }
+        if (corrective) {
+            corrective.disabled = false;
+        }
+        if (verification) verification.value = '';
     }
 
-    checkRoomCompletion(checkbox.closest('.cleanliness-item'));
+    const roomOrEq = checkbox.closest('.cleanliness-item');
+    if (roomOrEq) checkRoomCompletion(roomOrEq);
 }
-
-
-document.addEventListener('input', function(e) {
-    const roomWrapper = e.target.closest('.cleanliness-item');
-    if (roomWrapper) {
-        checkRoomCompletion(roomWrapper);
-    }
-});
 
 function checkRoomCompletion(roomWrapper) {
     const elements = roomWrapper.querySelectorAll('.col-md-4');
@@ -196,15 +193,15 @@ function checkRoomCompletion(roomWrapper) {
 
     elements.forEach(el => {
         const checkbox = el.querySelector('input[type="checkbox"]');
-        const fields = el.querySelectorAll('.cleanliness-fields input');
+        const fields = el.querySelectorAll('.cleanliness-fields input, .cleanliness-fields select');
 
-        if (!checkbox.checked) {
+        if (!checkbox || !checkbox.checked) {
             allFilled = false;
             return;
         }
 
         const filled = Array.from(fields).every(input =>
-            input.disabled || input.value.trim() !== ''
+            input.disabled || (String(input.value || '').trim() !== '')
         );
 
         if (!filled) allFilled = false;
@@ -213,8 +210,7 @@ function checkRoomCompletion(roomWrapper) {
     roomWrapper.style.backgroundColor = allFilled ? '#d4edda' : '#fff3cd';
 }
 
-// additional
-
+// Followup helper (tetap seperti sebelumnya)
 function addFollowupField(wrapper, baseName) {
     const count = wrapper.querySelectorAll('.followup-group').length;
 
@@ -230,52 +226,105 @@ function addFollowupField(wrapper, baseName) {
             </select>
         </div>
     `;
-
     wrapper.insertAdjacentHTML('beforeend', html);
 }
 
-// Saat verifikasi utama berubah
+// Event: verifikasi utama berubah -> tampilkan followup bila perlu, dan update warna
 document.addEventListener('change', function(e) {
     if (e.target.classList.contains('verification')) {
         const container = e.target.closest('.col-md-4');
+        if (!container) return;
         const wrapper = container.querySelector('.followup-wrapper');
         const baseName = e.target.name.replace('[verification]', '');
 
-        wrapper.innerHTML = ''; // reset followups
+        if (wrapper) wrapper.innerHTML = '';
 
         if (e.target.value.trim() !== 'OK' && e.target.value !== '') {
-            addFollowupField(wrapper, baseName);
+            if (wrapper) addFollowupField(wrapper, baseName);
         }
     }
 
-    // Tetap update warna room/equipment
+    // followup-verification handler
+    if (e.target.classList.contains('followup-verification')) {
+        const currentGroup = e.target.closest('.followup-group');
+        if (!currentGroup) return;
+        const wrapper = currentGroup.parentElement;
+        const allGroups = wrapper.querySelectorAll('.followup-group');
+        const currentIndex = Array.from(allGroups).indexOf(currentGroup);
+
+        if (e.target.value === 'Tidak OK') {
+            if (allGroups.length === currentIndex + 1) {
+                const baseName = e.target.name.replace(/\[followups\]\[\d+\]\[verification\]/, '');
+                addFollowupField(wrapper, baseName);
+            }
+        } else if (e.target.value === 'OK') {
+            for (let i = allGroups.length - 1; i > currentIndex; i--) {
+                allGroups[i].remove();
+            }
+        }
+    }
+
+    // update room/equipment completion color
     const roomWrapper = e.target.closest('.cleanliness-item');
     if (roomWrapper) {
         checkRoomCompletion(roomWrapper);
     }
 });
 
-// Saat verifikasi followup berubah
+// CHECKALL handlers
 document.addEventListener('change', function(e) {
-    if (e.target.classList.contains('followup-verification')) {
-        const currentGroup = e.target.closest('.followup-group');
-        const wrapper = currentGroup.parentElement;
-        const baseName = e.target.name.replace(/\[followups\]\[\d+\]\[verification\]/, '');
+    // Check all for rooms
+    if (e.target.classList.contains('checkall-room')) {
+        const roomId = e.target.dataset.room;
+        const checkboxes = document.querySelectorAll(`.room-elements-${roomId} .element-checkbox`);
+        const cleanlinessItem = document.querySelector(`.cleanliness-item[data-uuid="${roomId}"]`);
+        const wrapper = cleanlinessItem ? cleanlinessItem.querySelector('.form-wrapper') : null;
+        if (wrapper) wrapper.style.display = 'block'; // buka jika tersembunyi
 
-        const allGroups = wrapper.querySelectorAll('.followup-group');
-        const currentIndex = Array.from(allGroups).indexOf(currentGroup);
+        checkboxes.forEach(cb => {
+            if (cb.checked !== e.target.checked) {
+                cb.checked = e.target.checked;
+                toggleCleanlinessFields(cb);
+            } else {
+                // tetap panggil untuk memastikan UI konsisten
+                toggleCleanlinessFields(cb);
+            }
+        });
+    }
 
-        if (e.target.value === 'Tidak OK') {
-            // Tambahkan followup berikutnya hanya kalau belum ada
-            if (allGroups.length === currentIndex + 1) {
-                addFollowupField(wrapper, baseName);
+    // Check all for equipments
+    if (e.target.classList.contains('checkall-equipment')) {
+        const eqId = e.target.dataset.equipment;
+        const checkboxes = document.querySelectorAll(`.equipment-parts-${eqId} .part-checkbox`);
+        const cleanlinessItem = document.querySelector(`.cleanliness-item[data-uuid="${eqId}"]`);
+        const wrapper = cleanlinessItem ? cleanlinessItem.querySelector('.form-wrapper') : null;
+        if (wrapper) wrapper.style.display = 'block';
+
+        checkboxes.forEach(cb => {
+            if (cb.checked !== e.target.checked) {
+                cb.checked = e.target.checked;
+                toggleCleanlinessFields(cb);
+            } else {
+                toggleCleanlinessFields(cb);
             }
-        } else if (e.target.value === 'OK') {
-            // Hapus followup setelah current
-            for (let i = allGroups.length - 1; i > currentIndex; i--) {
-                allGroups[i].remove();
-            }
-        }
+        });
+    }
+
+    // Auto-update checkall when manual cek/unccek
+    if (e.target.classList.contains('element-checkbox')) {
+        const roomId = e.target.dataset.room;
+        const all = document.querySelectorAll(`.room-elements-${roomId} .element-checkbox`);
+        const checked = document.querySelectorAll(`.room-elements-${roomId} .element-checkbox:checked`);
+        const checkall = document.querySelector(`.checkall-room[data-room="${roomId}"]`);
+        if (checkall) checkall.checked = (all.length > 0 && all.length === checked.length);
+    }
+
+    if (e.target.classList.contains('part-checkbox')) {
+        const eqId = e.target.dataset.equipment;
+        const all = document.querySelectorAll(`.equipment-parts-${eqId} .part-checkbox`);
+        const checked = document.querySelectorAll(`.equipment-parts-${eqId} .part-checkbox:checked`);
+        const checkall = document.querySelector(`.checkall-equipment[data-equipment="${eqId}"]`);
+        if (checkall) checkall.checked = (all.length > 0 && all.length === checked.length);
     }
 });
 </script>

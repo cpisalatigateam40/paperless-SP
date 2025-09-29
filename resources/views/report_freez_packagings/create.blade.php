@@ -99,6 +99,13 @@ function addDetailRow() {
             <label>Suhu Akhir Produk (°C)</label>
             <input type="number" step="0.0000001" name="details[${index}][freezing][end_product_temp]" class="form-control">
         </div>
+        <div class="col-md-6">
+            <label>Standard Suhu (°C)</label>
+            <input type="number" step="0.0000001" 
+                name="details[${index}][freezing][standard_temp]" 
+                class="form-control"
+                value="-18">
+        </div>
     </div>
 
     <div class="row mt-2">
@@ -151,7 +158,7 @@ function addDetailRow() {
     <div class="row mt-2">
         <div class="col-md-4">
             <label>Berat Standar (kg)</label>
-            <input type="number" step="0.01" name="details[${index}][kartoning][carton_weight_standard]" class="form-control">
+            <input type="text" name="details[${index}][kartoning][carton_weight_standard]" class="form-control">
         </div>
     </div>
     <div class="row kartoning-group mt-2" data-index="${index}">

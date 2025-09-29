@@ -77,68 +77,78 @@
                     <hr>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label>Diameter Casing (mm)</label>
                             <input type="number" name="details[0][cases][0][actual_case_2]" class="form-control">
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label>Standar Berat (gr)</label>
-                            <input type="number" step="0.01" name="details[0][weight_standard]" class="form-control"
-                                required>
-                        </div>
-                        <div class="col-md-6">
-                            <label>Standar Panjang</label>
-                            <input type="number" step="0.01" name="details[0][long_standard]" class="form-control"
-                                required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <label class="fw-bold">Berat Aktual (gr)</label>
-                            <div id="weightWrapper-0" class="row g-2">
-                                @for($i = 1; $i <= 3; $i++) <div class="col-md-4">
-                                    <label>Berat {{ $i }}</label>
-                                    <input type="number" step="0.01"
-                                        name="details[0][weights][0][actual_weight_{{ $i }}]" class="form-control">
+                    <div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label>Standar Berat (gr)</label>
+                                <input type="number" step="0.01" name="details[0][weight_standard]" class="form-control"
+                                    required>
                             </div>
-                            @endfor
                         </div>
-                        <button type="button" class="btn btn-sm btn-secondary mt-2 add-weight" data-index="0">
-                            + Tambah Berat
-                        </button>
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label>Rata-rata Berat</label>
-                        <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control" readonly>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <label class="fw-bold">Panjang Aktual</label>
-                            <div id="longWrapper-0" class="row g-2">
-                                @for($i = 1; $i <= 3; $i++) <div class="col-md-4">
-                                    <label>Panjang {{ $i }}</label>
-                                    <input type="number" step="0.01" name="details[0][weights][0][actual_long_{{ $i }}]"
-                                        class="form-control">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="fw-bold">Berat Aktual (gr)</label>
+                                <div id="weightWrapper-0" class="row g-2">
+                                    @for($i = 1; $i <= 3; $i++) <div class="col-md-4">
+                                        <label>Berat {{ $i }}</label>
+                                        <input type="number" step="0.01"
+                                            name="details[0][weights][0][actual_weight_{{ $i }}]" class="form-control">
+                                </div>
+                                @endfor
                             </div>
-                            @endfor
+                            <button type="button" class="btn btn-sm btn-secondary mt-2 add-weight" data-index="0">
+                                + Tambah Berat
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-sm btn-secondary mt-2 add-long" data-index="0">
-                            + Tambah Panjang
-                        </button>
+
+                        <div>
+                            <div class="col-md-12 mb-3">
+                                <label>Rata-rata Berat</label>
+                                <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control"
+                                    readonly>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label>Rata-rata Panjang</label>
-                        <input type="number" step="0.01" name="details[0][avg_long]" class="form-control" readonly>
+                    <div>
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <label>Standar Panjang</label>
+                                <input type="number" step="0.01" name="details[0][long_standard]" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 mb-3">
+                                <label class="fw-bold">Panjang Aktual</label>
+                                <div id="longWrapper-0" class="row g-2">
+                                    @for($i = 1; $i <= 3; $i++) <div class="col-md-4">
+                                        <label>Panjang {{ $i }}</label>
+                                        <input type="number" step="0.01"
+                                            name="details[0][weights][0][actual_long_{{ $i }}]" class="form-control">
+                                </div>
+                                @endfor
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary mt-2 add-long" data-index="0">
+                                + Tambah Panjang
+                            </button>
+                        </div>
+
+                        <div>
+                            <div class="col-md-12 mb-3">
+                                <label>Rata-rata Panjang</label>
+                                <input type="number" step="0.01" name="details[0][avg_long]" class="form-control"
+                                    readonly>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
 </div>

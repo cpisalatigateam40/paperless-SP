@@ -134,9 +134,6 @@
             <td style="text-align: left; border: none;">
                 Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section->section_name }}</span>
-            </td>
         </tr>
     </table>
 

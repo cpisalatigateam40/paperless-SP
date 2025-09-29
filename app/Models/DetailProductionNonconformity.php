@@ -24,6 +24,7 @@ class DetailProductionNonconformity extends Model implements Auditable
         'disposition',
         'evidence',
         'remark',
+        'unit',
     ];
 
     protected $auditEvents = [

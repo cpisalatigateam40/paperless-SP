@@ -29,25 +29,13 @@
             <div class="card-header">Data Utama</div>
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label>Tanggal</label>
                         <input type="date" name="date" class="form-control" value="{{ $report->date }}" readonly>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label>Shift</label>
                         <input type="text" name="shift" class="form-control" value="{{ $report->shift }}" readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label>Section</label>
-                        <select name="section_uuid" class="form-control" readonly>
-                            <option value="">-- Pilih Section --</option>
-                            @foreach($sections as $section)
-                            <option value="{{ $section->uuid }}"
-                                {{ $report->section_uuid == $section->uuid ? 'selected' : '' }}>
-                                {{ $section->section_name }}
-                            </option>
-                            @endforeach
-                        </select>
                     </div>
                 </div>
             </div>
@@ -452,55 +440,55 @@ function calculateAvgExitTemp(i) {
     document.getElementById('avg_exit_temp_' + i).value = avg;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const maurerStandards = @json($maurerStandardMap);
+// document.addEventListener('DOMContentLoaded', function() {
+//     const maurerStandards = @json($maurerStandardMap);
 
-    console.log('✅ Maurer Standards loaded:', maurerStandards);
+//     console.log('✅ Maurer Standards loaded:', maurerStandards);
 
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('product-selector')) {
-            const select = e.target;
-            const productUuid = select.value;
-            const index = select.dataset.index;
+//     document.addEventListener('change', function(e) {
+//         if (e.target.classList.contains('product-selector')) {
+//             const select = e.target;
+//             const productUuid = select.value;
+//             const index = select.dataset.index;
 
-            console.log(`➡️ Product selected: ${productUuid}`);
-            console.log(`➡️ Data index: ${index}`);
+//             console.log(`➡️ Product selected: ${productUuid}`);
+//             console.log(`➡️ Data index: ${index}`);
 
-            const relatedInputs = document.querySelectorAll(`input[data-index="${index}"]`);
-            console.log(`🧩 Related inputs found:`, relatedInputs.length);
+//             const relatedInputs = document.querySelectorAll(`input[data-index="${index}"]`);
+//             console.log(`🧩 Related inputs found:`, relatedInputs.length);
 
-            if (!maurerStandards[productUuid]) {
-                console.warn(`🚫 No MaurerStandard found for product: ${productUuid}`);
-                relatedInputs.forEach(input => {
-                    if (!input.disabled) input.value = '';
-                });
-                return;
-            }
+//             if (!maurerStandards[productUuid]) {
+//                 console.warn(`🚫 No MaurerStandard found for product: ${productUuid}`);
+//                 relatedInputs.forEach(input => {
+//                     if (!input.disabled) input.value = '';
+//                 });
+//                 return;
+//             }
 
-            relatedInputs.forEach(input => {
-                const step = input.dataset.step;
-                const field = input.dataset.field;
+//             relatedInputs.forEach(input => {
+//                 const step = input.dataset.step;
+//                 const field = input.dataset.field;
 
-                console.log(`🔍 Input: step="${step}", field="${field}"`);
+//                 console.log(`🔍 Input: step="${step}", field="${field}"`);
 
-                if (!step || !field) {
-                    console.warn('⚠️ Missing step or field');
-                    return;
-                }
+//                 if (!step || !field) {
+//                     console.warn('⚠️ Missing step or field');
+//                     return;
+//                 }
 
-                const stepData = maurerStandards[productUuid][step];
-                console.log(`📦 Step data for "${step}":`, stepData);
+//                 const stepData = maurerStandards[productUuid][step];
+//                 console.log(`📦 Step data for "${step}":`, stepData);
 
-                if (stepData && stepData[field] !== undefined) {
-                    input.value = stepData[field];
-                    console.log(`✅ Set value for [${step}][${field}]: ${stepData[field]}`);
-                } else {
-                    input.value = '';
-                    console.warn(`❓ Data not found for [${step}][${field}]`);
-                }
-            });
-        }
-    });
-});
+//                 if (stepData && stepData[field] !== undefined) {
+//                     input.value = stepData[field];
+//                     console.log(`✅ Set value for [${step}][${field}]: ${stepData[field]}`);
+//                 } else {
+//                     input.value = '';
+//                     console.warn(`❓ Data not found for [${step}][${field}]`);
+//                 }
+//             });
+//         }
+//     });
+// });
 </script>
 @endsection

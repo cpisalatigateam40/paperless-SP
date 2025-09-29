@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Report Fessman Cooking</title>
+    <title>VERIFIKASI PEMBEKUAN IQF & PENGEMASAN KARTON BOX</title>
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
@@ -113,6 +113,7 @@
                 <th rowspan="2">Tindakan Koreksi</th>
                 <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
                 <th rowspan="2">Suhu Produk After IQF</th>
+                <th rowspan="2">Standar Suhu</th>
                 <th colspan="2">Suhu IQF</th>
                 <th colspan="2">Lama Pembekuan</th>
                 <th colspan="4">Isi tiap Karton</th>
@@ -151,6 +152,7 @@
 
                 {{-- Freezing --}}
                 <td>{{ $detail->freezing->end_product_temp ?? '' }}</td>
+                <td>{{ $detail->freezing->standard_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->iqf_room_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->iqf_suction_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->freezing_time_display ?? '' }}</td>
@@ -171,7 +173,7 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="22" style="text-align: right; border: none;">QM 39 / 02</td>
+                <td colspan="23" style="text-align: right; border: none;">QM 39 / 02</td>
             </tr>
         </tbody>
     </table>

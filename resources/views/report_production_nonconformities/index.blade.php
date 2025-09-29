@@ -146,7 +146,7 @@
                                         <tr>
                                             <td>{{ $detail->occurrence_time }}</td>
                                             <td>{{ $detail->description }}</td>
-                                            <td>{{ $detail->quantity }}</td>
+                                            <td>{{ $detail->quantity }} {{ $detail->unit }}</td>
                                             <td>{{ $detail->hazard_category }}</td>
                                             <td>{{ $detail->disposition }}</td>
                                             <td>

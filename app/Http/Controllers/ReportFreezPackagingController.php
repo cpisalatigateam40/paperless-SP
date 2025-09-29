@@ -63,6 +63,7 @@ class ReportFreezPackagingController extends Controller
                     'uuid' => Str::uuid(),
                     'detail_uuid' => $detailModel->uuid,
                     'start_product_temp' => $detail['freezing']['start_product_temp'] ?? null,
+                    'standard_temp' => $detail['freezing']['standard_temp'] ?? null,
                     'end_product_temp' => $detail['freezing']['end_product_temp'] ?? null,
                     'iqf_room_temp' => $detail['freezing']['iqf_room_temp'] ?? null,
                     'iqf_suction_temp' => $detail['freezing']['iqf_suction_temp'] ?? null,
@@ -133,6 +134,7 @@ class ReportFreezPackagingController extends Controller
                 // 'start_product_temp' => $item['freezing']['start_product_temp'],
                 'end_product_temp' => $item['freezing']['end_product_temp'],
                 'iqf_room_temp' => $item['freezing']['iqf_room_temp'],
+                'standard_temp' => $item['freezing']['standard_temp'],
                 'iqf_suction_temp' => $item['freezing']['iqf_suction_temp'],
                 'freezing_time_display' => $item['freezing']['freezing_time_display'],
                 'freezing_time_actual' => $item['freezing']['freezing_time_actual'],
@@ -223,7 +225,7 @@ class ReportFreezPackagingController extends Controller
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
         ])
-            ->setPaper('a4', 'landscape');
+            ->setPaper([0, 0, 1200, 595]);
 
         return $pdf->stream('laporan-pembekuan-kartoning.pdf');
     }

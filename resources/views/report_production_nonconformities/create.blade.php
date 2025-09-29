@@ -34,12 +34,23 @@
                         </div>
                         <div class="mb-3">
                             <label>Ketidaksesuaian</label>
-                            <input type="text" name="details[0][description]" class="form-control">
+                            <textarea name="details[0][description]" class="form-control" rows="3"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label>Jumlah</label>
-                            <input type="number" name="details[0][quantity]" class="form-control">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Jumlah</label>
+                                <input type="number" name="details[0][quantity]" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Satuan</label>
+                                <select name="details[0][unit]" class="form-control">
+                                    <option value="">-- Pilih satuan --</option>
+                                    <option value="Kemasan">Kemasan</option>
+                                    <option value="Pack">Pack</option>
+                                </select>
+                            </div>
                         </div>
+
                         <div class="mb-3">
                             <label>Kategori Bahaya</label>
                             <select name="details[0][hazard_category]" class="form-control">

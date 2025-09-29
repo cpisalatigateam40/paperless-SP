@@ -23,6 +23,7 @@ class DataFreezing extends Model implements Auditable
         'iqf_suction_temp',
         'freezing_time_display',
         'freezing_time_actual',
+        'standard_temp'
     ];
 
     protected $auditEvents = [

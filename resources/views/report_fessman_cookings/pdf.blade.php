@@ -101,7 +101,6 @@
                     class="underline">{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}</span>
             </td>
             <td style="border: none;">Shift: <span class="underline">{{ $report->shift }}</span></td>
-            <td style="border: none;">Area: <span class="underline">{{ $report->section->section_name }}</span></td>
         </tr>
     </table>
 

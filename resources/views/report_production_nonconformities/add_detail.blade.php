@@ -16,13 +16,24 @@
                     <input type="time" name="occurrence_time" class="form-control" value="{{ now()->format('H:i') }}">
                 </div>
                 <div class="mb-3">
-                    <label>Deskripsi Ketidaksesuaian</label>
-                    <input type="text" name="description" class="form-control">
+                    <label>Ketidaksesuaian</label>
+                    <textarea name="description" class="form-control" rows="3"></textarea>
                 </div>
-                <div class="mb-3">
-                    <label>Jumlah</label>
-                    <input type="number" name="quantity" class="form-control">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Jumlah</label>
+                        <input type="number" name="quantity" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Satuan</label>
+                        <select name="unit" class="form-control">
+                            <option value="">-- Pilih satuan --</option>
+                            <option value="Kemasan">Kemasan</option>
+                            <option value="Pack">Pack</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div class="mb-3">
                     <label>Kategori Bahaya</label>
                     <select name="hazard_category" class="form-control">
