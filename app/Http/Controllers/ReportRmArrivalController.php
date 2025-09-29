@@ -45,10 +45,7 @@ class ReportRmArrivalController extends Controller
         return view('report_rm_arrivals.create', [
             'areas' => Area::all(),
             'rawMaterials' => RawMaterial::all(),
-            'sections' => Section::whereIn('uuid', [
-            'b435deed-4255-491b-9f21-e758ffc4551b',
-            'd70f9b36-3044-4d7d-99d9-50fba677b4b7'
-        ])->get(),
+            'sections' => Section::whereIn('section_name', ['Seasoning', 'Chillroom'])->get(),
         ]);
     }
 
