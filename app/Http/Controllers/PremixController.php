@@ -14,7 +14,7 @@ class PremixController extends Controller
 {
     public function index()
     {
-        $premixes = Premix::with('area')->latest()->paginate(10);
+        $premixes = Premix::with('area')->orderBy('name', 'asc')->paginate(10);
         return view('premixes.index', compact('premixes'));
     }
 

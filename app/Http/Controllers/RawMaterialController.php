@@ -14,7 +14,7 @@ class RawMaterialController extends Controller
 {
     public function index()
     {
-        $rawMaterials = RawMaterial::with('area')->paginate(10);
+        $rawMaterials = RawMaterial::with('area')->orderBy('material_name', 'asc')->paginate(10);
         return view('raw_material.index', compact('rawMaterials'));
     }
 

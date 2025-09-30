@@ -18,8 +18,8 @@ class RoomEquipmentController extends Controller
     {
         return view('room_equipment.master_data', [
             'areas' => Area::all(),
-            'rooms' => Room::with('elements')->get(),
-            'equipments' => Equipment::with('parts')->get(),
+            'rooms' => Room::with('elements')->orderBy('name', 'asc')->get(),
+            'equipments' => Equipment::with('parts')->orderBy('name', 'asc')->get(),
         ]);
     }
 

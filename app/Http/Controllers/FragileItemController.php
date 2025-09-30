@@ -12,7 +12,7 @@ class FragileItemController extends Controller
 {
     public function index()
     {
-        $fragileItems = FragileItem::with('area')->latest()->paginate(10);
+        $fragileItems = FragileItem::with('area')->orderBy('item_name', 'asc')->paginate(10);
         return view('fragile_item.index', compact('fragileItems'));
     }
 

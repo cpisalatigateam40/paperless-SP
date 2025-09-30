@@ -12,7 +12,7 @@ class ScaleController extends Controller
 {
     public function index()
     {
-        $scales = Scale::with('area')->latest()->paginate(10);
+        $scales = Scale::with('area')->orderBy('brand', 'asc')->paginate(10);
         return view('scales.index', compact('scales'));
     }
 

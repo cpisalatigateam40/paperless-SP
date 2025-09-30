@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with(['area'])->paginate(10);
+        $users = User::with(['area'])->orderBy('name', 'asc')->paginate(10);
         return view('users.user', compact('users'));
     }
 

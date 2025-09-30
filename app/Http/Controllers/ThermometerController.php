@@ -11,7 +11,7 @@ class ThermometerController extends Controller
 {
     public function index()
     {
-        $thermometers = Thermometer::with('area')->latest()->paginate(10);
+        $thermometers = Thermometer::with('area')->orderBy('brand', 'asc')->paginate(10);
         return view('thermometers.index', compact('thermometers'));
     }
 
