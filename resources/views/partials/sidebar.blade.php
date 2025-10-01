@@ -110,10 +110,10 @@ $isKetidaksesuaian = Request::is([
         <div id="collapseTwo" class="collapse {{ $isMasterData ? 'show' : '' }}" aria-labelledby="headingTwo"
             data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-                @can('user view')
+                <!-- @can('user view')
                 <a class="collapse-item {{ Request::is('users*') ? 'active' : '' }}"
                     href="{{ route('users.index') }}">User</a>
-                @endcan
+                @endcan -->
                 <a class="collapse-item {{ Request::is('area*') ? 'active' : '' }}"
                     href="{{ route('areas.index') }}">Area</a>
                 <a class="collapse-item {{ Request::is('section*') ? 'active' : '' }}"
