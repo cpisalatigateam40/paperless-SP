@@ -1041,6 +1041,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
         });
 
-    // Route::post('user-sync', [ApiController::class, 'syncUser']);
-    // Route::post('user-desync', [ApiController::class, 'desyncUser']);
+    Route::post('user-sync', [ApiController::class, 'syncUser']);
+    Route::post('user-desync', [ApiController::class, 'desyncUser']);
 });
