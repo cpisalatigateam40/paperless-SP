@@ -128,60 +128,62 @@ class ApiController extends Controller
     }
 
 
+
+    
     public function syncPlant(Request $request)
     {
         try {
             $data = $request->json()->all();
 
 
-            if (empty($data['area'])) {
+            if (empty($data['plant'])) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Invalid payload'
                 ], 400);
             }
-            $areaData = $data['area']; // keep raw payload data
+            $plantData = $data['plant']; // keep raw payload data
 
 
             // find existing plant
-            $area = Area::where('uuid', $areaData['uuid'])
-                ->orWhere('area', 'LIKE', '%' . $areaData['area'] . '%')
+            $plant = Area::where('uuid', $plantData['uuid'])
+                ->orWhere('plant', 'LIKE', '%' . $plantData['plant'] . '%')
                 ->first();
 
 
-            if ($area) {
-                $area->update([
-                    'uuid'  => $areaData['uuid'],
-                    'area' => $areaData['area'],
+            if ($plant) {
+                $plant->update([
+                    'uuid'  => $plantData['uuid'],
+                    'plant' => $plantData['plant'],
                 ]);
             } else {
-                $area = Area::create([
-                    'uuid'  => $areaData['uuid'],
-                    'area' => $areaData['area'],
+                $plant = Area::create([
+                    'uuid'  => $plantData['uuid'],
+                    'plant' => $plantData['plant'],
                 ]);
             }
 
 
             // Sync Departments
-            foreach ($areaData['departments'] as $deptData) {
-                $department = Area::where('uuid', $deptData['uuid'])
-                    ->orWhere('area', 'LIKE', '%' . $deptData['department'] . '%')
+            foreach ($plantData['departments'] as $deptData) {
+                $department = Plant::where('uuid', $deptData['uuid'])
+                    ->orWhere('plant', 'LIKE', '%' . $deptData['department'] . '%')
                     ->first();
 
 
                 if ($department) {
                     $department->update([
                         'uuid'        => $deptData['uuid'],
-                        'area'       => $deptData['department'],
+                        'plant'       => $deptData['department'],
                         'abbrivation' => $deptData['abbrivation'],
-                        'area_uuid'   => $area->uuid
+                        'area_uuid'   => $plant->uuid
                     ]);
                 } else {
-                    Area::create([
+                    Plant::create([
                         'uuid'        => $deptData['uuid'],
-                        'area'       => $deptData['department'],
+                        'plant'       => $deptData['department'],
                         'abbrivation' => $deptData['abbrivation'],
-                        'area_uuid'   => $area->uuid
+                        'area_uuid'   => $plant->uuid
                     ]);
                 }
             }
@@ -189,7 +191,7 @@ class ApiController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'area Synced successfully'
+                'message' => 'Plant Synced successfully'
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -198,6 +200,7 @@ class ApiController extends Controller
             ], 200);
         }
     }
+
 
 
 }
