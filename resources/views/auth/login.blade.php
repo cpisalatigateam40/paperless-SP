@@ -13,6 +13,7 @@
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
     <!-- SB Admin 2 CSS -->
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('img/sausage.png') }}">
 
     <style>
     body,
