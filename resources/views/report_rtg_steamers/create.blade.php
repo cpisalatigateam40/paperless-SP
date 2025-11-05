@@ -55,7 +55,7 @@
                             </div>
                         </div>
 
-                        <h5 class="mt-4">Streaming</h5>
+                        <h5 class="mt-4">Steaming</h5>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label>Suhu Ruang (°C)</label>

@@ -22,7 +22,7 @@ class ReportWaterbathController extends Controller
     {
         $reports = ReportWaterbath::with(['details', 'pasteurisasi', 'coolingShocks', 'drippings'])
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('report_waterbaths.index', compact('reports'));
     }

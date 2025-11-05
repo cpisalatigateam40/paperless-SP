@@ -26,7 +26,7 @@ class ReportPasteurController extends Controller
             'details.steps.drainageStep',
             'details.steps.finishStep',
             'area'
-        ])->get();
+        ])->paginate(10);
 
         return view('report_pasteurs.index', compact('reports'));
     }

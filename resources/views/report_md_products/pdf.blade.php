@@ -180,7 +180,7 @@
                 @endforeach
                 @endforeach
                 <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verification ? 'Ya' : 'Tidak' }}</td>
+                <td>{{ $detail->verification ? 'OK' : 'Tidak OK' }}</td>
             </tr>
             @endforeach
             <tr>

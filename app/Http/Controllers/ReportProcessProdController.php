@@ -23,6 +23,24 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportProcessProdController extends Controller
 {
+    // public function index()
+    // {
+    //     $reports = ReportProcessProd::with([
+    //         'area',
+    //         'section',
+    //         'detail.product',
+    //         'detail.formula',
+    //         'detail.items.formulation.rawMaterial',
+    //         'detail.items.formulation.premix',
+    //         'detail.emulsifying',
+    //         'detail.sensoric',
+    //         'detail.tumbling',
+    //         'detail.aging'
+    //     ])->latest()->get();
+
+    //     return view('report_process_productions.index', compact('reports'));
+    // }
+
     public function index()
     {
         $reports = ReportProcessProd::with([
@@ -36,10 +54,53 @@ class ReportProcessProdController extends Controller
             'detail.sensoric',
             'detail.tumbling',
             'detail.aging'
-        ])->latest()->get();
+        ])
+        ->latest()
+        ->paginate(10);
+
+        // Hitung ketidaksesuaian untuk setiap report
+        $reports->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->detail as $detail) {
+                // 🔹 Cek dari DetailProcessProd (nilai 'x')
+                if (
+                    $detail->sensory_homogenity === 'x' ||
+                    $detail->sensory_stiffness === 'x' ||
+                    $detail->sensory_aroma === 'x'
+                ) {
+                    $totalKetidaksesuaian++;
+                }
+
+                // 🔹 Cek dari ProcessSensoric (nilai "Tidak OK" / "Terdeteksi")
+                if ($detail->sensoric) {
+                    if (
+                        $detail->sensoric->homogeneous === 'Tidak OK' ||
+                        $detail->sensoric->stiffness === 'Tidak OK' ||
+                        $detail->sensoric->aroma === 'Tidak OK' ||
+                        $detail->sensoric->foreign_object === 'Terdeteksi'
+                    ) {
+                        $totalKetidaksesuaian++;
+                    }
+                }
+
+                // 🔹 Cek dari ItemDetailProd (nilai "Tidak OK" di sensory)
+                if ($detail->items) {
+                    $totalKetidaksesuaian += $detail->items
+                        ->filter(fn($item) => $item->sensory === 'Tidak OK')
+                        ->count();
+                }
+            }
+
+            // Simpan hasilnya di properti baru
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+
+            return $report;
+        });
 
         return view('report_process_productions.index', compact('reports'));
     }
+
 
 
     public function create()

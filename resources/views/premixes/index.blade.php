@@ -8,8 +8,8 @@
 
             <div class="d-flex justify-content-between" style="gap: .5rem;">
                 <div class="input-group input-group-sm" style="width: 200px;">
-                    <input type="text" id="searchInput" class="form-control form-control-sm"
-                        placeholder="Cari Raw Material" style="border-radius: 0;">
+                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari Premix"
+                        style="border-radius: 0;">
                     <span class="input-group-text" style="border-radius: 0;">
                         <i class="fas fa-search"></i>
                     </span>

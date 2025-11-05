@@ -23,7 +23,35 @@ class ReportSiomayController extends Controller
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
-        ])->latest()->get();
+        ])->latest()->paginate(10);
+
+        // transform() agar tetap bekerja dengan pagination
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                // 🔹 Cek di level detail proses (color, aroma, taste, texture)
+                if (
+                    $detail->color === 'Tidak OK' ||
+                    $detail->aroma === 'Tidak OK' ||
+                    $detail->taste === 'Tidak OK' ||
+                    $detail->texture === 'Tidak OK'
+                ) {
+                    $totalKetidaksesuaian++;
+                }
+
+                // 🔹 Cek di level bahan baku (raw materials)
+                if ($detail->rawMaterials) {
+                    $totalKetidaksesuaian += $detail->rawMaterials
+                        ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
+                        ->count();
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+
+            return $report;
+        });
 
         return view('report_siomays.index', compact('reports'));
     }

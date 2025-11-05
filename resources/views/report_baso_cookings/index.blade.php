@@ -21,6 +21,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Produk</th>
                             <th>STD Suhu Pusat</th>
                             <th>STD Berat akhir/potong</th>
@@ -37,6 +38,13 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
                             <td>{{ $report->product->product_name ?? '-' }}</td>
                             <td>{{ $report->std_core_temp ?? '-' }}</td>
                             <td>{{ $report->std_weight ?? '-' }}</td>
@@ -115,7 +123,7 @@
                             </td>
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="11">
+                            <td colspan="12">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm text-center align-middle">
                                         <thead class="table-secondary">
@@ -227,6 +235,10 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>

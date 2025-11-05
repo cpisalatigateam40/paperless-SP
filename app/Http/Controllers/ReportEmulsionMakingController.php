@@ -16,7 +16,34 @@ class ReportEmulsionMakingController extends Controller
 {
     public function index()
     {
-        $reports = ReportEmulsionMaking::with('header.details', 'header.agings')->get();
+        $reports = ReportEmulsionMaking::with('header.details', 'header.agings')
+        ->latest()
+        ->paginate(10);
+
+        $reports->getCollection()->transform(function ($report) {
+            $ketidaksesuaian = 0;
+
+            // 🔹 Cek dari tabel details
+            if ($report->header && $report->header->details) {
+                $ketidaksesuaian += $report->header->details
+                    ->filter(fn($d) => $d->conformity === 'x')
+                    ->count();
+            }
+
+            // 🔹 Cek dari tabel agings
+            if ($report->header && $report->header->agings) {
+                $ketidaksesuaian += $report->header->agings->filter(function ($a) {
+                    return $a->sensory_color === 'x'
+                        || $a->sensory_texture === 'x'
+                        || $a->emulsion_result === 'Tidak OK';
+                })->count();
+            }
+
+            $report->ketidaksesuaian = $ketidaksesuaian;
+
+            return $report;
+        });
+
         $rawMaterials = \App\Models\RawMaterial::all();
         return view('report_emulsion_makings.index', compact('reports', 'rawMaterials'));
     }

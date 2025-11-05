@@ -21,6 +21,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Produk</th>
                             <th>Aksi</th>
                         </tr>
@@ -33,6 +34,13 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
                             <td>{{ $report->product->product_name ?? '-' }}</td>
                             <td class="text-center">
                                 {{-- Toggle Detail --}}
@@ -105,7 +113,7 @@
                         </tr>
                         {{-- Detail Collapse --}}
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="table-responsive">
                                     <table class="table table-bordered align-middle small text-center">
                                         <tbody>
@@ -231,7 +239,9 @@
                 </table>
             </div>
 
-            {{ $reports->links() }}
+            <div class="mt-3">
+                {{ $reports->links('pagination::bootstrap-5') }}
+            </div>
         </div>
     </div>
 </div>

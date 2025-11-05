@@ -14,9 +14,21 @@ class ReportPremixController extends Controller
 {
     public function index()
     {
-        $reports = ReportPremix::with(['area', 'detailPremixes.premix'])->latest()->paginate(10);
+        $reports = ReportPremix::with(['area', 'detailPremixes.premix'])
+            ->latest()
+            ->paginate(10);
+
+        $reports->getCollection()->transform(function ($report) {
+            $report->ketidaksesuaian = $report->detailPremixes
+                ->filter(fn($d) => $d->verification === 'x')
+                ->count();
+
+            return $report;
+        });
+
         return view('report_premixes.index', compact('reports'));
     }
+
 
     public function create()
     {

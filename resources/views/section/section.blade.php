@@ -5,7 +5,18 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5>Data Section</h5>
-            <a href="{{ route('sections.create') }}" class="btn btn-primary btn-sm">Tambah Section</a>
+
+            <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
+                <div class="input-group input-group-sm" style="width: 200px;">
+                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari Section"
+                        style="border-radius: 0;">
+                    <span class="input-group-text" style="border-radius: 0;">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+                <a href="{{ route('sections.create') }}" class="btn btn-primary btn-sm">Tambah Section</a></a>
+            </div>
+
         </div>
 
         <div class="card-body">
@@ -76,6 +87,21 @@ $(document).ready(function() {
         $('#success-alert').fadeOut('slow');
         $('#error-alert').fadeOut('slow');
     }, 3000);
+});
+
+function isSimilar(a, b) {
+    return a.includes(b) || b.includes(a);
+}
+
+$(document).ready(function() {
+    $('#searchInput').on('keyup', function() {
+        let keyword = $(this).val().toLowerCase();
+        $('table tbody tr').each(function() {
+            let rowText = $(this).text().toLowerCase();
+            let isMatch = isSimilar(rowText, keyword);
+            $(this).toggle(isMatch);
+        });
+    });
 });
 </script>
 @endsection

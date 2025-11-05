@@ -18,14 +18,36 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportReCleanlinessController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportReCleanliness::with(['roomDetails.room', 'roomDetails.element', 'equipmentDetails.equipment', 'equipmentDetails.part'])
-            ->orderByDesc('date')
-            ->get();
+public function index()
+{
+    $reports = ReportReCleanliness::with([
+            'roomDetails.room',
+            'roomDetails.element',
+            'equipmentDetails.equipment',
+            'equipmentDetails.part'
+        ])
+        ->latest()
+        ->paginate(10);
 
-        return view('report_re_cleanliness.index', compact('reports'));
-    }
+    // hitung ketidaksesuaian berdasarkan verification "Tidak OK"
+    $reports->getCollection()->transform(function ($report) {
+        $roomIssues = $report->roomDetails
+            ->filter(fn($d) => $d->verification === 'Tidak OK')
+            ->count();
+
+        $equipmentIssues = $report->equipmentDetails
+            ->filter(fn($d) => $d->verification === 'Tidak OK')
+            ->count();
+
+        // total ketidaksesuaian
+        $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
+
+        return $report;
+    });
+
+    return view('report_re_cleanliness.index', compact('reports'));
+}
+
 
     public function create()
     {

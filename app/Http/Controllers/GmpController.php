@@ -23,18 +23,73 @@ class GmpController extends Controller
 {
     use HasRoles;
 
-    public function index()
-    {
-        $reports = ReportGmpEmployee::with('area')
-            ->with('details', 'area', 'sanitationCheck.sanitationArea.sanitationResult')
-            ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-                $query->where('area_uuid', Auth::user()->area_uuid);
-            })
-            ->latest()
-            ->get();
+    // public function index()
+    // {
+    //     $reports = ReportGmpEmployee::with('area')
+    //         ->with('details', 'area', 'sanitationCheck.sanitationArea.sanitationResult')
+    //         ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+    //             $query->where('area_uuid', Auth::user()->area_uuid);
+    //         })
+    //         ->latest()
+    //         ->paginate(10);
 
-        return view('gmp_employee.index', compact('reports'));
+    //     return view('gmp_employee.index', compact('reports'));
+    // }
+
+    public function index()
+{
+    $reports = ReportGmpEmployee::with([
+        'area',
+        'details.followups',
+        'sanitationCheck.sanitationArea.followups'
+    ])
+    ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+        $query->where('area_uuid', Auth::user()->area_uuid);
+    })
+    ->latest()
+    ->paginate(10);
+
+    // 🔹 Hitung ketidaksesuaian untuk tiap laporan
+    foreach ($reports as $report) {
+        $count = 0;
+
+        // 🧍 Detail pegawai
+        foreach ($report->details as $detail) {
+            if ($detail->verification == 0) {
+                $count++;
+            }
+
+            // follow-up pegawai
+            foreach ($detail->followups as $f) {
+                if ($f->verification == 0) {
+                    $count++;
+                }
+            }
+        }
+
+        // 🧽 Sanitasi area
+        if ($report->sanitationCheck) {
+            foreach ($report->sanitationCheck->sanitationArea as $area) {
+                if ($area->verification == 0) {
+                    $count++;
+                }
+
+                // follow-up sanitasi
+                foreach ($area->followups as $f) {
+                    if ($f->verification == 0) {
+                        $count++;
+                    }
+                }
+            }
+        }
+
+        // Tambahkan properti dinamis
+        $report->ketidaksesuaian = $count;
     }
+
+    return view('gmp_employee.index', compact('reports'));
+}
+
 
     public function create()
     {

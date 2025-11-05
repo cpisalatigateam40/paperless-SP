@@ -101,8 +101,8 @@
                         <label>Verifikasi Setelah Perbaikan</label>
                         <select name="details[0][verification]" class="form-control">
                             <option value="">-- Pilih Verifikasi --</option>
-                            <option value="0">Tidak</option>
-                            <option value="1">Ya</option>
+                            <option value="0">Tidak OK</option>
+                            <option value="1">OK</option>
                         </select>
                     </div>
                 </div>

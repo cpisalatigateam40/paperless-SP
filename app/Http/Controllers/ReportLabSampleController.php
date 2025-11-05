@@ -18,7 +18,7 @@ class ReportLabSampleController extends Controller
 {
     public function index()
     {
-        $reports = ReportLabSample::with('area', 'details.product')->latest()->get();
+        $reports = ReportLabSample::with('area', 'details.product')->latest()->paginate(10);
         return view('report_lab_samples.index', compact('reports'));
     }
 

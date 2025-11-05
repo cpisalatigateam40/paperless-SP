@@ -16,7 +16,7 @@ class ReportTofuVerifController extends Controller
 {
     public function index()
     {
-        $reports = ReportTofuVerif::latest()->with(['productInfos', 'weightVerifs', 'defectVerifs'])->get();
+        $reports = ReportTofuVerif::latest()->with(['productInfos', 'weightVerifs', 'defectVerifs'])->paginate(10);
 
         return view('report_tofu_verifs.index', compact('reports'));
     }

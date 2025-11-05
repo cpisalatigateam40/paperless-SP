@@ -18,7 +18,7 @@ class ReportRmArrivalController extends Controller
     public function index()
     {
         $reports = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
-            ->orderByDesc('date')
+            ->latest()
             ->get()
             ->map(function ($report) {
                 $report->ketidaksesuaian = $report->details->filter(function ($d) {
@@ -37,6 +37,8 @@ class ReportRmArrivalController extends Controller
 
         return view('report_rm_arrivals.index', compact('reports'));
     }
+
+
 
 
 

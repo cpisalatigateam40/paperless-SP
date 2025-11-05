@@ -23,12 +23,34 @@ class ReportFessmanCookingController extends Controller
     public function index()
     {
         $reports = ReportFessmanCooking::with([
-            'details.processSteps',
-            'details.coolingDowns',
             'details.sensoryCheck'
-        ])->latest()->get();
+        ])
+        ->latest()
+        ->paginate(10);
+
+        // Hitung ketidaksesuaian berdasarkan sensory check
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                if ($detail->sensoryCheck) {
+                    $fields = ['ripeness', 'aroma', 'taste', 'texture', 'color'];
+                    foreach ($fields as $field) {
+                        // Nilai 0 = Tidak OK
+                        if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
+                            $totalKetidaksesuaian++;
+                        }
+                    }
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+            return $report;
+        });
+
         return view('report_fessman_cookings.index', compact('reports'));
     }
+
 
     public function create()
     {

@@ -21,7 +21,7 @@ class ReportWeightStufferController extends Controller
 {
     public function index()
     {
-        $reports = ReportWeightStuffer::with('details')->latest()->get();
+        $reports = ReportWeightStuffer::with('details')->latest()->paginate(10);
         return view('report_weight_stuffers.index', compact('reports'));
     }
 

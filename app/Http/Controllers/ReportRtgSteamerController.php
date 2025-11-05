@@ -17,9 +17,37 @@ class ReportRtgSteamerController extends Controller
 {
     public function index()
     {
-        $reports = ReportRtgSteamer::with(['product', 'area'])->latest()->paginate(10);
+        $reports = ReportRtgSteamer::with(['product', 'area', 'details'])
+            ->latest()
+            ->paginate(10);
+
+        // Tambahkan kolom ketidaksesuaian berdasarkan sensory check
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                $fields = [
+                    'sensory_ripeness',
+                    'sensory_taste',
+                    'sensory_aroma',
+                    'sensory_texture',
+                    'sensory_color'
+                ];
+
+                foreach ($fields as $field) {
+                    if (isset($detail->$field) && $detail->$field === 'Tidak OK') {
+                        $totalKetidaksesuaian++;
+                    }
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+            return $report;
+        });
+
         return view('report_rtg_steamers.index', compact('reports'));
     }
+
 
     public function create()
     {

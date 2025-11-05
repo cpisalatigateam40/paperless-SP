@@ -14,11 +14,34 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportMdProductController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportMdProduct::latest()->paginate(10);
-        return view('report_md_products.index', compact('reports'));
+public function index()
+{
+    $reports = ReportMdProduct::with(['details.positions'])->latest()->paginate(10);
+
+    foreach ($reports as $report) {
+        $totalNonConform = 0;
+
+        foreach ($report->details as $detail) {
+            // 1️⃣ Cek verifikasi setelah perbaikan
+            if (isset($detail->verification) && $detail->verification == 0) {
+                $totalNonConform++;
+                continue; // langsung lanjut, tidak perlu cek posisi lagi
+            }
+
+            // 2️⃣ Cek posisi (status = 0 berarti Tidak OK)
+            if ($detail->positions->contains('status', 0)) {
+                $totalNonConform++;
+            }
+        }
+
+        // Tambahkan properti untuk dipakai di view
+        $report->ketidaksesuaian = $totalNonConform;
     }
+
+    return view('report_md_products.index', compact('reports'));
+}
+
+
 
     public function create()
     {

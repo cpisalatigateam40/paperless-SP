@@ -17,9 +17,38 @@ class ReportBasoCookingController extends Controller
 {
     public function index()
     {
-        $reports = ReportBasoCooking::with('details.temperatures')->latest()->get();
+        $reports = ReportBasoCooking::with(['details.temperatures'])
+            ->latest()
+            ->paginate(10);
+
+        // Tambahkan atribut ketidaksesuaian untuk setiap report
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                $fields = [
+                    'sensory_shape',
+                    'sensory_taste',
+                    'sensory_aroma',
+                    'sensory_texture',
+                    'sensory_color',
+                ];
+
+                foreach ($fields as $field) {
+                    // "0" dianggap Tidak OK
+                    if (isset($detail->$field) && $detail->$field == '0') {
+                        $totalKetidaksesuaian++;
+                    }
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+            return $report;
+        });
+
         return view('report_baso_cookings.index', compact('reports'));
     }
+
 
     public function create()
     {

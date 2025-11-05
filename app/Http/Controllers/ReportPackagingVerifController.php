@@ -15,9 +15,42 @@ class ReportPackagingVerifController extends Controller
 {
     public function index()
     {
-        $reports = ReportPackagingVerif::with('details.checklist')->get();
+        $reports = ReportPackagingVerif::with('details.checklist')
+        ->latest()
+        ->paginate(10);
+
+        foreach ($reports as $report) {
+            $totalNonConform = 0;
+
+            foreach ($report->details as $detail) {
+                $check = $detail->checklist;
+
+                if (!$check) continue;
+
+                $fieldsToCheck = [
+                    'sampling_result',
+                    'verif_md',
+                    'sealing_condition_1', 'sealing_condition_2', 'sealing_condition_3',
+                    'sealing_condition_4', 'sealing_condition_5',
+                    'sealing_vacuum_1', 'sealing_vacuum_2', 'sealing_vacuum_3',
+                    'sealing_vacuum_4', 'sealing_vacuum_5',
+                ];
+
+                foreach ($fieldsToCheck as $field) {
+                    if (isset($check->$field) && $check->$field === 'Tidak OK') {
+                        $totalNonConform++;
+                    }
+                }
+            }
+
+            // simpan hasil ke properti tambahan
+            $report->ketidaksesuaian = $totalNonConform;
+        }
+
         return view('report_packaging_verifs.index', compact('reports'));
     }
+
+
 
     public function create()
     {

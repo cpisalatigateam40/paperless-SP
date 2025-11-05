@@ -33,6 +33,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Dibuat oleh</th>
                             <th>Action</th>
                         </tr>
@@ -44,6 +45,13 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ optional($report->area)->name }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">
                                 {{-- Toggle Detail --}}
@@ -271,6 +279,10 @@
             @endforeach
             </tbody>
             </table>
+        </div>
+
+        <div class="mt-3">
+            {{ $reports->links('pagination::bootstrap-5') }}
         </div>
 
     </div>

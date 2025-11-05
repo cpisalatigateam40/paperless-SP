@@ -15,7 +15,7 @@ class ReportProductionNonconformityController extends Controller
 {
     public function index()
     {
-        $reports = ReportProductionNonconformity::with('details')->latest()->get();
+        $reports = ReportProductionNonconformity::with('details')->latest()->paginate(10);
         return view('report_production_nonconformities.index', compact('reports'));
     }
 

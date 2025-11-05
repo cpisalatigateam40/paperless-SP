@@ -19,9 +19,32 @@ class ReportFreezPackagingController extends Controller
 {
     public function index()
     {
-        $reports = ReportFreezPackaging::with('area')->latest()->get();
+        $reports = ReportFreezPackaging::with(['area', 'details.kartoning'])->latest()->paginate(10);
+
+        // Hitung ketidaksesuaian
+        foreach ($reports as $report) {
+            $count = 0;
+
+            foreach ($report->details as $detail) {
+                // 1️⃣ Cek verifikasi setelah tindakan koreksi
+                if ($detail->verif_after === 'x') {
+                    $count++;
+                    continue; // tidak perlu cek karton jika sudah x
+                }
+
+                // 2️⃣ Cek kondisi karton
+                if (optional($detail->kartoning)->carton_condition === 'x') {
+                    $count++;
+                }
+            }
+
+            // Tambahkan properti agar bisa dipakai di Blade
+            $report->ketidaksesuaian = $count;
+        }
+
         return view('report_freez_packagings.index', compact('reports'));
     }
+
 
     public function create()
     {

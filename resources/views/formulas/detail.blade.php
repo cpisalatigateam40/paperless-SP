@@ -121,7 +121,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php $totalWeight = 0; @endphp
                                     @foreach($details as $detail)
+                                    @php $totalWeight += $detail->weight ?? 0; @endphp
                                     <tr>
                                         <td>{{ $detail->rawMaterial->material_name ?? $detail->premix->name ?? '-' }}
                                         </td>
@@ -153,6 +155,10 @@
                                     @endforeach
                                 </tbody>
                             </table>
+
+                            <p class="mt-2 fw-bold">
+                                Total Bahan: {{ number_format($totalWeight, 2) }} kg
+                            </p>
                         </td>
                     </tr>
                     @empty

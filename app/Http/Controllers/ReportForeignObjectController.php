@@ -20,7 +20,7 @@ class ReportForeignObjectController extends Controller
     {
         $reports = ReportForeignObject::with('section', 'area', 'details.product')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('report_foreign_objects.index', compact('reports'));
     }

@@ -23,11 +23,38 @@ class ReportSauceController extends Controller
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
-        ])->latest()->get();
+        ])->latest()->paginate(10);
+
+        // Gunakan transform() karena paginate() menghasilkan paginator
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                // 🔹 1. Cek kolom sensory di detail (color, aroma, taste, texture)
+                if (
+                    $detail->color === 'Tidak OK' ||
+                    $detail->aroma === 'Tidak OK' ||
+                    $detail->taste === 'Tidak OK' ||
+                    $detail->texture === 'Tidak OK'
+                ) {
+                    $totalKetidaksesuaian++;
+                }
+
+                // 🔹 2. Cek raw materials di setiap detail
+                if ($detail->rawMaterials) {
+                    $totalKetidaksesuaian += $detail->rawMaterials
+                        ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
+                        ->count();
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+
+            return $report;
+        });
 
         return view('report_sauces.index', compact('reports'));
     }
-
 
     // 2. Create: tampilkan form tambah
     public function create()
