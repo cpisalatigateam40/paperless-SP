@@ -62,12 +62,12 @@
             <div class="row g-3 mb-3 card-body">
                 <div class="col-md-4">
                     <label>Nama Produk</label>
-                    <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector"
+                    <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector select2-product"
                         data-index="{{ $i }}">
                         <option value="">-- Pilih Produk --</option>
                         @foreach($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }}
-                            {{ $product->nett_weight }}</option>
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                            {{ $product->nett_weight }} g</option>
                         @endforeach
                     </select>
                 </div>

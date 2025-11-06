@@ -45,7 +45,8 @@
                                 -
                                 @endif
                             </td>
-                            <td>{{ $report->product->product_name ?? '-' }}</td>
+                            <td>{{ $report->product->product_name ?? '-' }} -
+                                {{ $report->product->nett_weight ?? '-' }} g</td>
                             <td>{{ $report->std_core_temp ?? '-' }}</td>
                             <td>{{ $report->std_weight ?? '-' }}</td>
                             <td>{{ $report->set_boiling_1 ?? '-' }}</td>
@@ -230,7 +231,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8">Belum ada data laporan.</td>
+                            <td colspan="12">Belum ada data laporan.</td>
                         </tr>
                         @endforelse
                     </tbody>

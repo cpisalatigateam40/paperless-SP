@@ -67,7 +67,7 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <label>Formula</label>
-                        <select name="formula_uuid" id="formula-select" class="form-control" required>
+                        <select name="formula_uuid" id="formula-select" class="form-control">
                             <option value="">-- Pilih Formula --</option>
                             @foreach($formulas as $formula)
                             <option value="{{ $formula->uuid }}"

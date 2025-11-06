@@ -41,7 +41,8 @@
                                 -
                                 @endif
                             </td>
-                            <td>{{ $report->product->product_name ?? '-' }}</td>
+                            <td>{{ $report->product->product_name ?? '-' }} -
+                                {{ $report->product->nett_weight ?? '-' }} g</td>
                             <td class="text-center">
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"

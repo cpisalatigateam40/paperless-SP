@@ -139,8 +139,8 @@
                                             <tr>
                                                 <th rowspan="2" class="align-middle">Waktu Pengecekan</th>
                                                 <th rowspan="2" class="align-middle">Nama Produk</th>
-                                                <th rowspan="2" class="align-middle">Kode Produksi</th>
                                                 <th rowspan="2" class="align-middle">Gramase</th>
+                                                <th rowspan="2" class="align-middle">Kode Produksi</th>
                                                 <th rowspan="2" class="align-middle">Best Before</th>
                                                 <th rowspan="2" class="align-middle">No. Program</th>
                                                 <th colspan="4" class="align-middle">Fe 1.5 mm</th>
@@ -169,8 +169,8 @@
                                             <tr>
                                                 <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
                                                 <td>{{ $detail->product->product_name ?? '-' }}</td>
+                                                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
                                                 <td>{{ $detail->production_code }}</td>
-                                                <td>{{ $detail->gramase }}</td>
                                                 <td>{{ $detail->best_before }}</td>
                                                 <td>{{ $detail->program_number }}</td>
 

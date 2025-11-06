@@ -216,4 +216,66 @@ class ReportMetalDetectorController extends Controller
         return $pdf->stream('report-metal-detector-' . $report->date . '.pdf');
     }
 
+    public function edit($uuid)
+    {
+        $report = ReportMetalDetector::where('uuid', $uuid)->firstOrFail();
+        $details = DetailMetalDetector::where('report_uuid', $report->uuid)->get();
+        $areas = Area::all();
+        $sections = Section::all();
+        $products = Product::all();
+
+        return view('report_metal_detectors.edit', compact(
+            'report',
+            'details',
+            'areas',
+            'sections',
+            'products'
+        ));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required',
+            'section_uuid' => 'nullable',
+            'details' => 'required|array',
+            'details.*.product_uuid' => 'required',
+            'details.*.hour' => 'required',
+            'details.*.production_code' => 'required',
+        ]);
+
+        // Update header laporan
+        $report = ReportMetalDetector::where('uuid', $uuid)->firstOrFail();
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'section_uuid' => $request->section_uuid,
+        ]);
+
+        // Hapus semua detail lama dan simpan ulang (praktis untuk form dinamis)
+        DetailMetalDetector::where('report_uuid', $report->uuid)->delete();
+
+        foreach ($request->details as $detail) {
+            DetailMetalDetector::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'product_uuid' => $detail['product_uuid'],
+                'hour' => $detail['hour'],
+                'production_code' => $detail['production_code'],
+                'result_fe' => $detail['result_fe'],
+                'result_non_fe' => $detail['result_non_fe'],
+                'result_sus316' => $detail['result_sus316'],
+                'verif_loma' => $detail['verif_loma'],
+                'nonconformity' => $detail['nonconformity'],
+                'corrective_action' => $detail['corrective_action'],
+                'verif_after_correct' => $detail['verif_after_correct'],
+                'notes' => $detail['notes'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('report_metal_detectors.index')->with('success', 'Data berhasil diperbarui!');
+    }
+
+
 }

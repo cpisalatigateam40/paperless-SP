@@ -13,25 +13,26 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Jam</label>
                         <input type="time" name="time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Produk</label>
-                        <select name="product_uuid" class="form-control" required>
+                        <select name="product_uuid" class="form-control select2-product" required>
                             <option value="">Pilih Produk</option>
                             @foreach($products as $product)
-                            <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                            <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                {{ $product->nett_weight }} g</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Kode Produksi</label>
                         <input type="text" name="production_code" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Jenis Kontaminan</label>
                         <input type="text" name="contaminant_type" class="form-control">
                     </div>
@@ -39,25 +40,25 @@
 
 
                 <div class="row mt-4 mb-3">
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Bukti (Foto)</label>
                         <input type="file" name="evidence" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Tahapan Analisis</label>
                         <input type="text" name="analysis_stage" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Asal Kontaminan</label>
                         <input type="text" name="contaminant_origin" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Keterangan</label>
                         <input type="text" name="notes" class="form-control">
                     </div>
                 </div>
 
-                <div class="row mb-3">
+                <div class="row mb-3 mt-5">
                     <div class="col-md-4">
                         <label class="form-label">Paraf QC</label>
                         <canvas id="qc-canvas" class="border" width="300" height="150"

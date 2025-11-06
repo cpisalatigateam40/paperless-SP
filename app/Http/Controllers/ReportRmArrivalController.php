@@ -38,10 +38,6 @@ class ReportRmArrivalController extends Controller
         return view('report_rm_arrivals.index', compact('reports'));
     }
 
-
-
-
-
     public function create()
     {
         return view('report_rm_arrivals.create', [
@@ -50,7 +46,6 @@ class ReportRmArrivalController extends Controller
             'sections' => Section::whereIn('section_name', ['Seasoning', 'Chillroom'])->get(),
         ]);
     }
-
 
     public function store(Request $request)
     {
@@ -90,7 +85,6 @@ class ReportRmArrivalController extends Controller
         return redirect()->route('report_rm_arrivals.index')
             ->with('success', 'Laporan kedatangan bahan baku berhasil disimpan.');
     }
-
 
     public function destroy($uuid)
     {
@@ -224,5 +218,64 @@ class ReportRmArrivalController extends Controller
 
         return $pdf->stream('laporan_rm_arrival_' . $report->date . '.pdf');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportRmArrival::where('uuid', $uuid)->with('details')->firstOrFail();
+
+        return view('report_rm_arrivals.edit', [
+            'report' => $report,
+            'areas' => Area::all(),
+            'rawMaterials' => RawMaterial::all(),
+            'sections' => Section::whereIn('section_name', ['Seasoning', 'Chillroom'])->get(),
+        ]);
+    }
+
+
+    public function update(Request $request, $uuid)
+    {
+        // 1️⃣ Ambil data header
+        $report = ReportRmArrival::where('uuid', $uuid)->firstOrFail();
+
+        // 2️⃣ Update header
+        $report->update([
+            'section_uuid' => $request->section_uuid,
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'updated_by' => Auth::user()->name,
+        ]);
+
+        // 3️⃣ Hapus semua detail lama
+        DetailRmArrival::where('report_uuid', $report->uuid)->delete();
+
+        // 4️⃣ Simpan ulang semua detail baru
+        foreach ($request->input('details', []) as $detail) {
+            DetailRmArrival::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'raw_material_uuid' => $detail['raw_material_uuid'],
+                'supplier'           => isset($detail['supplier']) 
+                                ? implode(',', $detail['supplier']) 
+                                : null,
+                'rm_condition' => $detail['rm_condition'],
+                'production_code' => $detail['production_code'] ?? null,
+                'time' => $detail['time'],
+                'temperature' => $detail['temperature'],
+                'packaging_condition' => $detail['packaging_condition'],
+                // 'sensorial_condition' => $detail['sensorial_condition'],
+                'sensory_appearance' => $detail['sensory_appearance'],
+                'sensory_aroma' => $detail['sensory_aroma'],
+                'sensory_color' => $detail['sensory_color'],
+                'contamination' => $detail['contamination'],
+                'problem' => $detail['problem'] ?? null,
+                'corrective_action' => $detail['corrective_action'] ?? null,
+            ]);
+        }
+
+        // 5️⃣ Redirect dengan notifikasi sukses
+        return redirect()->route('report_rm_arrivals.index')
+            ->with('success', 'Laporan kedatangan bahan baku berhasil diperbarui.');
+    }
+
 
 }

@@ -51,6 +51,13 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
+                                @can('edit report')
+                                <a href="{{ route('report_weight_stuffers.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Hapus --}}
                                 <form action="{{ route('report_weight_stuffers.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
@@ -131,6 +138,12 @@
                                             <th class="text-start">Nama Produk</th>
                                             @foreach ($details as $d)
                                             <th>{{ $d->product->product_name ?? '-' }}</th>
+                                            @endforeach
+                                        </tr>
+                                        <tr>
+                                            <th class="text-start">Gramase</th>
+                                            @foreach ($details as $d)
+                                            <th>{{ $d->product->nett_weight ?? '-' }} g</th>
                                             @endforeach
                                         </tr>
                                         <tr>

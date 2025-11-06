@@ -49,6 +49,12 @@
                                     data-bs-target="#detail-{{ $r->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                @can('edit report')
+                                <a href="{{ route('report_siomays.edit', $r->uuid) }}" class="btn btn-sm btn-warning"
+                                    title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
                                 <form action="{{ route('report_siomays.destroy', $r->uuid) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus laporan ini?')">
                                     @csrf
@@ -121,6 +127,12 @@
                                             <th class="text-start">Nama Produk</th>
                                             <td colspan="16" class="text-start" style="text-align: start !important;">
                                                 {{ $r->product->product_name }}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-start">Gramase</th>
+                                            <td colspan="16" class="text-start" style="text-align: start !important;">
+                                                {{ $r->product->nett_weight }} g</td>
                                         </tr>
 
                                         <tr>

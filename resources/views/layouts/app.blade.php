@@ -12,6 +12,13 @@
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="{{ asset('img/sausage.png') }}">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- jQuery (wajib untuk Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
 
     <style>
@@ -93,6 +100,36 @@
     td {
         vertical-align: middle !important;
     }
+
+    .select2-container--default .select2-selection--single {
+        height: calc(2.25rem + 2px) !important;
+        /* tinggi standar form-control */
+        padding: 0.375rem 0.75rem !important;
+        /* padding Bootstrap */
+        border: 1px solid #ced4da !important;
+        /* warna border form-control */
+        border-radius: 0.375rem !important;
+        /* sudut membulat */
+        background-color: #fff !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #212529 !important;
+        line-height: 1.5 !important;
+        padding-left: 0 !important;
+        /* hapus padding kiri default */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100% !important;
+        right: 0.75rem !important;
+    }
+
+    /* Saat focus */
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
     </style>
 
     @yield('style')
@@ -122,6 +159,15 @@
     <!-- Bootstrap JS + Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('.select2-product').select2({
+            placeholder: '-- Pilih Produk --',
+            allowClear: true,
+            width: '100%'
+        });
+    });
+    </script>
 
     @yield('script')
 </body>

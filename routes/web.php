@@ -421,6 +421,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/known', 'known')->name('known');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     // MD PREMIX
@@ -432,6 +434,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{uuid}', 'update')->name('update');
         Route::delete('/{uuid}', 'destroy')->name('destroy');
         Route::post('/import', 'import')->name('import');
+        
     });
 
     // REPORT PREMIX
@@ -443,6 +446,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/known', 'known')->name('known');
         Route::post('/{id}/approve', 'approve')->name('approve');
         Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
     });
 
     // REPORT FOREIGN OBJECT
@@ -613,6 +618,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/known', 'known')->name('known');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{report_uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-retains')
@@ -835,6 +842,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-packaging-verifs')
@@ -879,6 +888,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-process-productions')
@@ -1009,6 +1020,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
             Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     Route::prefix('report-siomays')
@@ -1024,6 +1038,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
             Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-waterbaths')

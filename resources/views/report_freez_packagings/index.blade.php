@@ -144,6 +144,7 @@
                                             <tr>
                                                 <th rowspan="2">Waktu Pemeriksaan</th>
                                                 <th rowspan="2">Nama Produk</th>
+                                                <th rowspan="2">Gramase</th>
                                                 <th rowspan="2">Kode Produksi</th>
                                                 <th rowspan="2">Best Before</th>
                                                 <th rowspan="2">Tindakan Koreksi</th>
@@ -183,6 +184,8 @@
                                                     {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : '-' }}
                                                 </td>
                                                 <td class="align-middle">{{ $detail->product->product_name ?? '-' }}
+                                                </td>
+                                                <td class="align-middle">{{ $detail->product->nett_weight ?? '-' }} g
                                                 </td>
                                                 <td class="align-middle">{{ $detail->production_code ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->best_before ?? '-' }}</td>

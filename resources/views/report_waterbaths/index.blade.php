@@ -111,6 +111,7 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Produk</th>
+                                                <th>Gramase</th>
                                                 <th>Batch</th>
                                                 <th>Jumlah</th>
                                                 <th>Satuan</th>
@@ -133,6 +134,7 @@
                                             @for($i = 0; $i < $max; $i++) <tr>
                                                 {{-- Detail Produk --}}
                                                 <td>{{ $report->details[$i]->product->product_name ?? '-' }}</td>
+                                                <td>{{ $report->details[$i]->product->nett_weight ?? '-' }} g</td>
                                                 <td>{{ $report->details[$i]->batch_code ?? '-' }}</td>
                                                 <td>{{ $report->details[$i]->amount ?? '-' }}</td>
                                                 <td>{{ $report->details[$i]->unit ?? '-' }}</td>

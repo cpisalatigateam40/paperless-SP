@@ -132,7 +132,8 @@
                 Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
             </td>
             <td style="text-align: left; border: none;">
-                Produk: <span style="text-decoration: underline;"> {{ $report->product->product_name ?? '-' }}</span>
+                Produk: <span style="text-decoration: underline;"> {{ $report->product->product_name ?? '-' }} -
+                    {{ $report->product->nett_weight ?? '-' }} g</span>
             </td>
         </tr>
     </table>

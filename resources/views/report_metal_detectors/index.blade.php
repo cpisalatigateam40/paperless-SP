@@ -59,6 +59,13 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
+                                @can('edit report')
+                                <a href="{{ route('report_metal_detectors.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Hapus --}}
                                 <form action="{{ route('report_metal_detectors.destroy', $report->id) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus?')">
@@ -136,6 +143,7 @@
                                             <tr>
                                                 <th>Jam</th>
                                                 <th>Produk</th>
+                                                <th>Gramase</th>
                                                 <th>Kode Produksi</th>
                                                 <th>Fe 1.5 mm</th>
                                                 <th>Non Fe 1.5 mm</th>
@@ -152,6 +160,7 @@
                                             <tr>
                                                 <td>{{ $detail->hour }}</td>
                                                 <td>{{ $detail->product->product_name ?? '-' }}</td>
+                                                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
                                                 <td>{{ $detail->production_code }}</td>
                                                 <td>{{ $detail->result_fe }}</td>
                                                 <td>{{ $detail->result_non_fe }}</td>

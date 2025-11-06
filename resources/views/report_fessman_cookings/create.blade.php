@@ -57,27 +57,32 @@
         <div class="accordion-body card shadow">
 
             {{-- Info Produk --}}
-            <div class="row g-3 card-body">
-                <div class="col-md-4">
+            <div class="row card-body">
+                <div class="col-md-6">
                     <label>Nama Produk</label>
-                    <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector"
+                    <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector select2-product"
                         data-index="{{ $i }}">
                         <option value="">-- Pilih Produk --</option>
                         @foreach($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }}
-                            {{ $product->nett_weight }}</option>
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }} - {{ $product->nett_weight }}
+                            g
+                        </option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label>Kode Produksi</label>
                     <input type="text" name="details[{{ $i }}][production_code]" class="form-control">
                 </div>
-                <div class="col-md-2">
+
+            </div>
+
+            <div class="row g-3 card-body" style="margin-top: -2rem;">
+                <div class="col-md-6">
                     <label>Untuk Kemasan (gr)</label>
                     <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-6">
                     <label>Jumlah Trolley</label>
                     <input type="number" name="details[{{ $i }}][trolley_count]" class="form-control">
                 </div>

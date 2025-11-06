@@ -23,24 +23,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportProcessProdController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportProcessProd::with([
-    //         'area',
-    //         'section',
-    //         'detail.product',
-    //         'detail.formula',
-    //         'detail.items.formulation.rawMaterial',
-    //         'detail.items.formulation.premix',
-    //         'detail.emulsifying',
-    //         'detail.sensoric',
-    //         'detail.tumbling',
-    //         'detail.aging'
-    //     ])->latest()->get();
-
-    //     return view('report_process_productions.index', compact('reports'));
-    // }
-
     public function index()
     {
         $reports = ReportProcessProd::with([

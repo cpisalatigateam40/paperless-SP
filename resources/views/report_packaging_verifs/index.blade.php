@@ -142,6 +142,7 @@
                                         <tr>
                                             <th rowspan="2">Jam</th>
                                             <th rowspan="2">Produk</th>
+                                            <th rowspan="2">Gramase</th>
                                             <th rowspan="2">Upload MD BPOM</th>
                                             <th rowspan="2">Upload QR Code</th>
                                             <th rowspan="2">Upload Kode Produksi & Best Before</th>
@@ -186,6 +187,7 @@
                                             @if($i == 1)
                                             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
                                             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
+                                            <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
                                             <td rowspan="5">
                                                 @if($d->upload_md)
                                                 <a href="{{ asset('storage/' . $d->upload_md) }}" target="_blank">

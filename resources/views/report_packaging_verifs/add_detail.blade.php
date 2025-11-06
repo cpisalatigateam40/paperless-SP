@@ -27,10 +27,10 @@
                             <td><input type="time" name="details[0][time]" class="form-control"
                                     value="{{ \Carbon\Carbon::now()->format('H:i') }}"></td>
                             <td>
-                                <select name="details[0][product_uuid]" class="form-control">
+                                <select name="details[0][product_uuid]" class="form-control select2-product">
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}
-                                        {{ $product->nett_weight }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                        {{ $product->nett_weight }} g</option>
                                     @endforeach
                                 </select>
                             </td>

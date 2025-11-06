@@ -270,5 +270,81 @@ class ReportSauceController extends Controller
             ->with('success', 'Detail berhasil ditambahkan');
     }
 
+    public function edit($uuid)
+{
+    $report = ReportSauce::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
+    $products = Product::all();
+    $rawMaterials = RawMaterial::all();
+
+    return view('report_sauces.edit', compact('report', 'products', 'rawMaterials'));
+}
+
+public function update(Request $request, $uuid)
+{
+    DB::beginTransaction();
+    try {
+        $report = ReportSauce::where('uuid', $uuid)->firstOrFail();
+
+        // ✅ Update header laporan
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'product_uuid' => $request->product_uuid,
+            'production_code' => $request->production_code,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'sensory' => $request->sensory,
+        ]);
+
+        // ✅ Hapus detail lama (biar tidak dobel data nested)
+        $report->details()->each(function ($detail) {
+            $detail->rawMaterials()->delete();
+            $detail->delete();
+        });
+
+        // ✅ Simpan ulang detail baru
+        if ($request->has('details')) {
+            foreach ($request->details as $detail) {
+                $detailModel = $report->details()->create([
+                    'uuid' => Str::uuid(),
+                    'time' => $detail['time'] ?? null,
+                    'process_step' => $detail['process_step'] ?? null,
+                    'duration' => $detail['duration'] ?? null,
+                    'pressure' => $detail['pressure'] ?? null,
+                    'target_temperature' => $detail['target_temperature'] ?? null,
+                    'actual_temperature' => $detail['actual_temperature'] ?? null,
+                    'color' => $detail['color'] ?? null,
+                    'aroma' => $detail['aroma'] ?? null,
+                    'taste' => $detail['taste'] ?? null,
+                    'texture' => $detail['texture'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                    'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
+                    'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
+                ]);
+
+                if (isset($detail['raw_materials'])) {
+                    foreach ($detail['raw_materials'] as $rm) {
+                        if (!empty($rm['raw_material_uuid'])) {
+                            $detailModel->rawMaterials()->create([
+                                'uuid' => Str::uuid(),
+                                'raw_material_uuid' => $rm['raw_material_uuid'],
+                                'amount' => $rm['amount'] ?? null,
+                                'sensory' => $rm['sensory'] ?? null,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        DB::commit();
+        return redirect()->route('report_sauces.index')->with('success', 'Laporan berhasil diperbarui.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+}
+
+
 
 }
