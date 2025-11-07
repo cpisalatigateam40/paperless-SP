@@ -11,16 +11,17 @@
                 @csrf
                 @method('PUT')
 
-                {{-- HEADER --}}
+                {{-- HEADER REPORT --}}
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Tanggal</label>
                         <input type="date" name="date" class="form-control"
-                            value="{{ \Carbon\Carbon::parse($report->date)->format('Y-m-d') }}" required>
+                            value="{{ old('date', \Carbon\Carbon::parse($report->date)->toDateString()) }}" required>
                     </div>
                     <div class="col-md-6">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" value="{{ $report->shift }}" required>
+                        <input type="text" id="shift" name="shift" class="form-control"
+                            value="{{ old('shift', $report->shift) }}" required>
                     </div>
                 </div>
 
@@ -31,98 +32,168 @@
                             <option value="">-- pilih produk --</option>
                             @foreach($products as $product)
                             <option value="{{ $product->uuid }}"
-                                {{ $report->product_uuid == $product->uuid ? 'selected' : '' }}>
+                                {{ old('product_uuid', $report->product_uuid) == $product->uuid ? 'selected' : '' }}>
                                 {{ $product->product_name }} - {{ $product->nett_weight }} g
                             </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label>Kode Produksi</label>
+                        <label class="form-label">Kode Produksi</label>
                         <input type="text" name="production_code" class="form-control"
-                            value="{{ $report->production_code }}">
+                            value="{{ old('production_code', $report->production_code) }}">
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label>Waktu Start</label>
-                        <input type="time" name="start_time" class="form-control" value="{{ $report->start_time }}">
+                        <label class="form-label">Waktu Start</label>
+                        <input type="time" name="start_time" class="form-control"
+                            value="{{ old('start_time', $report->start_time) }}">
                     </div>
                     <div class="col-md-6">
-                        <label>Waktu Stop</label>
-                        <input type="time" name="end_time" class="form-control" value="{{ $report->end_time }}">
+                        <label class="form-label">Waktu Stop</label>
+                        <input type="time" name="end_time" class="form-control"
+                            value="{{ old('end_time', $report->end_time) }}">
                     </div>
                 </div>
 
-                @php $detail = $report->details->first(); @endphp
                 <h6 class="mt-4">Detail Proses</h6>
 
-                <div class="row mb-3">
+                @php
+                $detail = $report->details->first();
+                @endphp
+
+                <div class="row mb-4">
                     <div class="col-md-6">
-                        <label>Pukul</label>
-                        <input type="time" name="details[0][time]" class="form-control" value="{{ $detail->time }}">
+                        <label class="form-label">Pukul</label>
+                        <input type="time" name="details[0][time]" class="form-control"
+                            value="{{ old('details.0.time', $detail->time) }}">
                     </div>
                     <div class="col-md-6">
-                        <label>Tahapan Proses</label>
+                        <label class="form-label">Tahapan Proses</label>
                         <input type="text" name="details[0][process_step]" class="form-control"
-                            value="{{ $detail->process_step }}">
+                            value="{{ old('details.0.process_step', $detail->process_step) }}">
                     </div>
                 </div>
 
                 {{-- RAW MATERIALS --}}
                 <div id="raw-materials-wrapper">
-                    @foreach($detail->rawMaterials as $i => $rm)
+                    @foreach($detail->rawMaterials as $i => $rmDetail)
                     <div class="row mb-2 raw-material-item">
                         <div class="col-md-4">
-                            <label>Bahan Baku</label>
-                            <select name="details[0][raw_materials][{{ $i }}][raw_material_uuid]" class="form-control">
+                            <label class="form-label">Bahan Baku</label>
+                            <select name="details[0][raw_materials][{{ $i }}][raw_material_uuid]" class="form-control"
+                                required>
                                 <option value="">-- pilih bahan baku --</option>
-                                @foreach($rawMaterials as $m)
-                                <option value="{{ $m->uuid }}"
-                                    {{ $rm->raw_material_uuid == $m->uuid ? 'selected' : '' }}>
-                                    {{ $m->material_name }}
+                                @foreach($rawMaterials as $rm)
+                                <option value="{{ $rm->uuid }}"
+                                    {{ $rmDetail->raw_material_uuid == $rm->uuid ? 'selected' : '' }}>
+                                    {{ $rm->material_name }}
                                 </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label>Berat (Kg)</label>
+                            <label class="form-label">Berat (kg)</label>
                             <input type="number" step="0.01" name="details[0][raw_materials][{{ $i }}][amount]"
-                                class="form-control" value="{{ $rm->amount }}">
+                                value="{{ old("details.0.raw_materials.$i.amount", $rmDetail->amount) }}"
+                                class="form-control" placeholder="Berat (kg)">
                         </div>
                         <div class="col-md-4">
-                            <label>Sensory</label>
-                            <select name="details[0][raw_materials][{{ $i }}][sensory]" class="form-control">
-                                <option value="OK" {{ $rm->sensory == 'OK' ? 'selected' : '' }}>OK</option>
-                                <option value="Tidak OK" {{ $rm->sensory == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
-                                </option>
+                            <label class="form-label">Sensory</label>
+                            <select name="details[0][raw_materials][{{ $i }}][sensory]" class="form-control" required>
+                                <option value="OK" {{ $rmDetail->sensory == 'OK' ? 'selected' : '' }}>OK</option>
+                                <option value="Tidak OK" {{ $rmDetail->sensory == 'Tidak OK' ? 'selected' : '' }}>Tidak
+                                    OK</option>
                             </select>
                         </div>
                     </div>
                     @endforeach
                 </div>
 
-                <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
-                    Baku</button>
+                <!-- <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
+                    Baku</button> -->
 
-                {{-- Sensory --}}
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label>Warna</label>
-                        <select name="details[0][color]" class="form-control">
+                <div class="row mb-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Warna</label>
+                        <select name="details[0][color]" class="form-control" required>
                             <option value="OK" {{ $detail->color == 'OK' ? 'selected' : '' }}>OK</option>
                             <option value="Tidak OK" {{ $detail->color == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
                             </option>
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label>Aroma</label>
-                        <select name="details[0][aroma]" class="form-control">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Aroma</label>
+                        <select name="details[0][aroma]" class="form-control" required>
                             <option value="OK" {{ $detail->aroma == 'OK' ? 'selected' : '' }}>OK</option>
                             <option value="Tidak OK" {{ $detail->aroma == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
                             </option>
                         </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Rasa</label>
+                        <select name="details[0][taste]" class="form-control" required>
+                            <option value="OK" {{ $detail->taste == 'OK' ? 'selected' : '' }}>OK</option>
+                            <option value="Tidak OK" {{ $detail->taste == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tekstur</label>
+                        <select name="details[0][texture]" class="form-control" required>
+                            <option value="OK" {{ $detail->texture == 'OK' ? 'selected' : '' }}>OK</option>
+                            <option value="Tidak OK" {{ $detail->texture == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-4 mt-4">
+                    <div class="col-md-6">
+                        <label class="form-label d-block">Mixing Paddle</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="on"
+                                id="mixingOn0" {{ $detail->mixing_paddle_on ? 'checked' : '' }}>
+                            <label class="form-check-label" for="mixingOn0">On</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="off"
+                                id="mixingOff0" {{ $detail->mixing_paddle_off ? 'checked' : '' }}>
+                            <label class="form-check-label" for="mixingOff0">Off</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Lama Proses (menit)</label>
+                        <input type="number" step="0.01" name="details[0][duration]" class="form-control"
+                            value="{{ old('details.0.duration', $detail->duration) }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Pressure (Bar)</label>
+                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control"
+                            value="{{ old('details.0.pressure', $detail->pressure) }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Target Temperature (&deg;C)</label>
+                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control"
+                            value="{{ old('details.0.target_temperature', $detail->target_temperature) }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Actual Temperature (&deg;C)</label>
+                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control"
+                            value="{{ old('details.0.actual_temperature', $detail->actual_temperature) }}">
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Catatan</label>
+                        <input type="text" name="details[0][notes]" class="form-control"
+                            value="{{ old('details.0.notes', $detail->notes) }}">
                     </div>
                 </div>
 

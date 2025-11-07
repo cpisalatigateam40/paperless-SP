@@ -90,6 +90,7 @@ class ReportWaterbathController extends Controller
                     'stop_time_pasteur' => $c['stop_time_pasteur'] ?? null,
                     'water_temp_setting'=> $c['water_temp_setting'] ?? null,
                     'water_temp_actual' => $c['water_temp_actual'] ?? null,
+                    'water_temp_final' => $c['water_temp_final'] ?? null,
                     'product_temp_final'=> $c['product_temp_final'] ?? null,
                 ]);
             }
@@ -252,6 +253,7 @@ class ReportWaterbathController extends Controller
                     'stop_time_pasteur' => $c['stop_time_pasteur'] ?? null,
                     'water_temp_setting'=> $c['water_temp_setting'] ?? null,
                     'water_temp_actual' => $c['water_temp_actual'] ?? null,
+                    'water_temp_final' => $c['water_temp_final'] ?? null,
                     'product_temp_final'=> $c['product_temp_final'] ?? null,
                 ]);
             }
@@ -275,5 +277,107 @@ class ReportWaterbathController extends Controller
         return redirect()->route('report_waterbaths.index')
             ->with('success', 'Detail tambahan berhasil disimpan');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportWaterbath::where('uuid', $uuid)->firstOrFail();
+        $details = DetailWaterbath::where('report_uuid', $uuid)->get();
+        $pasteurisasi = PasteurisasiWaterbath::where('report_uuid', $uuid)->get();
+        $cooling_shocks = CoolingShockWaterbath::where('report_uuid', $uuid)->get();
+        $drippings = DrippingWaterbath::where('report_uuid', $uuid)->get();
+        $products = Product::orderBy('product_name')->get();
+
+        return view('report_waterbaths.edit', compact(
+            'report', 'details', 'pasteurisasi', 'cooling_shocks', 'drippings', 'products'
+        ));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportWaterbath::where('uuid', $uuid)->firstOrFail();
+
+        // Update header
+        $report->update([
+            'date'  => $request->date,
+            'shift' => $request->shift,
+        ]);
+
+        // Hapus detail lama untuk replace dengan yang baru
+        DetailWaterbath::where('report_uuid', $uuid)->delete();
+        PasteurisasiWaterbath::where('report_uuid', $uuid)->delete();
+        CoolingShockWaterbath::where('report_uuid', $uuid)->delete();
+        DrippingWaterbath::where('report_uuid', $uuid)->delete();
+
+        // Simpan detail baru
+        if ($request->has('details')) {
+            foreach ($request->details as $i => $d) {
+                DetailWaterbath::create([
+                    'uuid'        => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'product_uuid'=> $d['product_uuid'] ?? null,
+                    'batch_code'  => $d['batch_code'] ?? null,
+                    'amount'      => $d['amount'] ?? null,
+                    'unit'        => $d['unit'] ?? null,
+                    'note'        => $d['note'] ?? null,
+                ]);
+            }
+        }
+
+        // Simpan pasteurisasi
+        if ($request->has('pasteurisasi')) {
+            foreach ($request->pasteurisasi as $p) {
+                PasteurisasiWaterbath::create([
+                    'uuid'                         => Str::uuid(),
+                    'report_uuid'                  => $report->uuid,
+                    'initial_product_temp'         => $p['initial_product_temp'] ?? null,
+                    'initial_water_temp'           => $p['initial_water_temp'] ?? null,
+                    'start_time_pasteur'           => $p['start_time_pasteur'] ?? null,
+                    'stop_time_pasteur'            => $p['stop_time_pasteur'] ?? null,
+                    'water_temp_after_input_panel' => $p['water_temp_after_input_panel'] ?? null,
+                    'water_temp_after_input_actual'=> $p['water_temp_after_input_actual'] ?? null,
+                    'water_temp_setting'           => $p['water_temp_setting'] ?? null,
+                    'water_temp_actual'            => $p['water_temp_actual'] ?? null,
+                    'water_temp_final'             => $p['water_temp_final'] ?? null,
+                    'product_temp_final'           => $p['product_temp_final'] ?? null,
+                ]);
+            }
+        }
+
+        // Simpan cooling_shock
+        if ($request->has('cooling_shocks')) {
+            foreach ($request->cooling_shocks as $c) {
+                CoolingShockWaterbath::create([
+                    'uuid'              => Str::uuid(),
+                    'report_uuid'       => $report->uuid,
+                    'initial_water_temp'=> $c['initial_water_temp'] ?? null,
+                    'start_time_pasteur'=> $c['start_time_pasteur'] ?? null,
+                    'stop_time_pasteur' => $c['stop_time_pasteur'] ?? null,
+                    'water_temp_setting'=> $c['water_temp_setting'] ?? null,
+                    'water_temp_actual' => $c['water_temp_actual'] ?? null,
+                    'water_temp_final' => $c['water_temp_final'] ?? null,
+                    'product_temp_final'=> $c['product_temp_final'] ?? null,
+                ]);
+            }
+        }
+
+        // Simpan dripping
+        if ($request->has('drippings')) {
+            foreach ($request->drippings as $dr) {
+                DrippingWaterbath::create([
+                    'uuid'                => Str::uuid(),
+                    'report_uuid'         => $report->uuid,
+                    'start_time_pasteur'  => $dr['start_time_pasteur'] ?? null,
+                    'stop_time_pasteur'   => $dr['stop_time_pasteur'] ?? null,
+                    'hot_zone_temperature'=> $dr['hot_zone_temperature'] ?? null,
+                    'cold_zone_temperature'=> $dr['cold_zone_temperature'] ?? null,
+                    'product_temp_final'  => $dr['product_temp_final'] ?? null,
+                ]);
+            }
+        }
+
+        return redirect()->route('report_waterbaths.index')
+            ->with('success', 'Report Waterbath berhasil diperbarui');
+    }
+
 
 }

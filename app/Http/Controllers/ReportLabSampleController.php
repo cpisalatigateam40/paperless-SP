@@ -172,4 +172,50 @@ class ReportLabSampleController extends Controller
 
         return $pdf->stream('ReportLabSample-' . $report->date . '.pdf');
     }
+
+    public function edit($uuid)
+{
+    $report = ReportLabSample::with('details.product')->where('uuid', $uuid)->firstOrFail();
+    $areas = Area::all();
+    $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+        ->groupBy('product_name')
+        ->get();
+
+    return view('report_lab_samples.edit', compact('report', 'areas', 'products'));
+}
+
+public function update(Request $request, $uuid)
+{
+    DB::transaction(function () use ($request, $uuid) {
+        $report = ReportLabSample::where('uuid', $uuid)->firstOrFail();
+
+        // Update header
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'storage' => implode(', ', $request->storage ?? []),
+        ]);
+
+        // Hapus detail lama
+        DetailLabSample::where('report_uuid', $report->uuid)->delete();
+
+        // Simpan ulang detail
+        foreach ($request->details as $detail) {
+            DetailLabSample::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'product_uuid' => $detail['product_uuid'],
+                'production_code' => $detail['production_code'],
+                'best_before' => $detail['best_before'],
+                'quantity' => $detail['quantity'],
+                'notes' => $detail['notes'],
+                'gramase' => $detail['gramase'],
+            ]);
+        }
+    });
+
+    return redirect()->route('report_lab_samples.index')->with('success', 'Data berhasil diperbarui');
+}
+
+
 }

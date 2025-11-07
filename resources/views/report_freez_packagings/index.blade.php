@@ -63,6 +63,13 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
+                                @can('edit report')
+                                <a href="{{ route('report_freez_packagings.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Delete --}}
                                 <form action="{{ route('report_freez_packagings.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Hapus data ini?')">

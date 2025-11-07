@@ -53,6 +53,13 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
+                                @can('edit report')
+                                <a href="{{ route('report_lab_samples.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Delete --}}
                                 <form action="{{ route('report_lab_samples.destroy', $report->id) }}" method="POST"
                                     onsubmit="return confirm('Yakin?')">

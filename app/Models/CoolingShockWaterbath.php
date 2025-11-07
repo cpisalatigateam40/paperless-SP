@@ -15,7 +15,7 @@ class CoolingShockWaterbath extends Model implements Auditable
     protected $fillable = [
         'uuid', 'report_uuid', 'initial_water_temp',
         'start_time_pasteur', 'stop_time_pasteur',
-        'water_temp_setting', 'water_temp_actual', 'product_temp_final'
+        'water_temp_setting', 'water_temp_actual', 'product_temp_final', 'water_temp_final'
     ];
 
     protected $auditEvents = [

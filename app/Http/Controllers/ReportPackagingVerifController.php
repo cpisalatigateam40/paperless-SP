@@ -359,4 +359,101 @@ class ReportPackagingVerifController extends Controller
         return $pdf->stream('report-packaging-' . $report->date . '.pdf');
     }
 
+public function edit($uuid)
+{
+    $report = ReportPackagingVerif::with(['details.checklist','details.product'])
+                ->where('uuid', $uuid)
+                ->firstOrFail();
+
+    $products = \App\Models\Product::all();
+    $areas = \App\Models\Area::all();
+    $sections = \App\Models\Section::all();
+
+    $details = $report->details; // <-- penting
+
+    return view('report_packaging_verifs.edit', compact('report','details','products','areas','sections'));
+}
+
+
+
+public function update(Request $request, $uuid)
+{
+    $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
+
+    $report->update([
+        'section_uuid' => $request->section_uuid,
+        'date' => $request->date,
+        'shift' => $request->shift,
+        'updated_by' => Auth::user()->name,
+    ]);
+
+    // Hapus detail lama
+    DetailPackagingVerif::where('report_uuid', $report->uuid)->delete();
+
+    // Simpan ulang semua detail baru
+    foreach ($request->details as $index => $detail) {
+        $uploadMd = null;
+        $uploadQr = null;
+        $uploadEd = null;
+
+        // Upload file jika ada file baru
+        if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
+            $file = $detail['upload_md'];
+            $filename = time() . '_md_' . $index . '_' . $file->getClientOriginalName();
+            $uploadMd = $file->storeAs('upload_packaging', $filename, 'public');
+        } elseif (!empty($detail['old_upload_md'])) {
+            $uploadMd = $detail['old_upload_md'];
+        }
+
+        if (isset($detail['upload_qr']) && $detail['upload_qr'] instanceof \Illuminate\Http\UploadedFile) {
+            $file = $detail['upload_qr'];
+            $filename = time() . '_qr_' . $index . '_' . $file->getClientOriginalName();
+            $uploadQr = $file->storeAs('upload_packaging', $filename, 'public');
+        } elseif (!empty($detail['old_upload_qr'])) {
+            $uploadQr = $detail['old_upload_qr'];
+        }
+
+        if (isset($detail['upload_ed']) && $detail['upload_ed'] instanceof \Illuminate\Http\UploadedFile) {
+            $file = $detail['upload_ed'];
+            $filename = time() . '_ed_' . $index . '_' . $file->getClientOriginalName();
+            $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
+        } elseif (!empty($detail['old_upload_ed'])) {
+            $uploadEd = $detail['old_upload_ed'];
+        }
+
+        $detailModel = DetailPackagingVerif::create([
+            'uuid' => Str::uuid(),
+            'report_uuid' => $report->uuid,
+            'product_uuid' => $detail['product_uuid'],
+            'time' => $detail['time'],
+            'upload_md' => $uploadMd,
+            'upload_qr' => $uploadQr,
+            'upload_ed' => $uploadEd,
+        ]);
+
+        // checklist seperti store()
+        $checklistData = $detail['checklist'];
+        $checklistData['uuid'] = Str::uuid();
+        $checklistData['detail_uuid'] = $detailModel->uuid;
+
+        // Mapping khusus radio
+        $inCutting = $checklistData['in_cutting'] ?? null;
+        for ($i = 1; $i <= 5; $i++) {
+            $checklistData['in_cutting_manual_' . $i] = ($i == 1 && $inCutting == 'Manual') ? 'OK' : null;
+            $checklistData['in_cutting_machine_' . $i] = ($i == 1 && $inCutting == 'Mesin') ? 'OK' : null;
+        }
+
+        $packaging = $checklistData['packaging'] ?? null;
+        for ($i = 1; $i <= 5; $i++) {
+            $checklistData['packaging_thermoformer_' . $i] = ($i == 1 && $packaging == 'Thermoformer') ? 'OK' : null;
+            $checklistData['packaging_manual_' . $i] = ($i == 1 && $packaging == 'Manual') ? 'OK' : null;
+        }
+
+        ChecklistPackagingDetail::create($checklistData);
+    }
+
+    return redirect()->route('report_packaging_verifs.index')->with('success', 'Laporan berhasil diperbarui.');
+}
+
+
 }

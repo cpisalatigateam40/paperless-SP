@@ -61,6 +61,12 @@
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @can('edit report')
+                                <a href="{{ route('report_baso_cookings.edit_next', $report->uuid) }}"
+                                    class="btn btn-sm btn-danger" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
                                 {{-- Known --}}
                                 @can('known report')
                                 @if(!$report->known_by)

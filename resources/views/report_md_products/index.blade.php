@@ -59,6 +59,13 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
+                                @can('edit report')
+                                <a href="{{ route('report_md_products.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Delete --}}
                                 <form method="POST" action="{{ route('report_md_products.destroy', $report->uuid) }}"
                                     onsubmit="return confirm('Hapus report ini?')">

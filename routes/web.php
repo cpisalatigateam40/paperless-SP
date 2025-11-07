@@ -178,6 +178,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{report}/add-detail', 'storeDetail')->name('detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     // PROCESS AREA ROUTES
@@ -464,6 +466,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/known', 'known')->name('known');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     // REPORT MAGNET TRAP
@@ -543,6 +548,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/store-detail', 'storeDetail')->name('store-detail');
             Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     Route::prefix('report-chlorine-residues')
@@ -588,6 +596,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
             Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-returns')
@@ -680,6 +690,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     Route::prefix('report-retain-exterminations')
@@ -753,6 +766,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     Route::prefix('report-checkweigher-boxes')
@@ -859,6 +875,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     Route::prefix('formulas')
@@ -966,6 +985,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
+            Route::get('/{uuid}/edit-next', 'editNext')->name('edit_next');
+            Route::put('/{uuid}/update-next', 'updateNext')->name('update_next');
         });
 
     Route::prefix('report-rtg-steamers')
@@ -1039,7 +1060,7 @@ Route::put('/{uuid}', 'update')->name('update');
             Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
-Route::put('/{uuid}', 'update')->name('update');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-waterbaths')
@@ -1055,6 +1076,9 @@ Route::put('/{uuid}', 'update')->name('update');
              Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
              Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+
         });
 
     Route::post('user-sync', [ApiController::class, 'syncUser']);

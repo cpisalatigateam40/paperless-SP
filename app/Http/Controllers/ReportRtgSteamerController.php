@@ -255,4 +255,53 @@ class ReportRtgSteamerController extends Controller
         return $pdf->stream("report-rtg-steamer-{$report->date}.pdf");
     }
 
+    public function edit($uuid)
+    {
+        $report = ReportRtgSteamer::with('details')->where('uuid', $uuid)->firstOrFail();
+        $products = Product::all();
+        $areas = Area::all();
+
+        return view('report_rtg_steamers.edit', compact('report', 'products', 'areas'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportRtgSteamer::where('uuid', $uuid)->firstOrFail();
+
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'product_uuid' => $request->product_uuid,
+        ]);
+
+        // Hapus detail lama dan insert ulang (atau bisa diupdate satu-satu)
+        DetailRtgSteamer::where('report_uuid', $report->uuid)->delete();
+
+        if ($request->has('details')) {
+            foreach ($request->details as $index => $detail) {
+                DetailRtgSteamer::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'steamer' => $detail['steamer'] ?? null,
+                    'production_code' => $detail['production_code'] ?? null,
+                    'trolley_count' => $detail['trolley_count'] ?? null,
+                    'room_temp' => $detail['room_temp'] ?? null,
+                    'product_temp' => $detail['product_temp'] ?? null,
+                    'time_minute' => $detail['time_minute'] ?? null,
+                    'start_time' => $detail['start_time'] ?? null,
+                    'end_time' => $detail['end_time'] ?? null,
+                    'sensory_ripeness' => $detail['sensory_ripeness'] ?? null,
+                    'sensory_taste' => $detail['sensory_taste'] ?? null,
+                    'sensory_aroma' => $detail['sensory_aroma'] ?? null,
+                    'sensory_texture' => $detail['sensory_texture'] ?? null,
+                    'sensory_color' => $detail['sensory_color'] ?? null,
+                ]);
+            }
+        }
+
+        return redirect()->route('report_rtg_steamers.index')
+            ->with('success', 'Report berhasil diperbarui.');
+    }
+
+
 }

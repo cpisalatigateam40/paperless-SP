@@ -49,6 +49,12 @@
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                @can('edit report')
+                                <a href="{{ route('report_rtg_steamers.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
                                 <form action="{{ route('report_rtg_steamers.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">
                                     @csrf

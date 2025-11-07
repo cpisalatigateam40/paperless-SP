@@ -55,6 +55,12 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
 
+                                    @can('edit report')
+                                    <a href="{{ route('report_production_nonconformities.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    @endcan
 
                                     {{-- Hapus --}}
                                     <form
