@@ -148,6 +148,12 @@
                 @endforeach
             </tr>
             <tr>
+                <td>Gramase</td>
+                @foreach ($report->details as $detail)
+                <td> {{ $detail->product->nett_weight ?? '-' }} g</td>
+                @endforeach
+            </tr>
+            <tr>
                 <td>Kode Produksi</td>
                 @foreach ($report->details as $detail)
                 <td>{{ $detail->production_code ?? '-' }}</td>

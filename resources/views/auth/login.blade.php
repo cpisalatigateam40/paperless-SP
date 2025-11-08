@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Login - Paperless SP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -124,9 +124,8 @@
             <div class="card login-card border-0 shadow-lg">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <h1 class="h3 text-dark fw-bold mb-2" style="font-weight: bold; margin-top: -1rem;">Selamat
-                            Datang 👋</h1>
-                        <p class="text-muted">Masuk untuk melanjutkan ke sistem</p>
+                        <h1 class="h1 text-dark fw-bold mb-4" style="font-weight: bold;">Paperless SP</h1>
+                        <p class="text-muted">Silahkan login untuk melanjutkan ke sistem</p>
                     </div>
 
                     @if ($errors->any())

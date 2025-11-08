@@ -152,7 +152,7 @@
         </tr>
         <tr>
             <th colspan="2">GRAMASE</th>
-            <td colspan="4">{{ $detail->gramase ?? '-' }}</td>
+            <td colspan="4">{{ number_format($detail->gramase, 0) }} g</td>
         </tr>
         <tr>
             <th colspan="2">KODE PRODUKSI</th>

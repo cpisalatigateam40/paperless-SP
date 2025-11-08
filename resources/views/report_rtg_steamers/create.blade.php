@@ -31,31 +31,36 @@
 
                 <div id="detailWrapper">
                     <div class="detail-block border rounded p-3 mb-3">
-                        <div class="row mb-2">
-                            <div class="col-md-3">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label>Produk</label>
-                                <select name="product_uuid" class="form-control" required>
+                                <select name="product_uuid" class="form-control select2-product" required>
                                     <option value="">-- pilih produk --</option>
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                        {{ $product->nett_weight }} g</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label>Steamer</label>
                                 <input type="text" name="details[0][steamer]" class="form-control">
                             </div>
-                            <div class="col-md-3">
+
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label>Kode Produksi</label>
                                 <input type="text" name="details[0][production_code]" class="form-control">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label>Jumlah Trolly</label>
                                 <input type="number" name="details[0][trolley_count]" class="form-control">
                             </div>
                         </div>
 
-                        <h5 class="mt-4">Streaming</h5>
+                        <h5 class="mt-4">Steaming</h5>
                         <div class="row mb-2">
                             <div class="col-md-4">
                                 <label>Suhu Ruang (°C)</label>

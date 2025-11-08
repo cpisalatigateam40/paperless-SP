@@ -32,7 +32,7 @@ const productOptions = `
         <option value="{{ $product->uuid }}"
             data-shelf-life="{{ $product->shelf_life }}"
             data-created-at="{{ $product->created_at }}">
-            {{ $product->product_name }}
+            {{ $product->product_name }} - {{ $product->nett_weight }} g
         </option>
     @endforeach
 `;
@@ -52,24 +52,24 @@ function addDetailRow() {
         <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">Hapus</button>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6 mb-3">
             <label>Produk</label>
-            <select name="details[${index}][product_uuid]" class="form-control" onchange="updateBestBefore(this, ${index})" required>
+            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})" required>
                 <option value="">- Pilih Produk -</option>
                 ${productOptions}
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6 mb-3">
             <label>Kode Produksi</label>
             <input type="text" name="details[${index}][production_code]" class="form-control" placeholder="Kode Batch/Produksi">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6 mb-3">
             <label>Best Before</label>
             <input type="date" name="details[${index}][best_before]" class="form-control" >
         </div>
     </div>
 
-    <div class="row mt-2">
+    <div class="row mt-3">
         <div class="col-md-6">
             <label>Waktu Mulai</label>
             <input type="time" name="details[${index}][start_time]" class="form-control" value="${currentTime}">
@@ -95,7 +95,7 @@ function addDetailRow() {
         </div>
     </div>
 
-    <div class="row mt-2">
+    <div class="row mt-3">
         <div class="col-md-6">
             <label>Suhu Room IQF (°C)</label>
             <input type="number" step="0.1" name="details[${index}][freezing][iqf_room_temp]" class="form-control">
@@ -106,7 +106,7 @@ function addDetailRow() {
         </div>
     </div>
 
-    <div class="row mt-2">
+    <div class="row mt-3">
         <div class="col-md-6">
             <label>Durasi Display (menit)</label>
             <input type="number" name="details[${index}][freezing][freezing_time_display]" class="form-control">
@@ -119,7 +119,7 @@ function addDetailRow() {
 
     <h6 class="mt-5 mb-3" style="font-weight: bold;">Kartoning</h6>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <label class="form-label">Verifikasi Kondisi Karton</label>
             <select name="details[${index}][kartoning][carton_condition]" class="form-control">
                 <option value="✓">✓</option>
@@ -127,27 +127,30 @@ function addDetailRow() {
             </select>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-4">
+    
+    <div class="row mt-3">
+        <div class="col-md-6 mb-3">
             <label>Isi Bag</label>
             <input type="number" name="details[${index}][kartoning][content_bag]" class="form-control">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6 mb-3">
             <label>Isi Binded</label>
             <input type="number" name="details[${index}][kartoning][content_binded]" class="form-control">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6 mb-3">
             <label>Isi Inner RTG</label>
             <input type="number" name="details[${index}][kartoning][content_rtg]" class="form-control">
         </div>
     </div>
-    <div class="row mt-2">
+    
+    <div class="row mt-3">
         <div class="col-md-6">
             <label>Berat Standar (kg)</label>
             <input type="text" name="details[${index}][kartoning][carton_weight_standard]" class="form-control">
         </div>
     </div>
-    <div class="row kartoning-group mt-2" data-index="${index}">
+    
+    <div class="row kartoning-group mt-3" data-index="${index}">
         <div class="col-md-2">
             <label>Berat Karton 1</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_1]" class="form-control weight-input">
@@ -173,12 +176,13 @@ function addDetailRow() {
             <input type="number" step="0.01" name="details[${index}][kartoning][avg_weight]" class="form-control avg-weight" readonly>
         </div>
     </div>
+    
     <div class="row mt-3">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <label>Tindakan Koreksi</label>
             <input type="text" name="details[${index}][corrective_action]" class="form-control">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <label class="form-label">Verifikasi Setelah Tindakan Koreksi</label>
             <select name="details[${index}][verif_after]" class="form-control">
                 <option value="✓">✓</option>

@@ -33,6 +33,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Dibuat oleh</th>
                             <th>Action</th>
                         </tr>
@@ -44,6 +45,13 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ optional($report->area)->name }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">
                                 {{-- Toggle Detail --}}
@@ -51,6 +59,13 @@
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
+
+                                @can('edit report')
+                                <a href="{{ route('report_packaging_verifs.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
 
                                 {{-- Delete --}}
                                 <form action="{{ route('report_packaging_verifs.destroy', $report->uuid) }}"
@@ -134,6 +149,7 @@
                                         <tr>
                                             <th rowspan="2">Jam</th>
                                             <th rowspan="2">Produk</th>
+                                            <th rowspan="2">Gramase</th>
                                             <th rowspan="2">Upload MD BPOM</th>
                                             <th rowspan="2">Upload QR Code</th>
                                             <th rowspan="2">Upload Kode Produksi & Best Before</th>
@@ -178,6 +194,7 @@
                                             @if($i == 1)
                                             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
                                             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
+                                            <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
                                             <td rowspan="5">
                                                 @if($d->upload_md)
                                                 <a href="{{ asset('storage/' . $d->upload_md) }}" target="_blank">
@@ -271,6 +288,10 @@
             @endforeach
             </tbody>
             </table>
+        </div>
+
+        <div class="mt-3">
+            {{ $reports->links('pagination::bootstrap-5') }}
         </div>
 
     </div>

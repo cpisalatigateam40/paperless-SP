@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 use App\Models\ReportReCleanliness;
 use App\Models\DetailRoomCleanliness;
 use App\Models\DetailEquipmentCleanliness;
+use App\Models\FollowupDetailRoomCleanliness;
+use App\Models\FollowupDetailEquipmentCleanliness;
 use App\Models\RoomElement;
 use App\Models\EquipmentPart;
 use App\Models\Area;
@@ -18,14 +20,36 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportReCleanlinessController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportReCleanliness::with(['roomDetails.room', 'roomDetails.element', 'equipmentDetails.equipment', 'equipmentDetails.part'])
-            ->orderByDesc('date')
-            ->get();
+public function index()
+{
+    $reports = ReportReCleanliness::with([
+            'roomDetails.room',
+            'roomDetails.element',
+            'equipmentDetails.equipment',
+            'equipmentDetails.part'
+        ])
+        ->latest()
+        ->paginate(10);
 
-        return view('report_re_cleanliness.index', compact('reports'));
-    }
+    // hitung ketidaksesuaian berdasarkan verification "Tidak OK"
+    $reports->getCollection()->transform(function ($report) {
+        $roomIssues = $report->roomDetails
+            ->filter(fn($d) => $d->verification === 'Tidak OK')
+            ->count();
+
+        $equipmentIssues = $report->equipmentDetails
+            ->filter(fn($d) => $d->verification === 'Tidak OK')
+            ->count();
+
+        // total ketidaksesuaian
+        $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
+
+        return $report;
+    });
+
+    return view('report_re_cleanliness.index', compact('reports'));
+}
+
 
     public function create()
     {
@@ -184,4 +208,91 @@ class ReportReCleanlinessController extends Controller
 
         return $pdf->stream('laporan_kebersihan_' . $report->date . '.pdf');
     }
+
+    public function edit($uuid)
+{
+    $report = ReportReCleanliness::with([
+        'roomDetails.followups',
+        'equipmentDetails.followups'
+    ])->where('uuid', $uuid)->firstOrFail();
+
+    return view('report_re_cleanliness.edit', [
+        'report' => $report,
+        'rooms' => Room::with('elements')->get(),
+        'equipments' => Equipment::with('parts')->get(),
+    ]);
+}
+
+
+public function update(Request $request, $uuid)
+{
+    $report = ReportReCleanliness::where('uuid', $uuid)->firstOrFail();
+
+    // Update header
+    $report->update([
+        'date' => $request->date,
+        'updated_by' => Auth::user()->name,
+    ]);
+
+    // Hapus detail lama (agar tidak duplikat)
+    DetailRoomCleanliness::where('report_re_uuid', $report->uuid)->delete();
+    DetailEquipmentCleanliness::where('report_re_uuid', $report->uuid)->delete();
+
+    // Simpan ulang data detail room
+    foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
+        foreach ($roomData['elements'] ?? [] as $element_uuid => $data) {
+            $detail = DetailRoomCleanliness::create([
+                'uuid' => Str::uuid(),
+                'report_re_uuid' => $report->uuid,
+                'room_uuid' => $room_uuid,
+                'room_element_uuid' => $element_uuid,
+                'condition' => $data['condition'] ?? 'dirty',
+                'notes' => $data['notes'] ?? null,
+                'corrective_action' => $data['corrective_action'] ?? null,
+                'verification' => $data['verification'] ?? null,
+            ]);
+
+            if (isset($data['followups'])) {
+                foreach ($data['followups'] as $followup) {
+                    FollowupDetailRoomCleanliness::create([
+                        'detail_room_uuid' => $detail->uuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
+            }
+        }
+    }
+
+    // Simpan ulang data detail equipment
+    foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
+        foreach ($equipmentData['parts'] ?? [] as $part_uuid => $data) {
+            $detail = DetailEquipmentCleanliness::create([
+                'uuid' => Str::uuid(),
+                'report_re_uuid' => $report->uuid,
+                'equipment_uuid' => $equipment_uuid,
+                'equipment_part_uuid' => $part_uuid,
+                'condition' => $data['condition'] ?? 'dirty',
+                'notes' => $data['notes'] ?? null,
+                'corrective_action' => $data['corrective_action'] ?? null,
+                'verification' => $data['verification'] ?? null,
+            ]);
+
+            if (isset($data['followups'])) {
+                foreach ($data['followups'] as $followup) {
+                    FollowupDetailEquipmentCleanliness::create([
+                        'detail_equipment_uuid' => $detail->uuid,
+                        'notes' => $followup['notes'] ?? null,
+                        'corrective_action' => $followup['action'] ?? null,
+                        'verification' => $followup['verification'] ?? null,
+                    ]);
+                }
+            }
+        }
+    }
+
+    return redirect()->route('report-re-cleanliness.index')->with('success', 'Laporan berhasil diperbarui.');
+}
+
 }

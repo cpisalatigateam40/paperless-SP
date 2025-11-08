@@ -23,7 +23,35 @@ class ReportSiomayController extends Controller
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
-        ])->latest()->get();
+        ])->latest()->paginate(10);
+
+        // transform() agar tetap bekerja dengan pagination
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                // 🔹 Cek di level detail proses (color, aroma, taste, texture)
+                if (
+                    $detail->color === 'Tidak OK' ||
+                    $detail->aroma === 'Tidak OK' ||
+                    $detail->taste === 'Tidak OK' ||
+                    $detail->texture === 'Tidak OK'
+                ) {
+                    $totalKetidaksesuaian++;
+                }
+
+                // 🔹 Cek di level bahan baku (raw materials)
+                if ($detail->rawMaterials) {
+                    $totalKetidaksesuaian += $detail->rawMaterials
+                        ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
+                        ->count();
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+
+            return $report;
+        });
 
         return view('report_siomays.index', compact('reports'));
     }
@@ -230,5 +258,80 @@ class ReportSiomayController extends Controller
 
         return redirect()->route('report_siomays.index')
             ->with('success', 'Detail berhasil ditambahkan');
+    }
+
+    public function edit($uuid)
+    {
+        $report = ReportSiomay::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
+        $products = Product::all();
+        $rawMaterials = RawMaterial::all();
+
+        return view('report_siomays.edit', compact('report', 'products', 'rawMaterials'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        DB::beginTransaction();
+        try {
+            $report = ReportSiomay::where('uuid', $uuid)->firstOrFail();
+
+            // Update header
+            $report->update([
+                'date' => $request->date,
+                'shift' => $request->shift,
+                'product_uuid' => $request->product_uuid,
+                'production_code' => $request->production_code,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'sensory' => $request->sensory,
+            ]);
+
+            // Hapus detail & raw material lama
+            foreach ($report->details as $d) {
+                $d->rawMaterials()->delete();
+                $d->delete();
+            }
+
+            // Simpan detail & raw material baru
+            if ($request->has('details')) {
+                foreach ($request->details as $detail) {
+                    $detailModel = $report->details()->create([
+                        'uuid' => Str::uuid(),
+                        'time' => $detail['time'] ?? null,
+                        'process_step' => $detail['process_step'] ?? null,
+                        'duration' => $detail['duration'] ?? null,
+                        'pressure' => $detail['pressure'] ?? null,
+                        'target_temperature' => $detail['target_temperature'] ?? null,
+                        'actual_temperature' => $detail['actual_temperature'] ?? null,
+                        'color' => $detail['color'] ?? null,
+                        'aroma' => $detail['aroma'] ?? null,
+                        'taste' => $detail['taste'] ?? null,
+                        'texture' => $detail['texture'] ?? null,
+                        'notes' => $detail['notes'] ?? null,
+                        'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
+                        'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
+                    ]);
+
+                    if (isset($detail['raw_materials'])) {
+                        foreach ($detail['raw_materials'] as $rm) {
+                            if (!empty($rm['raw_material_uuid'])) {
+                                $detailModel->rawMaterials()->create([
+                                    'uuid' => Str::uuid(),
+                                    'raw_material_uuid' => $rm['raw_material_uuid'],
+                                    'amount' => $rm['amount'] ?? null,
+                                    'sensory' => $rm['sensory'] ?? null,
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('report_siomays.index')->with('success', 'Laporan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

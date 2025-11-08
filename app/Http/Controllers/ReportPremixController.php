@@ -14,9 +14,21 @@ class ReportPremixController extends Controller
 {
     public function index()
     {
-        $reports = ReportPremix::with(['area', 'detailPremixes.premix'])->latest()->paginate(10);
+        $reports = ReportPremix::with(['area', 'detailPremixes.premix'])
+            ->latest()
+            ->paginate(10);
+
+        $reports->getCollection()->transform(function ($report) {
+            $report->ketidaksesuaian = $report->detailPremixes
+                ->filter(fn($d) => $d->verification === 'x')
+                ->count();
+
+            return $report;
+        });
+
         return view('report_premixes.index', compact('reports'));
     }
+
 
     public function create()
     {
@@ -151,6 +163,64 @@ class ReportPremixController extends Controller
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('laporan_pemeriksaan_premix_' . $report->date->format('Ymd') . '.pdf');
+    }
+
+    public function edit($uuid)
+    {
+        $report = ReportPremix::where('uuid', $uuid)->firstOrFail();
+        $details = DetailPremix::where('report_uuid', $report->uuid)->get();
+        $premixes = \App\Models\Premix::orderBy('name')->get();
+
+        return view('report_premixes.edit', compact('report', 'details', 'premixes'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|string|max:20',
+
+            'details' => 'required|array|min:1',
+            'details.*.premix_uuid' => 'required|exists:premixes,uuid',
+            'details.*.weight' => 'required|numeric',
+            'details.*.used_for_batch' => 'nullable|string|max:255',
+            'details.*.notes' => 'nullable|string',
+            'details.*.corrective_action' => 'nullable|string',
+            'details.*.verification' => 'nullable|string|max:10',
+        ]);
+
+        // 🔹 Update header laporan
+        $report = ReportPremix::where('uuid', $uuid)->firstOrFail();
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'known_by' => $request->known_by,
+            'approved_by' => $request->approved_by,
+            'updated_by' => Auth::user()->name,
+        ]);
+
+        // 🔹 Hapus semua detail lama dan ganti dengan data baru
+        DetailPremix::where('report_uuid', $report->uuid)->delete();
+
+        // 🔹 Simpan ulang detail dari request
+        foreach ($request->details as $detail) {
+            $premix = \App\Models\Premix::where('uuid', $detail['premix_uuid'])->first();
+
+            DetailPremix::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'premix_uuid' => $detail['premix_uuid'],
+                'premix_name' => $premix->name,
+                'production_code' => $detail['production_code'] ?? null,
+                'weight' => $detail['weight'],
+                'used_for_batch' => $detail['used_for_batch'] ?? null,
+                'notes' => $detail['notes'] ?? null,
+                'corrective_action' => $detail['corrective_action'] ?? null,
+                'verification' => $detail['verification'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('report-premixes.index')->with('success', 'Laporan berhasil diperbarui.');
     }
 
 

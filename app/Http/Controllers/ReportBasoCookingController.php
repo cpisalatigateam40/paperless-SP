@@ -12,14 +12,44 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class ReportBasoCookingController extends Controller
 {
     public function index()
     {
-        $reports = ReportBasoCooking::with('details.temperatures')->latest()->get();
+        $reports = ReportBasoCooking::with(['details.temperatures'])
+            ->latest()
+            ->paginate(10);
+
+        // Tambahkan atribut ketidaksesuaian untuk setiap report
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                $fields = [
+                    'sensory_shape',
+                    'sensory_taste',
+                    'sensory_aroma',
+                    'sensory_texture',
+                    'sensory_color',
+                ];
+
+                foreach ($fields as $field) {
+                    // "0" dianggap Tidak OK
+                    if (isset($detail->$field) && $detail->$field == '0') {
+                        $totalKetidaksesuaian++;
+                    }
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+            return $report;
+        });
+
         return view('report_baso_cookings.index', compact('reports'));
     }
+
 
     public function create()
     {
@@ -342,6 +372,238 @@ class ReportBasoCookingController extends Controller
         return redirect()->route('report_baso_cookings.index')
             ->with('success', 'Laporan Baso Cooking berhasil diperbarui');
     }
+
+    public function editNext($uuid)
+    {
+        $report = ReportBasoCooking::with(['details.temperatures'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        $products = Product::orderBy('product_name')->get();
+
+        // ambil details dari report agar view menemukan $details
+        $details = $report->details;
+
+        return view('report_baso_cookings.editNext', compact('report', 'products', 'details'));
+    }
+
+
+public function updateNext(Request $request, $uuid)
+{
+    // validasi dasar (opsional) bisa ditambah sesuai kebutuhan
+    $request->validate([
+        'date' => 'required|date',
+        'shift' => 'required',
+        // 'details' => 'required|array', // jika memang wajib
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $report = ReportBasoCooking::with('details.temperatures')->where('uuid', $uuid)->firstOrFail();
+
+        // 1) Update header
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'product_uuid' => $request->product_uuid,
+            'std_core_temp' => $request->std_core_temp,
+            'std_weight' => $request->std_weight,
+            'set_boiling_1' => $request->set_boiling_1,
+            'set_boiling_2' => $request->set_boiling_2,
+        ]);
+
+        // 2) Cache data 'akhir' & paraf lama sebelum hapus
+        $akhirMap = []; // keyed by production_code (lebih robust) or detail uuid if kamu kirim uuid
+        $parafMap = []; // keyed by production_code -> ['qc_paraf' => ..., 'prod_paraf' => ...]
+
+        foreach ($report->details as $existingDetail) {
+            $prodCode = $existingDetail->production_code ?? null;
+
+            // ambil suhu time_type = 'akhir' (ambil first jika ada)
+            $akhir = $existingDetail->temperatures->firstWhere('time_type', 'akhir');
+            if ($akhir) {
+                $akhirMap[$prodCode] = [
+                    'time_recorded' => $akhir->time_recorded,
+                    'baso_temp_1' => $akhir->baso_temp_1,
+                    'baso_temp_2' => $akhir->baso_temp_2,
+                    'baso_temp_3' => $akhir->baso_temp_3,
+                    'baso_temp_4' => $akhir->baso_temp_4,
+                    'baso_temp_5' => $akhir->baso_temp_5,
+                    'avg_baso_temp' => $akhir->avg_baso_temp,
+                ];
+            }
+
+            //cache paraf jika perlu (agar tidak hilang)
+            $parafMap[$prodCode] = [
+                'qc_paraf' => $existingDetail->qc_paraf,
+                'prod_paraf' => $existingDetail->prod_paraf,
+            ];
+        }
+
+        // 3) Hapus detail + semua temperatur (kita akan recreate dari request)
+        foreach ($report->details as $d) {
+            $d->temperatures()->delete();
+            $d->delete();
+        }
+
+        // 4) Recreate detail dari request, sambil memulihkan 'akhir' bila ada
+        if ($request->has('details')) {
+            foreach ($request->details as $index => $detail) {
+
+                // Simpan paraf digital dari request bila ada; jika tidak ada, gunakan yang lama (jika ada)
+                $qcParafPath = null;
+                if (!empty($detail['qc_paraf'])) {
+                    $qcParafPath = $this->saveSignature($detail['qc_paraf'], "qc_{$index}");
+                } elseif (!empty($parafMap[$detail['production_code']]['qc_paraf'])) {
+                    $qcParafPath = $parafMap[$detail['production_code']]['qc_paraf'];
+                }
+
+                $productionParafPath = null;
+                if (!empty($detail['prod_paraf'])) {
+                    $productionParafPath = $this->saveSignature($detail['prod_paraf'], "prod_{$index}");
+                } elseif (!empty($parafMap[$detail['production_code']]['prod_paraf'])) {
+                    $productionParafPath = $parafMap[$detail['production_code']]['prod_paraf'];
+                }
+
+                $detailModel = DetailBasoCooking::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'production_code' => $detail['production_code'] ?? null,
+                    'emulsion_temp' => $detail['emulsion_temp'] ?? null,
+                    'boiling_tank_temp_1' => $detail['boiling_tank_temp_1'] ?? null,
+                    'boiling_tank_temp_2' => $detail['boiling_tank_temp_2'] ?? null,
+                    'initial_weight' => $detail['initial_weight'] ?? null,
+                    'final_weight' => $detail['final_weight'] ?? null,
+                    'sensory_shape' => $detail['sensory_shape'] ?? null,
+                    'sensory_taste' => $detail['sensory_taste'] ?? null,
+                    'sensory_aroma' => $detail['sensory_aroma'] ?? null,
+                    'sensory_texture' => $detail['sensory_texture'] ?? null,
+                    'sensory_color' => $detail['sensory_color'] ?? null,
+                    // 'qc_paraf' => $qcParafPath,
+                    // 'prod_paraf' => $productionParafPath,
+                ]);
+
+                // Simpan suhu 'awal' dari request (jika ada)
+                if (isset($detail['temperatures']) && is_array($detail['temperatures'])) {
+                    foreach ($detail['temperatures'] as $temp) {
+                        // buat record 'awal' berdasarkan data form
+                        BasoTemperature::create([
+                            'uuid' => Str::uuid(),
+                            'detail_uuid' => $detailModel->uuid,
+                            'time_type' => 'awal',
+                            'time_recorded' => $temp['time_recorded'] ?? null,
+                            'baso_temp_1' => $temp['baso_temp_1'] ?? null,
+                            'baso_temp_2' => $temp['baso_temp_2'] ?? null,
+                            'baso_temp_3' => $temp['baso_temp_3'] ?? null,
+                            'baso_temp_4' => $temp['baso_temp_4'] ?? null,
+                            'baso_temp_5' => $temp['baso_temp_5'] ?? null,
+                            'avg_baso_temp' => $temp['avg_baso_temp'] ?? null,
+                        ]);
+
+                        // restore 'akhir' jika ada cache untuk production_code
+                        $prodCode = $detail['production_code'] ?? null;
+                        if (isset($akhirMap[$prodCode])) {
+                            $a = $akhirMap[$prodCode];
+                            BasoTemperature::create([
+                                'uuid' => Str::uuid(),
+                                'detail_uuid' => $detailModel->uuid,
+                                'time_type' => 'akhir',
+                                'time_recorded' => $a['time_recorded'],
+                                'baso_temp_1' => $a['baso_temp_1'],
+                                'baso_temp_2' => $a['baso_temp_2'],
+                                'baso_temp_3' => $a['baso_temp_3'],
+                                'baso_temp_4' => $a['baso_temp_4'],
+                                'baso_temp_5' => $a['baso_temp_5'],
+                                'avg_baso_temp' => $a['avg_baso_temp'],
+                            ]);
+                        } else {
+                            // jika tidak ada cache 'akhir', buat baris 'akhir' kosong (seperti saat create)
+                            BasoTemperature::create([
+                                'uuid' => Str::uuid(),
+                                'detail_uuid' => $detailModel->uuid,
+                                'time_type' => 'akhir',
+                                'time_recorded' => null,
+                                'baso_temp_1' => null,
+                                'baso_temp_2' => null,
+                                'baso_temp_3' => null,
+                                'baso_temp_4' => null,
+                                'baso_temp_5' => null,
+                                'avg_baso_temp' => null,
+                            ]);
+                        }
+                    }
+                } else {
+                    // Jika tidak ada temperatures di request, tetap restore 'akhir' (tapi tanpa 'awal')
+                    $prodCode = $detail['production_code'] ?? null;
+                    if (isset($akhirMap[$prodCode])) {
+                        $a = $akhirMap[$prodCode];
+                        // buat baris 'awal' kosong supaya struktur tetap sama (opsional)
+                        BasoTemperature::create([
+                            'uuid' => Str::uuid(),
+                            'detail_uuid' => $detailModel->uuid,
+                            'time_type' => 'awal',
+                            'time_recorded' => null,
+                            'baso_temp_1' => null,
+                            'baso_temp_2' => null,
+                            'baso_temp_3' => null,
+                            'baso_temp_4' => null,
+                            'baso_temp_5' => null,
+                            'avg_baso_temp' => null,
+                        ]);
+                        // restore akhir
+                        BasoTemperature::create([
+                            'uuid' => Str::uuid(),
+                            'detail_uuid' => $detailModel->uuid,
+                            'time_type' => 'akhir',
+                            'time_recorded' => $a['time_recorded'],
+                            'baso_temp_1' => $a['baso_temp_1'],
+                            'baso_temp_2' => $a['baso_temp_2'],
+                            'baso_temp_3' => $a['baso_temp_3'],
+                            'baso_temp_4' => $a['baso_temp_4'],
+                            'baso_temp_5' => $a['baso_temp_5'],
+                            'avg_baso_temp' => $a['avg_baso_temp'],
+                        ]);
+                    } else {
+                        // tidak ada temperatures request dan tidak ada cached akhir -> buat empty awal+akhir
+                        BasoTemperature::create([
+                            'uuid' => Str::uuid(),
+                            'detail_uuid' => $detailModel->uuid,
+                            'time_type' => 'awal',
+                            'time_recorded' => null,
+                            'baso_temp_1' => null,
+                            'baso_temp_2' => null,
+                            'baso_temp_3' => null,
+                            'baso_temp_4' => null,
+                            'baso_temp_5' => null,
+                            'avg_baso_temp' => null,
+                        ]);
+                        BasoTemperature::create([
+                            'uuid' => Str::uuid(),
+                            'detail_uuid' => $detailModel->uuid,
+                            'time_type' => 'akhir',
+                            'time_recorded' => null,
+                            'baso_temp_1' => null,
+                            'baso_temp_2' => null,
+                            'baso_temp_3' => null,
+                            'baso_temp_4' => null,
+                            'baso_temp_5' => null,
+                            'avg_baso_temp' => null,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        DB::commit();
+        return redirect()->route('report_baso_cookings.index')->with('success', 'Laporan Baso Cooking berhasil diperbarui.');
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        // untuk debug sementara bisa gunakan ->with('error', $e->getMessage())
+        return back()->with('error', 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage());
+    }
+}
+
+
 
 
 

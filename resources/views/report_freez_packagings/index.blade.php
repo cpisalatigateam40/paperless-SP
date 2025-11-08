@@ -34,6 +34,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Dibuat Oleh</th>
                             <th>Aksi</th>
                         </tr>
@@ -46,6 +47,14 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
+
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">
                                 {{-- Toggle Detail --}}
@@ -53,6 +62,13 @@
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
+
+                                @can('edit report')
+                                <a href="{{ route('report_freez_packagings.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
 
                                 {{-- Delete --}}
                                 <form action="{{ route('report_freez_packagings.destroy', $report->uuid) }}"
@@ -135,6 +151,7 @@
                                             <tr>
                                                 <th rowspan="2">Waktu Pemeriksaan</th>
                                                 <th rowspan="2">Nama Produk</th>
+                                                <th rowspan="2">Gramase</th>
                                                 <th rowspan="2">Kode Produksi</th>
                                                 <th rowspan="2">Best Before</th>
                                                 <th rowspan="2">Tindakan Koreksi</th>
@@ -174,6 +191,8 @@
                                                     {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : '-' }}
                                                 </td>
                                                 <td class="align-middle">{{ $detail->product->product_name ?? '-' }}
+                                                </td>
+                                                <td class="align-middle">{{ $detail->product->nett_weight ?? '-' }} g
                                                 </td>
                                                 <td class="align-middle">{{ $detail->production_code ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->best_before ?? '-' }}</td>
@@ -241,6 +260,10 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="mt-3">
+                {{ $reports->links('pagination::bootstrap-5') }}
             </div>
 
         </div>

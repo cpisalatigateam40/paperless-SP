@@ -19,12 +19,13 @@
                 </div>
                 <div class=" mb-3">
                     <label>Nama Produk</label>
-                    <select name="details[0][product_uuid]" class="form-control" onchange="updateBestBefore(this, 0)">
+                    <select name="details[0][product_uuid]" class="form-control select2-product"
+                        onchange="updateBestBefore(this, 0)">
                         <option value="">-- Pilih Produk --</option>
                         @foreach ($products as $product)
                         <option value="{{ $product->uuid }}" data-shelf-life="{{ $product->shelf_life }}"
                             data-created-at="{{ $product->created_at }}">
-                            {{ $product->product_name }}
+                            {{ $product->product_name }} - {{ $product->nett_weight }} g
                         </option>
                         @endforeach
                     </select>
@@ -101,8 +102,8 @@
                         <label>Verifikasi Setelah Perbaikan</label>
                         <select name="details[0][verification]" class="form-control">
                             <option value="">-- Pilih Verifikasi --</option>
-                            <option value="0">Tidak</option>
-                            <option value="1">Ya</option>
+                            <option value="0">Tidak OK</option>
+                            <option value="1">OK</option>
                         </select>
                     </div>
                 </div>

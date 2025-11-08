@@ -17,34 +17,39 @@
                     <!-- Template detail item -->
                     <div class="border p-3 mb-3 detail-item d-none" id="detail-template">
                         <div class="row mb-4">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Produk</label>
-                                <select class="form-control product-select">
+                                <select class="form-control product-select select2-product">
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                        {{ $product->nett_weight }} g</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Nomor Program</label>
                                 <input type="text" class="form-control program-number">
                             </div>
-                            <div class="col-md-4">
+
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
                                 <label>Kode Produk</label>
                                 <input type="text" class="form-control product-code">
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Kemasan (gr)</label>
                                 <input type="number" class="form-control for-packaging-gr">
                             </div>
-                            <div class="col-md-4">
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
                                 <label>Jumlah Troly</label>
                                 <input type="number" class="form-control trolley-count">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Suhu Produk (°C)</label>
                                 <input type="number" step="0.1" class="form-control product-temp">
                             </div>
@@ -102,11 +107,11 @@
                                 <input type="hidden" class="step-type" value="drainage">
 
                                 <div class="row mb-4 mt-2">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label>Jam Mulai</label>
                                         <input type="time" class="form-control start-time">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label>Jam Selesai</label>
                                         <input type="time" class="form-control end-time">
                                     </div>
@@ -121,11 +126,11 @@
                                 <input type="hidden" class="step-type" value="finish">
 
                                 <div class="row mb-4 mt-2">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label>Suhu Inti Produk (°C)</label>
                                         <input type="number" step="0.1" class="form-control product-core-temp">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label>Sortasi</label>
                                         <input type="text" class="form-control sortation">
                                     </div>
@@ -134,16 +139,16 @@
                         </div>
 
                         {{-- Paraf --}}
-                        <h6 class="mt-3">Paraf</h6>
+                        <h6 class="mt-4">Paraf</h6>
                         <div class="row mb-2">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Paraf QC</label>
                                 <canvas class="border qc-canvas" width="300" height="150"></canvas>
                                 <input type="hidden" class="qc-input">
                                 <button type="button"
                                     class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Paraf Produksi</label>
                                 <canvas class="border prod-canvas" width="300" height="150"></canvas>
                                 <input type="hidden" class="prod-input">

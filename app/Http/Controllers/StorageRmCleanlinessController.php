@@ -19,17 +19,42 @@ class StorageRmCleanlinessController extends Controller
 
     use HasRoles;
 
-    public function index()
-    {
-        $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
-            ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-                $query->where('area_uuid', Auth::user()->area_uuid);
-            })
-            ->latest()
-            ->get();
+public function index()
+{
+    $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
+        ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+            $query->where('area_uuid', Auth::user()->area_uuid);
+        })
+        ->latest()
+        ->paginate(10);
 
-        return view('cleanliness.index', compact('reports'));
+    // Hitung ketidaksesuaian
+    foreach ($reports as $report) {
+        $count = 0;
+
+        foreach ($report->details as $detail) {
+            foreach ($detail->items as $item) {
+                // Jika item tidak OK
+                if ($item->verification == 0) {
+                    $count++;
+                }
+
+                // Jika ada followup dan followup-nya tidak OK juga dihitung
+                foreach ($item->followups as $followup) {
+                    if ($followup->verification == 0) {
+                        $count++;
+                    }
+                }
+            }
+        }
+
+        // Tambahkan properti ke model
+        $report->ketidaksesuaian = $count;
     }
+
+    return view('cleanliness.index', compact('reports'));
+}
+
 
     public function create()
     {
@@ -233,4 +258,86 @@ class StorageRmCleanlinessController extends Controller
 
         return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');
     }
+
+public function edit($uuid)
+{
+    $report = ReportStorageRmCleanliness::with([
+        'details.items.followups'
+    ])->where('uuid', $uuid)->firstOrFail();
+
+    return view('cleanliness.edit', compact('report'));
+}
+
+
+
+public function update(Request $request, $uuid)
+{
+    DB::beginTransaction();
+    try {
+        $report = ReportStorageRmCleanliness::where('uuid', $uuid)->firstOrFail();
+
+        $report->update([
+            'shift' => $request->shift,
+            'room_name' => $request->room_name,
+            'known_by' => $request->known_by,
+            'approved_by' => $request->approved_by,
+        ]);
+
+        // Hapus detail lama & semua item terkait
+        foreach ($report->details as $detail) {
+            foreach ($detail->items as $item) {
+                $item->followups()->delete();
+            }
+            $detail->items()->delete();
+            $detail->delete();
+        }
+
+        // Recreate detail dan item seperti store
+        foreach ($request->details as $detailInput) {
+            $detail = DetailStorageRmCleanliness::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'inspection_hour' => $detailInput['inspection_hour'],
+            ]);
+
+            foreach ($detailInput['items'] as $itemInput) {
+                $itemName = $itemInput['item'];
+                if ($itemName === 'Suhu ruang (℃) / RH (%)') {
+                    $condition = 'Suhu: ' . $itemInput['temperature'] . ' °C, RH: ' . $itemInput['humidity'] . ' %';
+                } else {
+                    $condition = $itemInput['condition'];
+                }
+
+                $item = ItemStorageRmCleanliness::create([
+                    'detail_uuid' => $detail->uuid,
+                    'item' => $itemName,
+                    'condition' => $condition,
+                    'notes' => isset($itemInput['notes'])
+                        ? (is_array($itemInput['notes']) ? json_encode($itemInput['notes']) : $itemInput['notes'])
+                        : null,
+                    'corrective_action' => $itemInput['corrective_action'] ?? null,
+                    'verification' => $itemInput['verification'] ?? 0,
+                ]);
+
+                if (isset($itemInput['followups'])) {
+                    foreach ($itemInput['followups'] as $followupInput) {
+                        FollowupCleanlinessStorage::create([
+                            'item_storage_rm_cleanliness_id' => $item->id,
+                            'notes' => $followupInput['notes'] ?? null,
+                            'corrective_action' => $followupInput['corrective_action'] ?? null,
+                            'verification' => $followupInput['verification'] ?? 0,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        DB::commit();
+        return redirect()->route('cleanliness.index')->with('success', 'Data berhasil diperbarui.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Gagal update: ' . $e->getMessage());
+    }
+}
+
 }

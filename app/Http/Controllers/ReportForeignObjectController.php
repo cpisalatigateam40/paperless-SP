@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class ReportForeignObjectController extends Controller
 {
@@ -20,7 +21,7 @@ class ReportForeignObjectController extends Controller
     {
         $reports = ReportForeignObject::with('section', 'area', 'details.product')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('report_foreign_objects.index', compact('reports'));
     }
@@ -59,8 +60,6 @@ class ReportForeignObjectController extends Controller
 
         return null;
     }
-
-
 
     public function store(Request $request)
     {
@@ -291,6 +290,90 @@ class ReportForeignObjectController extends Controller
 
         return $pdf->stream('Laporan_Kontaminasi_' . $report->date->format('Ymd') . '.pdf');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportForeignObject::with('details')->where('uuid', $uuid)->firstOrFail();
+        $areas = Area::all();
+        $sections = Section::all();
+        $products = Product::all();
+
+        return view('report_foreign_objects.edit', compact('report', 'areas', 'sections', 'products'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportForeignObject::where('uuid', $uuid)->firstOrFail();
+
+        $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|string',
+            'section_uuid' => 'required|uuid',
+            'details' => 'required|array|min:1',
+            'details.*.time' => 'required',
+            'details.*.product_uuid' => 'required|uuid',
+            'details.*.production_code' => 'nullable|string',
+            'details.*.contaminant_type' => 'nullable|string',
+            'details.*.evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'details.*.analysis_stage' => 'nullable|string',
+            'details.*.contaminant_origin' => 'nullable|string',
+            'details.*.notes' => 'nullable|string',
+            'details.*.qc_paraf' => 'nullable|string',
+            'details.*.production_paraf' => 'nullable|string',
+            'details.*.engineering_paraf' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update header
+            $report->update([
+                'date' => $request->date,
+                'shift' => $request->shift,
+                'section_uuid' => $request->section_uuid,
+            ]);
+
+            // Hapus detail lama
+            $report->details()->delete();
+
+            // Simpan detail baru
+            foreach ($request->details as $index => $detail) {
+                $evidencePath = null;
+                if(isset($detail['evidence']) && $detail['evidence'] instanceof \Illuminate\Http\UploadedFile){
+                    $file = $detail['evidence'];
+                    $filename = time().'_'.$index.'_'.$file->getClientOriginalName();
+                    $evidencePath = $file->storeAs('evidence_foreign_objects', $filename, 'public');
+                }
+
+                $qcParafPath = !empty($detail['qc_paraf']) ? $this->saveSignature($detail['qc_paraf'], "qc_{$index}") : null;
+                $productionParafPath = !empty($detail['production_paraf']) ? $this->saveSignature($detail['production_paraf'], "production_{$index}") : null;
+                $engineeringParafPath = !empty($detail['engineering_paraf']) ? $this->saveSignature($detail['engineering_paraf'], "engineering_{$index}") : null;
+
+                DetailForeignObject::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'product_uuid' => $detail['product_uuid'],
+                    'time' => $detail['time'],
+                    'production_code' => $detail['production_code'] ?? null,
+                    'contaminant_type' => $detail['contaminant_type'] ?? null,
+                    'evidence' => $evidencePath,
+                    'analysis_stage' => $detail['analysis_stage'] ?? null,
+                    'contaminant_origin' => $detail['contaminant_origin'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                    'qc_paraf' => $qcParafPath,
+                    'production_paraf' => $productionParafPath,
+                    'engineering_paraf' => $engineeringParafPath,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('report-foreign-objects.index')->with('success', 'Laporan berhasil diupdate');
+        } catch(\Throwable $e){
+            DB::rollBack();
+            return back()->with('error', 'Gagal mengupdate: '.$e->getMessage());
+        }
+    }
+
+
 
 
 }

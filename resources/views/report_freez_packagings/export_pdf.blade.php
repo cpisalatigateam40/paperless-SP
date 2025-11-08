@@ -108,6 +108,7 @@
             <tr>
                 <th rowspan="2">Waktu Pemeriksaan</th>
                 <th rowspan="2">Nama Produk</th>
+                <th rowspan="2">Gramase</th>
                 <th rowspan="2">Kode Produksi</th>
                 <th rowspan="2">Best Before</th>
                 <th rowspan="2">Tindakan Koreksi</th>
@@ -145,6 +146,7 @@
                     {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : '' }}
                 </td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
+                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
                 <td>{{ $detail->corrective_action }}</td>
@@ -173,7 +175,7 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="23" style="text-align: right; border: none;">QM 39 / 02</td>
+                <td colspan="24" style="text-align: right; border: none;">QM 39 / 02</td>
             </tr>
         </tbody>
     </table>

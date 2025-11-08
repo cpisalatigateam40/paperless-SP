@@ -144,6 +144,7 @@
         <tr>
             <th rowspan="2">Jam</th>
             <th rowspan="2">Produk</th>
+            <th rowspan="2">Gramase</th>
             <th rowspan="2">MD BPOM</th>
             <th rowspan="2">QR Code</th>
             <th rowspan="2">Kode Produksi & Best Before</th>
@@ -187,6 +188,7 @@
             @if($i == 1)
             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
+            <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
             <td rowspan="5">
                 @php
                 $mdPath = storage_path('app/public/' . $d->upload_md);
@@ -298,7 +300,7 @@
             @endforeach
 
             <tr>
-                <td colspan="25" class="text-end" style="border: none;">QM 05 / 01</td>
+                <td colspan="26" class="text-end" style="border: none;">QM 05 / 01</td>
             </tr>
 
     </table>

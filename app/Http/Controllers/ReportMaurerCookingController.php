@@ -25,7 +25,40 @@ class ReportMaurerCookingController extends Controller
 {
     public function index()
     {
-        $reports = ReportMaurerCooking::latest()->paginate(10);
+        $reports = ReportMaurerCooking::with([
+            'details.thermocouplePositions',
+            'details.sensoryCheck'
+        ])
+        ->latest()
+        ->paginate(10);
+
+        // Hitung kolom ketidaksesuaian
+        $reports->getCollection()->transform(function ($report) {
+            $totalKetidaksesuaian = 0;
+
+            foreach ($report->details as $detail) {
+                // 🔹 Cek Thermocouple Positions
+                foreach ($detail->thermocouplePositions as $pos) {
+                    if (strtolower($pos->position_info) === 'tidak oke' || strtolower($pos->position_info) === 'tidak ok') {
+                        $totalKetidaksesuaian++;
+                    }
+                }
+
+                // 🔹 Cek Sensory Check
+                if ($detail->sensoryCheck) {
+                    $fields = ['ripeness', 'aroma', 'texture', 'color', 'taste'];
+                    foreach ($fields as $field) {
+                        if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
+                            $totalKetidaksesuaian++;
+                        }
+                    }
+                }
+            }
+
+            $report->ketidaksesuaian = $totalKetidaksesuaian;
+            return $report;
+        });
+
         return view('report_maurer_cookings.index', compact('reports'));
     }
 

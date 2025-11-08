@@ -11,10 +11,12 @@
                 @csrf
                 <div class="mb-3">
                     <label>Produk</label>
-                    <select name="product_uuid" class="form-control" required>
+                    <select name="product_uuid" class="form-control select2-product" required>
                         <option value="">-- Pilih Produk --</option>
                         @foreach($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }} - {{ $product->nett_weight }}
+                            g
+                        </option>
                         @endforeach
                     </select>
                 </div>

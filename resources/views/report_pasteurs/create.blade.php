@@ -14,7 +14,8 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control">
+                        <input type="date" name="date" value="{{ \Carbon\Carbon::today()->toDateString() }}"
+                            class="form-control">
                     </div>
                     <div class="col-md-6">
                         <label>Shift</label>
@@ -27,34 +28,39 @@
                 <div id="detail-wrapper">
                     <div class="border p-3 mb-3 detail-item">
                         <div class="row mb-4">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Produk</label>
-                                <select name="details[0][product_uuid]" class="form-control">
+                                <select name="details[0][product_uuid]" class="form-control select2-product">
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                        {{ $product->nett_weight }} g</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Nomor Program</label>
                                 <input type="text" name="details[0][program_number]" class="form-control">
                             </div>
-                            <div class="col-md-4">
+
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
                                 <label>Kode Produk</label>
                                 <input type="text" name="details[0][product_code]" class="form-control">
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Kemasan (gr)</label>
                                 <input type="number" name="details[0][for_packaging_gr]" class="form-control">
                             </div>
-                            <div class="col-md-4">
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
                                 <label>Jumlah Troly</label>
                                 <input type="number" name="details[0][trolley_count]" class="form-control">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>Suhu Produk (°C)</label>
                                 <input type="number" step="0.1" name="details[0][product_temp]" class="form-control">
                             </div>
@@ -120,12 +126,12 @@
                                 <input type="hidden" name="details[0][steps][7][step_order]" value="8">
                                 <input type="hidden" name="details[0][steps][7][step_type]" value="drainage">
 
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label>Jam Mulai</label>
                                     <input type="time" name="details[0][steps][7][data][start_time]"
                                         class="form-control">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label>Jam Selesai</label>
                                     <input type="time" name="details[0][steps][7][data][end_time]" class="form-control">
                                 </div>
@@ -140,12 +146,12 @@
                                 <input type="hidden" name="details[0][steps][8][step_order]" value="9">
                                 <input type="hidden" name="details[0][steps][8][step_type]" value="finish">
 
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label>Suhu Inti Produk (°C)</label>
                                     <input type="number" step="0.1" name="details[0][steps][8][data][product_core_temp]"
                                         class="form-control">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label>Sortasi</label>
                                     <input type="text" name="details[0][steps][8][data][sortation]"
                                         class="form-control">
@@ -159,7 +165,7 @@
 
                 <h6 class="mt-3">Paraf</h6>
                 <div class="row mb-2">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label">Paraf QC</label>
                         <canvas id="qc-canvas-0" class="border" width="300" height="150"
                             data-input="qc_paraf_input_0"></canvas>
@@ -167,7 +173,7 @@
                         <button type="button" class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label">Paraf Produksi</label>
                         <canvas id="prod-canvas-0" class="border" width="300" height="150"
                             data-input="production_paraf_input_0"></canvas>

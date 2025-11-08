@@ -140,6 +140,7 @@
             <tr>
                 <th rowspan="2">Jam</th>
                 <th rowspan="2">Produk</th>
+                <th rowspan="2">Gramase</th>
                 <th rowspan="2">Kode Produksi</th>
                 <th colspan="3">Spesimen</th>
                 <th rowspan="2">Hasil Verifikasi MD Loma</th>
@@ -160,6 +161,7 @@
             <tr>
                 <td>{{ $detail->hour }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
+                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->result_fe }}</td>
                 <td>{{ $detail->result_non_fe }}</td>
@@ -172,11 +174,11 @@
             </tr>
             @empty
             <tr>
-                <td colspan="11">Tidak ada detail pemeriksaan</td>
+                <td colspan="12">Tidak ada detail pemeriksaan</td>
             </tr>
             @endforelse
             <tr>
-                <td colspan="11" style="text-align: right; border: none;">QM 10 / 00</td>
+                <td colspan="12" style="text-align: right; border: none;">QM 10 / 00</td>
             </tr>
         </tbody>
     </table>

@@ -158,4 +158,35 @@ class ReportFragileItemController extends Controller
             ->setPaper('A4', 'portrait')
             ->stream('Laporan Fragile Item - ' . $report->date . '.pdf');
     }
+
+    public function editNext($uuid)
+{
+    $report = ReportFragileItem::with('details')->where('uuid', $uuid)->firstOrFail();
+    $fragileItems = FragileItem::all();
+
+    // isEdit = false agar form aktif untuk waktu akhir (time_end)
+    return view('report_fragile_item.editnext', compact('report', 'fragileItems'))->with('isEdit', true);
 }
+
+public function updateNext(Request $request, $uuid)
+{
+    $report = ReportFragileItem::where('uuid', $uuid)->firstOrFail();
+
+    foreach ($request->items as $uuidItem => $data) {
+        $detail = $report->details->where('fragile_item_uuid', $uuidItem)->first();
+
+        if ($detail) {
+            $detail->update([
+                'time_start' => $data['time_start'] ?? 0,
+                'time_end' => $data['time_end'] ?? 0,
+                'notes' => $data['notes'] ?? 0,
+            ]);
+        }
+    }
+
+    return redirect()->route('report-fragile-item.index')->with('success', 'Laporan tahap 2 berhasil diperbarui.');
+}
+
+}
+
+

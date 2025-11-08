@@ -1,3 +1,5 @@
+
+
 @extends('layouts.app')
 
 @section('content')
@@ -52,6 +54,10 @@
                         ])
                     </div>
                     @endforeach
+                </div>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

@@ -21,6 +21,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Produk</th>
                             <th>Aksi</th>
                         </tr>
@@ -33,13 +34,27 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
-                            <td>{{ $report->product->product_name ?? '-' }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
+                            <td>{{ $report->product->product_name ?? '-' }} -
+                                {{ $report->product->nett_weight ?? '-' }} g</td>
                             <td class="text-center">
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                @can('edit report')
+                                <a href="{{ route('report_rtg_steamers.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
                                 <form action="{{ route('report_rtg_steamers.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">
                                     @csrf
@@ -105,7 +120,7 @@
                         </tr>
                         {{-- Detail Collapse --}}
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="table-responsive">
                                     <table class="table table-bordered align-middle small text-center">
                                         <tbody>
@@ -231,7 +246,9 @@
                 </table>
             </div>
 
-            {{ $reports->links() }}
+            <div class="mt-3">
+                {{ $reports->links('pagination::bootstrap-5') }}
+            </div>
         </div>
     </div>
 </div>

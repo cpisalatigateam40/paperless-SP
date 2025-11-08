@@ -14,11 +14,34 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportMdProductController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportMdProduct::latest()->paginate(10);
-        return view('report_md_products.index', compact('reports'));
+public function index()
+{
+    $reports = ReportMdProduct::with(['details.positions'])->latest()->paginate(10);
+
+    foreach ($reports as $report) {
+        $totalNonConform = 0;
+
+        foreach ($report->details as $detail) {
+            // 1️⃣ Cek verifikasi setelah perbaikan
+            if (isset($detail->verification) && $detail->verification == 0) {
+                $totalNonConform++;
+                continue; // langsung lanjut, tidak perlu cek posisi lagi
+            }
+
+            // 2️⃣ Cek posisi (status = 0 berarti Tidak OK)
+            if ($detail->positions->contains('status', 0)) {
+                $totalNonConform++;
+            }
+        }
+
+        // Tambahkan properti untuk dipakai di view
+        $report->ketidaksesuaian = $totalNonConform;
     }
+
+    return view('report_md_products.index', compact('reports'));
+}
+
+
 
     public function create()
     {
@@ -197,5 +220,67 @@ class ReportMdProductController extends Controller
         ]);
         return $pdf->stream('Report-Metal-Detector-' . $report->date . '.pdf');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportMdProduct::with(['details.positions', 'details.product'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        $products = Product::all();
+        return view('report_md_products.edit', compact('report', 'products'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
+
+        // Update header
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+        ]);
+
+        // Hapus detail lama sebelum menulis ulang
+        foreach ($report->details as $oldDetail) {
+            $oldDetail->positions()->delete();
+            $oldDetail->delete();
+        }
+
+        // Simpan detail baru dari form edit
+        if ($request->has('details')) {
+            foreach ($request->details as $detail) {
+                $detailModel = DetailMdProduct::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'product_uuid' => $detail['product_uuid'] ?? null,
+                    'production_code' => $detail['production_code'] ?? null,
+                    'gramase' => $detail['gramase'] ?? null,
+                    'best_before' => $detail['best_before'] ?? null,
+                    'time' => $detail['time'] ?? null,
+                    'program_number' => $detail['program_number'] ?? null,
+                    'corrective_action' => $detail['corrective_action'] ?? null,
+                    'verification' => isset($detail['verification']) ? (bool) $detail['verification'] : false,
+                ]);
+
+                // Simpan ulang posisi
+                if (!empty($detail['positions'])) {
+                    foreach ($detail['positions'] as $position) {
+                        PositionMdProduct::create([
+                            'uuid' => Str::uuid(),
+                            'detail_uuid' => $detailModel->uuid,
+                            'specimen' => $position['specimen'] ?? null,
+                            'position' => $position['position'] ?? null,
+                            'status' => isset($position['status']) ? (bool) $position['status'] : false,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('report_md_products.index')
+            ->with('success', 'Report berhasil diperbarui.');
+    }
+
 
 }

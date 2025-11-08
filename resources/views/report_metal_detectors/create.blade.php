@@ -19,15 +19,6 @@
                     <label>Shift</label>
                     <input type="text" name="shift" class="form-control" required>
                 </div>
-                <!-- <div class="mb-3">
-                    <label>Section</label>
-                    <select name="section_uuid" class="form-control">
-                        <option value="">-- Pilih Section --</option>
-                        @foreach($sections as $section)
-                        <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
-                        @endforeach
-                    </select>
-                </div> -->
 
                 <hr>
                 <h5>Detail Pemeriksaan</h5>
@@ -35,9 +26,10 @@
                     <div class="card p-3 mb-3">
                         <div class="mb-3">
                             <label>Produk</label>
-                            <select name="details[0][product_uuid]" class="form-control" required>
+                            <select name="details[0][product_uuid]" class="form-control select2-product" required>
                                 @foreach($products as $product)
-                                <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                    {{ $product->nett_weight }} g</option>
                                 @endforeach
                             </select>
                         </div>

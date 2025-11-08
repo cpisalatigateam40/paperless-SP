@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class ReportPasteurController extends Controller
 {
@@ -26,7 +27,7 @@ class ReportPasteurController extends Controller
             'details.steps.drainageStep',
             'details.steps.finishStep',
             'area'
-        ])->get();
+        ])->paginate(10);
 
         return view('report_pasteurs.index', compact('reports'));
     }
@@ -306,4 +307,97 @@ class ReportPasteurController extends Controller
         // Download PDF
         return $pdf->stream("Report_Pasteur_{$report->uuid}.pdf");
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportPasteur::with([
+            'details.product',
+            'details.steps.standardStep',
+            'details.steps.drainageStep',
+            'details.steps.finishStep'
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        $areas = Area::all();
+        $products = Product::all();
+
+        return view('report_pasteurs.edit', compact('report', 'areas', 'products'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        DB::transaction(function () use ($request, $uuid) {
+            $report = ReportPasteur::where('uuid', $uuid)->firstOrFail();
+
+            // 🧾 Update header
+            $report->update([
+                'date' => $request->date,
+                'shift' => $request->shift,
+                'problem' => $request->problem,
+                'corrective_action' => $request->corrective_action,
+            ]);
+
+            // 💣 Hapus detail lama (biar bersih)
+            DetailPasteur::where('report_uuid', $report->uuid)->delete();
+
+            // 🔁 Insert ulang semua detail dan step
+            foreach ($request->details as $index => $detailData) {
+
+                $qcParafPath = null;
+                if (!empty($detailData['qc_paraf'])) {
+                    $qcParafPath = $this->saveSignature($detailData['qc_paraf'], "qc_{$index}");
+                }
+
+                $productionParafPath = null;
+                if (!empty($detailData['production_paraf'])) {
+                    $productionParafPath = $this->saveSignature($detailData['production_paraf'], "production_{$index}");
+                }
+
+                $detail = DetailPasteur::create([
+                    'report_uuid' => $report->uuid,
+                    'product_uuid' => $detailData['product_uuid'] ?? null,
+                    'program_number' => $detailData['program_number'] ?? null,
+                    'product_code' => $detailData['product_code'] ?? null,
+                    'for_packaging_gr' => $detailData['for_packaging_gr'] ?? null,
+                    'trolley_count' => $detailData['trolley_count'] ?? null,
+                    'product_temp' => $detailData['product_temp'] ?? null,
+                    'qc_paraf' => $qcParafPath,
+                    'production_paraf' => $productionParafPath,
+                ]);
+
+                if (isset($detailData['steps'])) {
+                    foreach ($detailData['steps'] as $stepData) {
+                        $step = StepPasteur::create([
+                            'detail_uuid' => $detail->uuid,
+                            'step_name' => $stepData['step_name'] ?? null,
+                            'step_order' => $stepData['step_order'] ?? null,
+                            'step_type' => $stepData['step_type'] ?? null,
+                        ]);
+
+                        if (($stepData['step_type'] ?? '') === 'standard') {
+                            StandardStep::create(array_merge($stepData['data'] ?? [], [
+                                'step_uuid' => $step->uuid,
+                            ]));
+                        }
+
+                        if (($stepData['step_type'] ?? '') === 'drainage') {
+                            DrainageStep::create(array_merge($stepData['data'] ?? [], [
+                                'step_uuid' => $step->uuid,
+                            ]));
+                        }
+
+                        if (($stepData['step_type'] ?? '') === 'finish') {
+                            FinishStep::create(array_merge($stepData['data'] ?? [], [
+                                'step_uuid' => $step->uuid,
+                            ]));
+                        }
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('report_pasteurs.index')
+            ->with('success', 'Data laporan Pasteurisasi berhasil diperbarui.');
+    }
+
+
 }

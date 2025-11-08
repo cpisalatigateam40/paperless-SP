@@ -25,25 +25,26 @@
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label>Produk</label>
-                        <select name="product_uuid" class="form-control" required>
+                        <select name="product_uuid" class="form-control select2-product" required>
                             <option value="">-- pilih produk --</option>
                             @foreach($products as $product)
-                            <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                            <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                {{ $product->nett_weight }} g</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Kode Produksi</label>
                         <input type="text" name="production_code" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Start</label>
                         <input type="time" name="start_time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Stop</label>
                         <input type="time" name="end_time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
@@ -107,7 +108,7 @@
                 {{-- DETAIL PROSES (1x input, bukan repeater) --}}
 
                 <div class="row mb-2">
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Warna</label>
                         <select name="details[0][color]" class="form-control" required>
 
@@ -115,7 +116,7 @@
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Aroma</label>
                         <select name="details[0][aroma]" class="form-control" required>
 
@@ -123,7 +124,7 @@
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Rasa</label>
                         <select name="details[0][taste]" class="form-control" required>
 
@@ -131,7 +132,7 @@
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Tekstur</label>
                         <select name="details[0][texture]" class="form-control" required>
 
@@ -158,27 +159,23 @@
                 </div>
 
                 <div class="row mb-2">
-
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Lama Proses (menit)</label>
                         <input type="number" step="0.01" name="details[0][duration]" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Pressure (Bar)</label>
                         <input type="number" step="0.01" name="details[0][pressure]" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Target Temperature (&deg;C)</label>
                         <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Actual Temperature (&deg;C)</label>
                         <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control">
                     </div>
                 </div>
-
-
-
 
 
 

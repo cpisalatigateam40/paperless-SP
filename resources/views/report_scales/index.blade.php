@@ -57,6 +57,13 @@
                                     <i class="fas fa-pen"></i>
                                 </a>
 
+                                @can('edit report')
+                                <a href="{{ route('report-scales.edit-next', $report->uuid) }}"
+                                    class="btn btn-sm btn-danger" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Hapus --}}
                                 <form action="{{ route('report-scales.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Hapus laporan ini?')">
@@ -244,7 +251,9 @@
                     </tbody>
                 </table>
 
-                {{ $reports->links('pagination::bootstrap-5') }}
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>

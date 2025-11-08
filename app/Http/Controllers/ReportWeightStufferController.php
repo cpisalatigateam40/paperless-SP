@@ -21,7 +21,7 @@ class ReportWeightStufferController extends Controller
 {
     public function index()
     {
-        $reports = ReportWeightStuffer::with('details')->latest()->get();
+        $reports = ReportWeightStuffer::with('details')->latest()->paginate(10);
         return view('report_weight_stuffers.index', compact('reports'));
     }
 
@@ -263,4 +263,101 @@ class ReportWeightStufferController extends Controller
         ])->setPaper('A4', 'landscape');
         return $pdf->stream('laporan-verifikasi-berat-stuffer.pdf');
     }
+
+    public function edit($uuid)
+{
+    $report = ReportWeightStuffer::where('uuid', $uuid)
+        ->with([
+            'details.product',
+            'details.townsend',
+            'details.hitech',
+            'details.cases',
+            'details.weights',
+        ])->firstOrFail();
+
+    $products = Product::all();
+    $standards = StandardStuffer::with('product')->get();
+
+    return view('report_weight_stuffers.edit', compact('report', 'products', 'standards'));
+}
+
+public function update(Request $request, $uuid)
+{
+    $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
+
+    // Update header
+    $report->update([
+        'date'  => $request->date,
+        'shift' => $request->shift,
+    ]);
+
+    // Hapus detail lama agar bisa replace data baru
+    foreach ($report->details as $oldDetail) {
+        TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+        HitechStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+        CaseStuffer::where('stuffer_id', $oldDetail->id)->delete();
+        WeightStufferMeasurement::where('stuffer_id', $oldDetail->id)->delete();
+        $oldDetail->delete();
+    }
+
+    // Simpan detail baru dari form
+    foreach ($request->details as $detail) {
+        $detailModel = DetailWeightStuffer::create([
+            'uuid' => Str::uuid(),
+            'report_uuid' => $report->uuid,
+            'product_uuid' => $detail['product_uuid'],
+            'production_code' => $detail['production_code'],
+            'time' => $detail['time'],
+            'weight_standard' => $detail['weight_standard'] ?? null,
+            'long_standard' => $detail['long_standard'] ?? null,
+        ]);
+
+        if ($detail['machine'] === 'townsend') {
+            TownsendStuffer::create([
+                'detail_uuid' => $detailModel->uuid,
+                'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                'avg_weight' => $detail['avg_weight'] ?? null,
+                'avg_long' => $detail['avg_long'] ?? null,
+                'notes' => $detail['notes'] ?? null,
+            ]);
+        }
+
+        if ($detail['machine'] === 'hitech') {
+            HitechStuffer::create([
+                'detail_uuid' => $detailModel->uuid,
+                'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                'avg_weight' => $detail['avg_weight'] ?? null,
+                'avg_long' => $detail['avg_long'] ?? null,
+                'notes' => $detail['notes'] ?? null,
+            ]);
+        }
+
+        if (isset($detail['cases'])) {
+            foreach ($detail['cases'] as $case) {
+                CaseStuffer::create([
+                    'stuffer_id' => $detailModel->id,
+                    'actual_case_2' => $case['actual_case_2'],
+                ]);
+            }
+        }
+
+        if (isset($detail['weights'])) {
+            foreach ($detail['weights'] as $weightSet) {
+                foreach ($weightSet as $key => $value) {
+                    if (strpos($key, 'actual_weight_') === 0) {
+                        $index = str_replace('actual_weight_', '', $key);
+                        WeightStufferMeasurement::create([
+                            'stuffer_id' => $detailModel->id,
+                            'actual_weight' => $value ?? null,
+                            'actual_long' => $weightSet['actual_long_' . $index] ?? null,
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    return redirect()->route('report_weight_stuffers.index')->with('success', 'Laporan berhasil diperbarui.');
+}
+
 }

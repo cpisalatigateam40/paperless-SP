@@ -37,50 +37,52 @@
                     <div>
                         <div id="detail-container">
                             <div class="row mb-3">
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Jam</label>
                                     <input type="time" name="details[0][time]" class="form-control"
                                         value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Produk</label>
-                                    <select name="details[0][product_uuid]" class="form-control" required>
+                                    <select name="details[0][product_uuid]" class="form-control select2-product"
+                                        required>
                                         <option value="">Pilih Produk</option>
                                         @foreach($products as $product)
-                                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
+                                        <option value="{{ $product->uuid }}">{{ $product->product_name }} -
+                                            {{ $product->nett_weight }} g</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Kode Produksi</label>
                                     <input type="text" name="details[0][production_code]" class="form-control">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Jenis Kontaminan</label>
                                     <input type="text" name="details[0][contaminant_type]" class="form-control">
                                 </div>
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Bukti (Foto)</label>
                                     <input type="file" name="details[0][evidence]" class="form-control">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Tahapan Analisis</label>
                                     <input type="text" name="details[0][analysis_stage]" class="form-control">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Asal Kontaminan</label>
                                     <input type="text" name="details[0][contaminant_origin]" class="form-control">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Keterangan</label>
                                     <input type="text" name="details[0][notes]" class="form-control">
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="row mb-3 mt-5">
                                 <div class="col-md-4">
                                     <label class="form-label">Paraf QC</label>
                                     <canvas id="qc-canvas-0" class="border" width="300" height="150"

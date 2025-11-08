@@ -13,40 +13,47 @@
             <div class="card-body">
                 {{-- HEADER REPORT --}}
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="date" class="form-label">Tanggal</label>
                         <input type="date" id="date" name="date" class="form-control"
                             value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="shift" class="form-label">Shift</label>
                         <input type="text" id="shift" name="shift" class="form-control" required>
                     </div>
-                    <div class="col-md-4">
+
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <label class="form-label">Jenis Produk</label>
-                        <select name="product_uuid" class="form-control">
+                        <select name="product_uuid" class="form-control select2-product">
                             <option value="">-- Pilih Produk --</option>
                             @foreach($products as $p)
-                            <option value="{{ $p->uuid }}">{{ $p->product_name }}</option>
+                            <option value="{{ $p->uuid }}">{{ $p->product_name }} - {{ $p->nett_weight }} g</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label>Std Suhu Pusat</label>
                         <input type="text" name="std_core_temp" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label>Std Berat Akhir/Potong</label>
                         <input type="text" name="std_weight" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <label>Set Suhu Tangki Perebusan 1</label>
                         <input type="number" step="0.01" name="set_boiling_1" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label>Set Suhu Tangki Perebusan 2</label>
                         <input type="number" step="0.01" name="set_boiling_2" class="form-control">
                     </div>
@@ -57,33 +64,37 @@
                 <h6>Detail Produksi</h6>
                 <div id="detail-wrapper">
                     <div class="detail-item border rounded p-3 mb-3">
-                        <div class="row mb-2">
-                            <div class="col-md-3">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label>Kode Produksi Kemasan</label>
                                 <input type="text" name="details[0][production_code]" class="form-control">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label>Suhu Emulsi</label>
                                 <input type="number" step="0.01" name="details[0][emulsion_temp]" class="form-control">
                             </div>
-                            <div class="col-md-3">
+
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label>Suhu Air Tangki 1</label>
                                 <input type="number" step="0.01" name="details[0][boiling_tank_temp_1]"
                                     class="form-control">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label>Suhu Air Tangki 2</label>
                                 <input type="number" step="0.01" name="details[0][boiling_tank_temp_2]"
                                     class="form-control">
                             </div>
                         </div>
 
-                        <div class="row mb-2">
-                            <div class="col-md-3">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label>Berat Awal</label>
                                 <input type="number" step="0.01" name="details[0][initial_weight]" class="form-control">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label>Berat Akhir</label>
                                 <input type="number" step="0.01" name="details[0][final_weight]" class="form-control">
                             </div>
@@ -117,7 +128,7 @@
                         </div>
 
                         {{-- Sensory Checks --}}
-                        <h6 class="mt-4 mb-3">Pemeriksaan Sensory</h6>
+                        <h6 class="mt-5 mb-3">Pemeriksaan Sensory</h6>
                         <div class="row mb-2">
                             @foreach(['shape' => 'Bentuk', 'taste' => 'Rasa', 'aroma' => 'Aroma', 'texture' =>
                             'Tekstur', 'color' => 'Warna']
@@ -133,23 +144,21 @@
                         </div>
 
                         {{-- Parafer --}}
-                        <div class="row mb-2">
-                            <div class="col-md-4">
+                        <div class="row mb-2 mt-5">
+                            <div class="col-md-6">
                                 <label class="form-label">Paraf QC</label>
                                 <canvas id="qc-canvas-0" class="border" width="300" height="150"
                                     data-input="qc_paraf_input_0"></canvas>
                                 <input type="hidden" name="details[0][qc_paraf]" id="qc_paraf_input_0">
-                                <button type="button"
-                                    class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
+                                <button type="button" class="btn btn-sm btn-secondary  clear-signature">Hapus</button>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Paraf Produksi</label>
                                 <canvas id="prod-canvas-0" class="border" width="300" height="150"
                                     data-input="prod_paraf_input_0"></canvas>
                                 <input type="hidden" name="details[0][prod_paraf]" id="prod_paraf_input_0">
-                                <button type="button"
-                                    class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
+                                <button type="button" class="btn btn-sm btn-secondary  clear-signature">Hapus</button>
                             </div>
                         </div>
 

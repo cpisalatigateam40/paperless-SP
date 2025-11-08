@@ -142,6 +142,7 @@
             <tr>
                 <th class="align-middle">Jam</th>
                 <th class="align-middle">Nama Produk</th>
+                <th class="align-middle">Gramase</th>
                 <th class="align-middle">Kode Produksi</th>
                 <th class="align-middle">Jenis Kontaminan</th>
                 <th class="align-middle">Bukti (Foto)</th>
@@ -158,6 +159,7 @@
             <tr>
                 <td>{{ $detail->time }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
+                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->contaminant_type }}</td>
                 <td class="text-center">

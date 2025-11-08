@@ -168,7 +168,6 @@
                 {{-- SENSORIK --}}
                 <h5 class="mt-4 font-weight-bold">Sensorik</h5>
                 <div class="row mb-3">
-
                     <div class="col-md-3">
                         <label>Homogenitas</label>
                         <select name="homogeneous" class="form-control">
@@ -201,7 +200,6 @@
                             <option value="Terdeteksi">Terdeteksi</option>
                         </select>
                     </div>
-
                 </div>
 
                 {{-- TUMBLING --}}

@@ -30,7 +30,8 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label>Nama Produk</label>
-                            <select name="details[0][product_uuid]" class="form-control product-select" required>
+                            <select name="details[0][product_uuid]" class="form-control product-select select2-product"
+                                required>
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach($products as $product)
                                 @php
@@ -40,7 +41,7 @@
                                     data-long-min="{{ $standard->long_min }}" data-long-max="{{ $standard->long_max }}"
                                     data-diameter="{{ $standard->diameter }}"
                                     data-weight-standard="{{ $standard->weight_max }}" @endif>
-                                    {{ $product->product_name }}
+                                    {{ $product->product_name }} - {{ $product->nett_weight }} g
                                 </option>
                                 @endforeach
                             </select>

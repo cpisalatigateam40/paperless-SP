@@ -210,21 +210,21 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report-premixes.index') }}">
                     Pemeriksaan Premix
                 </a>
-                <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
-                    href="{{ route('report_metal_detectors.index') }}">
-                    Pemeriksaan Metal Detector Adonan
-                </a>
-                <a class="collapse-item {{ Request::is('report-weight-stuffers*') ? 'active' : '' }}"
-                    href="{{ route('report_weight_stuffers.index') }}">
-                    Verifikasi Berat Stuffer
-                </a>
                 <a class="collapse-item {{ Request::is('report-emulsion-makings*') ? 'active' : '' }}"
                     href="{{ route('report_emulsion_makings.index') }}">
                     Verifikasi Pembuatan Emulsi / CCM Block
                 </a>
+                <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
+                    href="{{ route('report_metal_detectors.index') }}">
+                    Pemeriksaan Metal Detector Adonan
+                </a>
                 <a class="collapse-item {{ Request::is('report-process-productions*') ? 'active' : '' }}"
                     href="{{ route('report_process_productions.index') }}">
                     Verifikasi Proses Produksi
+                </a>
+                <a class="collapse-item {{ Request::is('report-weight-stuffers*') ? 'active' : '' }}"
+                    href="{{ route('report_weight_stuffers.index') }}">
+                    Verifikasi Berat Stuffer
                 </a>
                 <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
                     href="{{ route('report_sauces.index') }}">
@@ -256,13 +256,13 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_fessman_cookings.index') }}">
                     Fessman
                 </a>
-                <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
-                    href="{{ route('report_baso_cookings.index') }}">
-                    Verifikasi Pemasakan Baso
-                </a>
                 <a class="collapse-item {{ Request::is('report-rtg-steamers*') ? 'active' : '' }}"
                     href="{{ route('report_rtg_steamers.index') }}">
                     Pemeriksaan Pemasakan Dengan Steamer
+                </a>
+                <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
+                    href="{{ route('report_baso_cookings.index') }}">
+                    Verifikasi Pemasakan Baso
                 </a>
             </div>
         </div>
@@ -277,48 +277,27 @@ $isKetidaksesuaian = Request::is([
         <div id="collapsePagesPacking" class="collapse {{ $isPacking ? 'show' : '' }}" aria-labelledby="headingPages"
             data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-
-                {{-- <a class="collapse-item" href="{{ route('report_repack_verifs.index') }}">Verifikasi Repack
-                Produk</a> --}}
-
-                <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
-                    href="{{ route('report_lab_samples.index') }}">
-                    Verifikasi Pengambilan Sample
+                <a class="collapse-item {{ Request::is('report-packaging-verifs*') ? 'active' : '' }}"
+                    href="{{ route('report_packaging_verifs.index') }}">
+                    Verifikasi Kemasan Plastik
                 </a>
-
-                {{-- <a class="collapse-item" href="{{ route('report_retains.index') }}">Retained Sample Report</a> --}}
-                {{-- <a class="collapse-item" href="{{ route('report_retain_exterminations.index') }}">Pemusnahan Retain
-                Sample</a> --}}
 
                 <a class="collapse-item {{ Request::is('report-md-products*') ? 'active' : '' }}"
                     href="{{ route('report_md_products.index') }}">
                     Pemeriksaan Metal Detector Produk
                 </a>
 
-                <!-- <a class="collapse-item {{ Request::is('report-retain-samples*') ? 'active' : '' }}"
-                    href="{{ route('report_retain_samples.index') }}">
-                    Pendataan Retain Sample ABF/IQF
-                </a> -->
-
-                <!-- <a class="collapse-item {{ Request::is('report-product-verifs*') ? 'active' : '' }}"
-                    href="{{ route('report_product_verifs.index') }}">
-                    Verifikasi Produk
-                </a> -->
-
                 <a class="collapse-item {{ Request::is('report-tofu-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_tofu_verifs.index') }}">
                     Verifikasi Produk Tofu
                 </a>
 
-                <!-- <a class="collapse-item {{ Request::is('report-prod-loss-vacums*') ? 'active' : '' }}"
-                    href="{{ route('report_prod_loss_vacums.index') }}">
-                    Verifikasi Produk Loss Vacum
-                </a> -->
-
-                <a class="collapse-item {{ Request::is('report-packaging-verifs*') ? 'active' : '' }}"
-                    href="{{ route('report_packaging_verifs.index') }}">
-                    Verifikasi Pemeriksaan Kemasan Plastik
+                <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
+                    href="{{ route('report_lab_samples.index') }}">
+                    Verifikasi Pengambilan Sample
                 </a>
+
+                
             </div>
         </div>
     </li>
@@ -354,18 +333,10 @@ $isKetidaksesuaian = Request::is([
         <div id="collapsePagesCartoning" class="collapse {{ $isCartoning ? 'show' : '' }}"
             aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-                {{-- <a class="collapse-item" href="{{ route('report_iqf_freezings.index') }}">Verifikasi Pembekuan
-                IQF</a> --}}
-                {{-- <a class="collapse-item" href="{{ route('report_vacuum_conditions.index') }}">Verifikasi Kondisi
-                Vakum Produk Setelah IQF</a> --}}
-
                 <a class="collapse-item {{ Request::is('report-freez-packagings*') ? 'active' : '' }}"
                     href="{{ route('report_freez_packagings.index') }}">
                     Verifikasi Pembekuan IQF dan Pengemasan Karton Box
                 </a>
-
-                {{-- <a class="collapse-item" href="{{ route('report_checkweigher_boxes.index') }}">Pemeriksaan
-                Checkweigher Box</a> --}}
             </div>
         </div>
     </li>
@@ -380,16 +351,6 @@ $isKetidaksesuaian = Request::is([
             aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
 
-                <a class="collapse-item {{ Request::is('report-re-cleanliness*') ? 'active' : '' }}"
-                    href="{{ route('report-re-cleanliness.index') }}">
-                    Kebersihan Ruangan, Mesin, dan Peralatan
-                </a>
-
-                {{-- <a class="collapse-item" href="{{ route('report_pre_operations.index') }}">Pemeriksaan Pra Operasi
-                Produk</a> --}}
-                {{-- <a class="collapse-item" href="{{ route('report_product_changes.index') }}">Verifikasi Pergantian
-                Produk</a> --}}
-
                 <a class="collapse-item {{ Request::is('storage-rm-cleanliness*') ? 'active' : '' }}"
                     href="{{ route('cleanliness.index') }}">
                     Kebersihan Area Penyimpanan Bahan
@@ -400,44 +361,25 @@ $isKetidaksesuaian = Request::is([
                     Kebersihan Area Proses
                 </a>
 
-                <!-- <a class="collapse-item {{ Request::is('report-conveyor-cleanliness*') ? 'active' : '' }}"
-                    href="{{ route('report-conveyor-cleanliness.index') }}">
-                    Kebersihan Conveyor Packing
-                </a> -->
-
-                {{-- <a class="collapse-item" href="{{ route('repair-cleanliness.index') }}">Report Pemeriksaan dan
-                Sanitasi Setelah Perbaikan Mesin</a> --}}
-
                 <a class="collapse-item {{ Request::is('gmp-employee*') ? 'active' : '' }}"
                     href="{{ route('gmp-employee.index') }}">
                     GMP karyawan & Kontrol Sanitasi
                 </a>
-
-                <!-- <a class="collapse-item {{ Request::is('report-chlorine-residues*') ? 'active' : '' }}"
-                    href="{{ route('report_chlorine_residues.index') }}">
-                    Air Proses Produksi
-                </a> -->
-
-                {{-- <a class="collapse-item" href="{{ route('report-solvents.index') }}">Report Pembuatan Larutan
-                Cleaning dan Sanitasi</a> --}}
 
                 <a class="collapse-item {{ Request::is('report-fragile-item*') ? 'active' : '' }}"
                     href="{{ route('report-fragile-item.index') }}">
                     Barang Mudah Pecah
                 </a>
 
+                <a class="collapse-item {{ Request::is('report-re-cleanliness*') ? 'active' : '' }}"
+                    href="{{ route('report-re-cleanliness.index') }}">
+                    Kebersihan Ruangan, Mesin, dan Peralatan
+                </a>
+
                 <a class="collapse-item {{ Request::is('report-scales*') ? 'active' : '' }}"
                     href="{{ route('report-scales.index') }}">
                     Timbangan & Thermometer
                 </a>
-
-                {{-- <a class="collapse-item" href="{{ route('report-qc-equipment.index') }}">Report Inventaris
-                Peralatan QC</a> --}}
-
-                <!-- <a class="collapse-item {{ Request::is('report-sharp-tools*') ? 'active' : '' }}"
-                    href="{{ route('report_sharp_tools.index') }}">
-                    Benda Tajam
-                </a> -->
             </div>
         </div>
     </li>

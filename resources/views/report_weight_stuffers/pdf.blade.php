@@ -148,6 +148,12 @@
             @endforeach
         </tr>
         <tr>
+            <th class="text-start">Gramase</th>
+            @foreach ($details as $d)
+            <th>{{ $d->product->nett_weight ?? '-' }} g</th>
+            @endforeach
+        </tr>
+        <tr>
             <th class="text-start">Kode Produksi</th>
             @foreach ($details as $d)
             <td>{{ $d->production_code }}</td>

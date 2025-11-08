@@ -21,6 +21,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Ketidaksesuaian</th>
                             <th>Produk</th>
                             <th>STD Suhu Pusat</th>
                             <th>STD Berat akhir/potong</th>
@@ -37,7 +38,15 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
-                            <td>{{ $report->product->product_name ?? '-' }}</td>
+                            <td>
+                                @if ($report->ketidaksesuaian > 0)
+                                Ada
+                                @else
+                                -
+                                @endif
+                            </td>
+                            <td>{{ $report->product->product_name ?? '-' }} -
+                                {{ $report->product->nett_weight ?? '-' }} g</td>
                             <td>{{ $report->std_core_temp ?? '-' }}</td>
                             <td>{{ $report->std_weight ?? '-' }}</td>
                             <td>{{ $report->set_boiling_1 ?? '-' }}</td>
@@ -52,6 +61,12 @@
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @can('edit report')
+                                <a href="{{ route('report_baso_cookings.edit_next', $report->uuid) }}"
+                                    class="btn btn-sm btn-danger" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
                                 {{-- Known --}}
                                 @can('known report')
                                 @if(!$report->known_by)
@@ -115,7 +130,7 @@
                             </td>
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="11">
+                            <td colspan="12">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm text-center align-middle">
                                         <thead class="table-secondary">
@@ -222,11 +237,15 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8">Belum ada data laporan.</td>
+                            <td colspan="12">Belum ada data laporan.</td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>

@@ -5,6 +5,7 @@
             <th>Shift</th>
             <th>Waktu</th>
             <th>Area</th>
+            <th>Ketidaksesuaian</th>
             <th>Dibuat Oleh</th>
             <th>Aksi</th>
         </tr>
@@ -16,6 +17,13 @@
             <td>{{ $report->shift }}</td>
             <td>{{ $report->created_at->format('H:i') }}</td>
             <td>{{ $report->area->name }}</td>
+            <td>
+                @if ($report->ketidaksesuaian > 0)
+                Ada
+                @else
+                -
+                @endif
+            </td>
             <td>{{ $report->created_by }}</td>
             <td class="d-flex" style="gap: .3rem;">
                 {{-- Lihat Detail --}}
@@ -23,6 +31,13 @@
                     title="Lihat Detail">
                     <i class="fas fa-eye"></i>
                 </button>
+
+                @can('edit report')
+                <a href="{{ route('process-area-cleanliness.edit', $report->uuid) }}"
+                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                    <i class="fas fa-edit"></i>
+                </a>
+                @endcan
 
                 {{-- Hapus --}}
                 <form action="{{ route('process-area-cleanliness.destroy', $report->id) }}" method="POST"
@@ -89,7 +104,7 @@
         </tr>
 
         <tr class="collapse" id="detail-{{ $report->id }}">
-            <td colspan="6">
+            <td colspan="7">
                 <strong>Area:</strong> {{ $report->area->name ?? '-' }} <br>
 
                 @if($report->approved_by)

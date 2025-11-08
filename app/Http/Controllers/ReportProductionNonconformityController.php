@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class ReportProductionNonconformityController extends Controller
 {
     public function index()
     {
-        $reports = ReportProductionNonconformity::with('details')->latest()->get();
+        $reports = ReportProductionNonconformity::with('details')->latest()->paginate(10);
         return view('report_production_nonconformities.index', compact('reports'));
     }
 
@@ -194,5 +195,74 @@ class ReportProductionNonconformityController extends Controller
 
         return $pdf->stream('Report-Ketidaksesuaian-' . $report->date . '.pdf');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportProductionNonconformity::with('details')->where('uuid', $uuid)->firstOrFail();
+        return view('report_production_nonconformities.edit', compact('report'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportProductionNonconformity::where('uuid', $uuid)->firstOrFail();
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|string',
+            'details' => 'required|array',
+            'details.*.occurrence_time' => 'required',
+            'details.*.description' => 'required',
+            'details.*.quantity' => 'required|integer',
+            'details.*.unit' => 'required|string',
+            'details.*.hazard_category' => 'required|string',
+            'details.*.disposition' => 'required|string',
+            'details.*.evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'details.*.remark' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update report header
+            $report->update([
+                'date' => $validated['date'],
+                'shift' => $validated['shift'],
+            ]);
+
+            // Hapus detail lama (atau bisa update per detail UUID jika ada)
+            $report->details()->delete();
+
+            // Simpan detail baru
+            foreach ($validated['details'] as $index => $detail) {
+                $evidencePath = null;
+
+                if (isset($detail['evidence']) && $detail['evidence'] instanceof \Illuminate\Http\UploadedFile) {
+                    $file = $detail['evidence'];
+                    $filename = time() . '_' . $index . '_' . $file->getClientOriginalName();
+                    $evidencePath = $file->storeAs('evidence_product_nonconformities', $filename, 'public');
+                }
+
+                DetailProductionNonconformity::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'occurrence_time' => $detail['occurrence_time'],
+                    'description' => $detail['description'],
+                    'quantity' => $detail['quantity'],
+                    'unit' => $detail['unit'],
+                    'hazard_category' => $detail['hazard_category'],
+                    'disposition' => $detail['disposition'],
+                    'evidence' => $evidencePath,
+                    'remark' => $detail['remark'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('report_production_nonconformities.index')->with('success', 'Report berhasil diupdate.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal mengupdate: ' . $e->getMessage());
+        }
+    }
+
+
 
 }

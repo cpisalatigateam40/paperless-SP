@@ -16,7 +16,34 @@ class ReportEmulsionMakingController extends Controller
 {
     public function index()
     {
-        $reports = ReportEmulsionMaking::with('header.details', 'header.agings')->get();
+        $reports = ReportEmulsionMaking::with('header.details', 'header.agings')
+        ->latest()
+        ->paginate(10);
+
+        $reports->getCollection()->transform(function ($report) {
+            $ketidaksesuaian = 0;
+
+            // 🔹 Cek dari tabel details
+            if ($report->header && $report->header->details) {
+                $ketidaksesuaian += $report->header->details
+                    ->filter(fn($d) => $d->conformity === 'x')
+                    ->count();
+            }
+
+            // 🔹 Cek dari tabel agings
+            if ($report->header && $report->header->agings) {
+                $ketidaksesuaian += $report->header->agings->filter(function ($a) {
+                    return $a->sensory_color === 'x'
+                        || $a->sensory_texture === 'x'
+                        || $a->emulsion_result === 'Tidak OK';
+                })->count();
+            }
+
+            $report->ketidaksesuaian = $ketidaksesuaian;
+
+            return $report;
+        });
+
         $rawMaterials = \App\Models\RawMaterial::all();
         return view('report_emulsion_makings.index', compact('reports', 'rawMaterials'));
     }
@@ -224,4 +251,77 @@ class ReportEmulsionMakingController extends Controller
 
         return $pdf->stream('report_emulsion_' . $report->uuid . '.pdf');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportEmulsionMaking::where('uuid', $uuid)->firstOrFail();
+        $header = HeaderEmulsionMaking::where('report_uuid', $report->uuid)->first();
+        $details = DetailEmulsionMaking::where('header_uuid', $header->uuid)->get();
+        $agings = AgingEmulsionMaking::where('header_uuid', $header->uuid)->get();
+        $rawMaterials = \App\Models\RawMaterial::all();
+        $areas = \App\Models\Area::all();
+
+        return view('report_emulsion_makings.edit', compact(
+            'report',
+            'header',
+            'details',
+            'agings',
+            'rawMaterials',
+            'areas'
+        ));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        // Ambil report utama
+        $report = ReportEmulsionMaking::where('uuid', $uuid)->firstOrFail();
+        $header = HeaderEmulsionMaking::where('report_uuid', $report->uuid)->first();
+
+        // Update report utama
+        $report->update([
+            'date' => $request->date,
+            'shift' => $request->shift,
+        ]);
+
+        // Update header
+        $header->update([
+            'emulsion_type' => $request->emulsion_type,
+            'production_code' => $request->production_code,
+        ]);
+
+        // 🔹 Hapus detail lama, lalu simpan ulang (lebih sederhana & aman)
+        DetailEmulsionMaking::where('header_uuid', $header->uuid)->delete();
+        if ($request->has('details')) {
+            foreach ($request->details as $detail) {
+                DetailEmulsionMaking::create([
+                    'uuid' => Str::uuid(),
+                    'header_uuid' => $header->uuid,
+                    'raw_material_uuid' => $detail['raw_material_uuid'],
+                    'weight' => $detail['weight'],
+                    'temperature' => $detail['temperature'],
+                    'conformity' => $detail['conformity'],
+                ]);
+            }
+        }
+
+        // 🔹 Hapus aging lama, lalu simpan ulang
+        AgingEmulsionMaking::where('header_uuid', $header->uuid)->delete();
+        if ($request->has('agings')) {
+            foreach ($request->agings as $aging) {
+                AgingEmulsionMaking::create([
+                    'uuid' => Str::uuid(),
+                    'header_uuid' => $header->uuid,
+                    'start_aging' => $aging['start_aging'],
+                    'finish_aging' => $aging['finish_aging'],
+                    'emulsion_result' => $aging['emulsion_result'],
+                    'sensory_color' => $aging['sensory_color'],
+                    'sensory_texture' => $aging['sensory_texture'],
+                    'temp_after' => $aging['temp_after'],
+                ]);
+            }
+        }
+
+        return redirect()->route('report_emulsion_makings.index')->with('success', 'Data berhasil diperbarui.');
+    }
+
 }
