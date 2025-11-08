@@ -61,6 +61,13 @@
                                     <i class="fas fa-pen"></i>
                                 </a>
 
+                                @can('edit report')
+                                <a href="{{ route('report-fragile-item.edit-next', $report->uuid) }}"
+                                    class="btn btn-sm btn-danger" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @endcan
+
                                 {{-- Hapus --}}
                                 <form action="{{ route('report-fragile-item.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">

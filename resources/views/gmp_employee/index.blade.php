@@ -70,6 +70,13 @@
                                         <i class="fas fa-pen"></i>
                                     </a>
 
+                                    @can('edit report')
+                                    <a href="{{ route('gmp-employee.editnext', $report->uuid) }}"
+                                        class="btn btn-sm btn-danger" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    @endcan
+
                                     {{-- Hapus --}}
                                     <form action="{{ route('gmp-employee.destroy', $report->id) }}" method="POST"
                                         onsubmit="return confirm('Yakin ingin menghapus laporan ini?')"

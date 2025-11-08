@@ -25,7 +25,7 @@ public function index()
             $query->where('area_uuid', Auth::user()->area_uuid);
         })
         ->latest()
-        ->paginate(10);
+        ->paginate(20);
 
     // 🔹 Hitung ketidaksesuaian untuk setiap report
     foreach ($reports as $report) {
@@ -247,6 +247,80 @@ public function index()
 
         return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');
     }
+
+    public function edit($uuid)
+    {
+        $report = ReportProcessAreaCleanliness::with([
+            'details.items.followups'
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        return view('cleanliness_PA.edit', compact('report'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        DB::beginTransaction();
+        try {
+            $report = ReportProcessAreaCleanliness::where('uuid', $uuid)->firstOrFail();
+
+            $report->update([
+                'shift' => $request->shift,
+                'section_name' => $request->section_name,
+                'known_by' => $request->known_by,
+                'approved_by' => $request->approved_by,
+                'updated_at' => now()->setTimezone('Asia/Jakarta'),
+            ]);
+
+            // Hapus data lama dan simpan ulang (opsi paling aman untuk struktur nested)
+            $report->details()->each(function ($detail) {
+                $detail->items()->each(function ($item) {
+                    $item->followups()->delete();
+                });
+                $detail->items()->delete();
+                $detail->delete();
+            });
+
+            foreach ($request->details as $detailInput) {
+                $detail = DetailProcessAreaCleanliness::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'inspection_hour' => $detailInput['inspection_hour'],
+                ]);
+
+                foreach ($detailInput['items'] as $itemInput) {
+                    $item = ItemProcessAreaCleanliness::create([
+                        'detail_uuid' => $detail->uuid,
+                        'item' => $itemInput['item'],
+                        'condition' => $itemInput['condition'] ?? null,
+                        'temperature_actual' => $itemInput['temperature_actual'] ?? null,
+                        'temperature_display' => $itemInput['temperature_display'] ?? null,
+                        'notes' => $itemInput['notes'] ?? null,
+                        'corrective_action' => $itemInput['corrective_action'] ?? null,
+                        'verification' => $itemInput['verification'] ?? 0,
+                    ]);
+
+                    if (!empty($itemInput['followups'])) {
+                        foreach ($itemInput['followups'] as $followup) {
+                            ItemFollowup::create([
+                                'item_id' => $item->id,
+                                'notes' => $followup['notes'] ?? null,
+                                'action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? 0,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('process-area-cleanliness.index')->with('success', 'Data berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal update: ' . $e->getMessage());
+        }
+    }
+
+
 
 
 }

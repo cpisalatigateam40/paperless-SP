@@ -196,6 +196,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{report}/add-detail', 'storeDetail')->name('detail.store');
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}/update', 'update')->name('update');
         });
 
     // GMP EMPLOYEE ROUTES
@@ -214,6 +216,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/pdf', 'exportPdf')->whereUuid('uuid')->name('export.pdf');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/editnext', 'editNext')->whereUuid('uuid')->name('editnext');
+            Route::put('/{uuid}/updatenext', 'updateNext')->whereUuid('uuid')->name('updatenext');
+
         });
 
     // FRAGILE ITEM MD ROUTES
@@ -243,6 +248,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit-next', 'editNext')->name('edit-next');
+            Route::put('/{uuid}/update-next', 'updateNext')->name('update-next');
         });
 
     // QC EQUIPMENT ROUTES
@@ -300,6 +307,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit-next', 'editNext')->name('edit-next');
+            Route::put('/{uuid}/update-next', 'updateNext')->name('update-next');
         });
 
     // THERMOMETER MD ROUTES
@@ -344,6 +353,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
             Route::post('/{id}/known', 'known')->name('known');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     // REPORT REPAIR CLEANLINESS ROUTES

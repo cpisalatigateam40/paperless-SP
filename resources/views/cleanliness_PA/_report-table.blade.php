@@ -32,6 +32,13 @@
                     <i class="fas fa-eye"></i>
                 </button>
 
+                @can('edit report')
+                <a href="{{ route('process-area-cleanliness.edit', $report->uuid) }}"
+                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                    <i class="fas fa-edit"></i>
+                </a>
+                @endcan
+
                 {{-- Hapus --}}
                 <form action="{{ route('process-area-cleanliness.destroy', $report->id) }}" method="POST"
                     style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
