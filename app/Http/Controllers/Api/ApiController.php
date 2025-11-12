@@ -48,7 +48,10 @@ class ApiController extends Controller
             ];
 
 
-            $existingUser = User::where('uuid', $user['uuid'])->first();
+            $existingUser = User::where('uuid', $user['uuid'])
+            ->orWhere('email', $user['email'] )
+            ->orWhere('username', $user['username'] )
+            ->first();
 
 
             if ($existingUser) {
