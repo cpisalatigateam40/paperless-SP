@@ -19,41 +19,41 @@ class StorageRmCleanlinessController extends Controller
 
     use HasRoles;
 
-public function index()
-{
-    $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
-        ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-            $query->where('area_uuid', Auth::user()->area_uuid);
-        })
-        ->latest()
-        ->paginate(10);
+    public function index()
+    {
+        $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
+            ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+                $query->where('area_uuid', Auth::user()->area_uuid);
+            })
+            ->latest()
+            ->paginate(20);
 
-    // Hitung ketidaksesuaian
-    foreach ($reports as $report) {
-        $count = 0;
+        // Hitung ketidaksesuaian
+        foreach ($reports as $report) {
+            $count = 0;
 
-        foreach ($report->details as $detail) {
-            foreach ($detail->items as $item) {
-                // Jika item tidak OK
-                if ($item->verification == 0) {
-                    $count++;
-                }
-
-                // Jika ada followup dan followup-nya tidak OK juga dihitung
-                foreach ($item->followups as $followup) {
-                    if ($followup->verification == 0) {
+            foreach ($report->details as $detail) {
+                foreach ($detail->items as $item) {
+                    // Jika item tidak OK
+                    if ($item->verification == 0) {
                         $count++;
+                    }
+
+                    // Jika ada followup dan followup-nya tidak OK juga dihitung
+                    foreach ($item->followups as $followup) {
+                        if ($followup->verification == 0) {
+                            $count++;
+                        }
                     }
                 }
             }
+
+            // Tambahkan properti ke model
+            $report->ketidaksesuaian = $count;
         }
 
-        // Tambahkan properti ke model
-        $report->ketidaksesuaian = $count;
+        return view('cleanliness.index', compact('reports'));
     }
-
-    return view('cleanliness.index', compact('reports'));
-}
 
 
     public function create()

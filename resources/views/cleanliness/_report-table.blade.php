@@ -25,6 +25,8 @@
                 @endif
             </td>
 
+
+
             <td>{{ $report->created_by }}</td>
             <td class="d-flex" style="gap: .3rem;">
                 {{-- Toggle Detail --}}
@@ -34,8 +36,8 @@
                 </button>
 
                 @can('edit report')
-                <a href="{{ route('cleanliness.edit', $report->uuid) }}"
-                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                <a href="{{ route('cleanliness.edit', $report->uuid) }}" class="btn btn-sm btn-warning"
+                    title="Edit Laporan">
                     <i class="fas fa-edit"></i>
                 </a>
                 @endcan
@@ -138,6 +140,12 @@
                         </thead>
                         <tbody>
                             @foreach($detail->items as $i => $item)
+
+                            {{-- Hide Item Index 3 (Item 4) ketika Chillroom --}}
+                            @if(($detail->room_name ?? $report->room_name) == '' && $i == 3)
+                            @continue
+                            @endif
+
                             <tr>
                                 <td class="align-middle">{{ $i + 1 }}</td>
                                 <td class="align-middle">{{ $item->item }}</td>
@@ -159,14 +167,18 @@
                             @foreach($item->followups as $index => $followup)
                             <tr class="table-secondary">
                                 <td></td>
-                                <td colspan="2" class="align-middle">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
+                                <td colspan="2" class="align-middle">
+                                    ↳ Koreksi Lanjutan #{{ $index + 1 }}
+                                </td>
                                 <td class="align-middle">{{ $followup->notes }}</td>
                                 <td class="align-middle">{{ $followup->corrective_action }}</td>
                                 <td class="align-middle">{!! $followup->verification ? '✔' : '✘' !!}</td>
                             </tr>
                             @endforeach
+
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
                 @endforeach

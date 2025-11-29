@@ -170,7 +170,15 @@
                                             {{-- Detail bahan baku --}}
                                             @foreach($report->header->details ?? [] as $detail)
                                             <tr>
-                                                <td>{{ $detail->rawMaterial->material_name ?? '-' }}</td>
+                                                <td>
+                                                    @if($detail->isRawMaterial())
+                                                        {{ $detail->rawMaterial->material_name ?? '-' }}
+                                                    @elseif($detail->isPremix())
+                                                        {{ $detail->premix->name ?? '-' }}
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td>{{ $detail->weight ?? '-' }}</td>
                                                 @foreach($report->header->agings ?? [] as $idx => $aging)
                                                 @if($detail->aging_index == $idx)

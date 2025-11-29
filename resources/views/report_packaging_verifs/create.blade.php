@@ -55,18 +55,26 @@
                     </div>
                     <div class="card-body p-2">
                         <div class="row">
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <label class="form-label">Upload MD BPOM</label>
-                                <input type="file" name="details[0][upload_md]" class="form-control">
-                            </div>
-                            <div class="col-md-4">
+                                <input type="file" name="details[0][upload_md]" class="form-control" multiple>
+                            </div> -->
+                            <!-- <div class="col-md-4">
                                 <label class="form-label">Upload QR Code</label>
                                 <input type="file" name="details[0][upload_qr]" class="form-control">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Upload Kode Produksi & Best Before</label>
                                 <input type="file" name="details[0][upload_ed]" class="form-control">
+                            </div> -->
+                            <div class="col-md-4">
+                                <label class="form-label">Upload MD BPOM, QR Code, Kode Produksi, dan Expire Date</label>
+                                <input type="file" name="details[0][upload_md_multi][]" class="form-control upload-md-multi" multiple accept="image/*">
+
+                                <!-- Tempat preview -->
+                                <div class="preview-md-multi mt-2 d-flex flex-wrap" style="gap: 10px;"></div>
                             </div>
+
                         </div>
                     </div>
 
@@ -358,5 +366,28 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', calculateAverage);
     });
 });
+
+document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("upload-md-multi")) {
+        let previewContainer = e.target.closest(".col-md-4").querySelector(".preview-md-multi");
+        previewContainer.innerHTML = ""; // Clear old previews
+
+        Array.from(e.target.files).forEach(file => {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let img = document.createElement("img");
+                img.src = event.target.result;
+                img.style.width = "80px";
+                img.style.height = "80px";
+                img.style.objectFit = "cover";
+                img.style.borderRadius = "5px";
+                img.style.border = "1px solid #ddd";
+                previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+});
+
 </script>
 @endsection

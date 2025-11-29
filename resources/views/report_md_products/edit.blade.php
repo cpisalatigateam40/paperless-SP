@@ -26,8 +26,33 @@
 
                 <hr>
                 <h5 class="mt-5">Detail Pemeriksaan</h5>
-
                 @foreach ($report->details as $i => $detail)
+                <p class="mt-5">Pilih Tipe</p>
+                <div class="d-flex mb-3" style="gap: 2rem;">
+                    <label>
+                        <input type="radio" name="details[{{ $i }}][process_type]" value="Manual"
+                            {{ old("details.$i.process_type", $detail->process_type) == 'Manual' ? 'checked' : '' }}>
+                        Manual
+                    </label>
+
+                    <label>
+                        <input type="radio" name="details[{{ $i }}][process_type]" value="CFS"
+                            {{ old("details.$i.process_type", $detail->process_type) == 'CFS' ? 'checked' : '' }}>
+                        CFS
+                    </label>
+
+                    <label>
+                        <input type="radio" name="details[{{ $i }}][process_type]" value="Colimatic"
+                            {{ old("details.$i.process_type", $detail->process_type) == 'Colimatic' ? 'checked' : '' }}>
+                        Colimatic
+                    </label>
+
+                    <label>
+                        <input type="radio" name="details[{{ $i }}][process_type]" value="Multivac"
+                            {{ old("details.$i.process_type", $detail->process_type) == 'Multivac' ? 'checked' : '' }}>
+                        Multivac
+                    </label>
+                </div>
                 <div class="border rounded p-3 mb-3">
                     <div class="mb-3">
                         <label>Waktu Pengecekan</label>

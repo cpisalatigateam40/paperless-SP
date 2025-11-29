@@ -25,7 +25,7 @@
                     </div>
 
                     <label>Area (Room Name):</label>
-                    <select name="room_name" class="form-control col-md-5 mb-5" required>
+                    <select id="roomSelect" name="room_name" class="form-control col-md-5 mb-5" required>
                         <option value="">-- Pilih Area --</option>
                         <option value="Seasoning">Seasoning</option>
                         <option value="Chillroom">Chillroom</option>
@@ -178,6 +178,7 @@
                                     <td>
                                         <select name="details[__index__][items][1][verification]" data-item="1"
                                             class="form-control verification-select" required>
+                                            <option value="">-- Pilih --</option>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
@@ -301,6 +302,7 @@
                                     <td>
                                         <select name="details[__index__][items][2][verification]"
                                             class="form-control verification-select" data-item="2" required>
+                                            <option value="">-- Pilih --</option>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
@@ -313,7 +315,7 @@
                                 </tr>
 
                                 {{-- ITEM 4 --}}
-                                <tr>
+                                <tr class="item-4-row">
                                     <td>4</td>
                                     <td>
                                         <input type="hidden" name="details[__index__][items][3][item]"
@@ -325,35 +327,23 @@
                                         <div class="d-flex gap-1" style="gap: 1rem;">
                                             <input type="number" step="0.1"
                                                 name="details[__index__][items][3][temperature]" placeholder="℃"
-                                                class="form-control" required>
+                                                class="form-control">
                                             <input type="number" step="0.1"
                                                 name="details[__index__][items][3][humidity]" placeholder="RH%"
-                                                class="form-control" required>
+                                                class="form-control">
                                         </div>
-
-                                        <!-- <button type="button" id="sync-sensor"
-                                            class="btn btn-outline-primary mb-3 mt-3 btn-sm w-100 d-flex justify-content-center align-items-center"
-                                            style="gap: .5rem;">
-                                            <span class="icon">🔄</span>
-                                            <span class="label">Sync Data Sensor</span>
-                                        </button> -->
-
-                                        <p id="sync-status-message" class="text-success text-center"
-                                            style="display: none; margin-top: -.5rem;">
-                                        </p>
-
                                     </td>
                                     <td>
                                         <input type="text" name="details[__index__][items][3][notes]"
-                                            class="form-control" required>
+                                            class="form-control">
                                     </td>
                                     <td>
                                         <input type="text" name="details[__index__][items][3][corrective_action]"
-                                            class="form-control" required>
+                                            class="form-control">
                                     </td>
                                     <td>
-                                        <select name="details[__index__][items][3][verification]" class="form-control"
-                                            required>
+                                        <select name="details[__index__][items][3][verification]" class="form-control">
+                                            <option value="">-- Pilih --</option>
                                             <option value="0">Tidak OK</option>
                                             <option value="1">OK</option>
                                         </select>
@@ -373,6 +363,17 @@
 
 @section('script')
 <script>
+// document.getElementById('roomSelect').addEventListener('change', function () {
+//     const selected = this.value;
+//     const item4 = document.querySelector('.item-4-row');
+
+//     if (selected === "Chillroom") {
+//         item4.classList.add('d-none'); // sembunyikan
+//     } else {
+//         item4.classList.remove('d-none'); // tampilkan kembali
+//     }
+// });
+
 let inspectionIndex = 0;
 
 document.getElementById('add-inspection').addEventListener('click', function() {

@@ -150,6 +150,7 @@
                                                 <th rowspan="2" class="align-middle">Kode Produksi</th>
                                                 <th rowspan="2" class="align-middle">Best Before</th>
                                                 <th rowspan="2" class="align-middle">No. Program</th>
+                                                <th rowspan="2" class="align-middle">Tipe</th>
                                                 <th colspan="4" class="align-middle">Fe 1.5 mm</th>
                                                 <th colspan="4" class="align-middle">Non Fe 2 mm</th>
                                                 <th colspan="4" class="align-middle">SUS 2.5 mm</th>
@@ -180,6 +181,7 @@
                                                 <td>{{ $detail->production_code }}</td>
                                                 <td>{{ $detail->best_before }}</td>
                                                 <td>{{ $detail->program_number }}</td>
+                                                <td>{{ $detail->process_type }}</td>
 
                                                 {{-- Verifikasi Specimen --}}
                                                 @php

@@ -29,10 +29,10 @@
                         <tbody>
                             @php
                             $items = [
-                            'Kondisi dan penempatan barang',
-                            'Pelabelan',
-                            'Kebersihan Ruangan',
-                            'Suhu ruang (℃)'
+                            'Kondisi Kebersihan Ruangan',
+                            'Kondisi Kebersihan Peralatan',
+                            'Kondisi Kebersihan Karyawan',
+                            'Suhu Ruang (℃)'
                             ];
                             @endphp
 

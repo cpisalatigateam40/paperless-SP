@@ -21,7 +21,9 @@ class DetailEmulsionMaking extends Model implements Auditable
         'temperature',
         'sensory',
         'conformity',
-        'aging_index'
+        'aging_index',
+        'material_uuid',
+        'material_type'
     ];
 
     protected $auditEvents = [
@@ -36,5 +38,20 @@ class DetailEmulsionMaking extends Model implements Auditable
     public function rawMaterial()
     {
         return $this->belongsTo(RawMaterial::class, 'raw_material_uuid', 'uuid');
+    }
+
+    public function premix()
+    {
+        return $this->belongsTo(Premix::class, 'material_uuid', 'uuid');
+    }
+
+    public function isRawMaterial()
+    {
+        return $this->material_type === 'raw';
+    }
+
+    public function isPremix()
+    {
+        return $this->material_type === 'premix';
     }
 }

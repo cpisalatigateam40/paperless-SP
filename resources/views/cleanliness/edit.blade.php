@@ -26,10 +26,12 @@
                     </div>
 
                     <label>Area (Room Name):</label>
-                    <select name="room_name" class="form-control col-md-5 mb-5" required>
+                    <select name="room_name" id="roomSelect" class="form-control col-md-5 mb-5" required>
                         <option value="">-- Pilih Area --</option>
-                        <option value="Seasoning" {{ $report->room_name == 'Seasoning' ? 'selected' : '' }}>Seasoning</option>
-                        <option value="Chillroom" {{ $report->room_name == 'Chillroom' ? 'selected' : '' }}>Chillroom</option>
+                        <option value="Seasoning" {{ $report->room_name == 'Seasoning' ? 'selected' : '' }}>Seasoning
+                        </option>
+                        <option value="Chillroom" {{ $report->room_name == 'Chillroom' ? 'selected' : '' }}>Chillroom
+                        </option>
                     </select>
                 </div>
 
@@ -56,30 +58,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-    @foreach($detail->items as $j => $item)
-        @if($item->item === 'Suhu ruang (℃) / RH (%)')
-            {{-- ITEM 4 KHUSUS SUHU --}}
-            <tr>
-                <td>{{ $j + 1 }}</td>
-                <td>
-                    <input type="hidden" name="details[{{ $i }}][items][{{ $j }}][item]"
-                        value="Suhu ruang (℃) / RH (%)">
-                    Suhu ruang (℃) / RH (%)
-                </td>
-                <td>
-                    <div class="d-flex gap-1" style="gap: 1rem;">
-                        <input type="number" step="0.1"
-                            name="details[{{ $i }}][items][{{ $j }}][temperature]"
-                            value="{{ $item->temperature ?? '' }}"
-                            placeholder="℃" class="form-control" required>
-                        <input type="number" step="0.1"
-                            name="details[{{ $i }}][items][{{ $j }}][humidity]"
-                            value="{{ $item->humidity ?? '' }}"
-                            placeholder="RH%" class="form-control" required>
-                    </div>
+                                @foreach($detail->items as $j => $item)
+                                @if($item->item === 'Suhu ruang (℃) / RH (%)')
+                                {{-- ITEM 4 KHUSUS SUHU --}}
+                                <tr class="item-4-row">
+                                    <td>{{ $j + 1 }}</td>
+                                    <td>
+                                        <input type="hidden" name="details[{{ $i }}][items][{{ $j }}][item]"
+                                            value="Suhu ruang (℃) / RH (%)">
+                                        Suhu ruang (℃) / RH (%)
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1" style="gap: 1rem;">
+                                            <input type="number" step="0.1"
+                                                name="details[{{ $i }}][items][{{ $j }}][temperature]"
+                                                value="{{ $item->temperature ?? '' }}" placeholder="℃"
+                                                class="form-control">
+                                            <input type="number" step="0.1"
+                                                name="details[{{ $i }}][items][{{ $j }}][humidity]"
+                                                value="{{ $item->humidity ?? '' }}" placeholder="RH%"
+                                                class="form-control">
+                                        </div>
 
-                    <!-- Optional: tombol sync sensor -->
-                    <!--
+                                        <!-- Optional: tombol sync sensor -->
+                                        <!--
                     <button type="button" id="sync-sensor"
                         class="btn btn-outline-primary mb-3 mt-3 btn-sm w-100 d-flex justify-content-center align-items-center"
                         style="gap: .5rem;">
@@ -88,98 +90,118 @@
                     </button>
                     -->
 
-                    <p id="sync-status-message" class="text-success text-center"
-                        style="display: none; margin-top: -.5rem;"></p>
-                </td>
-                <td>
-                    <input type="text" name="details[{{ $i }}][items][{{ $j }}][notes]"
-                        value="{{ $item->notes ?? '' }}" class="form-control" required>
-                </td>
-                <td>
-                    <input type="text" name="details[{{ $i }}][items][{{ $j }}][corrective_action]"
-                        value="{{ $item->corrective_action ?? '' }}" class="form-control" required>
-                </td>
-                <td>
-                    <select name="details[{{ $i }}][items][{{ $j }}][verification]" class="form-control" required>
-                        <option value="0" {{ $item->verification == '0' ? 'selected' : '' }}>Tidak OK</option>
-                        <option value="1" {{ $item->verification == '1' ? 'selected' : '' }}>OK</option>
-                    </select>
-                </td>
-            </tr>
-        @else
-            {{-- ITEM NORMAL --}}
-            <tr>
-                <td>{{ $j + 1 }}</td>
-                <td>
-                    <input type="hidden" name="details[{{ $i }}][items][{{ $j }}][item]"
-                        value="{{ $item->item }}">
-                    {{ $item->item }}
-                </td>
-                <td>
-                    <select name="details[{{ $i }}][items][{{ $j }}][condition]" class="form-control" required>
-                        <option value="">-- Pilih --</option>
-                        <option value="Tertata rapi" {{ $item->condition == 'Tertata rapi' ? 'selected' : '' }}>Tertata rapi</option>
-                        <option value="Tidak tertata rapi" {{ $item->condition == 'Tidak tertata rapi' ? 'selected' : '' }}>Tidak tertata rapi</option>
-                        <option value="Sesuai tagging dan jenis alergen" {{ $item->condition == 'Sesuai tagging dan jenis alergen' ? 'selected' : '' }}>Sesuai tagging dan jenis alergen</option>
-                        <option value="Penempatan tidak sesuai" {{ $item->condition == 'Penempatan tidak sesuai' ? 'selected' : '' }}>Penempatan tidak sesuai</option>
-                        <option value="Bersih dan bebas kontaminan" {{ $item->condition == 'Bersih dan bebas kontaminan' ? 'selected' : '' }}>Bersih dan bebas kontaminan</option>
-                        <option value="Tidak bersih / ada kontaminan" {{ $item->condition == 'Tidak bersih / ada kontaminan' ? 'selected' : '' }}>Tidak bersih / ada kontaminan</option>
-                    </select>
-                </td>
-                <td>
-                    @php
-                        $selectedNotes = is_array($item->notes) ? $item->notes : json_decode($item->notes, true) ?? [];
-                    @endphp
-                    @foreach([
-                        'Sesuai',
-                        'Penataan bahan tidak rapi',
-                        'Penempatan bahan tidak sesuai dengan labelnya',
-                        'Tidak ada label/tagging di tempat penyimpanan',
-                        'Rak penyimpanan bahan kotor',
-                        'Langit-langit kotor',
-                        'Pintu kotor',
-                        'Dinding kotor',
-                        'Curving kotor',
-                        'Curtain kotor',
-                        'Lantai kotor/basah',
-                        'Pallet kotor',
-                        'Lampu + cover kotor',
-                        'Exhaust fan kotor',
-                        'Evaporator kotor',
-                        'Temuan pest di area produksi',
-                        'Temuan pest di dalam bahan'
-                    ] as $note)
-                        <div class="form-check">
-                            <input class="form-check-input note-checkbox" type="checkbox"
-                                name="details[{{ $i }}][items][{{ $j }}][notes][]"
-                                value="{{ $note }}"
-                                {{ in_array($note, $selectedNotes) ? 'checked' : '' }}>
-                            <label class="form-check-label">{{ $note }}</label>
-                        </div>
-                    @endforeach
-                </td>
-                <td>
-                    <input type="text" name="details[{{ $i }}][items][{{ $j }}][corrective_action]"
-                        value="{{ $item->corrective_action }}" class="form-control">
-                </td>
-                <td>
-                    <select name="details[{{ $i }}][items][{{ $j }}][verification]" class="form-control" required>
-                        <option value="">-- Pilih --</option>
-                        <option value="0" {{ $item->verification == '0' ? 'selected' : '' }}>Tidak OK</option>
-                        <option value="1" {{ $item->verification == '1' ? 'selected' : '' }}>OK</option>
-                    </select>
-                </td>
-            </tr>
-        @endif
-    @endforeach
-</tbody>
+                                        <p id="sync-status-message" class="text-success text-center"
+                                            style="display: none; margin-top: -.5rem;"></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="details[{{ $i }}][items][{{ $j }}][notes]"
+                                            value="{{ $item->notes ?? '' }}" class="form-control" required>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="details[{{ $i }}][items][{{ $j }}][corrective_action]"
+                                            value="{{ $item->corrective_action ?? '' }}" class="form-control" required>
+                                    </td>
+                                    <td>
+                                        <select name="details[{{ $i }}][items][{{ $j }}][verification]"
+                                            class="form-control" required>
+                                            <option value="0" {{ $item->verification == '0' ? 'selected' : '' }}>Tidak
+                                                OK</option>
+                                            <option value="1" {{ $item->verification == '1' ? 'selected' : '' }}>OK
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                @else
+                                {{-- ITEM NORMAL --}}
+                                <tr>
+                                    <td>{{ $j + 1 }}</td>
+                                    <td>
+                                        <input type="hidden" name="details[{{ $i }}][items][{{ $j }}][item]"
+                                            value="{{ $item->item }}">
+                                        {{ $item->item }}
+                                    </td>
+                                    <td>
+                                        <select name="details[{{ $i }}][items][{{ $j }}][condition]"
+                                            class="form-control" required>
+                                            <option value="">-- Pilih --</option>
+                                            <option value="Tertata rapi"
+                                                {{ $item->condition == 'Tertata rapi' ? 'selected' : '' }}>Tertata rapi
+                                            </option>
+                                            <option value="Tidak tertata rapi"
+                                                {{ $item->condition == 'Tidak tertata rapi' ? 'selected' : '' }}>Tidak
+                                                tertata rapi</option>
+                                            <option value="Sesuai tagging dan jenis alergen"
+                                                {{ $item->condition == 'Sesuai tagging dan jenis alergen' ? 'selected' : '' }}>
+                                                Sesuai tagging dan jenis alergen</option>
+                                            <option value="Penempatan tidak sesuai"
+                                                {{ $item->condition == 'Penempatan tidak sesuai' ? 'selected' : '' }}>
+                                                Penempatan tidak sesuai</option>
+                                            <option value="Bersih dan bebas kontaminan"
+                                                {{ $item->condition == 'Bersih dan bebas kontaminan' ? 'selected' : '' }}>
+                                                Bersih dan bebas kontaminan</option>
+                                            <option value="Tidak bersih / ada kontaminan"
+                                                {{ $item->condition == 'Tidak bersih / ada kontaminan' ? 'selected' : '' }}>
+                                                Tidak bersih / ada kontaminan</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        @php
+                                        $selectedNotes = is_array($item->notes) ? $item->notes :
+                                        json_decode($item->notes, true) ?? [];
+                                        @endphp
+                                        @foreach([
+                                        'Sesuai',
+                                        'Penataan bahan tidak rapi',
+                                        'Penempatan bahan tidak sesuai dengan labelnya',
+                                        'Tidak ada label/tagging di tempat penyimpanan',
+                                        'Rak penyimpanan bahan kotor',
+                                        'Langit-langit kotor',
+                                        'Pintu kotor',
+                                        'Dinding kotor',
+                                        'Curving kotor',
+                                        'Curtain kotor',
+                                        'Lantai kotor/basah',
+                                        'Pallet kotor',
+                                        'Lampu + cover kotor',
+                                        'Exhaust fan kotor',
+                                        'Evaporator kotor',
+                                        'Temuan pest di area produksi',
+                                        'Temuan pest di dalam bahan'
+                                        ] as $note)
+                                        <div class="form-check">
+                                            <input class="form-check-input note-checkbox" type="checkbox"
+                                                name="details[{{ $i }}][items][{{ $j }}][notes][]" value="{{ $note }}"
+                                                {{ in_array($note, $selectedNotes) ? 'checked' : '' }}>
+                                            <label class="form-check-label">{{ $note }}</label>
+                                        </div>
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        <input type="text" name="details[{{ $i }}][items][{{ $j }}][corrective_action]"
+                                            value="{{ $item->corrective_action }}" class="form-control">
+                                    </td>
+                                    <td>
+                                        <select name="details[{{ $i }}][items][{{ $j }}][verification]"
+                                            class="form-control" required>
+                                            <option value="">-- Pilih --</option>
+                                            <option value="0" {{ $item->verification == '0' ? 'selected' : '' }}>Tidak
+                                                OK</option>
+                                            <option value="1" {{ $item->verification == '1' ? 'selected' : '' }}>OK
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                @endif
+                                @endforeach
+                            </tbody>
 
                         </table>
                     </div>
                     @endforeach
                 </div>
 
-                <button type="button" id="add-inspection" class="btn btn-secondary mr-2 d-none">+ Tambah Detail Inspeksi</button>
+                <button type="button" id="add-inspection" class="btn btn-secondary mr-2 d-none">+ Tambah Detail
+                    Inspeksi</button>
                 <button type="submit" class="btn btn-primary">Perbarui</button>
             </form>
         </div>
@@ -189,6 +211,31 @@
 
 @section('script')
 <script>
+// document.addEventListener("DOMContentLoaded", function () {
+//     const roomSelect = document.getElementById('roomSelect');
+//     const item4Rows = document.querySelectorAll('.item-4-row');
+
+//     function toggleItem4() {
+//         const selected = roomSelect.value;
+//         item4Rows.forEach(row => {
+//             if (selected === "Chillroom") {
+//                 row.classList.add('d-none');
+//                 row.querySelectorAll('input,select').forEach(el => el.removeAttribute('required'));
+//             } else {
+//                 row.classList.remove('d-none');
+//                 row.querySelectorAll('input,select').forEach(el => el.setAttribute('required', true));
+//             }
+//         });
+//     }
+
+//     // Jalankan saat halaman edit pertama kali dimuat
+//     toggleItem4();
+
+//     // Jalankan jika user mengganti area
+//     roomSelect.addEventListener('change', toggleItem4);
+// });
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Pemetaan tindakan koreksi otomatis
     const koreksiMap = {
@@ -256,7 +303,8 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         wrapper.insertAdjacentHTML('beforeend', html);
 
-        const newSelect = wrapper.querySelectorAll('.followup-group')[count].querySelector('.followup-verification');
+        const newSelect = wrapper.querySelectorAll('.followup-group')[count].querySelector(
+            '.followup-verification');
         newSelect.addEventListener('change', function() {
             const allFollowups = wrapper.querySelectorAll('.followup-group');
             const currentIndex = Array.from(allFollowups).indexOf(this.closest('.followup-group'));
@@ -303,8 +351,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const autoFill = (itemIdx, conditionMatch, correctiveValue, verificationValue) => {
             if (target.name.includes(`[${itemIdx}][condition]`)) {
                 const block = target.closest('.inspection-block');
-                const corrective = block.querySelector(`input[name$="[${itemIdx}][corrective_action]"]`);
-                const verification = block.querySelector(`select[name$="[${itemIdx}][verification]"]`);
+                const corrective = block.querySelector(
+                    `input[name$="[${itemIdx}][corrective_action]"]`);
+                const verification = block.querySelector(
+                    `select[name$="[${itemIdx}][verification]"]`);
                 const wrapper = block.querySelectorAll('.followup-wrapper')[itemIdx];
 
                 if (target.value === conditionMatch) {

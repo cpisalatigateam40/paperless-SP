@@ -145,9 +145,10 @@
             <th rowspan="2">Jam</th>
             <th rowspan="2">Produk</th>
             <th rowspan="2">Gramase</th>
-            <th rowspan="2">MD BPOM</th>
+            <th rowspan="2">Upload MD BPOM, QR Code, Kode Produksi, dan Expire Date</th>
+            <!-- <th rowspan="2">MD BPOM</th>
             <th rowspan="2">QR Code</th>
-            <th rowspan="2">Kode Produksi & Best Before</th>
+            <th rowspan="2">Kode Produksi & Best Before</th> -->
             <!-- <th rowspan="2">Kode Produksi</th>
             <th rowspan="2">Best Before</th> -->
             <th colspan="2">In cutting</th>
@@ -190,6 +191,33 @@
             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
             <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
             <td rowspan="5">
+                @php
+                    $mdMulti = $d->upload_md_multi ? json_decode($d->upload_md_multi, true) : [];
+                @endphp
+
+                @if(!empty($mdMulti))
+                    @foreach($mdMulti as $file)
+                        @php
+                            $filePath = storage_path('app/public/' . $file);
+                            $base64 = null;
+
+                            if (file_exists($filePath)) {
+                                $type = pathinfo($filePath, PATHINFO_EXTENSION);
+                                $data = file_get_contents($filePath);
+                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                            }
+                        @endphp
+
+                        @if($base64)
+                            <img src="{{ $base64 }}" width="70" style="margin-bottom: 4px;">
+                        @endif
+                    @endforeach
+                @else
+                    -
+                @endif
+            </td>
+
+            <!-- <td rowspan="5">
                 @php
                 $mdPath = storage_path('app/public/' . $d->upload_md);
                 $mdBase64 = null;
@@ -242,7 +270,7 @@
                 @else
                 -
                 @endif
-            </td>
+            </td> -->
             <!-- <td rowspan="5">{{ $d->production_code }}</td>
             <td rowspan="5">{{ $d->expired_date }}</td> -->
 

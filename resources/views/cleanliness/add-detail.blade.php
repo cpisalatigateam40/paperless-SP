@@ -46,10 +46,10 @@
                                         <div class="d-flex gap-1">
                                             <input type="number" step="0.1"
                                                 name="details[__index__][items][3][temperature]" placeholder="℃"
-                                                class="form-control" required>
+                                                class="form-control">
                                             <input type="number" step="0.1"
                                                 name="details[__index__][items][3][humidity]" placeholder="RH%"
-                                                class="form-control" required>
+                                                class="form-control">
                                         </div>
                                         @else
                                         <select name="details[__index__][items][{{ $i }}][condition]"
@@ -74,7 +74,7 @@
                                     <td>
                                         @if ($i == 3)
                                         <input type="text" name="details[__index__][items][{{ $i }}][notes]"
-                                            class="form-control" required>
+                                            class="form-control">
                                         @else
                                         @php
                                         $notesOptions = $i < 2 ? ['Sesuai','Penataan bahan tidak rapi','Penempatan bahan
@@ -92,7 +92,7 @@
                                             </div>
                                             @endforeach
                                             <input type="hidden" name="details[__index__][items][{{ $i }}][notes]"
-                                                id="notes-hidden-{{ $i }}" required>
+                                                id="notes-hidden-{{ $i }}">
                     </div>
                     @endif
                     </td>
@@ -102,7 +102,7 @@
                     </td>
                     <td>
                         <select name="details[__index__][items][{{ $i }}][verification]"
-                            class="form-control verification-select" data-item="{{ $i }}" required>
+                            class="form-control verification-select" data-item="{{ $i }}">
                             <option value="">-- Pilih --</option>
                             <option value="0">Tidak OK</option>
                             <option value="1">OK</option>
@@ -125,6 +125,8 @@
     </div>
 </div>
 </div>
+
+<input type="hidden" id="section-room" value="{{ $report->room_name }}">
 @endsection
 
 @section('script')
@@ -202,6 +204,23 @@ document.getElementById('add-inspection').addEventListener('click', function() {
             corrective.value = selected.length > 0 ? (koreksiMap[selected[0]] || '') : '';
         });
     });
+
+    // const room = document.getElementById('section-room').value.toLowerCase();
+    // if (room.includes('chill')) {
+    //     const rows = container.querySelectorAll('tbody tr');
+
+    //     // Sembunyikan item Suhu & RH
+    //     if (rows[6]) rows[6].style.display = 'none';
+
+    //     // Tidak ada followup-row setelah item ke-4 → skip
+    //     container.querySelectorAll('[name*="[3][temperature]"]').forEach(el => el.removeAttribute('required'));
+    //     container.querySelectorAll('[name*="[3][humidity]"]').forEach(el => el.removeAttribute('required'));
+    //     const notesField = container.querySelector('[name*="[3][notes]"]');
+    //     if (notesField) notesField.removeAttribute('required');
+    // }
+
+
+
 
     document.getElementById('inspection-details').appendChild(container);
     inspectionIndex++;
