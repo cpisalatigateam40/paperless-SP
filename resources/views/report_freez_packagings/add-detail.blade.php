@@ -146,7 +146,7 @@ function addDetailRow() {
     <div class="row mt-3">
         <div class="col-md-6">
             <label>Berat Standar (kg)</label>
-            <input type="text" name="details[${index}][kartoning][carton_weight_standard]" class="form-control">
+            <input type="text" name="details[${index}][kartoning][carton_weight_standard]" class="form-control" placeholder="contoh: 12-13">
         </div>
     </div>
     
