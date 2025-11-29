@@ -40,12 +40,18 @@
                     <tbody id="bahan-baku-body">
                         <tr>
                             <td>
-                                <select name="details[0][raw_material_uuid]" class="form-control">
+                                <select name="details[0][material_uuid]" class="form-control" onchange="updateMaterialType(this)">
                                     <option value="">-- Pilih Bahan --</option>
+                                    {{-- Raw Materials --}}
                                     @foreach($rawMaterials as $material)
-                                    <option value="{{ $material->uuid }}">{{ $material->material_name }}</option>
+                                        <option value="{{ $material->uuid }}" data-type="raw">{{ $material->material_name }}</option>
+                                    @endforeach
+                                    {{-- Premix --}}
+                                    @foreach($premixes as $premix)
+                                        <option value="{{ $premix->uuid }}" data-type="premix">{{ $premix->name }} (Premix)</option>
                                     @endforeach
                                 </select>
+                                <input type="hidden" name="details[0][material_type]" value="raw">
                             </td>
                             <td>
                                 <input type="number" step="0.01" name="details[0][weight]" class="form-control">
@@ -130,12 +136,16 @@ function tambahBaris() {
     let html = `
         <tr>
             <td>
-                <select name="details[${rowIdx}][raw_material_uuid]" class="form-control">
+                <select name="details[${rowIdx}][material_uuid]" class="form-control" onchange="updateMaterialType(this)">
                     <option value="">-- Pilih Bahan --</option>
                     @foreach($rawMaterials as $material)
-                    <option value="{{ $material->uuid }}">{{ $material->material_name }}</option>
+                        <option value="{{ $material->uuid }}" data-type="raw">{{ $material->material_name }}</option>
+                    @endforeach
+                    @foreach($premixes as $premix)
+                        <option value="{{ $premix->uuid }}" data-type="premix">{{ $premix->name }} (Premix)</option>
                     @endforeach
                 </select>
+                <input type="hidden" name="details[${rowIdx}][material_type]" value="raw">
             </td>
             <td>
                 <input type="number" step="0.01" name="details[${rowIdx}][weight]" class="form-control">
@@ -153,6 +163,13 @@ function tambahBaris() {
     document.getElementById('bahan-baku-body').insertAdjacentHTML('beforeend', html);
     rowIdx++;
 }
+
+function updateMaterialType(select) {
+    // Cari input hidden di row yang sama
+    const hidden = select.closest('tr').querySelector('input[name$="[material_type]"]');
+    hidden.value = select.selectedOptions[0].dataset.type;
+}
+
 </script>
 
 @endsection

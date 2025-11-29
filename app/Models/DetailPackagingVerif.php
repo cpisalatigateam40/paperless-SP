@@ -23,10 +23,15 @@ class DetailPackagingVerif extends Model implements Auditable
         'upload_md',
         'upload_qr',
         'upload_ed',
+        'upload_md_multi'
     ];
 
     protected $auditEvents = [
         'updated',
+    ];
+
+    protected $casts = [
+        'upload_md_multi' => 'array',
     ];
 
     public function report()

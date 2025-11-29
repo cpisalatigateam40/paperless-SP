@@ -76,6 +76,7 @@ class ReportPackagingVerifController extends Controller
             $uploadMd = null;
             $uploadQr = null;
             $uploadEd = null;
+            $uploadMdMulti = [];
 
             // Upload MD
             if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
@@ -98,6 +99,16 @@ class ReportPackagingVerifController extends Controller
                 $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
             }
 
+            if (isset($detail['upload_md_multi']) && is_array($detail['upload_md_multi'])) {
+                foreach ($detail['upload_md_multi'] as $fileIndex => $file) {
+                    if ($file instanceof \Illuminate\Http\UploadedFile) {
+                        $filename = time() . "_md_multi_{$index}_{$fileIndex}_" . $file->getClientOriginalName();
+                        $path = $file->storeAs('upload_packaging', $filename, 'public');
+                        $uploadMdMulti[] = $path;
+                    }
+                }
+            }
+
             $detailModel = DetailPackagingVerif::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
@@ -108,6 +119,7 @@ class ReportPackagingVerifController extends Controller
                 'upload_md' => $uploadMd,
                 'upload_qr' => $uploadQr,
                 'upload_ed' => $uploadEd,
+                'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
             ]);
 
             $checklistData = [
@@ -199,6 +211,7 @@ class ReportPackagingVerifController extends Controller
             $uploadMd = null;
             $uploadQr = null;
             $uploadEd = null;
+            $uploadMdMulti = [];
 
             // Upload MD
             if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
@@ -221,6 +234,16 @@ class ReportPackagingVerifController extends Controller
                 $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
             }
 
+            if (isset($detail['upload_md_multi']) && is_array($detail['upload_md_multi'])) {
+                foreach ($detail['upload_md_multi'] as $fileIndex => $file) {
+                    if ($file instanceof \Illuminate\Http\UploadedFile) {
+                        $filename = time() . "_md_multi_{$index}_{$fileIndex}_" . $file->getClientOriginalName();
+                        $path = $file->storeAs('upload_packaging', $filename, 'public');
+                        $uploadMdMulti[] = $path;
+                    }
+                }
+            }
+
             $detailModel = DetailPackagingVerif::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
@@ -229,6 +252,7 @@ class ReportPackagingVerifController extends Controller
                 'upload_md' => $uploadMd,
                 'upload_qr' => $uploadQr,
                 'upload_ed' => $uploadEd,
+                'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
             ]);
 
             $checklistData = [
@@ -395,6 +419,7 @@ public function update(Request $request, $uuid)
         $uploadMd = null;
         $uploadQr = null;
         $uploadEd = null;
+        $uploadMdMulti = [];
 
         // Upload file jika ada file baru
         if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
@@ -421,6 +446,15 @@ public function update(Request $request, $uuid)
             $uploadEd = $detail['old_upload_ed'];
         }
 
+        if (!empty($detail['upload_md_multi'])) {
+            foreach ($detail['upload_md_multi'] as $fileMulti) {
+                if ($fileMulti instanceof \Illuminate\Http\UploadedFile) {
+                    $filename = time() . '_md_multi_' . $index . '_' . $fileMulti->getClientOriginalName();
+                    $uploadMdMulti[] = $fileMulti->storeAs('upload_packaging', $filename, 'public');
+                }
+            }
+        }
+
         $detailModel = DetailPackagingVerif::create([
             'uuid' => Str::uuid(),
             'report_uuid' => $report->uuid,
@@ -429,6 +463,8 @@ public function update(Request $request, $uuid)
             'upload_md' => $uploadMd,
             'upload_qr' => $uploadQr,
             'upload_ed' => $uploadEd,
+            'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
+
         ]);
 
         // checklist seperti store()

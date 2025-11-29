@@ -52,7 +52,7 @@
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-outline-primary btn-sm" id="add-thermo-row">
+    <button type="button" class="btn btn-outline-primary btn-sm mt-3" id="add-thermo-row">
         + Tambah Detail Thermometer
     </button>
 </div>

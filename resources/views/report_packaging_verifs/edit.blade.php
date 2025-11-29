@@ -60,7 +60,7 @@
                     </div>
                     <div class="card-body p-2">
                         <div class="row">
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <label class="form-label">Upload MD BPOM</label>
                                 @if($detail->upload_md)
                                 <a href="{{ asset('storage/'.$detail->upload_md) }}" target="_blank"
@@ -83,7 +83,29 @@
                                     class="d-block mb-1 text-primary">Lihat File Lama</a>
                                 @endif
                                 <input type="file" name="details[{{ $i }}][upload_ed]" class="form-control">
+                            </div> -->
+                            <div class="col-md-4">
+                                <label class="form-label">Upload MD BPOM (Multiple)</label>
+
+                                @if(!empty($detail->upload_md_multi))
+                                    @php
+                                        $files = json_decode($detail->upload_md_multi, true);
+                                    @endphp
+
+                                    <div class="mb-2">
+                                        @foreach($files as $file)
+                                            <a href="{{ asset('storage/' . $file) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $file) }}" alt="Preview" width="60" height="60"
+                                                    style="object-fit: cover; border: 1px solid #ccc; border-radius: 4px; margin-right: 6px;">
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <input type="file" name="details[{{ $i }}][upload_md_multi][]" class="form-control" multiple>
                             </div>
+
+
                         </div>
                     </div>
                 </div>

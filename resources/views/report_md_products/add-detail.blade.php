@@ -11,8 +11,31 @@
             <form method="POST" action="{{ route('report_md_products.store-detail', $report->uuid) }}">
                 @csrf
 
+                <p class="mt-5">Pilih Tipe</p>
+                <div class="d-flex " style="gap: 2rem;">
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="Manual">
+                        Manual
+                    </label>
+
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="CFS">
+                        CFS
+                    </label>
+
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="Colimatic">
+                        Colimatic
+                    </label>
+
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="Multivac">
+                        Multivac
+                    </label>
+                </div>
+
                 {{-- DETAIL --}}
-                <div class="mb-3">
+                <div class="mb-3 mt-5">
                     <label>Waktu Pengecekan</label>
                     <input type="time" name="details[0][time]" class="form-control"
                         value="{{ \Carbon\Carbon::now()->format('H:i') }}">

@@ -150,9 +150,10 @@
                                             <th rowspan="2">Jam</th>
                                             <th rowspan="2">Produk</th>
                                             <th rowspan="2">Gramase</th>
-                                            <th rowspan="2">Upload MD BPOM</th>
+                                            <th rowspan="2">Upload MD BPOM, QR Code, Kode Produksi, dan Expire Date</th>
+                                            <!-- <th rowspan="2">Upload MD BPOM</th>
                                             <th rowspan="2">Upload QR Code</th>
-                                            <th rowspan="2">Upload Kode Produksi & Best Before</th>
+                                            <th rowspan="2">Upload Kode Produksi & Best Before</th> -->
                                             <th colspan="2">In cutting</th>
                                             <th colspan="2">Proses Pengemasan</th>
                                             <th colspan="2">Sampling Kemasan</th>
@@ -195,7 +196,7 @@
                                             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
                                             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
                                             <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
-                                            <td rowspan="5">
+                                            <!-- <td rowspan="5">
                                                 @if($d->upload_md)
                                                 <a href="{{ asset('storage/' . $d->upload_md) }}" target="_blank">
                                                     <img src="{{ asset('storage/' . $d->upload_md) }}" alt="Bukti"
@@ -218,7 +219,21 @@
                                                         width="60">
                                                 </a>
                                                 @endif
+                                            </td> -->
+                                            <td rowspan="5">
+                                                @if(!empty($d->upload_md_multi))
+                                                    @php
+                                                        $files = json_decode($d->upload_md_multi, true);
+                                                    @endphp
+
+                                                    @foreach($files as $file)
+                                                        <a href="{{ asset('storage/' . $file) }}" target="_blank">
+                                                            <img src="{{ asset('storage/' . $file) }}" alt="Bukti" width="60" style="margin: 4px;">
+                                                        </a>
+                                                    @endforeach
+                                                @endif
                                             </td>
+
 
                                             {{-- In cutting manual & mesin sama, rowspan --}}
                                             <td rowspan="5">{{ $checklist?->in_cutting_manual_1 ?? '-' }}</td>

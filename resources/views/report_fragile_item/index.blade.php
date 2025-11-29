@@ -188,7 +188,7 @@
 
         </div>
 
-        {{ $reports->links() }} {{-- Pagination --}}
+        {{ $reports->links('pagination::bootstrap-5') }} {{-- Pagination --}}
     </div>
 </div>
 @endsection

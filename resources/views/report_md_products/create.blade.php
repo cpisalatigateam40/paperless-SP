@@ -22,9 +22,31 @@
                         <input type="text" name="shift" class="form-control" required>
                     </div>
                 </div>
-
-
                 <hr>
+
+                <p class="mt-5">Pilih Tipe</p>
+                <div class="d-flex " style="gap: 2rem;">
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="Manual">
+                        Manual
+                    </label>
+
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="CFS">
+                        CFS
+                    </label>
+
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="Colimatic">
+                        Colimatic
+                    </label>
+
+                    <label class="me-3">
+                        <input type="radio" name="details[0][process_type]" value="Multivac">
+                        Multivac
+                    </label>
+                </div>
+
                 <h5 class="mt-5">Detail Pemeriksaan</h5>
 
                 {{-- DETAIL --}}
@@ -140,7 +162,30 @@ let detailIndex = 1; // detail pertama sudah [0]
 
 function addDetail() {
     let html = `
-    <div class="border rounded p-3 mb-3">
+
+    <p class="mt-5">Pilih Tipe</p>
+    <div class="d-flex " style="gap: 2rem;">
+        <label class="me-3">
+            <input type="radio" name="details[${detailIndex}][process_type]" value="Manual">
+            Manual
+        </label>
+
+        <label class="me-3">
+            <input type="radio" name="details[${detailIndex}][process_type]" value="CFS">
+            CFS
+        </label>
+
+        <label class="me-3">
+            <input type="radio" name="details[${detailIndex}][process_type]" value="Colimatic">
+            Colimatic
+        </label>
+
+        <label class="me-3">
+            <input type="radio" name="details[${detailIndex}][process_type]" value="Multivac">
+            Multivac
+        </label>
+    </div>
+    <div class="border rounded p-3 mb-3 mt-5">
         <div class="mb-3">
             <label>Waktu Pengecekan</label>
             <input type="time" name="details[${detailIndex}][time]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}">

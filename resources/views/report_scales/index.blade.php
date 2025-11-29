@@ -245,7 +245,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center">Belum ada laporan.</td>
+                            <td colspan="6" class="text-center">Belum ada laporan.</td>
                         </tr>
                         @endforelse
                     </tbody>

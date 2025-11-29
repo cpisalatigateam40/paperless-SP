@@ -165,49 +165,47 @@
         </thead>
         <tbody>
             @foreach($report->details as $detail)
-            @foreach($detail->items as $i => $item)
-            <tr>
-                <td>{{ $detail->inspection_hour }}</td>
-                <td>{{ $i + 1 }}</td>
-                <td>{{ $item->item }}</td>
-                <td class="text-center">{{ $item->condition }}</td>
-                <td>
-                    @php $notes = json_decode($item->notes, true); @endphp
-                    @if(is_array($notes))
-                    {{ implode(', ', $notes) }}
-                    @else
-                    {{ $item->notes ?? '-' }}
+                @foreach($detail->items as $i => $item)
+                    @php
+                        $isChillroom = strtolower($report->room_name) === 'chillroom';
+                        $isItem4 = $item->item === 'Suhu ruang (℃) / RH (%)';
+                    @endphp
+
+                    @if(!($isChillroom && $isItem4))
+                    <tr>
+                        <td>{{ $detail->inspection_hour }}</td>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $item->item }}</td>
+                        <td class="text-center">{{ $item->condition }}</td>
+                        <td>
+                            @php $notes = json_decode($item->notes, true); @endphp
+                            @if(is_array($notes))
+                                {{ implode(', ', $notes) }}
+                            @else
+                                {{ $item->notes ?? '-' }}
+                            @endif
+                        </td>
+                        <td>{{ $item->corrective_action ?? '-' }}</td>
+                        <td>
+                            <ul>
+                                <li><strong>Utama:</strong> {{ $item->verification ? 'OK' : 'Tidak OK' }}</li>
+                                @foreach($item->followups as $index => $followup)
+                                    <li><strong>Lanjutan #{{ $index+1 }}:</strong> {{ $followup->verification ? 'OK' : 'Tidak OK' }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
+                    </tr>
                     @endif
-                </td>
-                <td>{{ $item->corrective_action ?? '-' }}</td>
-                <td>
-                    <ul>
-                        <li><strong>Utama:</strong> {{ $item->verification ? 'OK' : 'Tidak OK' }}</li>
-                        @foreach($item->followups as $index => $followup)
-                        <li><strong>Lanjutan #{{ $index+1 }}:</strong> {{ $followup->verification ? 'OK' : 'Tidak OK' }}
-                        </li>
-                        @endforeach
-                    </ul>
-                </td>
-            </tr>
-            @endforeach
+
+                @endforeach
             @endforeach
             <tr>
                 <td colspan="7" class="no-border" style="text-align: right;">QM 12 / 01</td>
             </tr>
         </tbody>
 
-    </table>
 
-    <p><strong>Keterangan:</strong></p>
-    <ul style="padding-left: 20px;">
-        <li>1. Tertata rapi</li>
-        <li>2. Penempatan sesuai tagging dan jenis allergen</li>
-        <li>3. Bersih dan bebas dari kontaminan</li>
-        <li>4. Tidak tertata rapi</li>
-        <li>5. Penempatan tidak sesuai tagging dan jenis allergen</li>
-        <li>6. Tidak bersih / ada kontaminan</li>
-    </ul>
+    </table>
 
     <br><br>
 

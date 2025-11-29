@@ -88,8 +88,8 @@
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
                                 <label>Standar Berat (gr)</label>
-                                <input type="number" step="0.01" name="details[0][weight_standard]" class="form-control"
-                                    required>
+                                <input type="text" name="details[0][weight_standard]" class="form-control" required
+                                    placeholder="contoh: 12-13">
                             </div>
                         </div>
                         <div class="row">
@@ -121,8 +121,8 @@
                         <div class="row mt-4">
                             <div class="col-md-4">
                                 <label>Standar Panjang</label>
-                                <input type="number" step="0.01" name="details[0][long_standard]" class="form-control"
-                                    required>
+                                <input type="text" name="details[0][long_standard]" class="form-control" required
+                                    placeholder="contoh: 12-13">
                             </div>
                         </div>
                         <div class="row mt-3">

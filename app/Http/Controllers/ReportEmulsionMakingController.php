@@ -51,8 +51,9 @@ class ReportEmulsionMakingController extends Controller
     public function create()
     {
         $rawMaterials = \App\Models\RawMaterial::all();
+        $premixes = \App\Models\Premix::orderBy('name')->get();
         $areas = \App\Models\Area::all();
-        return view('report_emulsion_makings.create', compact('rawMaterials', 'areas'));
+        return view('report_emulsion_makings.create', compact('rawMaterials', 'premixes', 'areas'));
     }
 
     public function store(Request $request)
@@ -77,15 +78,28 @@ class ReportEmulsionMakingController extends Controller
         // 3. Buat detail bahan baku
         if ($request->has('details')) {
             foreach ($request->details as $detail) {
-                $detailModel = new DetailEmulsionMaking();
-                $detailModel->uuid = Str::uuid();
-                $detailModel->header_uuid = $header->uuid;
-                $detailModel->raw_material_uuid = $detail['raw_material_uuid'];
-                $detailModel->weight = $detail['weight'];
-                $detailModel->temperature = $detail['temperature'];
-                // $detailModel->sensory = $detail['sensory'];
-                $detailModel->conformity = $detail['conformity'];
-                $detailModel->save();
+                if ($detail['material_type'] === 'raw') {
+                    // Simpan ke FK lama
+                    $detailModel = new DetailEmulsionMaking();
+                    $detailModel->uuid = Str::uuid();
+                    $detailModel->header_uuid = $header->uuid;
+                    $detailModel->raw_material_uuid = $detail['material_uuid']; // FK tetap aman
+                    $detailModel->weight = $detail['weight'];
+                    $detailModel->temperature = $detail['temperature'];
+                    $detailModel->conformity = $detail['conformity'];
+                    $detailModel->save();
+                } else {
+                    // Simpan Premix di kolom baru
+                    $detailModel = new DetailEmulsionMaking();
+                    $detailModel->uuid = Str::uuid();
+                    $detailModel->header_uuid = $header->uuid;
+                    $detailModel->material_uuid = $detail['material_uuid'];
+                    $detailModel->material_type = 'premix';
+                    $detailModel->weight = $detail['weight'];
+                    $detailModel->temperature = $detail['temperature'];
+                    $detailModel->conformity = $detail['conformity'];
+                    $detailModel->save();
+                }
             }
         }
 
@@ -121,8 +135,9 @@ class ReportEmulsionMakingController extends Controller
             ->with('header', 'header.details', 'header.agings')
             ->firstOrFail();
         $rawMaterials = \App\Models\RawMaterial::all();
+        $premixes = \App\Models\Premix::orderBy('name')->get();
 
-        return view('report_emulsion_makings.add_detail', compact('report', 'rawMaterials'));
+        return view('report_emulsion_makings.add_detail', compact('report', 'rawMaterials', 'premixes'));
     }
 
     public function storeDetail(Request $request, $uuid)
@@ -151,15 +166,31 @@ class ReportEmulsionMakingController extends Controller
         // Buat detail bahan baku tambahan
         if ($request->has('details')) {
             foreach ($request->details as $detail) {
+
                 $detailModel = new DetailEmulsionMaking();
                 $detailModel->uuid = \Illuminate\Support\Str::uuid();
                 $detailModel->header_uuid = $header->uuid;
-                $detailModel->raw_material_uuid = $detail['raw_material_uuid'];
                 $detailModel->weight = $detail['weight'];
                 $detailModel->temperature = $detail['temperature'];
-                // $detailModel->sensory = $detail['sensory'];
                 $detailModel->conformity = $detail['conformity'];
-                $detailModel->aging_index = $emulsiIndex;
+                $detailModel->aging_index = $emulsiIndex; // tetap simpan aging index
+
+                if (($detail['material_type'] ?? 'raw') === 'raw') {
+                    // Simpan FK ke raw_material_uuid → validasi dulu
+                    $exists = \App\Models\RawMaterial::where('uuid', $detail['material_uuid'])->exists();
+
+                    if ($exists) {
+                        $detailModel->raw_material_uuid = $detail['material_uuid'];
+                    } else {
+                        // kalau datanya bukan Raw Material, skip agar aman
+                        continue;
+                    }
+                } else {
+                    // Premix masuk ke kolom baru
+                    $detailModel->material_uuid = $detail['material_uuid'];
+                    $detailModel->material_type = 'premix';
+                }
+
                 $detailModel->save();
             }
         }
@@ -259,6 +290,7 @@ class ReportEmulsionMakingController extends Controller
         $details = DetailEmulsionMaking::where('header_uuid', $header->uuid)->get();
         $agings = AgingEmulsionMaking::where('header_uuid', $header->uuid)->get();
         $rawMaterials = \App\Models\RawMaterial::all();
+        $premixes = \App\Models\Premix::all();
         $areas = \App\Models\Area::all();
 
         return view('report_emulsion_makings.edit', compact(
@@ -267,6 +299,7 @@ class ReportEmulsionMakingController extends Controller
             'details',
             'agings',
             'rawMaterials',
+            'premixes',
             'areas'
         ));
     }
@@ -293,15 +326,28 @@ class ReportEmulsionMakingController extends Controller
         DetailEmulsionMaking::where('header_uuid', $header->uuid)->delete();
         if ($request->has('details')) {
             foreach ($request->details as $detail) {
-                DetailEmulsionMaking::create([
-                    'uuid' => Str::uuid(),
-                    'header_uuid' => $header->uuid,
-                    'raw_material_uuid' => $detail['raw_material_uuid'],
-                    'weight' => $detail['weight'],
-                    'temperature' => $detail['temperature'],
-                    'conformity' => $detail['conformity'],
-                ]);
+            $detailModel = new DetailEmulsionMaking();
+            $detailModel->uuid = Str::uuid();
+            $detailModel->header_uuid = $header->uuid;
+            $detailModel->weight = $detail['weight'];
+            $detailModel->temperature = $detail['temperature'];
+            $detailModel->conformity = $detail['conformity'];
+            $detailModel->aging_index = $detail['aging_index'] ?? 0;
+
+            if (($detail['material_type'] ?? 'raw') === 'raw') {
+                // FK ke raw_material_uuid
+                $exists = \App\Models\RawMaterial::where('uuid', $detail['material_uuid'])->exists();
+                if ($exists) {
+                    $detailModel->raw_material_uuid = $detail['material_uuid'];
+                }
+            } else {
+                // Premix di kolom baru
+                $detailModel->material_uuid = $detail['material_uuid'];
+                $detailModel->material_type = 'premix';
             }
+
+            $detailModel->save();
+        }
         }
 
         // 🔹 Hapus aging lama, lalu simpan ulang

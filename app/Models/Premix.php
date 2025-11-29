@@ -38,4 +38,10 @@ class Premix extends Model
     {
         return $this->hasMany(DetailPremix::class, 'premix_uuid', 'uuid');
     }
+
+    public function detailEmulsionMakings()
+    {
+        return $this->hasMany(DetailEmulsionMaking::class, 'material_uuid', 'uuid')
+                    ->where('material_type', 'premix');
+    }
 }

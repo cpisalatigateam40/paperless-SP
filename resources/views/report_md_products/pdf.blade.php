@@ -137,6 +137,7 @@
                 <th rowspan="2">Kode Produksi</th>
                 <th rowspan="2">Best Before</th>
                 <th rowspan="2">No Program</th>
+                <th rowspan="2">Tipe</th>
                 <th colspan="4">Fe 1.5 mm</th>
                 <th colspan="4">Non Fe 2 mm</th>
                 <th colspan="4">SUS 2.5 mm</th>
@@ -167,6 +168,7 @@
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
                 <td>{{ $detail->program_number }}</td>
+                <td>{{ $detail->process_type }}</td>
                 @php
                 $specimens = ['fe_1_5mm', 'non_fe_2mm', 'sus_2_5mm'];
                 $positions = ['d', 't', 'b', 'dl'];
@@ -184,7 +186,7 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="20" style="text-align: right; border: none;">QM 17 / 01</td>
+                <td colspan="21" style="text-align: right; border: none;">QM 17 / 01</td>
             </tr>
         </tbody>
     </table>
