@@ -60,6 +60,74 @@ public function index()
         ]);
     }
 
+    // public function store(Request $request)
+    // {
+    //     // Simpan header laporan
+    //     $report = ReportReCleanliness::create([
+    //         'uuid' => Str::uuid(),
+    //         'area_uuid' => Auth::user()->area_uuid,
+    //         'date' => $request->date,
+    //         'created_by' => Auth::user()->name,
+    //     ]);
+
+    //     // Detail room
+    //     foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
+    //         foreach ($roomData['elements'] ?? [] as $element_uuid => $data) {
+    //             $detail = DetailRoomCleanliness::create([
+    //                 'uuid' => Str::uuid(),
+    //                 'report_re_uuid' => $report->uuid,
+    //                 'room_uuid' => $room_uuid,
+    //                 'room_element_uuid' => $element_uuid,
+    //                 'condition' => $data['condition'] ?? 'dirty',
+    //                 'notes' => $data['notes'] ?? null,
+    //                 'corrective_action' => $data['corrective_action'] ?? null,
+    //                 'verification' => $data['verification'] ?? null,
+    //             ]);
+
+    //             // Simpan followups jika ada
+    //             if (isset($data['followups']) && is_array($data['followups'])) {
+    //                 foreach ($data['followups'] as $followup) {
+    //                     \App\Models\FollowupDetailRoomCleanliness::create([
+    //                         'detail_room_uuid' => $detail->uuid,
+    //                         'notes' => $followup['notes'] ?? null,
+    //                         'corrective_action' => $followup['action'] ?? null,
+    //                         'verification' => $followup['verification'] ?? null,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // Detail equipment
+    //     foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
+    //         foreach ($equipmentData['parts'] ?? [] as $part_uuid => $data) {
+    //             $detail = DetailEquipmentCleanliness::create([
+    //                 'uuid' => Str::uuid(),
+    //                 'report_re_uuid' => $report->uuid,
+    //                 'equipment_uuid' => $equipment_uuid,
+    //                 'equipment_part_uuid' => $part_uuid,
+    //                 'condition' => $data['condition'] ?? 'dirty',
+    //                 'notes' => $data['notes'] ?? null,
+    //                 'corrective_action' => $data['corrective_action'] ?? null,
+    //                 'verification' => $data['verification'] ?? null,
+    //             ]);
+
+    //             if (isset($data['followups']) && is_array($data['followups'])) {
+    //                 foreach ($data['followups'] as $followup) {
+    //                     \App\Models\FollowupDetailEquipmentCleanliness::create([
+    //                         'detail_equipment_uuid' => $detail->uuid,
+    //                         'notes' => $followup['notes'] ?? null,
+    //                         'corrective_action' => $followup['action'] ?? null,
+    //                         'verification' => $followup['verification'] ?? null,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return redirect()->route('report-re-cleanliness.index')->with('success', 'Laporan berhasil disimpan.');
+    // }
+
     public function store(Request $request)
     {
         // Simpan header laporan
@@ -70,63 +138,99 @@ public function index()
             'created_by' => Auth::user()->name,
         ]);
 
-        // Detail room
+
+        /** ====================== ROOM ====================== **/
         foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
-            foreach ($roomData['elements'] ?? [] as $element_uuid => $data) {
-                $detail = DetailRoomCleanliness::create([
+
+            // Jika ADA elements → simpan berdasarkan elements
+            if (!empty($roomData['elements'])) {
+                foreach ($roomData['elements'] as $element_uuid => $data) {
+                    $detail = DetailRoomCleanliness::create([
+                        'uuid' => Str::uuid(),
+                        'report_re_uuid' => $report->uuid,
+                        'room_uuid' => $room_uuid,
+                        'room_element_uuid' => $element_uuid,
+                        'condition' => $data['condition'] ?? 'dirty',
+                        'notes' => $data['notes'] ?? null,
+                        'corrective_action' => $data['corrective_action'] ?? null,
+                        'verification' => $data['verification'] ?? null,
+                    ]);
+
+                    if (!empty($data['followups'])) {
+                        foreach ($data['followups'] as $followup) {
+                            \App\Models\FollowupDetailRoomCleanliness::create([
+                                'detail_room_uuid' => $detail->uuid,
+                                'notes' => $followup['notes'] ?? null,
+                                'corrective_action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? null,
+                            ]);
+                        }
+                    }
+                }
+            }
+            else {
+                // Jika TIDAK ADA elements → simpan row default
+                DetailRoomCleanliness::create([
                     'uuid' => Str::uuid(),
                     'report_re_uuid' => $report->uuid,
                     'room_uuid' => $room_uuid,
-                    'room_element_uuid' => $element_uuid,
-                    'condition' => $data['condition'] ?? 'dirty',
-                    'notes' => $data['notes'] ?? null,
-                    'corrective_action' => $data['corrective_action'] ?? null,
-                    'verification' => $data['verification'] ?? null,
+                    'room_element_uuid' => null,
+                    'condition' => 'dirty',
+                    'notes' => null,
+                    'corrective_action' => null,
+                    'verification' => null,
                 ]);
-
-                // Simpan followups jika ada
-                if (isset($data['followups']) && is_array($data['followups'])) {
-                    foreach ($data['followups'] as $followup) {
-                        \App\Models\FollowupDetailRoomCleanliness::create([
-                            'detail_room_uuid' => $detail->uuid,
-                            'notes' => $followup['notes'] ?? null,
-                            'corrective_action' => $followup['action'] ?? null,
-                            'verification' => $followup['verification'] ?? null,
-                        ]);
-                    }
-                }
             }
         }
 
-        // Detail equipment
+
+        /** ====================== EQUIPMENT ====================== **/
         foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
-            foreach ($equipmentData['parts'] ?? [] as $part_uuid => $data) {
-                $detail = DetailEquipmentCleanliness::create([
+
+            if (!empty($equipmentData['parts'])) {
+                foreach ($equipmentData['parts'] as $part_uuid => $data) {
+                    $detail = DetailEquipmentCleanliness::create([
+                        'uuid' => Str::uuid(),
+                        'report_re_uuid' => $report->uuid,
+                        'equipment_uuid' => $equipment_uuid,
+                        'equipment_part_uuid' => $part_uuid,
+                        'condition' => $data['condition'] ?? 'dirty',
+                        'notes' => $data['notes'] ?? null,
+                        'corrective_action' => $data['corrective_action'] ?? null,
+                        'verification' => $data['verification'] ?? null,
+                    ]);
+
+                    if (!empty($data['followups'])) {
+                        foreach ($data['followups'] as $followup) {
+                            \App\Models\FollowupDetailEquipmentCleanliness::create([
+                                'detail_equipment_uuid' => $detail->uuid,
+                                'notes' => $followup['notes'] ?? null,
+                                'corrective_action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? null,
+                            ]);
+                        }
+                    }
+                }
+            }
+            else {
+                // fallback ketika equipment tidak punya part
+                DetailEquipmentCleanliness::create([
                     'uuid' => Str::uuid(),
                     'report_re_uuid' => $report->uuid,
                     'equipment_uuid' => $equipment_uuid,
-                    'equipment_part_uuid' => $part_uuid,
-                    'condition' => $data['condition'] ?? 'dirty',
-                    'notes' => $data['notes'] ?? null,
-                    'corrective_action' => $data['corrective_action'] ?? null,
-                    'verification' => $data['verification'] ?? null,
+                    'equipment_part_uuid' => null,
+                    'condition' => 'dirty',
+                    'notes' => null,
+                    'corrective_action' => null,
+                    'verification' => null,
                 ]);
-
-                if (isset($data['followups']) && is_array($data['followups'])) {
-                    foreach ($data['followups'] as $followup) {
-                        \App\Models\FollowupDetailEquipmentCleanliness::create([
-                            'detail_equipment_uuid' => $detail->uuid,
-                            'notes' => $followup['notes'] ?? null,
-                            'corrective_action' => $followup['action'] ?? null,
-                            'verification' => $followup['verification'] ?? null,
-                        ]);
-                    }
-                }
             }
         }
 
-        return redirect()->route('report-re-cleanliness.index')->with('success', 'Laporan berhasil disimpan.');
+        return redirect()->route('report-re-cleanliness.index')
+            ->with('success', 'Laporan berhasil disimpan.');
     }
+
 
     public function destroy($uuid)
     {
@@ -224,6 +328,77 @@ public function index()
 }
 
 
+// public function update(Request $request, $uuid)
+// {
+//     $report = ReportReCleanliness::where('uuid', $uuid)->firstOrFail();
+
+//     // Update header
+//     $report->update([
+//         'date' => $request->date,
+//         'updated_by' => Auth::user()->name,
+//     ]);
+
+//     // Hapus detail lama (agar tidak duplikat)
+//     DetailRoomCleanliness::where('report_re_uuid', $report->uuid)->delete();
+//     DetailEquipmentCleanliness::where('report_re_uuid', $report->uuid)->delete();
+
+//     // Simpan ulang data detail room
+//     foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
+//         foreach ($roomData['elements'] ?? [] as $element_uuid => $data) {
+//             $detail = DetailRoomCleanliness::create([
+//                 'uuid' => Str::uuid(),
+//                 'report_re_uuid' => $report->uuid,
+//                 'room_uuid' => $room_uuid,
+//                 'room_element_uuid' => $element_uuid,
+//                 'condition' => $data['condition'] ?? 'dirty',
+//                 'notes' => $data['notes'] ?? null,
+//                 'corrective_action' => $data['corrective_action'] ?? null,
+//                 'verification' => $data['verification'] ?? null,
+//             ]);
+
+//             if (isset($data['followups'])) {
+//                 foreach ($data['followups'] as $followup) {
+//                     FollowupDetailRoomCleanliness::create([
+//                         'detail_room_uuid' => $detail->uuid,
+//                         'notes' => $followup['notes'] ?? null,
+//                         'corrective_action' => $followup['action'] ?? null,
+//                         'verification' => $followup['verification'] ?? null,
+//                     ]);
+//                 }
+//             }
+//         }
+//     }
+
+//     // Simpan ulang data detail equipment
+//     foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
+//         foreach ($equipmentData['parts'] ?? [] as $part_uuid => $data) {
+//             $detail = DetailEquipmentCleanliness::create([
+//                 'uuid' => Str::uuid(),
+//                 'report_re_uuid' => $report->uuid,
+//                 'equipment_uuid' => $equipment_uuid,
+//                 'equipment_part_uuid' => $part_uuid,
+//                 'condition' => $data['condition'] ?? 'dirty',
+//                 'notes' => $data['notes'] ?? null,
+//                 'corrective_action' => $data['corrective_action'] ?? null,
+//                 'verification' => $data['verification'] ?? null,
+//             ]);
+
+//             if (isset($data['followups'])) {
+//                 foreach ($data['followups'] as $followup) {
+//                     FollowupDetailEquipmentCleanliness::create([
+//                         'detail_equipment_uuid' => $detail->uuid,
+//                         'notes' => $followup['notes'] ?? null,
+//                         'corrective_action' => $followup['action'] ?? null,
+//                         'verification' => $followup['verification'] ?? null,
+//                     ]);
+//                 }
+//             }
+//         }
+//     }
+
+//     return redirect()->route('report-re-cleanliness.index')->with('success', 'Laporan berhasil diperbarui.');
+// }
+
 public function update(Request $request, $uuid)
 {
     $report = ReportReCleanliness::where('uuid', $uuid)->firstOrFail();
@@ -235,64 +410,109 @@ public function update(Request $request, $uuid)
     ]);
 
     // Hapus detail lama (agar tidak duplikat)
+    FollowupDetailRoomCleanliness::whereIn('detail_room_uuid',
+        DetailRoomCleanliness::where('report_re_uuid', $report->uuid)->pluck('uuid')
+    )->delete();
+
+    FollowupDetailEquipmentCleanliness::whereIn('detail_equipment_uuid',
+        DetailEquipmentCleanliness::where('report_re_uuid', $report->uuid)->pluck('uuid')
+    )->delete();
+
     DetailRoomCleanliness::where('report_re_uuid', $report->uuid)->delete();
     DetailEquipmentCleanliness::where('report_re_uuid', $report->uuid)->delete();
 
-    // Simpan ulang data detail room
+
+    /** ====================== ROOM ====================== **/
     foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
-        foreach ($roomData['elements'] ?? [] as $element_uuid => $data) {
-            $detail = DetailRoomCleanliness::create([
+
+        if (!empty($roomData['elements'])) {
+            foreach ($roomData['elements'] as $element_uuid => $data) {
+
+                $detail = DetailRoomCleanliness::create([
+                    'uuid' => Str::uuid(),
+                    'report_re_uuid' => $report->uuid,
+                    'room_uuid' => $room_uuid,
+                    'room_element_uuid' => $element_uuid,
+                    'condition' => $data['condition'] ?? 'dirty',
+                    'notes' => $data['notes'] ?? null,
+                    'corrective_action' => $data['corrective_action'] ?? null,
+                    'verification' => $data['verification'] ?? null,
+                ]);
+
+                if (!empty($data['followups'])) {
+                    foreach ($data['followups'] as $followup) {
+                        FollowupDetailRoomCleanliness::create([
+                            'detail_room_uuid' => $detail->uuid,
+                            'notes' => $followup['notes'] ?? null,
+                            'corrective_action' => $followup['action'] ?? null,
+                            'verification' => $followup['verification'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        } else {
+            // fallback ketika tidak ada elements
+            DetailRoomCleanliness::create([
                 'uuid' => Str::uuid(),
                 'report_re_uuid' => $report->uuid,
                 'room_uuid' => $room_uuid,
-                'room_element_uuid' => $element_uuid,
-                'condition' => $data['condition'] ?? 'dirty',
-                'notes' => $data['notes'] ?? null,
-                'corrective_action' => $data['corrective_action'] ?? null,
-                'verification' => $data['verification'] ?? null,
+                'room_element_uuid' => null,
+                'condition' => 'clean',
+                'notes' => null,
+                'corrective_action' => null,
+                'verification' => null,
             ]);
-
-            if (isset($data['followups'])) {
-                foreach ($data['followups'] as $followup) {
-                    FollowupDetailRoomCleanliness::create([
-                        'detail_room_uuid' => $detail->uuid,
-                        'notes' => $followup['notes'] ?? null,
-                        'corrective_action' => $followup['action'] ?? null,
-                        'verification' => $followup['verification'] ?? null,
-                    ]);
-                }
-            }
         }
     }
 
-    // Simpan ulang data detail equipment
+
+    /** ====================== EQUIPMENT ====================== **/
     foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
-        foreach ($equipmentData['parts'] ?? [] as $part_uuid => $data) {
-            $detail = DetailEquipmentCleanliness::create([
+
+        if (!empty($equipmentData['parts'])) {
+            foreach ($equipmentData['parts'] as $part_uuid => $data) {
+
+                $detail = DetailEquipmentCleanliness::create([
+                    'uuid' => Str::uuid(),
+                    'report_re_uuid' => $report->uuid,
+                    'equipment_uuid' => $equipment_uuid,
+                    'equipment_part_uuid' => $part_uuid,
+                    'condition' => $data['condition'] ?? 'dirty',
+                    'notes' => $data['notes'] ?? null,
+                    'corrective_action' => $data['corrective_action'] ?? null,
+                    'verification' => $data['verification'] ?? null,
+                ]);
+
+                if (!empty($data['followups'])) {
+                    foreach ($data['followups'] as $followup) {
+                        FollowupDetailEquipmentCleanliness::create([
+                            'detail_equipment_uuid' => $detail->uuid,
+                            'notes' => $followup['notes'] ?? null,
+                            'corrective_action' => $followup['action'] ?? null,
+                            'verification' => $followup['verification'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        } else {
+            // fallback ketika tidak ada parts
+            DetailEquipmentCleanliness::create([
                 'uuid' => Str::uuid(),
                 'report_re_uuid' => $report->uuid,
                 'equipment_uuid' => $equipment_uuid,
-                'equipment_part_uuid' => $part_uuid,
-                'condition' => $data['condition'] ?? 'dirty',
-                'notes' => $data['notes'] ?? null,
-                'corrective_action' => $data['corrective_action'] ?? null,
-                'verification' => $data['verification'] ?? null,
+                'equipment_part_uuid' => null,
+                'condition' => 'clean',
+                'notes' => null,
+                'corrective_action' => null,
+                'verification' => null,
             ]);
-
-            if (isset($data['followups'])) {
-                foreach ($data['followups'] as $followup) {
-                    FollowupDetailEquipmentCleanliness::create([
-                        'detail_equipment_uuid' => $detail->uuid,
-                        'notes' => $followup['notes'] ?? null,
-                        'corrective_action' => $followup['action'] ?? null,
-                        'verification' => $followup['verification'] ?? null,
-                    ]);
-                }
-            }
         }
     }
 
-    return redirect()->route('report-re-cleanliness.index')->with('success', 'Laporan berhasil diperbarui.');
+
+    return redirect()->route('report-re-cleanliness.index')
+        ->with('success', 'Laporan berhasil diperbarui.');
 }
+
 
 }
