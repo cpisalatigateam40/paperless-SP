@@ -53,6 +53,9 @@
                                     @foreach ($room->elements as $element)
                                     <div class="col-md-4 mb-4">
                                         <label>
+                                            <input type="hidden"
+                                                name="rooms[{{ $room->uuid }}][elements][{{ $element->uuid }}][condition]"
+                                                value="dirty">
                                             <input type="checkbox" class="element-checkbox"
                                                 data-room="{{ $room->uuid }}" onchange="toggleCleanlinessFields(this)"
                                                 name="rooms[{{ $room->uuid }}][elements][{{ $element->uuid }}][condition]"
@@ -79,6 +82,15 @@
                                     </div>
                                     @endforeach
                                 </div>
+
+                                @if($room->elements->isEmpty())
+                                <div class="m-3">
+                                    <label>
+                                        <input type="checkbox" name="rooms[{{ $room->uuid }}][condition]" value="clean">
+                                        Ruangan Bersih
+                                    </label>
+                                </div>
+                                @endif
                             </div>
                         </div>
                         @endforeach
@@ -108,6 +120,10 @@
                                     @foreach ($equipment->parts as $part)
                                     <div class="col-md-4 mb-4">
                                         <label>
+                                            <input type="hidden"
+                                                name="equipments[{{ $equipment->uuid }}][parts][{{ $part->uuid }}][condition]"
+                                                value="dirty">
+
                                             <input type="checkbox" class="part-checkbox"
                                                 data-equipment="{{ $equipment->uuid }}"
                                                 onchange="toggleCleanlinessFields(this)"
@@ -135,6 +151,16 @@
                                     </div>
                                     @endforeach
                                 </div>
+
+                                @if($equipment->parts->isEmpty())
+                                <div class="m-3">
+                                    <label>
+                                        <input type="checkbox" name="equipments[{{ $equipment->uuid }}][condition]"
+                                            value="clean">
+                                        Equipment Bersih
+                                    </label>
+                                </div>
+                                @endif
                             </div>
                         </div>
                         @endforeach
@@ -169,23 +195,23 @@ function toggleCleanlinessFields(checkbox) {
     const verification = container.querySelector('.verification');
 
     if (checkbox.checked) {
+        checkbox.value = 'clean'; // 👈 FIX PALING PENTING
+
         if (notes) notes.disabled = true;
         if (corrective) corrective.disabled = true;
         if (verification) verification.value = 'OK';
     } else {
-        if (notes) {
-            notes.disabled = false;
-            notes.value = notes.value ?? notes.value;
-        }
-        if (corrective) {
-            corrective.disabled = false;
-        }
+        checkbox.value = 'dirty'; // 👈 FIX PALING PENTING
+
+        if (notes) notes.disabled = false;
+        if (corrective) corrective.disabled = false;
         if (verification) verification.value = '';
     }
 
     const roomOrEq = checkbox.closest('.cleanliness-item');
     if (roomOrEq) checkRoomCompletion(roomOrEq);
 }
+
 
 function checkRoomCompletion(roomWrapper) {
     const elements = roomWrapper.querySelectorAll('.col-md-4');
@@ -276,39 +302,51 @@ document.addEventListener('change', function(e) {
     // Check all for rooms
     if (e.target.classList.contains('checkall-room')) {
         const roomId = e.target.dataset.room;
-        const checkboxes = document.querySelectorAll(`.room-elements-${roomId} .element-checkbox`);
         const cleanlinessItem = document.querySelector(`.cleanliness-item[data-uuid="${roomId}"]`);
         const wrapper = cleanlinessItem ? cleanlinessItem.querySelector('.form-wrapper') : null;
-        if (wrapper) wrapper.style.display = 'block'; // buka jika tersembunyi
+        if (wrapper) wrapper.style.display = 'block';
 
-        checkboxes.forEach(cb => {
-            if (cb.checked !== e.target.checked) {
+        const checkboxes = document.querySelectorAll(`.room-elements-${roomId} .element-checkbox`);
+
+        if (checkboxes.length > 0) {
+            // Room dengan Elements
+            checkboxes.forEach(cb => {
                 cb.checked = e.target.checked;
                 toggleCleanlinessFields(cb);
-            } else {
-                // tetap panggil untuk memastikan UI konsisten
-                toggleCleanlinessFields(cb);
+            });
+        } else {
+            // Room TANPA Elements → centang condition clean
+            const roomInput = cleanlinessItem.querySelector('input[name^="rooms"][name$="[condition]"]');
+            if (roomInput) {
+                roomInput.checked = e.target.checked;
             }
-        });
+        }
     }
 
     // Check all for equipments
     if (e.target.classList.contains('checkall-equipment')) {
         const eqId = e.target.dataset.equipment;
-        const checkboxes = document.querySelectorAll(`.equipment-parts-${eqId} .part-checkbox`);
         const cleanlinessItem = document.querySelector(`.cleanliness-item[data-uuid="${eqId}"]`);
         const wrapper = cleanlinessItem ? cleanlinessItem.querySelector('.form-wrapper') : null;
         if (wrapper) wrapper.style.display = 'block';
 
-        checkboxes.forEach(cb => {
-            if (cb.checked !== e.target.checked) {
+        const checkboxes = document.querySelectorAll(`.equipment-parts-${eqId} .part-checkbox`);
+
+        if (checkboxes.length > 0) {
+            // Equipment dengan Parts
+            checkboxes.forEach(cb => {
                 cb.checked = e.target.checked;
                 toggleCleanlinessFields(cb);
-            } else {
-                toggleCleanlinessFields(cb);
+            });
+        } else {
+            // Equipment TANPA Parts → centang condition clean
+            const eqInput = cleanlinessItem.querySelector('input[name^="equipments"][name$="[condition]"]');
+            if (eqInput) {
+                eqInput.checked = e.target.checked;
             }
-        });
+        }
     }
+
 
     // Auto-update checkall when manual cek/unccek
     if (e.target.classList.contains('element-checkbox')) {

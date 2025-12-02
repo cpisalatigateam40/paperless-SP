@@ -137,6 +137,9 @@
                             </td>
 
                         </tr>
+
+
+
                         {{-- Baris detail (ruangan & equipment) --}}
                         <tr id="detail-{{ $report->uuid }}" style="display: none;">
                             <td colspan="6">
@@ -281,8 +284,6 @@
             </div>
         </div>
     </div>
-
-
 </div>
 @endsection
 
