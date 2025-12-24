@@ -7,12 +7,29 @@ use App\Models\FragileItem;
 use App\Models\Area;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\FragileItemTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\FragileItemImport;
 
 class FragileItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $fragileItems = FragileItem::with('area')->orderBy('item_name', 'asc')->paginate(10);
+        $query = FragileItem::with('area')
+            ->orderBy('item_name', 'asc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('item_name', 'like', "%{$search}%")
+                ->orWhere('section_name', 'like', "%{$search}%")
+                ->orWhere('owner', 'like', "%{$search}%");
+            });
+        }
+
+        $fragileItems = $query->paginate(10)->withQueryString();
+
         return view('fragile_item.index', compact('fragileItems'));
     }
 
@@ -73,5 +90,26 @@ class FragileItemController extends Controller
         $fragileItem->delete();
 
         return redirect()->route('fragile-item.index')->with('success', 'Item deleted successfully.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new FragileItemTemplateExport,
+            'template-fragile-item.xlsx'
+        );
+    }
+    
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new FragileItemImport, $request->file('file'));
+
+        return redirect()
+            ->route('fragile-item.index')
+            ->with('success', 'Data fragile item berhasil diimport');
     }
 }

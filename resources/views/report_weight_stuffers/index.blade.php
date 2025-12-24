@@ -5,7 +5,7 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
             <h4>Laporan Verifikasi Berat Stuffer</h4>
-            <a href="{{ route('report_weight_stuffers.create') }}" class="btn btn-primary btn-sm">+ Tambah Laporan</a>
+            <a href="{{ route('report_weight_stuffers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
         <div class="card-body table-responsive">
             @if(session('success'))

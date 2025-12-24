@@ -162,6 +162,8 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/import', 'import')->name('import');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     // STORAGE RM ROUTES
@@ -232,6 +234,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{fragileItem}/edit', 'edit')->name('edit');
             Route::put('/{fragileItem}', 'update')->name('update');
             Route::delete('/{fragileItem}', 'destroy')->name('destroy');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     // REPORT FRAGILE ITEM MD ROUTES
@@ -291,6 +295,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     // REPORT SCALES ROUTES
@@ -322,6 +328,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     // VERKEBRUANG MD ROUTES
@@ -332,13 +340,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'storeRoom')->name('store');
             Route::delete('/{uuid}', 'destroyRoom')->name('destroy');
+            Route::get('/template', 'downloadRoomTemplate')->name('template');
+            Route::post('/import', 'importRoom')->name('import');
         });
+
     Route::prefix('equipments')
         ->name('equipments.')
         ->controller(RoomEquipmentController::class)
         ->group(function () {
             Route::post('/', 'storeEquipment')->name('store');
             Route::delete('/{uuid}', 'destroyEquipment')->name('destroy');
+            Route::get('/template', 'downloadEquipmentTemplate')->name('template');
+            Route::post('/import', 'importEquipment')->name('import');
         });
 
     // REPORT RE ROUTES
@@ -385,6 +398,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     // REPORT CONVEYOR
@@ -447,7 +462,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{uuid}', 'update')->name('update');
         Route::delete('/{uuid}', 'destroy')->name('destroy');
         Route::post('/import', 'import')->name('import');
-        
+        Route::get('/template', 'downloadTemplate')->name('template');
+        Route::post('/import', 'import')->name('import');
     });
 
     // REPORT PREMIX
@@ -887,8 +903,7 @@ Route::put('/{uuid}', 'update')->name('update');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
-Route::put('/{uuid}', 'update')->name('update');
-
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('formulas')
@@ -903,6 +918,8 @@ Route::put('/{uuid}', 'update')->name('update');
             Route::post('/{uuid}/add-detail', 'addDetail')->name('addDetail');
             Route::delete('/{uuid}/delete-detail/{detail_uuid}', 'deleteDetail')->name('deleteDetail');
             Route::delete('/{uuid}/delete-detail-by-name/{formulation_name}', 'deleteDetailByName')->name('deleteDetailByName');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     Route::prefix('report-emulsion-makings')

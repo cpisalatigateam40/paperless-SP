@@ -6,12 +6,29 @@ use Illuminate\Http\Request;
 use App\Models\Thermometer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Exports\ThermometerTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ThermometerImport;
 
 class ThermometerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $thermometers = Thermometer::with('area')->orderBy('brand', 'asc')->paginate(10);
+        $query = Thermometer::with('area')
+            ->orderBy('brand', 'asc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                ->orWhere('type', 'like', "%{$search}%")
+                ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
+
+        $thermometers = $query->paginate(10)->withQueryString();
+
         return view('thermometers.index', compact('thermometers'));
     }
 
@@ -66,5 +83,26 @@ class ThermometerController extends Controller
         $thermometer->delete();
 
         return redirect()->route('thermometers.index')->with('success', 'Data thermometer berhasil dihapus.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new ThermometerTemplateExport,
+            'template-thermometer.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new ThermometerImport, $request->file('file'));
+
+        return redirect()
+            ->route('thermometers.index')
+            ->with('success', 'Data thermometer berhasil diimport');
     }
 }

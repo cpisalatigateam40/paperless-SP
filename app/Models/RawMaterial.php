@@ -12,7 +12,6 @@ class RawMaterial extends Model
     use HasFactory;
 
     protected $fillable = [
-        'uuid',
         'material_name',
         'supplier',
         'area_uuid',

@@ -13,7 +13,7 @@ class Scale extends Model
 
     protected $table = 'scales';
 
-    protected $fillable = ['uuid', 'area_uuid', 'owner', 'code', 'type', 'brand'];
+    protected $fillable = [ 'area_uuid', 'owner', 'code', 'type', 'brand'];
 
     protected static function booted()
     {

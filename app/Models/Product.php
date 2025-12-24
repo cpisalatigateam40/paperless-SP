@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -13,7 +14,6 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
-        'uuid',
         'product_name',
         'brand',
         'nett_weight',
@@ -129,6 +129,11 @@ class Product extends Model
     protected static function booted()
     {
         static::addGlobalScope(new UserAreaScope);
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
     }
 
     public function standardStuffers()

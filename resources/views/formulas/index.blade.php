@@ -7,12 +7,68 @@
             <h4>Data Formula</h4>
 
             <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
-                <div class="input-group input-group-sm" style="width: 200px;">
-                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari Formula"
-                        style="border-radius: 0;">
-                    <span class="input-group-text" style="border-radius: 0;">
-                        <i class="fas fa-search"></i>
-                    </span>
+                <!-- <form method="GET" action="{{ route('formulas.index') }}" class="mb-3">
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-control"
+                            placeholder="Cari formula / produk..."
+                            value="{{ request('q') }}"
+                        >
+                        <button class="btn btn-primary" type="submit">
+                            🔍 Cari
+                        </button>
+                    </div>
+                </form> -->
+
+                <form action="{{ route('formulas.index') }}" method="GET">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-auto p-0">
+                            <input type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                class="form-control form-control-sm"
+                                placeholder="Cari formula / produk...">
+                        </div>
+
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm">
+                                Search
+                            </button>
+
+                            @if(request('search'))
+                                <a href="{{ route('formulas.index') }}"
+                                class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap" style="gap: .4rem;">
+                    <a href="{{ route('formulas.template') }}" class="btn btn-outline-success btn-sm">
+                        Download Template
+                    </a>
+
+                    <form action="{{ route('formulas.import') }}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="d-flex align-items-center gap-2">
+                        @csrf
+
+                        <input type="file"
+                            name="file"
+                            accept=".xlsx,.xls"
+                            class="form-control form-control-sm mr-2"
+                            style="max-width: 220px"
+                            required>
+
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Import Excel
+                        </button>
+                    </form>
                 </div>
                 <a href="{{ route('formulas.create') }}" class="btn btn-primary btn-sm">Tambah Formula</a>
             </div>

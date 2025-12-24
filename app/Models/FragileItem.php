@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use App\Scopes\UserAreaScope;
+use Illuminate\Support\Str;
 
 class FragileItem extends Model
 {
@@ -13,7 +14,6 @@ class FragileItem extends Model
     protected $table = 'fragile_items';
 
     protected $fillable = [
-        'uuid',
         'area_uuid',
         'item_name',
         'section_name',
@@ -34,5 +34,10 @@ class FragileItem extends Model
     protected static function booted()
     {
         static::addGlobalScope(new UserAreaScope);
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
     }
 }

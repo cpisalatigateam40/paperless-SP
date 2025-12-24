@@ -7,14 +7,31 @@ use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\ProductTemplateExport;
+use App\Imports\ProductImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('area')->orderBy('product_name', 'asc')->paginate(10);
+        $query = Product::with('area')
+            ->orderBy('product_name', 'asc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('product_name', 'like', "%{$search}%")
+                ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
+
+        $products = $query->paginate(10)->withQueryString();
+
         return view('products.index', compact('products'));
     }
+
 
     public function create()
     {
@@ -79,5 +96,26 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new ProductTemplateExport,
+            'template-product.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new ProductImport, $request->file('file'));
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Data product berhasil diimport');
     }
 }

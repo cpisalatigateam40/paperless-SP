@@ -5,7 +5,7 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5>Laporan Verifikasi Pembuatan Kulit Siomay, Gioza & Mandu</h5>
-            <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-success">+ Tambah Laporan</a>
+            <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
         </div>
         <div class="card-body">
             @if(session('success'))

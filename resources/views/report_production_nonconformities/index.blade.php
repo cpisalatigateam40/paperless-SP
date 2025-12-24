@@ -6,7 +6,7 @@
         <div class="card-header d-flex justify-content-between">
             <h4>Laporan Verifikasi Ketidaksesuaian Proses Produksi</h4>
             <a href="{{ route('report_production_nonconformities.create') }}" class="btn btn-sm btn-primary">
-                + Tambah Report
+                Tambah Laporan
             </a>
         </div>
 

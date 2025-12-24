@@ -8,15 +8,35 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\FormulaTemplateExport;
+use App\Imports\FormulaImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FormulaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $formulas = Formula::with(['product', 'area'])->orderBy('product_name', 'asc')->paginate(10);
+        $areaUuid = Auth::user()->area_uuid;
+        $search   = $request->search; // ⬅️ FIX DI SINI
 
-        return view('formulas.index', compact('formulas'));
+        $formulas = Formula::with(['product', 'area'])
+            ->where('area_uuid', $areaUuid)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('formula_name', 'like', "%{$search}%")
+                    ->orWhere('product_name', 'like', "%{$search}%")
+                    ->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%");
+                    });
+                });
+            })
+            ->orderBy('product_name', 'asc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('formulas.index', compact('formulas', 'search'));
     }
+
 
     public function create()
     {
@@ -135,6 +155,27 @@ class FormulaController extends Controller
             ->delete();
 
         return redirect()->route('formulas.detail', $formula->uuid)->with('success', 'Berhasil hapus data formulasi.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new FormulaTemplateExport,
+            'template-formula.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new FormulaImport, $request->file('file'));
+
+        return redirect()
+            ->route('formulas.index')
+            ->with('success', 'Formula berhasil diimport');
     }
 
 }

@@ -5,7 +5,7 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
             <h4>Laporan Verifikasi Premix</h4>
-            <a href="{{ route('report-premixes.create') }}" class="btn btn-primary btn-sm">Buat Laporan</a>
+            <a href="{{ route('report-premixes.create') }}" class=" btn-primary btn-sm">Tambah Laporan</a>
         </div>
 
         <div class="card-body">

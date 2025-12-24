@@ -5,7 +5,7 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4>Laporan Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan</h4>
-            <a href="{{ route('report-re-cleanliness.create') }}" class="btn btn-sm btn-primary">+ Buat Laporan</a>
+            <a href="{{ route('report-re-cleanliness.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
         </div>
         <div class="card-body">
             @if(session('success'))

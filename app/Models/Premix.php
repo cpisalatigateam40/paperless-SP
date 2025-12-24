@@ -12,7 +12,6 @@ class Premix extends Model
     use HasFactory;
 
     protected $fillable = [
-        'uuid',
         'area_uuid',
         'name',
         'producer',
