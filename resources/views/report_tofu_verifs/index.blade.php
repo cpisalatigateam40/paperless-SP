@@ -5,7 +5,7 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Laporan Verifikasi Produk Tofu</h5>
-            <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">+ New Report</a>
+            <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
         </div>
         <div class="card-body">
             @if(session('success'))

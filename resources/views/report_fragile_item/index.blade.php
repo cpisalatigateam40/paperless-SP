@@ -6,8 +6,7 @@
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h5>Laporan Verifikasi Barang Mudah Pecah</h5>
-                <a href="{{ route('report-fragile-item.create') }}" class="btn btn-primary btn-sm">+ Buat Laporan
-                    Baru</a>
+                <a href="{{ route('report-fragile-item.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
             </div>
         </div>
         <div class="card-body">

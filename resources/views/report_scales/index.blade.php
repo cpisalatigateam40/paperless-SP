@@ -5,7 +5,7 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5> Laporan Verifikasi Timbangan & Thermometer</h5>
-            <a href="{{ route('report-scales.create') }}" class="btn btn-primary btn-sm">+ Tambah Laporan</a>
+            <a href="{{ route('report-scales.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
 
         <div class="card-body">

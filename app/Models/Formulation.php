@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Formulation extends Model
 {
@@ -12,7 +13,6 @@ class Formulation extends Model
     protected $table = 'formulations';
 
     protected $fillable = [
-        'uuid',
         'raw_material_uuid',
         'premix_uuid',
         'formula_uuid',
@@ -38,5 +38,14 @@ class Formulation extends Model
     public function itemDetails()
     {
         return $this->hasMany(ItemDetailProd::class, 'formulation_uuid', 'uuid');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
     }
 }

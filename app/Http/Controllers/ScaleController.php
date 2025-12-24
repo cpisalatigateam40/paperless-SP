@@ -7,12 +7,30 @@ use App\Models\Scale;
 use App\Models\Area;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\ScaleTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ScaleImport;
 
 class ScaleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $scales = Scale::with('area')->orderBy('brand', 'asc')->paginate(10);
+        $query = Scale::with('area')
+            ->orderBy('brand', 'asc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                ->orWhere('type', 'like', "%{$search}%")
+                ->orWhere('brand', 'like', "%{$search}%")
+                ->orWhere('owner', 'like', "%{$search}%");
+            });
+        }
+
+        $scales = $query->paginate(10)->withQueryString();
+
         return view('scales.index', compact('scales'));
     }
 
@@ -78,5 +96,26 @@ class ScaleController extends Controller
         $scale->delete();
 
         return redirect()->route('scales.index')->with('success', 'Timbangan berhasil dihapus.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new ScaleTemplateExport,
+            'template-timbangan.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new ScaleImport, $request->file('file'));
+
+        return redirect()
+            ->route('scales.index')
+            ->with('success', 'Data timbangan berhasil diimport');
     }
 }

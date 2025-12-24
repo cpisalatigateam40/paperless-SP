@@ -11,15 +11,44 @@ use App\Models\Equipment;
 use App\Models\EquipmentPart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Exports\RoomTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\RoomImport;
+use App\Exports\EquipmentTemplateExport;
+use App\Imports\EquipmentImport;
 
 class RoomEquipmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
+
+        // Rooms + Elements
+        $rooms = Room::with('elements')
+            ->when($search, function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhereHas('elements', function ($e) use ($search) {
+                    $e->where('element_name', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+
+        // Equipments + Parts
+        $equipments = Equipment::with('parts')
+            ->when($search, function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhereHas('parts', function ($p) use ($search) {
+                    $p->where('part_name', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+
         return view('room_equipment.master_data', [
             'areas' => Area::all(),
-            'rooms' => Room::with('elements')->orderBy('name', 'asc')->get(),
-            'equipments' => Equipment::with('parts')->orderBy('name', 'asc')->get(),
+            'rooms' => $rooms,
+            'equipments' => $equipments,
         ]);
     }
 
@@ -102,6 +131,44 @@ class RoomEquipmentController extends Controller
         });
 
         return back()->with('success', 'Mesin/peralatan berhasil dihapus.');
+    }
+
+    public function downloadRoomTemplate()
+    {
+        return Excel::download(
+            new RoomTemplateExport,
+            'template-ruangan.xlsx'
+        );
+    }
+
+    public function importRoom(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new RoomImport, $request->file('file'));
+
+        return back()->with('success', 'Data ruangan berhasil diimport');
+    }
+
+    public function downloadEquipmentTemplate()
+    {
+        return Excel::download(
+            new EquipmentTemplateExport,
+            'template-mesin-peralatan.xlsx'
+        );
+    }
+
+    public function importEquipment(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new EquipmentImport, $request->file('file'));
+
+        return back()->with('success', 'Data mesin & peralatan berhasil diimport');
     }
 
 }

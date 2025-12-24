@@ -14,7 +14,6 @@ class Thermometer extends Model
     protected $table = 'thermometers';
 
     protected $fillable = [
-        'uuid',
         'area_uuid',
         'code',
         'type',

@@ -5,7 +5,7 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
             <h4>Laporan Verifikasi Proses Produksi</h4>
-            <a href="{{ route('report_process_productions.create') }}" class="btn btn-primary btn-sm">+ Tambah
+            <a href="{{ route('report_process_productions.create') }}" class="btn btn-primary btn-sm">Tambah
                 Laporan</a>
         </div>
 

@@ -5,7 +5,7 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="m-0">Laporan Verifikasi Pemasakan Dengan Steamer</h4>
-            <a href="{{ route('report_rtg_steamers.create') }}" class="btn btn-primary btn-sm">+ Tambah Laporan</a>
+            <a href="{{ route('report_rtg_steamers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
         <div class="card-body">
             @if (session('success'))

@@ -7,12 +7,53 @@
             <h5>List Produk</h5>
 
             <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
-                <div class="input-group input-group-sm" style="width: 200px;">
-                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari Produk"
-                        style="border-radius: 0;">
-                    <span class="input-group-text" style="border-radius: 0;">
-                        <i class="fas fa-search"></i>
-                    </span>
+                <form action="{{ route('products.index') }}" method="GET">
+                    <div class="row align-items-center">
+                        <div class="col-auto p-0">
+                            <input type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                class="form-control form-control-sm"
+                                placeholder="Cari nama produk / merek">
+                        </div>
+
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm">
+                                Search
+                            </button>
+
+                            @if(request('search'))
+                                <a href="{{ route('products.index') }}"
+                                class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap" style="gap: .4rem;">
+                    <a href="{{ route('products.template') }}" class="btn btn-outline-success btn-sm">
+                        Download Template
+                    </a>
+
+                    <form action="{{ route('products.import') }}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="d-flex align-items-center gap-2">
+                        @csrf
+
+                        <input type="file"
+                            name="file"
+                            accept=".xlsx,.xls"
+                            class="form-control form-control-sm mr-2"
+                            style="max-width: 220px"
+                            required>
+
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Import Excel
+                        </button>
+                    </form>
                 </div>
                 <a href="{{ route('products.create') }}" class="btn btn-sm btn-primary">+ Tambah Produk</a>
             </div>

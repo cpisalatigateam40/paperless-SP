@@ -5,7 +5,7 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
             <h4>Laporan Verifikasi Metal Detector Produk</h4>
-            <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Report</a>
+            <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
         </div>
         <div class="card-body">
             @if(session('success'))

@@ -7,13 +7,56 @@
             <h5>Barang Mudah Pecah</h5>
 
             <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
-                <div class="input-group input-group-sm" style="width: 200px;">
-                    <input type="text" id="searchInput" class="form-control form-control-sm"
-                        placeholder="Cari barang mudah pecah" style="border-radius: 0;">
-                    <span class="input-group-text" style="border-radius: 0;">
-                        <i class="fas fa-search"></i>
-                    </span>
+                <form action="{{ route('fragile-item.index') }}" method="GET">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-auto p-0">
+                            <input type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                class="form-control form-control-sm"
+                                placeholder="Cari nama barang / section / pemilik">
+                        </div>
+
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm">
+                                Search
+                            </button>
+
+                            @if(request('search'))
+                                <a href="{{ route('fragile-item.index') }}"
+                                class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
+
+
+                <div class="d-flex align-items-center gap-2 flex-wrap" style="gap: .4rem;">
+                    <a href="{{ route('fragile-item.template') }}" class="btn btn-outline-success btn-sm">
+                        Download Template
+                    </a>
+
+                    <form action="{{ route('fragile-item.import') }}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="d-flex align-items-center gap-2">
+                        @csrf
+
+                        <input type="file"
+                            name="file"
+                            accept=".xlsx,.xls"
+                            class="form-control form-control-sm mr-2"
+                            style="max-width: 220px"
+                            required>
+
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Import Excel
+                        </button>
+                    </form>
                 </div>
+
                 <a href="{{ route('fragile-item.create') }}" class="btn btn-primary btn-sm">+ Tambah Data</a>
             </div>
         </div>

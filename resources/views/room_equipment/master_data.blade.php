@@ -4,16 +4,34 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-4">Master Data Ruangan, Mesin, dan Peralatan</h4>
+            <h4>Master Data Ruangan, Mesin, dan Peralatan</h4>
 
             <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
-                <div class="input-group input-group-sm" style="width: 200px;">
-                    <input type="text" id="searchInput" class="form-control form-control-sm"
-                        placeholder="Cari Ruangan, Mesin, dan Peralatan" style="border-radius: 0;">
-                    <span class="input-group-text" style="border-radius: 0;">
-                        <i class="fas fa-search"></i>
-                    </span>
-                </div>
+                <form method="GET" action="{{ route('rooms.index') }}">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-auto p-0">
+                            <input type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                class="form-control form-control-sm"
+                                placeholder="Cari ruangan, elemen, mesin, atau part">
+                        </div>
+
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm">
+                                Search
+                            </button>
+
+                            @if(request('search'))
+                                <a href="{{ route('rooms.index') }}"
+                                class="btn btn-secondary btn-sm">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
+
             </div>
         </div>
         <div class="card-body">
@@ -34,8 +52,32 @@
             <div class="tab-content mt-3" id="masterTabContent">
                 {{-- Tab Ruangan --}}
                 <div class="tab-pane fade show active" id="room" role="tabpanel">
+                    <div class="d-flex align-items-center gap-2 flex-wrap mb-4 mt-4" style="gap: .4rem;">
+                        <a href="{{ route('rooms.template') }}" class="btn btn-outline-success btn-sm">
+                            Download Template
+                        </a>
+
+                        <form action="{{ route('rooms.import') }}"
+                            method="POST"
+                            enctype="multipart/form-data"
+                            class="d-flex align-items-center gap-2">
+                            @csrf
+
+                            <input type="file"
+                                name="file"
+                                accept=".xlsx,.xls"
+                                class="form-control form-control-sm mr-2"
+                                style="max-width: 220px"
+                                required>
+
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Import Excel
+                            </button>
+                        </form>
+                    </div>
                     <form action="{{ route('rooms.store') }}" method="POST" class="mb-4">
                         @csrf
+
                         <div class="row">
                             <div class="col-md-4">
                                 <label for="roomName">Nama Ruangan</label>
@@ -47,7 +89,9 @@
                                     placeholder="Contoh: Dinding, Lantai, Langit-langit">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary mt-3">Simpan Ruangan</button>
+                        <button type="submit" class="btn btn-primary mt-3 mb-5">Simpan Ruangan</button>
+
+                        
                     </form>
 
                     <h5>Daftar Ruangan</h5>
@@ -87,6 +131,29 @@
 
                 {{-- Tab Mesin/Peralatan --}}
                 <div class="tab-pane fade" id="equipment" role="tabpanel">
+                    <div class="d-flex align-items-center gap-2 flex-wrap mb-4 mt-4" style="gap: .4rem;">
+                        <a href="{{ route('equipments.template') }}" class="btn btn-outline-success btn-sm">
+                            Download Template
+                        </a>
+
+                        <form action="{{ route('equipments.import') }}"
+                            method="POST"
+                            enctype="multipart/form-data"
+                            class="d-flex align-items-center gap-2">
+                            @csrf
+
+                            <input type="file"
+                                name="file"
+                                accept=".xlsx,.xls"
+                                class="form-control form-control-sm mr-2"
+                                style="max-width: 220px"
+                                required>
+
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Import Excel
+                            </button>
+                        </form>
+                    </div>
                     <form action="{{ route('equipments.store') }}" method="POST" class="mb-4">
                         @csrf
                         <div class="row">
@@ -100,7 +167,7 @@
                                     placeholder="Contoh: Screw, Panel, Cover">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary mt-3">Simpan Mesin/Peralatan</button>
+                        <button type="submit" class="btn btn-primary mt-3 mb-5">Simpan Mesin/Peralatan</button>
                     </form>
 
                     <h5>Daftar Mesin / Peralatan</h5>

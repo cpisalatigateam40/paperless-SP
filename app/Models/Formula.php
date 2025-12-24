@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
+use Illuminate\Support\Str;
 
 class Formula extends Model
 {
@@ -13,7 +14,6 @@ class Formula extends Model
     protected $table = 'formulas';
 
     protected $fillable = [
-        'uuid',
         'area_uuid',
         'product_uuid',
         'product_name',
@@ -43,5 +43,10 @@ class Formula extends Model
     protected static function booted()
     {
         static::addGlobalScope(new UserAreaScope);
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
     }
 }
