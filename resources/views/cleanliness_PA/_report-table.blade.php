@@ -122,7 +122,7 @@
                                 <th class="align-middle">Kondisi</th>
                                 <th class="align-middle">Catatan</th>
                                 <th class="align-middle">Tindakan Koreksi</th>
-                                <th class="align-middle">Verifikasi</th>
+                                <th class="align-middle">Hasil Verifikasi</th>
                             </tr>
                         </thead>
                         <tbody>

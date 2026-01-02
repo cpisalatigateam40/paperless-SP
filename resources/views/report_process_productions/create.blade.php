@@ -399,36 +399,5 @@ function hitungRataRataSuhu() {
 ['actual_mixture_temp_1', 'actual_mixture_temp_2', 'actual_mixture_temp_3'].forEach(id => {
     document.getElementById(id).addEventListener('input', hitungRataRataSuhu);
 });
-
-document.getElementById('product-select').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const productName = selectedOption.getAttribute('data-name');
-
-    if (!productName) return;
-
-    const url = @json(route('report_process_productions.getFormulasByName')) + '?product_name=' +
-        encodeURIComponent(productName);
-
-    fetch(url)
-        .then(res => res.json())
-        .then(data => {
-            const formulaSelect = document.getElementById('formula-select');
-            formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
-            data.forEach(formula => {
-                const option = document.createElement('option');
-                option.value = formula.uuid;
-                option.textContent = formula.formula_name;
-                formulaSelect.appendChild(option);
-            });
-        });
-});
-
-// $(document).ready(function() {
-//     $('#product-select').select2({
-//         placeholder: "-- Pilih Produk --",
-//         allowClear: true,
-//         width: '100%'
-//     });
-// });
 </script>
 @endsection

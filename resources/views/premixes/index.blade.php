@@ -79,40 +79,42 @@
             </div>
             @endif
 
-            <table class="table table-bordered table-sm">
-                <thead>
-                    <tr>
-                        <th class="align-middle">No</th>
-                        <th class="align-middle">Nama</th>
-                        <!-- <th class="align-middle">Kode Produksi</th> -->
-                        <th class="align-middle">Produsen</th>
-                        <th class="align-middle">Batas Kadaluarsa (Bulan)</th>
-                        <th class="align-middle">Area</th>
-                        <th class="align-middle text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($premixes as $i => $premix)
-                    <tr>
-                        <td class="align-middle">{{ $i + $premixes->firstItem() }}</td>
-                        <td class="align-middle">{{ $premix->name }}</td>
-                        <!-- <td class="align-middle">{{ $premix->production_code }}</td> -->
-                        <td class="align-middle">{{ $premix->producer }}</td>
-                        <td class="align-middle">{{ $premix->shelf_life ?? '-' }}</td>
-                        <td class="align-middle">{{ $premix->area->name ?? '-' }}</td>
-                        <td class="align-middle text-center">
-                            <a href="{{ route('premixes.edit', $premix->uuid) }}"
-                                class="btn btn-sm btn-warning">Edit</a>
-                            <form action="{{ route('premixes.destroy', $premix->uuid) }}" method="POST" class="d-inline"
-                                onsubmit="return confirm('Yakin hapus data ini?')">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th class="align-middle">No</th>
+                            <th class="align-middle">Nama</th>
+                            <!-- <th class="align-middle">Kode Produksi</th> -->
+                            <th class="align-middle">Produsen</th>
+                            <th class="align-middle">Batas Kadaluarsa (Bulan)</th>
+                            <th class="align-middle">Area</th>
+                            <th class="align-middle text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($premixes as $i => $premix)
+                        <tr>
+                            <td class="align-middle">{{ $i + $premixes->firstItem() }}</td>
+                            <td class="align-middle">{{ $premix->name }}</td>
+                            <!-- <td class="align-middle">{{ $premix->production_code }}</td> -->
+                            <td class="align-middle">{{ $premix->producer }}</td>
+                            <td class="align-middle">{{ $premix->shelf_life ?? '-' }}</td>
+                            <td class="align-middle">{{ $premix->area->name ?? '-' }}</td>
+                            <td class="align-middle text-center">
+                                <a href="{{ route('premixes.edit', $premix->uuid) }}"
+                                    class="btn btn-sm btn-warning">Edit</a>
+                                <form action="{{ route('premixes.destroy', $premix->uuid) }}" method="POST" class="d-inline"
+                                    onsubmit="return confirm('Yakin hapus data ini?')">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-sm btn-danger">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <div class="mt-2">
                 {{ $premixes->links('pagination::bootstrap-5') }}

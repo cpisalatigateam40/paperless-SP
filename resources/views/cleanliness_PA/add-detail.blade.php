@@ -23,7 +23,7 @@
                                 <th class="align-middle">Kondisi</th>
                                 <th class="align-middle">Catatan</th>
                                 <th class="align-middle">Tindakan Koreksi</th>
-                                <th class="align-middle">Verifikasi</th>
+                                <th class="align-middle">Hasil Verifikasi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -32,7 +32,7 @@
                             'Kondisi Kebersihan Ruangan',
                             'Kondisi Kebersihan Peralatan',
                             'Kondisi Kebersihan Karyawan',
-                            'Suhu Ruang (℃)'
+                            'Suhu ruang (℃)'
                             ];
                             @endphp
 
@@ -44,7 +44,7 @@
                                     {{ $item }}
                                 </td>
                                 <td class="align-middle">
-                                    @if($item === 'Suhu ruang (℃)')
+                                    @if(Str::contains($item, 'Suhu ruang'))
                                     <div class="row">
                                         <div class="col">
                                             <input type="number" step="0.1"
