@@ -133,7 +133,7 @@
                 <th colspan="2">Kondisi</th>
                 <th rowspan="2">Keterangan</th>
                 <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
+                <th rowspan="2">Hasil Verifikasi</th>
             </tr>
             <tr>
                 <th>Bersih</th>

@@ -7,21 +7,6 @@
             <h4>Data Formula</h4>
 
             <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
-                <!-- <form method="GET" action="{{ route('formulas.index') }}" class="mb-3">
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            name="q"
-                            class="form-control"
-                            placeholder="Cari formula / produk..."
-                            value="{{ request('q') }}"
-                        >
-                        <button class="btn btn-primary" type="submit">
-                            🔍 Cari
-                        </button>
-                    </div>
-                </form> -->
-
                 <form action="{{ route('formulas.index') }}" method="GET">
                     <div class="row g-2 align-items-center">
                         <div class="col-auto p-0">
@@ -89,36 +74,38 @@
                 </ul>
             </div>
             @endif
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Nama Formula</th>
-                        <th>Produk</th>
-                        <th>Area</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($formulas as $formula)
-                    <tr>
-                        <td>{{ $formula->formula_name }}</td>
-                        <td>{{ $formula->product->product_name ?? '-' }}</td>
-                        <td>{{ $formula->area->name ?? '-' }}</td>
-                        <td>
-                            <a href="{{ route('formulas.detail', $formula->uuid) }}" class="btn btn-info btn-sm">Lihat
-                                Formula</a>
-                            <form action="{{ route('formulas.destroy', $formula->uuid) }}" method="POST"
-                                style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button onclick="return confirm('Delete formula?')"
-                                    class="btn btn-danger btn-sm">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nama Formula</th>
+                            <th>Produk</th>
+                            <th>Area</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($formulas as $formula)
+                        <tr>
+                            <td>{{ $formula->formula_name }}</td>
+                            <td>{{ $formula->product->product_name ?? '-' }}</td>
+                            <td>{{ $formula->area->name ?? '-' }}</td>
+                            <td>
+                                <a href="{{ route('formulas.detail', $formula->uuid) }}" class="btn btn-info btn-sm">Lihat
+                                    Formula</a>
+                                <form action="{{ route('formulas.destroy', $formula->uuid) }}" method="POST"
+                                    style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button onclick="return confirm('Delete formula?')"
+                                        class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <div class="mt-3">
                 {{ $formulas->links('pagination::bootstrap-5') }}

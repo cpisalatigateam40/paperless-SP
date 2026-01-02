@@ -95,38 +95,41 @@
                     </form>
 
                     <h5>Daftar Ruangan</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Area</th>
-                                <th>Elemen</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($rooms as $room)
-                            <tr>
-                                <td>{{ $room->name }}</td>
-                                <td>{{ optional($room->area)->name }}</td>
-                                <td>
-                                    <ul>
-                                        @foreach($room->elements as $el)
-                                        <li>{{ $el->element_name }}</li>
-                                        @endforeach
-                                    </ul>
-                                </td>
-                                <td>
-                                    <form action="{{ route('rooms.destroy', $room->uuid) }}" method="POST"
-                                        onsubmit="return confirm('Hapus ruangan ini?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Area</th>
+                                    <th>Elemen</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($rooms as $room)
+                                <tr>
+                                    <td>{{ $room->name }}</td>
+                                    <td>{{ optional($room->area)->name }}</td>
+                                    <td>
+                                        <ul>
+                                            @foreach($room->elements as $el)
+                                            <li>{{ $el->element_name }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('rooms.destroy', $room->uuid) }}" method="POST"
+                                            onsubmit="return confirm('Hapus ruangan ini?')">
+                                            @csrf @method('DELETE')
+                                            <button class="btn btn-sm btn-danger">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    
                 </div>
 
                 {{-- Tab Mesin/Peralatan --}}
@@ -171,38 +174,40 @@
                     </form>
 
                     <h5>Daftar Mesin / Peralatan</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Area</th>
-                                <th>Parts</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($equipments as $eq)
-                            <tr>
-                                <td>{{ $eq->name }}</td>
-                                <td>{{ optional($eq->area)->name }}</td>
-                                <td>
-                                    <ul>
-                                        @foreach($eq->parts as $part)
-                                        <li>{{ $part->part_name }}</li>
-                                        @endforeach
-                                    </ul>
-                                </td>
-                                <td>
-                                    <form action="{{ route('equipments.destroy', $eq->uuid) }}" method="POST"
-                                        onsubmit="return confirm('Hapus peralatan ini?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Area</th>
+                                    <th>Parts</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($equipments as $eq)
+                                <tr>
+                                    <td>{{ $eq->name }}</td>
+                                    <td>{{ optional($eq->area)->name }}</td>
+                                    <td>
+                                        <ul>
+                                            @foreach($eq->parts as $part)
+                                            <li>{{ $part->part_name }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('equipments.destroy', $eq->uuid) }}" method="POST"
+                                            onsubmit="return confirm('Hapus peralatan ini?')">
+                                            @csrf @method('DELETE')
+                                            <button class="btn btn-sm btn-danger">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

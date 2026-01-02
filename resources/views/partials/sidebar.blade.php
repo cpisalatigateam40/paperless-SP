@@ -26,7 +26,7 @@ Request::is('report-tofu-verifs*') ||
 Request::is('report-prod-loss-vacums*') ||
 Request::is('report-packaging-verifs*');
 $isPasteurizing =
-Request::is('report-pasteurs*');
+Request::is('report-pasteurs*') ||
 Request::is('report-waterbaths*');
 $isCartoning =
 Request::is('report-freez-packagings*');
@@ -68,38 +68,30 @@ $isKetidaksesuaian = Request::is([
     border: 1px solid #ddd;
     border-radius: 0.25rem;
 }
+
 </style>
 
 <!-- Sidebar -->
 <ul class="navbar-nav bg-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-    <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard">
-        <div class="sidebar-brand-icon rotate-n-15">
-            {{-- <i class="fas fa-laugh-wink"></i> --}}
-        </div>
         <div class="sidebar-brand-text mx-3">Paperless SP</div>
     </a>
 
-    <!-- Divider -->
     <hr class="sidebar-divider my-0">
 
-    <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
         <a class="nav-link" href="/dashboard">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
 
-    <!-- Divider -->
     <hr class="sidebar-divider">
 
-    <!-- Heading -->
     <div class="sidebar-heading">
         Database
     </div>
 
-    <!-- Nav Item - Pages Collapse Menu -->
     @can('view master data')
     <li class="nav-item {{ $isMasterData ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -185,10 +177,8 @@ $isKetidaksesuaian = Request::is([
         </div>
     </div>
 
-    <!-- Divider -->
     <hr class="sidebar-divider">
 
-    <!-- Heading -->
     <div class="sidebar-heading mt-3">
         Report
     </div>
@@ -295,9 +285,7 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
                     href="{{ route('report_lab_samples.index') }}">
                     Verifikasi Pengambilan Sample
-                </a>
-
-                
+                </a>   
             </div>
         </div>
     </li>
@@ -460,3 +448,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+

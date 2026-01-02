@@ -52,7 +52,7 @@
                                     <th>Kondisi</th>
                                     <th>Catatan</th>
                                     <th>Tindakan Koreksi</th>
-                                    <th>Verifikasi setelah tindakan koreksi</th>
+                                    <th>Hasil Verifikasi</th>
                                 </tr>
                             </thead>
                             <tbody>

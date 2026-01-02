@@ -10,27 +10,26 @@
             <form action="{{ route('process-area-cleanliness.store') }}" method="POST">
                 @csrf
 
-                <div class="mb-4">
-                    <div class="d-flex" style="gap: 1rem;">
-                        <div class="col-md-5 mb-3">
-                            <label>Tanggal:</label>
-                            <input type="date" name="date" class="form-control" value="{{ now()->toDateString() }}"
-                                required>
-                        </div>
-                        <div class="col-md-5 mb-3">
-                            <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control" required>
-                        </div>
+                <div class="mb-4 row">
+                    <div class="col-md-6 mb-3">
+                        <label>Tanggal:</label>
+                        <input type="date" name="date" class="form-control" value="{{ now()->toDateString() }}"
+                            required>
                     </div>
-
-                    <label>Area:</label>
-                    <select name="section_name" class="form-control col-md-5 mb-5" required>
-                        <option value="">-- Pilih Area --</option>
-                        <option value="MP">MP</option>
-                        <option value="Cooking">Cooking</option>
-                        <option value="Packing">Packing</option>
-                        <option value="Cartoning">Cartoning</option>
-                    </select>
+                    <div class="col-md-6 mb-3">
+                        <label>Shift:</label>
+                        <input type="text" name="shift" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-5">
+                        <label>Area:</label>
+                        <select name="section_name" class="form-control " required>
+                            <option value="">-- Pilih Area --</option>
+                            <option value="MP">MP</option>
+                            <option value="Cooking">Cooking</option>
+                            <option value="Packing">Packing</option>
+                            <option value="Cartoning">Cartoning</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div id="inspection-details">
@@ -44,9 +43,6 @@
                 <!-- Template -->
                 <template id="inspection-template">
                     <div class="inspection-block border rounded p-3 mb-3 position-relative">
-                        <!-- <button type="button" class="btn btn-sm btn-danger position-absolute remove-inspection"
-                            style="right: .5rem; top: .5rem;">x</button> -->
-
                         <label>Jam Inspeksi:</label>
                         <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5"
                             value="{{ now()->format('H:i') }}" required>
@@ -59,7 +55,7 @@
                                     <th>Kondisi</th>
                                     <th>Catatan</th>
                                     <th>Tindakan Koreksi</th>
-                                    <th>Verifikasi setelahdilakukan tindakan koreksi </th>
+                                    <th>Hasil Verifikasi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,8 +63,7 @@
                                 $items = [
                                 'Kondisi Kebersihan Ruangan',
                                 'Kondisi Kebersihan Peralatan',
-                                'Kondisi
-                                Kebersihan Karyawan',
+                                'Kondisi Kebersihan Karyawan',
                                 'Suhu ruang (℃)'
                                 ];
                                 @endphp

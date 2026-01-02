@@ -18,44 +18,44 @@ class ProcessAreaCleanlinessController extends Controller
 {
     use HasRoles;
 
-public function index()
-{
-    $reports = ReportProcessAreaCleanliness::with('details.items.followups', 'area')
-        ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-            $query->where('area_uuid', Auth::user()->area_uuid);
-        })
-        ->latest()
-        ->paginate(20);
+    public function index()
+    {
+        $reports = ReportProcessAreaCleanliness::with('details.items.followups', 'area')
+            ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+                $query->where('area_uuid', Auth::user()->area_uuid);
+            })
+            ->latest()
+            ->paginate(20);
 
-    // 🔹 Hitung ketidaksesuaian untuk setiap report
-    foreach ($reports as $report) {
-        $count = 0;
+        // 🔹 Hitung ketidaksesuaian untuk setiap report
+        foreach ($reports as $report) {
+            $count = 0;
 
-        foreach ($report->details as $detail) {
-            foreach ($detail->items as $item) {
-                // Cek kondisi "Kotor" atau "Tidak OK"
-                if (
-                    strtolower($item->condition ?? '') === 'kotor' ||
-                    $item->verification == 0
-                ) {
-                    $count++;
-                }
-
-                // Jika ada follow-up juga tidak OK
-                foreach ($item->followups as $followup) {
-                    if ($followup->verification == 0) {
+            foreach ($report->details as $detail) {
+                foreach ($detail->items as $item) {
+                    // Cek kondisi "Kotor" atau "Tidak OK"
+                    if (
+                        strtolower($item->condition ?? '') === 'kotor' ||
+                        $item->verification == 0
+                    ) {
                         $count++;
+                    }
+
+                    // Jika ada follow-up juga tidak OK
+                    foreach ($item->followups as $followup) {
+                        if ($followup->verification == 0) {
+                            $count++;
+                        }
                     }
                 }
             }
+
+            // Tambahkan properti dinamis ke model
+            $report->ketidaksesuaian = $count;
         }
 
-        // Tambahkan properti dinamis ke model
-        $report->ketidaksesuaian = $count;
+        return view('cleanliness_PA.index', compact('reports'));
     }
-
-    return view('cleanliness_PA.index', compact('reports'));
-}
 
 
     public function create()

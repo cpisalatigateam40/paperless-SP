@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paperless SP</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -12,14 +13,9 @@
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="{{ asset('img/sausage.png') }}">
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- jQuery (wajib untuk Select2) -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 
     <style>
     body,
@@ -64,7 +60,16 @@
 
     #content {
         background-color: #FFF4F2;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
+
+    #content-wrapper {
+        width: 100%;
+        min-width: 0; /* penting agar tidak overflow di mobile */
+    }
+
 
     .btn-primary {
         background-color: #5b96c9;
@@ -130,7 +135,95 @@
         border-color: #86b7fe !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
+
+    /* Warna tombol sidebar mobile */
+    #sidebarToggleTop {
+        color: #CC7064 !important;
+        border: none;
+    }
+
+    /* Warna icon (fa-bars) */
+    #sidebarToggleTop i {
+        color: #CC7064 !important;
+    }
+
+    @media (max-width: 768px) {
+
+        .card-header.d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: stretch;
+            gap: .5rem;
+        }
+
+        .card-header .d-flex {
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .card-header form {
+            width: 100%;
+        }
+
+        .card-header input[type="file"] {
+            width: 100%;
+        }
+
+        .card-header .btn {
+            width: 100%;
+        }
+
+        .form-select, .form-control, .select2-selection {
+            margin-bottom: .5rem;
+        }
+
+        .soft-salmon {
+            background: #fff;
+        }
+    }
+
+    /* Default = desktop → tetap inline */
+    .d-flex.align-items-center.flex-wrap {
+        gap: .4rem;
+    }
+
+    /* Mobile layout */
+    @media (max-width: 768px) {
+
+        /* wadah utama → jadi kolom */
+        .d-flex.align-items-center.flex-wrap {
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        /* form di dalamnya → ikut kolom */
+        .d-flex.align-items-center.flex-wrap form.d-flex {
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+            gap: .4rem;
+        }
+
+        /* input file melebar */
+        .d-flex.align-items-center.flex-wrap input[type="file"] {
+            max-width: 100% !important;
+            width: 100%;
+        }
+
+        /* tombol download melebar */
+        .d-flex.align-items-center.flex-wrap > a.btn {
+            width: 100%;
+        }
+
+        /* tombol import juga melebar */
+        .d-flex.align-items-center.flex-wrap button[type="submit"] {
+            width: 100%;
+        }
+    }
+
     </style>
+
+    
 
     @yield('style')
 </head>

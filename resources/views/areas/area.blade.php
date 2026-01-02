@@ -19,7 +19,6 @@
                 </a>
             </div>
 
-
         </div>
         <div class="card-body">
             <div class="table-responsive">
