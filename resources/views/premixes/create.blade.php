@@ -28,7 +28,7 @@
 
                 <div class="mb-3">
                     <label>Batas Kadaluarsa (Bulan)</label>
-                    <input type="number" name="shelf_life" class="form-control" value="{{ old('shelf_life') }}">
+                    <input type="text" name="shelf_life" class="form-control" value="{{ old('shelf_life') }}">
                 </div>
 
                 <button type="submit" class="btn btn-success">Simpan</button>

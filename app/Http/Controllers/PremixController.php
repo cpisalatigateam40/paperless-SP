@@ -46,7 +46,7 @@ class PremixController extends Controller
             'name' => 'required|string|max:255',
             // 'production_code' => 'required|string|max:255',
             'producer' => 'nullable|string|max:255',
-            'shelf_life' => 'nullable|integer',
+            'shelf_life' => 'nullable|string|max:255',
         ]);
 
         $validated['area_uuid'] = Auth::user()->area_uuid;
@@ -71,7 +71,7 @@ class PremixController extends Controller
             'name' => 'required|string|max:255',
             // 'production_code' => 'nullable|string|max:255',
             'producer' => 'nullable|string|max:255',
-            'shelf_life' => 'nullable|integer',
+            'shelf_life' => 'nullable|string|max:255',
         ]);
 
         $validated['area_uuid'] = Auth::user()->area_uuid;

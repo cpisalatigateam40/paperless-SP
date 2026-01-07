@@ -37,7 +37,7 @@ class PremixImport implements OnEachRow, WithHeadingRow, WithValidation
         return [
             'name' => 'required|string|max:255',
             'producer' => 'nullable|string|max:255',
-            'shelf_life' => 'nullable|integer|min:0',
+            'shelf_life' => 'nullable|string|max:255',
         ];
     }
 }
