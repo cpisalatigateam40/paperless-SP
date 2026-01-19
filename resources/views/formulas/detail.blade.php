@@ -38,12 +38,14 @@
                 <h5>Raw Materials</h5>
                 <div id="raw-material-wrapper">
                     <div class="mb-2 d-flex align-items-center" style="gap: .8rem;">
-                        <select name="raw_material_uuid[]" class="form-control">
-                            <option value="">-- Select Raw Material --</option>
+                        
+                        <select name="raw_material_uuid[]" class="form-control select2-raw-material">
+                            <option value="">-- Pilih Raw Material --</option>
                             @foreach($rawMaterials as $rm)
                             <option value="{{ $rm->uuid }}">{{ $rm->material_name }}</option>
                             @endforeach
                         </select>
+                        
                         <input type="number" name="raw_material_weight[]" class="form-control" placeholder="Berat (kg)"
                             step="0.00000001" min="0">
                         <button type="button" class="btn btn-danger btn-sm ms-2"
@@ -56,7 +58,7 @@
                 <h5>Premixes</h5>
                 <div id="premix-wrapper">
                     <div class="mb-2 d-flex align-items-center" style="gap: .8rem;">
-                        <select name="premix_uuid[]" class="form-control">
+                        <select name="premix_uuid[]" class="form-control select2-premix">
                             <option value="">-- Pilih Premix --</option>
                             @foreach($premixes as $premix)
                             <option value="{{ $premix->uuid }}">{{ $premix->name }}</option>
@@ -174,7 +176,28 @@
 </div>
 @endsection
 
+
+
+
 @section('script')
+<script>
+$(document).ready(function () {
+    $('.select2-raw-material').select2({
+        placeholder: '-- Pilih Raw Material --',
+        allowClear: true,
+        width: '100%'
+    });
+});
+
+$(document).ready(function () {
+    $('.select2-premix').select2({
+        placeholder: '-- Pilih Premix --',
+        allowClear: true,
+        width: '100%'
+    });
+});
+</script>
+
 <script>
 $(document).ready(function() {
     setTimeout(() => {
@@ -186,8 +209,8 @@ $(document).ready(function() {
 function addRawMaterial() {
     let html = `
             <div class="mb-2 d-flex align-items-center" style="gap: .8rem;">
-                <select name="raw_material_uuid[]" class="form-control">
-                    <option value="">-- Select Raw Material --</option>
+                <select name="raw_material_uuid[]" class="form-control select2-raw-material">
+                    <option value="">-- Pilih Raw Material --</option>
                     @foreach($rawMaterials as $rm)
                         <option value="{{ $rm->uuid }}">{{ $rm->material_name }}</option>
                     @endforeach
@@ -196,13 +219,22 @@ function addRawMaterial() {
                 <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeField(this)">Hapus</button>
             </div>
         `;
-    document.getElementById('raw-material-wrapper').insertAdjacentHTML('beforeend', html);
+    // document.getElementById('raw-material-wrapper').insertAdjacentHTML('beforeend', html);
+    const wrapper = $('#raw-material-wrapper');
+    wrapper.append(html);
+
+    // 🔥 INIT SELECT2 KHUSUS ELEMEN BARU
+    wrapper.find('.select2-raw-material').last().select2({
+        placeholder: '-- Pilih Raw Material --',
+        allowClear: true,
+        width: '100%'
+    });
 }
 
 function addPremix() {
     let html = `
             <div class="mb-2 d-flex align-items-center" style="gap: .8rem;">
-                <select name="premix_uuid[]" class="form-control">
+                <select name="premix_uuid[]" class="form-control select2-premix">
                     <option value="">-- Pilih Premix --</option>
                     @foreach($premixes as $premix)
                         <option value="{{ $premix->uuid }}">{{ $premix->name }}</option>
@@ -212,7 +244,16 @@ function addPremix() {
                 <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeField(this)">Hapus</button>
             </div>
         `;
-    document.getElementById('premix-wrapper').insertAdjacentHTML('beforeend', html);
+    // document.getElementById('premix-wrapper').insertAdjacentHTML('beforeend', html);
+    const wrapper = $('#premix-wrapper');
+    wrapper.append(html);
+
+    // 🔥 INIT SELECT2 KHUSUS ELEMEN BARU
+    wrapper.find('.select2-premix').last().select2({
+        placeholder: '-- Pilih Premix --',
+        allowClear: true,
+        width: '100%'
+    });
 }
 
 function removeField(button) {

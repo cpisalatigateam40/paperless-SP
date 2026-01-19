@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h5>Edit Premix</h5>
+            <h5>Edit Bahan penunjang & Premix</h5>
         </div>
 
         <div class="card-body">
@@ -12,25 +12,35 @@
                 @csrf @method('PUT')
 
                 <div class="mb-3">
-                    <label>Nama Premix</label>
+                    <label>Nama Bahan penunjang & Premix</label>
                     <input type="text" name="name" class="form-control" value="{{ $premix->name }}" required>
                 </div>
-
-                <!-- <div class="mb-3">
-                    <label>Kode Produksi</label>
-                    <input type="text" name="production_code" class="form-control"
-                        value="{{ $premix->production_code }}" required>
-                </div> -->
 
                 <div class="mb-3">
                     <label>Produsen</label>
                     <input type="text" name="producer" class="form-control" value="{{ $premix->producer }}">
                 </div>
 
-                <div class="mb-3">
-                    <label>Shelf Life (hari)</label>
-                    <input type="text" name="shelf_life" class="form-control" value="{{ $premix->shelf_life }}">
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label>Best Before</label>
+                        <input type="text" name="shelf_life" class="form-control" value="{{ $premix->shelf_life }}">
+                    </div>
+
+                    <div class="mb-3 col-md-6">
+                        <label>Satuan</label>
+                        <select name="unit" class="form-control">
+                            <option value="">-- Pilih Satuan --</option>
+                            <option value="Jam" {{ old('unit', $premix->unit) == 'Jam' ? 'selected' : '' }}>Jam</option>
+                            <option value="Hari" {{ old('unit', $premix->unit) == 'Hari' ? 'selected' : '' }}>Hari</option>
+                            <option value="Bulan" {{ old('unit', $premix->unit) == 'Bulan' ? 'selected' : '' }}>Bulan</option>
+                            <option value="Tahun" {{ old('unit', $premix->unit) == 'Tahun' ? 'selected' : '' }}>Tahun</option>
+                        </select>
+                    </div>
                 </div>
+
+                
+
 
                 <button type="submit" class="btn btn-primary">Update</button>
                 <a href="{{ route('premixes.index') }}" class="btn btn-secondary">Batal</a>

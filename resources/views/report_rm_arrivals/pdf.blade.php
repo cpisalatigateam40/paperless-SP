@@ -76,7 +76,6 @@
 
     @page {
         margin-top: 80px;
-        size: 210mm 330mm;
     }
     </style>
 </head>
@@ -152,7 +151,13 @@
             @forelse ($report->details as $detail)
             <tr>
                 <td class="text-center">{{ $detail->time ?? '-' }}</td>
-                <td class="text-left">{{ $detail->rawMaterial->material_name ?? '-' }}</td>
+                <td class="text-left">
+                    @if ($detail->material_type === 'premix')
+                        {{ $detail->premix?->name ?? '-' }} (Premix)
+                    @else
+                        {{ $detail->rawMaterial?->material_name ?? '-' }}
+                    @endif
+                </td>
                 <td class="text-left">{{ $detail->rm_condition }}</td>
                 <td class="text-left">{{ implode(', ', explode(',', $detail->supplier)) }}</td>
                 <td class="text-center">{{ $detail->production_code ?? '-' }}</td>
@@ -175,7 +180,7 @@
         </tbody>
     </table>
 
-    <p style="margin-top: 30px; font-size: 10px;">
+    <p style="margin-top: 10px; font-size: 10px;">
         Keterangan kondisi kemasan :<br>
         √ : Utuh (tidak sobek), sensori oke<br>
         X : Kemasan sobek / sensori tidak oke

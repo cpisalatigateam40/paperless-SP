@@ -18,14 +18,29 @@
                         <div class="row align-items-end">
                             <div class="col-md-4">
                                 <label class="form-label">Bahan Baku</label>
-                                <select name="details[0][raw_material_uuid]" class="form-control raw-material-select"
-                                    required>
-                                    <option value="">-- Pilih --</option>
-                                    @foreach ($rawMaterials as $material)
-                                    <option value="{{ $material->uuid }}" data-supplier="{{ $material->supplier }}">
-                                        {{ $material->material_name }}</option>
+                                <select name="details[0][material_uuid]"
+                                        class="form-control"
+                                        onchange="updateMaterialType(this)"
+                                        required>
+
+                                    <option value="">-- Pilih Bahan --</option>
+
+                                    {{-- Raw Materials --}}
+                                    @foreach($rawMaterials as $material)
+                                        <option value="{{ $material->uuid }}" data-type="raw">
+                                            {{ $material->material_name }}
+                                        </option>
+                                    @endforeach
+
+                                    {{-- Premix --}}
+                                    @foreach($premixes as $premix)
+                                        <option value="{{ $premix->uuid }}" data-type="premix">
+                                            {{ $premix->name }} (Premix)
+                                        </option>
                                     @endforeach
                                 </select>
+
+                                <input type="hidden" name="details[0][material_type]" value="raw">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Kondisi RM</label>
@@ -57,9 +72,21 @@
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <label class="form-label">Kode Produksi</label>
                                 <input type="text" name="details[0][production_code]" class="form-control" required>
+                            </div> -->
+                            <div class="col-md-4">
+                                <label class="form-label">Kode Produksi</label>
+                                <input
+                                    type="text"
+                                    name="details[0][production_code]"
+                                    class="form-control"
+                                    list="productionCodes"
+                                    autocomplete="off"
+                                    required
+                                >
+                                <datalist id="productionCodes"></datalist>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Jam</label>
@@ -151,13 +178,35 @@
         <div class="row align-items-end">
             <div class="col-md-4">
                 <label class="form-label">Bahan Baku</label>
-                <select name="details[__index__][raw_material_uuid]" class="form-control raw-material-select" required>
-                    <option value="">-- Pilih --</option>
+
+                <select name="details[__index__][material_uuid]"
+                        class="form-control material-select"
+                        onchange="updateMaterialType(this)"
+                        required>
+
+                    <option value="">-- Pilih Bahan --</option>
+
+                    {{-- Raw Materials --}}
                     @foreach ($rawMaterials as $material)
-                    <option value="{{ $material->uuid }}" data-supplier="{{ $material->supplier }}">
-                        {{ $material->material_name }}</option>
+                        <option value="{{ $material->uuid }}"
+                                data-type="raw"
+                                data-supplier="{{ $material->supplier }}">
+                            {{ $material->material_name }}
+                        </option>
+                    @endforeach
+
+                    {{-- Premix --}}
+                    @foreach ($premixes as $premix)
+                        <option value="{{ $premix->uuid }}"
+                                data-type="premix">
+                            {{ $premix->name }} (Premix)
+                        </option>
                     @endforeach
                 </select>
+
+                <input type="hidden"
+                    name="details[__index__][material_type]"
+                    value="raw">
             </div>
             <div class="col-md-4">
                 <label class="form-label">Kondisi RM</label>
@@ -188,9 +237,21 @@
 
         </div>
         <div class="row mt-3">
-            <div class="col-md-4">
+            <!-- <div class="col-md-4">
                 <label class="form-label">Kode Produksi</label>
                 <input type="text" name="details[__index__][production_code]" class="form-control" required>
+            </div> -->
+            <div class="col-md-4">
+                <label class="form-label">Kode Produksi</label>
+                <input
+                    type="text"
+                    name="details[__index__][production_code]"
+                    class="form-control production-code"
+                    list="productionCodes"
+                    autocomplete="off"
+                    required
+                >
+                <datalist id="productionCodes"></datalist>
             </div>
             <div class="col-md-4">
                 <label class="form-label">Jam</label>
@@ -292,5 +353,48 @@ document.addEventListener('DOMContentLoaded', function() {
         detailIndex++;
     });
 });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.querySelector('[name="details[0][production_code]"]');
+    const datalist = document.getElementById('productionCodes');
+
+    input.addEventListener('input', function () {
+        if (this.value.length < 2) return;
+
+        fetch(`{{ route('production-codes') }}?q=${this.value}`)
+            .then(res => res.json())
+            .then(data => {
+                datalist.innerHTML = '';
+                data.forEach(code => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    datalist.appendChild(option);
+                });
+            });
+    });
+});
+</script>
+
+<script>
+function updateMaterialType(select) {
+    const option = select.options[select.selectedIndex];
+    const type = option.dataset.type || 'raw';
+
+    const wrapper = select.closest('.col-md-4').parentElement;
+    const hidden = wrapper.querySelector('input[name$="[material_type]"]');
+
+    if (hidden) hidden.value = type;
+
+    /**
+     * OPTIONAL:
+     * Kalau premix → kosongkan supplier
+     */
+    const supplierInput = wrapper.querySelector('select[name$="[supplier][]"]');
+    if (supplierInput && type === 'premix') {
+        supplierInput.value = '';
+    }
+}
 </script>
 @endsection

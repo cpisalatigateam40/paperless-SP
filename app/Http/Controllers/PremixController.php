@@ -47,6 +47,7 @@ class PremixController extends Controller
             // 'production_code' => 'required|string|max:255',
             'producer' => 'nullable|string|max:255',
             'shelf_life' => 'nullable|string|max:255',
+            'unit' => 'nullable|string|max:255',
         ]);
 
         $validated['area_uuid'] = Auth::user()->area_uuid;
@@ -72,6 +73,7 @@ class PremixController extends Controller
             // 'production_code' => 'nullable|string|max:255',
             'producer' => 'nullable|string|max:255',
             'shelf_life' => 'nullable|string|max:255',
+            'unit' => 'nullable|string|max:255',
         ]);
 
         $validated['area_uuid'] = Auth::user()->area_uuid;
@@ -88,44 +90,6 @@ class PremixController extends Controller
         $premix->delete();
         return redirect()->route('premixes.index')->with('success', 'Premix deleted.');
     }
-
-    // public function import(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|file|mimes:xlsx,xls,csv',
-    //     ]);
-
-    //     $file = $request->file('file');
-
-    //     // Baca file dan loop datanya
-    //     $data = Excel::toArray([], $file);
-    //     $rows = $data[0]; // sheet pertama
-
-    //     foreach ($rows as $index => $row) {
-    //         // Lewati baris header, sesuaikan jika header ada di baris pertama
-    //         if ($index === 0)
-    //             continue;
-
-    //         // Pastikan kolom sesuai urutan: material_name, supplier, shelf_life
-    //         $premixName = $row[0] ?? null;
-    //         $producer = $row[1] ?? null;
-    //         $shelfLife = $row[2] ?? null;
-
-    //         // Validasi data per baris
-    //         if (!$premixName)
-    //             continue; // Lewati jika nama kosong
-
-    //         Premix::create([
-    //             'uuid' => Str::uuid(),
-    //             'name' => $premixName,
-    //             'producer' => $producer,
-    //             'shelf_life' => $shelfLife,
-    //             'area_uuid' => Auth::user()->area_uuid,
-    //         ]);
-    //     }
-
-    //     return redirect()->route('premixes.index')->with('success', 'Data berhasil diimport.');
-    // }
 
     
     public function downloadTemplate()

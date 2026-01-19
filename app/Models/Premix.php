@@ -17,6 +17,7 @@ class Premix extends Model
         'producer',
         'production_code',
         'shelf_life',
+        'unit'
     ];
 
     protected static function boot()

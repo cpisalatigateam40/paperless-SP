@@ -180,7 +180,13 @@
                                                 @foreach ($report->details as $i => $detail)
                                                 <tr>
                                                     <td class="text-center">{{ $detail->time ?? '-' }}</td>
-                                                    <td>{{ $detail->rawMaterial->material_name ?? '-' }}</td>
+                                                    <td>
+                                                    @if ($detail->material_type === 'raw')
+                                                        {{ $detail->rawMaterial?->material_name }}
+                                                    @else
+                                                        {{ $detail->premix?->name }} (Premix)
+                                                    @endif
+                                                    </td>
                                                     <td class="text-center">{{ $detail->rm_condition }}</td>
                                                     <td>{{ implode(', ', explode(',', $detail->supplier)) }}</td>
                                                     <td>{{ $detail->production_code ?? '-' }}</td>

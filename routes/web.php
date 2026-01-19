@@ -1111,4 +1111,8 @@ Route::put('/{uuid}', 'update')->name('update');
 
     Route::post('user-sync', [ApiController::class, 'syncUser']);
     Route::post('user-desync', [ApiController::class, 'desyncUser']);
+
+    Route::get('/production-codes', [ReportRmArrivalController::class, 'productionCodes'])
+    ->name('production-codes');
+
 });

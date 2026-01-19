@@ -10,6 +10,7 @@ use App\Models\DetailRmArrival;
 use App\Models\Area;
 use App\Models\Section;
 use App\Models\RawMaterial;
+use App\Models\Premix;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -22,13 +23,15 @@ class ReportRmArrivalController extends Controller
             ->get()
             ->map(function ($report) {
                 $report->ketidaksesuaian = $report->details->filter(function ($d) {
-                    return in_array('x', [
-                        $d->packaging_condition,
-                        $d->sensory_appearance,
-                        $d->sensory_aroma,
-                        $d->sensory_color,
-                        $d->contamination,
-                    ]);
+                    return (
+                        in_array('x', [
+                            $d->packaging_condition,
+                            $d->sensory_appearance,
+                            $d->sensory_aroma,
+                            $d->sensory_color,
+                        ])
+                        || $d->contamination === '✓' // ✅ ini kuncinya
+                    );
                 })->count();
 
                 return $report;
@@ -43,6 +46,7 @@ class ReportRmArrivalController extends Controller
         return view('report_rm_arrivals.create', [
             'areas' => Area::all(),
             'rawMaterials' => RawMaterial::all(),
+            'premixes' => Premix::orderBy('name')->get(),
             'sections' => Section::whereIn('section_name', ['Seasoning', 'Chillroom'])->get(),
         ]);
     }
@@ -60,27 +64,39 @@ class ReportRmArrivalController extends Controller
         ]);
 
         foreach ($request->input('details', []) as $detail) {
-            DetailRmArrival::create([
+
+            $data = [
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
-                'raw_material_uuid' => $detail['raw_material_uuid'],
-                'supplier'           => isset($detail['supplier']) 
-                              ? implode(',', $detail['supplier']) 
-                              : null,
+
+                // kolom umum
+                'material_uuid' => $detail['material_uuid'] ?? null,
+                'material_type' => $detail['material_type'] ?? 'raw',
+
+                'supplier' => isset($detail['supplier'])
+                    ? implode(',', $detail['supplier'])
+                    : null,
+
                 'rm_condition' => $detail['rm_condition'],
                 'production_code' => $detail['production_code'] ?? null,
                 'time' => $detail['time'],
                 'temperature' => $detail['temperature'],
                 'packaging_condition' => $detail['packaging_condition'],
-                // 'sensorial_condition' => $detail['sensorial_condition'],
                 'sensory_appearance' => $detail['sensory_appearance'],
                 'sensory_aroma' => $detail['sensory_aroma'],
                 'sensory_color' => $detail['sensory_color'],
                 'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
-            ]);
+            ];
+
+            if (($detail['material_type'] ?? 'raw') === 'raw') {
+                $data['raw_material_uuid'] = $detail['material_uuid'];
+            }
+
+            DetailRmArrival::create($data);
         }
+
 
         return redirect()->route('report_rm_arrivals.index')
             ->with('success', 'Laporan kedatangan bahan baku berhasil disimpan.');
@@ -102,8 +118,9 @@ class ReportRmArrivalController extends Controller
     {
         $report = ReportRmArrival::with('details')->where('uuid', $uuid)->firstOrFail();
         $rawMaterials = RawMaterial::all();
+        $premixes = Premix::orderBy('name')->get();
 
-        return view('report_rm_arrivals.add_detail', compact('report', 'rawMaterials'));
+        return view('report_rm_arrivals.add_detail', compact('report', 'rawMaterials', 'premixes'));
     }
 
     public function storeDetail(Request $request, $uuid)
@@ -111,7 +128,8 @@ class ReportRmArrivalController extends Controller
         $report = ReportRmArrival::where('uuid', $uuid)->firstOrFail();
 
         $request->validate([
-            'details.*.raw_material_uuid' => 'required|exists:raw_materials,uuid',
+            'details.*.material_uuid' => 'required|uuid',
+            'details.*.material_type' => 'required|in:raw,premix',
             'details.*.production_code' => 'required|string',
             'details.*.time' => 'nullable',
             'details.*.temperature' => 'nullable|numeric',
@@ -125,27 +143,38 @@ class ReportRmArrivalController extends Controller
             'details.*.corrective_action' => 'nullable|string',
         ]);
 
-        foreach ($request->details as $detail) {
-            DetailRmArrival::create([
+        foreach ($request->input('details', []) as $detail) {
+
+            $data = [
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
-                'raw_material_uuid' => $detail['raw_material_uuid'],
-                'supplier'           => isset($detail['supplier']) 
-                              ? implode(',', $detail['supplier']) 
-                              : null,
-                'rm_condition' => $detail['rm_condition'] ?? null,
+
+                // kolom umum
+                'material_uuid' => $detail['material_uuid'] ?? null,
+                'material_type' => $detail['material_type'] ?? 'raw',
+
+                'supplier' => isset($detail['supplier'])
+                    ? implode(',', $detail['supplier'])
+                    : null,
+
+                'rm_condition' => $detail['rm_condition'],
                 'production_code' => $detail['production_code'] ?? null,
-                'time' => $detail['time'] ?? null,
-                'temperature' => $detail['temperature'] ?? null,
-                'packaging_condition' => $detail['packaging_condition'] ?? null,
-                // 'sensorial_condition' => $detail['sensorial_condition'] ?? null,
-                'sensory_appearance' => $detail['sensory_appearance'] ?? null,
-                'sensory_aroma' => $detail['sensory_aroma'] ?? null,
-                'sensory_color' => $detail['sensory_color'] ?? null,
-                'contamination' => $detail['contamination'] ?? null,
+                'time' => $detail['time'],
+                'temperature' => $detail['temperature'],
+                'packaging_condition' => $detail['packaging_condition'],
+                'sensory_appearance' => $detail['sensory_appearance'],
+                'sensory_aroma' => $detail['sensory_aroma'],
+                'sensory_color' => $detail['sensory_color'],
+                'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
-            ]);
+            ];
+
+            if (($detail['material_type'] ?? 'raw') === 'raw') {
+                $data['raw_material_uuid'] = $detail['material_uuid'];
+            }
+
+            DetailRmArrival::create($data);
         }
 
         return redirect()->route('report_rm_arrivals.index')
@@ -214,7 +243,7 @@ class ReportRmArrivalController extends Controller
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
-        ])->setPaper('A4', 'portrait');
+        ])->setPaper('A4', 'landscape');
 
         return $pdf->stream('laporan_rm_arrival_' . $report->date . '.pdf');
     }
@@ -227,6 +256,7 @@ class ReportRmArrivalController extends Controller
             'report' => $report,
             'areas' => Area::all(),
             'rawMaterials' => RawMaterial::all(),
+            'premixes' => Premix::orderBy('name')->get(),
             'sections' => Section::whereIn('section_name', ['Seasoning', 'Chillroom'])->get(),
         ]);
     }
@@ -248,34 +278,60 @@ class ReportRmArrivalController extends Controller
         // 3️⃣ Hapus semua detail lama
         DetailRmArrival::where('report_uuid', $report->uuid)->delete();
 
-        // 4️⃣ Simpan ulang semua detail baru
         foreach ($request->input('details', []) as $detail) {
-            DetailRmArrival::create([
+
+            $data = [
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
-                'raw_material_uuid' => $detail['raw_material_uuid'],
-                'supplier'           => isset($detail['supplier']) 
-                                ? implode(',', $detail['supplier']) 
-                                : null,
+
+                // kolom baru
+                'material_uuid' => $detail['material_uuid'],
+                'material_type' => $detail['material_type'] ?? 'raw',
+
+                'supplier' => isset($detail['supplier'])
+                    ? implode(',', $detail['supplier'])
+                    : null,
+
                 'rm_condition' => $detail['rm_condition'],
                 'production_code' => $detail['production_code'] ?? null,
                 'time' => $detail['time'],
                 'temperature' => $detail['temperature'],
                 'packaging_condition' => $detail['packaging_condition'],
-                // 'sensorial_condition' => $detail['sensorial_condition'],
                 'sensory_appearance' => $detail['sensory_appearance'],
                 'sensory_aroma' => $detail['sensory_aroma'],
                 'sensory_color' => $detail['sensory_color'],
                 'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
-            ]);
+            ];
+
+            /**
+             * RAW → isi FK lama
+             * PREMIX → biarkan NULL
+             */
+            if (($detail['material_type'] ?? 'raw') === 'raw') {
+                $data['raw_material_uuid'] = $detail['material_uuid'];
+            }
+
+            DetailRmArrival::create($data);
         }
 
         // 5️⃣ Redirect dengan notifikasi sukses
         return redirect()->route('report_rm_arrivals.index')
             ->with('success', 'Laporan kedatangan bahan baku berhasil diperbarui.');
     }
+
+    public function productionCodes(Request $request)
+    {
+        return DetailRmArrival::query()
+            ->whereNotNull('production_code')
+            ->where('production_code', 'like', '%' . $request->q . '%')
+            ->select('production_code')
+            ->distinct()
+            ->limit(10)
+            ->pluck('production_code');
+    }
+
 
 
 }

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h5>Master Data Premix</h5>
+            <h5>Master Data Bahan penunjang & Premix</h5>
 
             <div class="d-flex justify-content-between" style="gap: .5rem;">
                 <form action="{{ route('premixes.index') }}" method="GET">
@@ -57,7 +57,7 @@
                     </form>
                 </div>
 
-                <a href="{{ route('premixes.create') }}" class="btn btn-primary btn-sm">Tambah Premix</a>
+                <a href="{{ route('premixes.create') }}" class="btn btn-primary btn-sm">Tambah Bahan penunjang & Premix</a>
             </div>
 
         </div>
@@ -85,9 +85,8 @@
                         <tr>
                             <th class="align-middle">No</th>
                             <th class="align-middle">Nama</th>
-                            <!-- <th class="align-middle">Kode Produksi</th> -->
                             <th class="align-middle">Produsen</th>
-                            <th class="align-middle">Batas Kadaluarsa (Bulan)</th>
+                            <th class="align-middle">Best Before</th>
                             <th class="align-middle">Area</th>
                             <th class="align-middle text-center">Aksi</th>
                         </tr>
@@ -97,9 +96,8 @@
                         <tr>
                             <td class="align-middle">{{ $i + $premixes->firstItem() }}</td>
                             <td class="align-middle">{{ $premix->name }}</td>
-                            <!-- <td class="align-middle">{{ $premix->production_code }}</td> -->
                             <td class="align-middle">{{ $premix->producer }}</td>
-                            <td class="align-middle">{{ $premix->shelf_life ?? '-' }}</td>
+                            <td class="align-middle">{{ $premix->shelf_life ?? '-' }} {{ $premix->unit ?? '-' }}</td>
                             <td class="align-middle">{{ $premix->area->name ?? '-' }}</td>
                             <td class="align-middle text-center">
                                 <a href="{{ route('premixes.edit', $premix->uuid) }}"
@@ -121,7 +119,6 @@
             </div>
         </div>
     </div>
-
 </div>
 @endsection
 
