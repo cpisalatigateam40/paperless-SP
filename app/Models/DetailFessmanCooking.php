@@ -23,6 +23,7 @@ class DetailFessmanCooking extends Model implements Auditable
         'trolley_count',
         'start_time',
         'end_time',
+        'no_fessman'
     ];
 
     protected $auditEvents = [

@@ -192,7 +192,10 @@
             <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
             <td rowspan="5">
                 @php
-                    $mdMulti = $d->upload_md_multi ? json_decode($d->upload_md_multi, true) : [];
+                    $mdMulti = array_values(array_filter(
+                        $d->upload_md_multi ? json_decode($d->upload_md_multi, true) : [],
+                        fn ($file) => is_string($file) && $file !== ''
+                    ));
                 @endphp
 
                 @if(!empty($mdMulti))
@@ -209,7 +212,7 @@
                         @endphp
 
                         @if($base64)
-                            <img src="{{ $base64 }}" width="70" style="margin-bottom: 4px;">
+                            <img src="{{ $base64 }}" width="70" style="margin-bottom:4px;">
                         @endif
                     @endforeach
                 @else

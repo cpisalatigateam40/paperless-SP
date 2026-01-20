@@ -86,9 +86,39 @@
                             </div>
                         </div>
 
-                        <label>Jumlah</label>
-                        <input type="number" name="details[{{ $i }}][quantity]" class="form-control mb-3"
-                            value="{{ $detail->quantity }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Jenis Sample</label>
+                                <select name="details[{{ $i }}][sample_type]" class="form-control mb-3">
+                                    <option value="">-- Pilih Jenis Sample --</option>
+                                    <option value="Sampel Lab" @selected($detail->sample_type === 'Sampel Lab')>Sampel Lab</option>
+                                    <option value="Sampel Retained" @selected($detail->sample_type === 'Sampel Retained')>Sampel Retained</option>
+                                    <option value="Sampel RnD" @selected($detail->sample_type === 'Sampel RnD')>Sampel RnD</option>
+                                    <option value="Sampel Trial" @selected($detail->sample_type === 'Sampel Trial')>Sampel Trial</option>
+                                    <option value="Lainnya" @selected($detail->sample_type === 'Lainnya')>Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Jumlah</label>
+                                <input type="number" name="details[{{ $i }}][quantity]" class="form-control mb-3"
+                                    value="{{ $detail->quantity }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Satuan</label>
+                                <select name="details[{{ $i }}][unit]" class="form-control mb-3">
+                                    <option value="">-- Pilih Satuan --</option>
+                                    <option value="pcs" @selected($detail->unit === 'pcs')>pcs</option>
+                                    <option value="pack" @selected($detail->unit === 'pack')>pack</option>
+                                    <option value="inner" @selected($detail->unit === 'inner')>inner</option>
+                                    <option value="box" @selected($detail->unit === 'box')>box</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        
 
                         <label>Catatan</label>
                         <input type="text" name="details[{{ $i }}][notes]" class="form-control mb-3"
@@ -97,8 +127,10 @@
                     @endforeach
                 </div>
 
-                <button type="button" onclick="addDetail()" class="btn btn-sm btn-secondary mb-2">+ Tambah
-                    Detail</button>
+                
+
+                <!-- <button type="button" onclick="addDetail()" class="btn btn-sm btn-secondary mb-2">+ Tambah
+                    Detail</button> -->
                 <br>
                 <div class="text-end">
                     <a href="{{ route('report_lab_samples.index') }}" class="btn btn-secondary">Batal</a>
@@ -148,8 +180,36 @@ function addDetail() {
                 </div>
             </div>
 
-            <label>Jumlah</label>
-            <input type="number" name="details[${detailIndex}][quantity]" class="form-control mb-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Jenis Sample</label>
+                    <select name="details[${detailIndex}][sample_type]" class="form-control mb-3">
+                        <option value="">-- Pilih Jenis Sample --</option>
+                        <option value="Sampel Lab">Sampel Lab</option>
+                        <option value="Sampel Retained">Sampel Retained</option>
+                        <option value="Sampel RnD">Sampel RnD</option>
+                        <option value="Sampel Trial">Sampel Trial</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Jumlah</label>
+                    <input type="number" name="details[${detailIndex}][quantity]" class="form-control mb-3">
+                </div>
+                <div class="col-md-6">
+                    <label>Satuan</label>
+                    <select name="details[${detailIndex}][unit]" class="form-control mb-3">
+                        <option value="">-- Pilih Satuan --</option>
+                        <option value="pcs">pcs</option>
+                        <option value="pack">pack</option>
+                        <option value="inner">inner</option>
+                        <option value="box">box</option>
+                    </select>
+                </div>
+            </div>
 
             <label>Catatan</label>
             <input type="text" name="details[${detailIndex}][notes]" class="form-control mb-3">

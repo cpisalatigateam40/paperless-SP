@@ -71,8 +71,36 @@
                             </div>
                         </div>
 
-                        <label>Jumlah</label>
-                        <input type="number" name="details[0][quantity]" class="form-control mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Jenis Sample</label>
+                                <select name="details[0][sample_type]" class="form-control mb-3">
+                                    <option value="">-- Pilih Jenis Sample --</option>
+                                    <option value="Sampel Lab">Sampel Lab</option>
+                                    <option value="Sampel Retained">Sampel Retained</option>
+                                    <option value="Sampel RnD">Sampel RnD</option>
+                                    <option value="Sampel Trial">Sampel Trial</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Jumlah</label>
+                                <input type="number" name="details[0][quantity]" class="form-control mb-3">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Satuan</label>
+                                <select name="details[0][unit]" class="form-control mb-3">
+                                    <option value="">-- Pilih Satuan --</option>
+                                    <option value="pcs">pcs</option>
+                                    <option value="pack">pack</option>
+                                    <option value="inner">inner</option>
+                                    <option value="box">box</option>
+                                </select>
+                            </div>
+                        </div>
 
                         <label>Catatan</label>
                         <input type="text" name="details[0][notes]" class="form-control mb-3">
@@ -127,8 +155,38 @@ function addDetail() {
                 </div>
             </div>
 
-            <label>Jumlah</label>
-            <input type="number" name="details[${detailIndex}][quantity]" class="form-control mb-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Jenis Sample</label>
+                    <select name="details[${detailIndex}][sample_type]" class="form-control mb-3">
+                        <option value="">-- Pilih Jenis Sample --</option>
+                        <option value="Sampel Lab">Sampel Lab</option>
+                        <option value="Sampel Retained">Sampel Retained</option>
+                        <option value="Sampel RnD">Sampel RnD</option>
+                        <option value="Sampel Trial">Sampel Trial</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Jumlah</label>
+                    <input type="number" name="details[${detailIndex}][quantity]" class="form-control mb-3">
+                </div>
+                <div class="col-md-6">
+                    <label>Satuan</label>
+                    <select name="details[${detailIndex}][unit]" class="form-control mb-3">
+                        <option value="">-- Pilih Satuan --</option>
+                        <option value="pcs">pcs</option>
+                        <option value="pack">pack</option>
+                        <option value="inner">inner</option>
+                        <option value="box">box</option>
+                    </select>
+                </div>
+            </div>
+
+            
 
             <label>Catatan</label>
             <input type="text" name="details[${detailIndex}][notes]" class="form-control mb-3">

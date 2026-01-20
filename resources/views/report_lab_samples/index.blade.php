@@ -53,12 +53,24 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                @can('edit report')
+                                <!-- @can('edit report')
                                 <a href="{{ route('report_lab_samples.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan
+                                @endcan -->
+
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_lab_samples.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
 
                                 {{-- Delete --}}
                                 <form action="{{ route('report_lab_samples.destroy', $report->id) }}" method="POST"
@@ -144,6 +156,7 @@
                                                 <th>Gramase</th>
                                                 <th>Kode Produksi</th>
                                                 <th>Best Before</th>
+                                                <th>Jenis Sample</th>
                                                 <th>Jumlah</th>
                                                 <th>Catatan</th>
                                             </tr>
@@ -156,7 +169,8 @@
                                                 <td>{{ $detail->gramase }}</td>
                                                 <td>{{ $detail->production_code }}</td>
                                                 <td>{{ $detail->best_before }}</td>
-                                                <td>{{ $detail->quantity }}</td>
+                                                <td>{{ $detail->sample_type }}</td>
+                                                <td>{{ $detail->quantity }} {{ $detail->unit }}</td>
                                                 <td>{{ $detail->notes }}</td>
                                             </tr>
                                             @endforeach

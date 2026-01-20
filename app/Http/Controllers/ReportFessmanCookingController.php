@@ -125,6 +125,7 @@ class ReportFessmanCookingController extends Controller
                     'trolley_count' => $detailData['trolley_count'] ?? null,
                     'start_time' => $detailData['start_time'] ?? null,
                     'end_time' => $detailData['end_time'] ?? null,
+                    'no_fessman' => $detailData['no_fessman'] ?? null,
                 ]);
 
                 // Child: process_steps
@@ -279,6 +280,7 @@ class ReportFessmanCookingController extends Controller
                     'trolley_count' => $detailData['trolley_count'] ?? null,
                     'start_time' => $detailData['start_time'] ?? null,
                     'end_time' => $detailData['end_time'] ?? null,
+                    'no_fessman' => $detailData['no_fessman'] ?? null,
                 ]);
 
                 // Process Steps

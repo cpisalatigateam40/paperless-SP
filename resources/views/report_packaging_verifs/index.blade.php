@@ -60,12 +60,24 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                @can('edit report')
+                                <!-- @can('edit report')
                                 <a href="{{ route('report_packaging_verifs.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan
+                                @endcan -->
+
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_packaging_verifs.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
 
                                 {{-- Delete --}}
                                 <form action="{{ route('report_packaging_verifs.destroy', $report->uuid) }}"
@@ -223,16 +235,23 @@
                                             <td rowspan="5">
                                                 @if(!empty($d->upload_md_multi))
                                                     @php
-                                                        $files = json_decode($d->upload_md_multi, true);
+                                                        $files = array_filter(
+                                                            json_decode($d->upload_md_multi, true) ?? [],
+                                                            fn ($file) => !empty($file) && $file !== false
+                                                        );
                                                     @endphp
 
                                                     @foreach($files as $file)
                                                         <a href="{{ asset('storage/' . $file) }}" target="_blank">
-                                                            <img src="{{ asset('storage/' . $file) }}" alt="Bukti" width="60" style="margin: 4px;">
+                                                            <img src="{{ asset('storage/' . $file) }}"
+                                                                alt="Bukti"
+                                                                width="60"
+                                                                style="margin:4px;">
                                                         </a>
                                                     @endforeach
                                                 @endif
                                             </td>
+
 
 
                                             {{-- In cutting manual & mesin sama, rowspan --}}

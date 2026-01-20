@@ -40,10 +40,37 @@
                     </div>
                 </div>
 
-                <div class="mb-2">
-                    <label>Jumlah</label>
-                    <input type="number" name="quantity" class="form-control" required>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Jenis Sample</label>
+                        <select name="sample_type" class="form-control mb-3">
+                            <option value="">-- Pilih Jenis Sample --</option>
+                            <option value="Sampel Lab">Sampel Lab</option>
+                            <option value="Sampel Retained">Sampel Retained</option>
+                            <option value="Sampel RnD">Sampel RnD</option>
+                            <option value="Sampel Trial">Sampel Trial</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Jumlah</label>
+                        <input type="number" name="quantity" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Satuan</label>
+                        <select name="unit" class="form-control mb-3">
+                            <option value="">-- Pilih Satuan --</option>
+                            <option value="pcs">pcs</option>
+                            <option value="pack">pack</option>
+                            <option value="inner">inner</option>
+                            <option value="box">box</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="mb-2">
                     <label>Catatan</label>
                     <input type="text" name="notes" class="form-control">

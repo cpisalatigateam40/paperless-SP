@@ -14,7 +14,7 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-bordered  align-middle text-center">
+                <table class="table table-bordered align-middle text-center">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -57,10 +57,21 @@
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <a href="{{ route('report_baso_cookings.edit', $report->uuid) }}"
+                                <!-- <a href="{{ route('report_baso_cookings.edit', $report->uuid) }}"
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-edit"></i>
-                                </a>
+                                </a> -->
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_baso_cookings.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
                                 @can('edit report')
                                 <a href="{{ route('report_baso_cookings.edit_next', $report->uuid) }}"
                                     class="btn btn-sm btn-danger" title="Edit Laporan">

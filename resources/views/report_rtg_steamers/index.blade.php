@@ -43,18 +43,29 @@
                             </td>
                             <td>{{ $report->product->product_name ?? '-' }} -
                                 {{ $report->product->nett_weight ?? '-' }} g</td>
-                            <td class="text-center">
+                            <td>
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                @can('edit report')
+                                <!-- @can('edit report')
                                 <a href="{{ route('report_rtg_steamers.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan
+                                @endcan -->
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_rtg_steamers.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
                                 <form action="{{ route('report_rtg_steamers.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">
                                     @csrf

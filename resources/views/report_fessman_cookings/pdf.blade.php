@@ -106,6 +106,12 @@
 
     <table class="table table-bordered small">
         <tbody>
+            <tr>
+                <td>Nomor Mesin Fessman</td>
+                @foreach ($report->details as $detail)
+                <td>{{ $detail->no_fessman ?? '-' }}</td>
+                @endforeach
+            </tr>
             {{-- Produk --}}
             <tr>
                 <td>Nama Produk</td>
@@ -170,6 +176,7 @@
             'SMOKING',
             'COOKINGI',
             'COOKINGII',
+            'DRYING',
             'STEAM SUCTION',
             'DOOR OPENING SECTION 1',
             'REMOVE CORE PROBE',

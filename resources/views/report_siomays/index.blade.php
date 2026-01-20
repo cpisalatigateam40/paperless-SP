@@ -49,12 +49,23 @@
                                     data-bs-target="#detail-{{ $r->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                @can('edit report')
+                                <!-- @can('edit report')
                                 <a href="{{ route('report_siomays.edit', $r->uuid) }}" class="btn btn-sm btn-warning"
                                     title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan
+                                @endcan -->
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $r->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_siomays.edit', $r->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
                                 <form action="{{ route('report_siomays.destroy', $r->uuid) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus laporan ini?')">
                                     @csrf

@@ -61,10 +61,21 @@
                                 </button>
 
                                 {{-- Edit --}}
-                                <a href="{{ route('report_fessman_cookings.edit', $report->uuid) }}"
+                                <!-- <a href="{{ route('report_fessman_cookings.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Update Laporan">
                                     <i class="fa fa-pen"></i>
-                                </a>
+                                </a> -->
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_fessman_cookings.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
 
                                 {{-- Delete --}}
                                 <form action="{{ route('report_fessman_cookings.destroy', $report->uuid) }}"
@@ -135,6 +146,12 @@
                                 <div class="table-responsive">
                                     <table class="table table-bordered small">
                                         <tbody>
+                                            <tr>
+                                                <td>Nomor Mesin Fessman</td>
+                                                @foreach ($report->details as $detail)
+                                                <td>{{ $detail->no_fessman ?? '-' }}</td>
+                                                @endforeach
+                                            </tr>
                                             {{-- Produk --}}
                                             <tr>
                                                 <td>Nama Produk</td>
@@ -190,7 +207,7 @@
                                             $steps = [
                                             'DRYINGI','DRYINGII','DRYINGIII','DRYINGIV','DRYINGV','DOOR OPENING SECTION
                                             1',
-                                            'PUT CORE PROBE','SMOKING','COOKINGI','COOKINGII',
+                                            'PUT CORE PROBE','SMOKING','COOKINGI','COOKINGII', 'DRYING',
                                             'STEAM SUCTION','DOOR OPENING SECTION 1','REMOVE CORE PROBE','FURTHER
                                             TRANSPORT'
                                             ];

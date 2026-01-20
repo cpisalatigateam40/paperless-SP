@@ -60,12 +60,24 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                @can('edit report')
+                                <!-- @can('edit report')
                                 <a href="{{ route('report_emulsion_makings.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan
+                                @endcan -->
+
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_emulsion_makings.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
 
                                 {{-- Hapus --}}
                                 <form action="{{ route('report_emulsion_makings.destroy', $report->uuid) }}"

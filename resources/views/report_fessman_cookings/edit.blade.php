@@ -64,6 +64,11 @@
                 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
                 'product_temp_2', 'actual_product_temp']
                 ],
+                [
+                'name' => 'DRYING',
+                'fields' => ['time_minutes_1', 'time_minutes_2','air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
+                'product_temp_2', 'actual_product_temp']
+                ],
                 ['name'=>'STEAM SUCTION','fields'=>['time_minutes_1','time_minutes_2']],
                 ['name'=>'DOOR OPENING SECTION 1','fields'=>[]],
                 ['name'=>'REMOVE CORE PROBE','fields'=>['time_minutes_1','time_minutes_2']],
@@ -103,9 +108,16 @@
                     <div id="produk{{ $i }}" class="accordion-collapse collapse {{ $isOpen ? 'show' : '' }}"
                         data-bs-parent="#produkAccordion">
                         <div class="accordion-body card shadow">
+                            <div class="row card-body" >
+                                <div class="col-md-6">
+                                    <label>Nomor Mesin Fessman</label>
+                                    <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control"
+                                        value="{{ $detail->no_fessman ?? '' }}">
+                                </div>
+                            </div>
 
                             {{-- Info Produk --}}
-                            <div class="row g-3 card-body mb-3">
+                            <div class="row g-3 card-body mb-3" style="margin-top: -3rem;">
                                 <div class="col-md-6">
                                     <label>Nama Produk</label>
                                     <select name="details[{{ $i }}][product_uuid]"
