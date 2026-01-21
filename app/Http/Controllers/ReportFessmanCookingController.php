@@ -20,23 +20,129 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportFessmanCookingController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportFessmanCooking::with([
-            'details.sensoryCheck'
-        ])
-        ->latest()
-        ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportFessmanCooking::with([
+    //         'details.sensoryCheck'
+    //     ])
+    //     ->latest()
+    //     ->paginate(10);
 
-        // Hitung ketidaksesuaian berdasarkan sensory check
+    //     // Hitung ketidaksesuaian berdasarkan sensory check
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $totalKetidaksesuaian = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             if ($detail->sensoryCheck) {
+    //                 $fields = ['ripeness', 'aroma', 'taste', 'texture', 'color'];
+    //                 foreach ($fields as $field) {
+    //                     // Nilai 0 = Tidak OK
+    //                     if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
+    //                         $totalKetidaksesuaian++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
+    //         return $report;
+    //     });
+
+    //     return view('report_fessman_cookings.index', compact('reports'));
+    // }
+
+
+    
+public function index(Request $request)
+    {
+        $query = ReportFessmanCooking::with([
+            'area',
+            'section',
+            'details.product',
+            'details.processSteps',
+            'details.coolingDowns',
+            'details.sensoryCheck',
+        ])->latest();
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 SECTION
+                $q->orWhereHas('section', function ($s) use ($search) {
+                    $s->where('section_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL
+                $q->orWhereHas('details', function ($d) use ($search) {
+
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('packaging_weight', 'like', "%{$search}%")
+                    ->orWhere('trolley_count', 'like', "%{$search}%")
+                    ->orWhere('no_fessman', 'like', "%{$search}%")
+                    ->orWhere('start_time', 'like', "%{$search}%")
+                    ->orWhere('end_time', 'like', "%{$search}%");
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 PROCESS STEPS
+                    $d->orWhereHas('processSteps', function ($ps) use ($search) {
+                        $ps->where('step_name', 'like', "%{$search}%")
+                        ->orWhere('room_temp_1', 'like', "%{$search}%")
+                        ->orWhere('room_temp_2', 'like', "%{$search}%")
+                        ->orWhere('product_temp_1', 'like', "%{$search}%")
+                        ->orWhere('product_temp_2', 'like', "%{$search}%")
+                        ->orWhere('actual_product_temp', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 COOLING DOWN
+                    $d->orWhereHas('coolingDowns', function ($cd) use ($search) {
+                        $cd->where('step_name', 'like', "%{$search}%")
+                        ->orWhere('avg_product_temp_after_exit', 'like', "%{$search}%")
+                        ->orWhere('loss_kg', 'like', "%{$search}%")
+                        ->orWhere('loss_percent', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 SENSORY CHECK
+                    $d->orWhereHas('sensoryCheck', function ($sc) use ($search) {
+                        $sc->where('ripeness', 'like', "%{$search}%")
+                        ->orWhere('aroma', 'like', "%{$search}%")
+                        ->orWhere('taste', 'like', "%{$search}%")
+                        ->orWhere('texture', 'like', "%{$search}%")
+                        ->orWhere('color', 'like', "%{$search}%")
+                        ->orWhere('can_be_twisted', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $totalKetidaksesuaian = 0;
 
             foreach ($report->details as $detail) {
                 if ($detail->sensoryCheck) {
-                    $fields = ['ripeness', 'aroma', 'taste', 'texture', 'color'];
-                    foreach ($fields as $field) {
-                        // Nilai 0 = Tidak OK
+                    foreach (['ripeness', 'aroma', 'taste', 'texture', 'color'] as $field) {
                         if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
                             $totalKetidaksesuaian++;
                         }
@@ -50,7 +156,6 @@ class ReportFessmanCookingController extends Controller
 
         return view('report_fessman_cookings.index', compact('reports'));
     }
-
 
     public function create()
     {

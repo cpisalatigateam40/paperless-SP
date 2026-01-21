@@ -16,12 +16,82 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportMetalDetectorController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportMetalDetector::with(['area', 'section', 'details.product'])
-            ->latest()
-            ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportMetalDetector::with(['area', 'section', 'details.product'])
+    //         ->latest()
+    //         ->paginate(10);
 
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $report->ketidaksesuaian = $report->details->filter(function ($d) {
+    //             return in_array('x', [
+    //                 $d->result_fe,
+    //                 $d->result_non_fe,
+    //                 $d->result_sus316,
+    //                 $d->verif_loma,
+    //             ]);
+    //         })->count();
+
+    //         return $report;
+    //     });
+
+    //     return view('report_metal_detectors.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportMetalDetector::with(['area', 'section', 'details.product'])
+            ->latest();
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 SECTION
+                $q->orWhereHas('section', function ($s) use ($search) {
+                    $s->where('section_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL METAL DETECTOR
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('hour', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%")
+                    ->orWhere('result_fe', 'like', "%{$search}%")
+                    ->orWhere('result_non_fe', 'like', "%{$search}%")
+                    ->orWhere('result_sus316', 'like', "%{$search}%")
+                    ->orWhere('verif_loma', 'like', "%{$search}%")
+                    ->orWhere('nonconformity', 'like', "%{$search}%")
+                    ->orWhere('corrective_action', 'like', "%{$search}%")
+                    ->orWhere('verif_after_correct', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%");
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        // SESUAIKAN kolom produk kamu
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $report->ketidaksesuaian = $report->details->filter(function ($d) {
                 return in_array('x', [

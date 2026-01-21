@@ -17,20 +17,119 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportSiomayController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportSiomay::with([
+    //         'product',
+    //         'area',
+    //         'details.rawMaterials.rawMaterial',
+    //     ])->latest()->paginate(10);
+
+    //     // transform() agar tetap bekerja dengan pagination
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $totalKetidaksesuaian = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             // 🔹 Cek di level detail proses (color, aroma, taste, texture)
+    //             if (
+    //                 $detail->color === 'Tidak OK' ||
+    //                 $detail->aroma === 'Tidak OK' ||
+    //                 $detail->taste === 'Tidak OK' ||
+    //                 $detail->texture === 'Tidak OK'
+    //             ) {
+    //                 $totalKetidaksesuaian++;
+    //             }
+
+    //             // 🔹 Cek di level bahan baku (raw materials)
+    //             if ($detail->rawMaterials) {
+    //                 $totalKetidaksesuaian += $detail->rawMaterials
+    //                     ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
+    //                     ->count();
+    //             }
+    //         }
+
+    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
+
+    //         return $report;
+    //     });
+
+    //     return view('report_siomays.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
     {
-        $reports = ReportSiomay::with([
+        $query = ReportSiomay::with([
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
-        ])->latest()->paginate(10);
+        ])->latest();
 
-        // transform() agar tetap bekerja dengan pagination
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('production_code', 'like', "%{$search}%")
+                ->orWhere('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('start_time', 'like', "%{$search}%")
+                ->orWhere('end_time', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%");
+                });
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL PROSES SIOMAY
+                $q->orWhereHas('details', function ($d) use ($search) {
+
+                    $d->where('time', 'like', "%{$search}%")
+                    ->orWhere('process_step', 'like', "%{$search}%")
+                    ->orWhere('duration', 'like', "%{$search}%")
+                    ->orWhere('pressure', 'like', "%{$search}%")
+                    ->orWhere('target_temperature', 'like', "%{$search}%")
+                    ->orWhere('actual_temperature', 'like', "%{$search}%")
+                    ->orWhere('color', 'like', "%{$search}%")
+                    ->orWhere('aroma', 'like', "%{$search}%")
+                    ->orWhere('taste', 'like', "%{$search}%")
+                    ->orWhere('texture', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%");
+
+                    // 🔹 RAW MATERIAL
+                    $d->orWhereHas('rawMaterials', function ($rm) use ($search) {
+
+                        $rm->where('amount', 'like', "%{$search}%")
+                        ->orWhere('sensory', 'like', "%{$search}%");
+
+                        // 🔹 RAW MATERIAL MASTER
+                        $rm->orWhereHas('rawMaterial', function ($rmm) use ($search) {
+                            $rmm->where('material_name', 'like', "%{$search}%");
+                        });
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $totalKetidaksesuaian = 0;
 
             foreach ($report->details as $detail) {
-                // 🔹 Cek di level detail proses (color, aroma, taste, texture)
+
+                // 🔹 DETAIL PROSES
                 if (
                     $detail->color === 'Tidak OK' ||
                     $detail->aroma === 'Tidak OK' ||
@@ -40,16 +139,15 @@ class ReportSiomayController extends Controller
                     $totalKetidaksesuaian++;
                 }
 
-                // 🔹 Cek di level bahan baku (raw materials)
+                // 🔹 RAW MATERIAL
                 if ($detail->rawMaterials) {
                     $totalKetidaksesuaian += $detail->rawMaterials
-                        ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
+                        ->filter(fn ($rm) => $rm->sensory === 'Tidak OK')
                         ->count();
                 }
             }
 
             $report->ketidaksesuaian = $totalKetidaksesuaian;
-
             return $report;
         });
 

@@ -14,37 +14,123 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportEmulsionMakingController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportEmulsionMaking::with('header.details', 'header.agings')
-        ->latest()
-        ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportEmulsionMaking::with('header.details', 'header.agings')
+    //     ->latest()
+    //     ->paginate(10);
 
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $ketidaksesuaian = 0;
+
+    //         // 🔹 Cek dari tabel details
+    //         if ($report->header && $report->header->details) {
+    //             $ketidaksesuaian += $report->header->details
+    //                 ->filter(fn($d) => $d->conformity === 'x')
+    //                 ->count();
+    //         }
+
+    //         // 🔹 Cek dari tabel agings
+    //         if ($report->header && $report->header->agings) {
+    //             $ketidaksesuaian += $report->header->agings->filter(function ($a) {
+    //                 return $a->sensory_color === 'x'
+    //                     || $a->sensory_texture === 'x'
+    //                     || $a->emulsion_result === 'Tidak OK';
+    //             })->count();
+    //         }
+
+    //         $report->ketidaksesuaian = $ketidaksesuaian;
+
+    //         return $report;
+    //     });
+
+    //     $rawMaterials = \App\Models\RawMaterial::all();
+    //     return view('report_emulsion_makings.index', compact('reports', 'rawMaterials'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportEmulsionMaking::with([
+            'area',
+            'header.details.rawMaterial',
+            'header.details.premix',
+            'header.agings'
+        ])->latest();
+
+        // 🔍 SEARCH GLOBAL
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 REPORT (HEADER UTAMA)
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 HEADER EMULSION
+                $q->orWhereHas('header', function ($hq) use ($search) {
+                    $hq->where('emulsion_type', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL EMULSION (RAW + PREMIX)
+                $q->orWhereHas('header.details', function ($dq) use ($search) {
+                $dq->where('weight', 'like', "%{$search}%")
+                ->orWhere('temperature', 'like', "%{$search}%")
+                ->orWhere('sensory', 'like', "%{$search}%")
+                ->orWhere('conformity', 'like', "%{$search}%")
+
+                ->orWhereHas('rawMaterial', function ($rm) use ($search) {
+                    $rm->where('material_name', 'like', "%{$search}%");
+                })
+
+                ->orWhereHas('premix', function ($pm) use ($search) {
+                    $pm->where('name', 'like', "%{$search}%");
+                });
+            });
+
+
+                // 🔹 AGING
+                $q->orWhereHas('header.agings', function ($aq) use ($search) {
+                    $aq->where('emulsion_result', 'like', "%{$search}%")
+                    ->orWhere('sensory_color', 'like', "%{$search}%")
+                    ->orWhere('sensory_texture', 'like', "%{$search}%")
+                    ->orWhere('temp_after', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $ketidaksesuaian = 0;
 
-            // 🔹 Cek dari tabel details
-            if ($report->header && $report->header->details) {
-                $ketidaksesuaian += $report->header->details
-                    ->filter(fn($d) => $d->conformity === 'x')
-                    ->count();
-            }
+            if ($report->header) {
 
-            // 🔹 Cek dari tabel agings
-            if ($report->header && $report->header->agings) {
-                $ketidaksesuaian += $report->header->agings->filter(function ($a) {
-                    return $a->sensory_color === 'x'
+                // DETAIL
+                $ketidaksesuaian += $report->header->details
+                    ->filter(fn ($d) => $d->conformity === 'x')
+                    ->count();
+
+                // AGING
+                $ketidaksesuaian += $report->header->agings
+                    ->filter(fn ($a) =>
+                        $a->sensory_color === 'x'
                         || $a->sensory_texture === 'x'
-                        || $a->emulsion_result === 'Tidak OK';
-                })->count();
+                        || $a->emulsion_result === 'Tidak OK'
+                    )->count();
             }
 
             $report->ketidaksesuaian = $ketidaksesuaian;
-
             return $report;
         });
 
         $rawMaterials = \App\Models\RawMaterial::all();
+
         return view('report_emulsion_makings.index', compact('reports', 'rawMaterials'));
     }
 

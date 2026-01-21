@@ -16,27 +16,121 @@ use Illuminate\Support\Facades\DB;
 
 class ReportBasoCookingController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportBasoCooking::with(['details.temperatures'])
-            ->latest()
-            ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportBasoCooking::with(['details.temperatures'])
+    //         ->latest()
+    //         ->paginate(10);
 
-        // Tambahkan atribut ketidaksesuaian untuk setiap report
+    //     // Tambahkan atribut ketidaksesuaian untuk setiap report
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $totalKetidaksesuaian = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             $fields = [
+    //                 'sensory_shape',
+    //                 'sensory_taste',
+    //                 'sensory_aroma',
+    //                 'sensory_texture',
+    //                 'sensory_color',
+    //             ];
+
+    //             foreach ($fields as $field) {
+    //                 // "0" dianggap Tidak OK
+    //                 if (isset($detail->$field) && $detail->$field == '0') {
+    //                     $totalKetidaksesuaian++;
+    //                 }
+    //             }
+    //         }
+
+    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
+    //         return $report;
+    //     });
+
+    //     return view('report_baso_cookings.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportBasoCooking::with([
+            'area',
+            'product',
+            'details.temperatures'
+        ])->latest();
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%")
+                ->orWhere('std_core_temp', 'like', "%{$search}%")
+                ->orWhere('std_weight', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL BASO COOKING
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('emulsion_temp', 'like', "%{$search}%")
+                    ->orWhere('boiling_tank_temp_1', 'like', "%{$search}%")
+                    ->orWhere('boiling_tank_temp_2', 'like', "%{$search}%")
+                    ->orWhere('initial_weight', 'like', "%{$search}%")
+                    ->orWhere('final_weight', 'like', "%{$search}%")
+                    ->orWhere('qc_paraf', 'like', "%{$search}%")
+                    ->orWhere('prod_paraf', 'like', "%{$search}%")
+
+                    // 🔹 SENSORY
+                    ->orWhere('sensory_shape', 'like', "%{$search}%")
+                    ->orWhere('sensory_taste', 'like', "%{$search}%")
+                    ->orWhere('sensory_aroma', 'like', "%{$search}%")
+                    ->orWhere('sensory_texture', 'like', "%{$search}%")
+                    ->orWhere('sensory_color', 'like', "%{$search}%")
+
+                    // 🔹 TEMPERATURE RECORD
+                    ->orWhereHas('temperatures', function ($t) use ($search) {
+                        $t->where('time_type', 'like', "%{$search}%")
+                            ->orWhere('time_recorded', 'like', "%{$search}%")
+                            ->orWhere('baso_temp_1', 'like', "%{$search}%")
+                            ->orWhere('baso_temp_2', 'like', "%{$search}%")
+                            ->orWhere('baso_temp_3', 'like', "%{$search}%")
+                            ->orWhere('baso_temp_4', 'like', "%{$search}%")
+                            ->orWhere('baso_temp_5', 'like', "%{$search}%")
+                            ->orWhere('avg_baso_temp', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $totalKetidaksesuaian = 0;
 
             foreach ($report->details as $detail) {
-                $fields = [
+                foreach ([
                     'sensory_shape',
                     'sensory_taste',
                     'sensory_aroma',
                     'sensory_texture',
                     'sensory_color',
-                ];
-
-                foreach ($fields as $field) {
-                    // "0" dianggap Tidak OK
+                ] as $field) {
+                    // nilai "0" = Tidak OK
                     if (isset($detail->$field) && $detail->$field == '0') {
                         $totalKetidaksesuaian++;
                     }

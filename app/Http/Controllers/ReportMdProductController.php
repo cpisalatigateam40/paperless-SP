@@ -11,30 +11,126 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Services\BestBeforeService;
 
 class ReportMdProductController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportMdProduct::with(['details.positions'])->latest()->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportMdProduct::with(['details.positions'])->latest()->paginate(10);
 
+    //     foreach ($reports as $report) {
+    //         $totalNonConform = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             // 1️⃣ Cek verifikasi setelah perbaikan
+    //             if (isset($detail->verification) && $detail->verification == 0) {
+    //                 $totalNonConform++;
+    //                 continue; // langsung lanjut, tidak perlu cek posisi lagi
+    //             }
+
+    //             // 2️⃣ Cek posisi (status = 0 berarti Tidak OK)
+    //             if ($detail->positions->contains('status', 0)) {
+    //                 $totalNonConform++;
+    //             }
+    //         }
+
+    //         // Tambahkan properti untuk dipakai di view
+    //         $report->ketidaksesuaian = $totalNonConform;
+    //     }
+
+    //     return view('report_md_products.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportMdProduct::with([
+            'area',
+            'details.product',
+            'details.positions'
+        ])->latest();
+
+        // 🔍 GLOBAL SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL MD PRODUCT
+                $q->orWhereHas('details', function ($d) use ($search) {
+
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('program_number', 'like', "%{$search}%")
+                    ->orWhere('process_type', 'like', "%{$search}%")
+                    ->orWhere('corrective_action', 'like', "%{$search}%")
+                    ->orWhere('gramase', 'like', "%{$search}%")
+                    ->orWhere('best_before', 'like', "%{$search}%")
+                    ->orWhere('time', 'like', "%{$search}%");
+
+                    // 🔹 VERIFICATION (boolean)
+                    if (strtolower($search) === 'ok') {
+                        $d->orWhere('verification', true);
+                    }
+
+                    if (strtolower($search) === 'tidak ok') {
+                        $d->orWhere('verification', false);
+                    }
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 POSITIONS (PALING DALAM)
+                    $d->orWhereHas('positions', function ($pos) use ($search) {
+                        $pos->where('specimen', 'like', "%{$search}%")
+                            ->orWhere('position', 'like', "%{$search}%");
+
+                        if (strtolower($search) === 'ok') {
+                            $pos->orWhere('status', true);
+                        }
+
+                        if (strtolower($search) === 'tidak ok') {
+                            $pos->orWhere('status', false);
+                        }
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         foreach ($reports as $report) {
             $totalNonConform = 0;
 
             foreach ($report->details as $detail) {
-                // 1️⃣ Cek verifikasi setelah perbaikan
-                if (isset($detail->verification) && $detail->verification == 0) {
+
+                // 1️⃣ Verifikasi setelah perbaikan
+                if ($detail->verification === false) {
                     $totalNonConform++;
-                    continue; // langsung lanjut, tidak perlu cek posisi lagi
+                    continue;
                 }
 
-                // 2️⃣ Cek posisi (status = 0 berarti Tidak OK)
-                if ($detail->positions->contains('status', 0)) {
+                // 2️⃣ Posisi MD (status = false)
+                if ($detail->positions->contains('status', false)) {
                     $totalNonConform++;
                 }
             }
 
-            // Tambahkan properti untuk dipakai di view
             $report->ketidaksesuaian = $totalNonConform;
         }
 
@@ -69,6 +165,7 @@ class ReportMdProductController extends Controller
 
         // Simpan detail jika ada
         if ($request->has('details')) {
+
             foreach ($request->details as $detail) {
                 $detailModel = DetailMdProduct::create([
                     'uuid' => Str::uuid(),

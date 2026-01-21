@@ -16,30 +16,107 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportRmArrivalController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
-            ->latest()
-            ->get()
-            ->map(function ($report) {
-                $report->ketidaksesuaian = $report->details->filter(function ($d) {
-                    return (
-                        in_array('x', [
-                            $d->packaging_condition,
-                            $d->sensory_appearance,
-                            $d->sensory_aroma,
-                            $d->sensory_color,
-                        ])
-                        || $d->contamination === '✓' // ✅ ini kuncinya
-                    );
-                })->count();
 
-                return $report;
-            })
-            ->groupBy(fn($report) => $report->section?->section_name ?? 'Tanpa Section');
+    public function index(Request $request)
+    {
+        $query = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
+            ->latest();
+
+        // 🔥 FILTER SECTION
+        if ($request->filled('section')) {
+            $query->whereHas('section', function ($q) use ($request) {
+                $q->where('section_name', $request->section);
+            });
+        }
+
+        // 🔍 SEARCH GLOBAL (HEADER + DETAIL + RELASI)
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // =====================
+                // HEADER REPORT
+                // =====================
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // =====================
+                // AREA
+                // =====================
+                $q->orWhereHas('area', function ($qa) use ($search) {
+                    $qa->where('name', 'like', "%{$search}%");
+                });
+
+                // =====================
+                // SECTION
+                // =====================
+                $q->orWhereHas('section', function ($qs) use ($search) {
+                    $qs->where('section_name', 'like', "%{$search}%");
+                });
+
+                // =====================
+                // DETAIL RM ARRIVAL
+                // =====================
+                $q->orWhereHas('details', function ($qd) use ($search) {
+
+                    $qd->where('supplier', 'like', "%{$search}%")
+                    ->orWhere('time', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%")
+                    ->orWhere('temperature', 'like', "%{$search}%")
+                    ->orWhere('rm_condition', 'like', "%{$search}%")
+                    ->orWhere('packaging_condition', 'like', "%{$search}%")
+                    ->orWhere('sensory_appearance', 'like', "%{$search}%")
+                    ->orWhere('sensory_aroma', 'like', "%{$search}%")
+                    ->orWhere('sensory_color', 'like', "%{$search}%")
+                    ->orWhere('contamination', 'like', "%{$search}%")
+                    ->orWhere('problem', 'like', "%{$search}%")
+                    ->orWhere('corrective_action', 'like', "%{$search}%");
+                });
+
+                // =====================
+                // RAW MATERIAL
+                // =====================
+                $q->orWhereHas('details.rawMaterial', function ($qr) use ($search) {
+                    $qr->where('material_name', 'like', "%{$search}%");
+                });
+
+                // =====================
+                // PREMIX
+                // =====================
+                $q->orWhereHas('details.premix', function ($qp) use ($search) {
+                    $qp->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // hitung ketidaksesuaian
+        $reports->getCollection()->transform(function ($report) {
+            $report->ketidaksesuaian = $report->details->filter(function ($d) {
+                return (
+                    in_array('x', [
+                        $d->packaging_condition,
+                        $d->sensory_appearance,
+                        $d->sensory_aroma,
+                        $d->sensory_color,
+                    ]) || $d->contamination === '✓'
+                );
+            })->count();
+
+            return $report;
+        });
 
         return view('report_rm_arrivals.index', compact('reports'));
     }
+
+
+
 
 
     public function create()

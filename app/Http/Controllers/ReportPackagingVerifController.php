@@ -13,44 +13,151 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportPackagingVerifController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportPackagingVerif::with('details.checklist')
-        ->latest()
-        ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportPackagingVerif::with('details.checklist')
+    //     ->latest()
+    //     ->paginate(10);
 
+    //     foreach ($reports as $report) {
+    //         $totalNonConform = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             $check = $detail->checklist;
+
+    //             if (!$check) continue;
+
+    //             $fieldsToCheck = [
+    //                 'sampling_result',
+    //                 'verif_md',
+    //                 'sealing_condition_1', 'sealing_condition_2', 'sealing_condition_3',
+    //                 'sealing_condition_4', 'sealing_condition_5',
+    //                 'sealing_vacuum_1', 'sealing_vacuum_2', 'sealing_vacuum_3',
+    //                 'sealing_vacuum_4', 'sealing_vacuum_5',
+    //             ];
+
+    //             foreach ($fieldsToCheck as $field) {
+    //                 if (isset($check->$field) && $check->$field === 'Tidak OK') {
+    //                     $totalNonConform++;
+    //                 }
+    //             }
+    //         }
+
+    //         // simpan hasil ke properti tambahan
+    //         $report->ketidaksesuaian = $totalNonConform;
+    //     }
+
+    //     return view('report_packaging_verifs.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportPackagingVerif::with([
+            'area',
+            'section',
+            'details.product',
+            'details.checklist'
+        ])->latest();
+
+        // 🔍 SEARCH GLOBAL
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 SECTION
+                $q->orWhereHas('section', function ($s) use ($search) {
+                    $s->where('section_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL PACKAGING
+                $q->orWhereHas('details', function ($d) use ($search) {
+
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('time', 'like', "%{$search}%")
+                    ->orWhere('expired_date', 'like', "%{$search}%")
+                    ->orWhere('qc_verif', 'like', "%{$search}%")
+                    ->orWhere('kr_verif', 'like', "%{$search}%");
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 CHECKLIST PACKAGING (PALING DALAM)
+                    $d->orWhereHas('checklist', function ($c) use ($search) {
+                        $c->where('sampling_result', 'like', "%{$search}%")
+                        ->orWhere('verif_md', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%")
+                        ->orWhere('unit', 'like', "%{$search}%")
+                        ->orWhere('sampling_amount', 'like', "%{$search}%")
+
+                        // sealing condition
+                        ->orWhere('sealing_condition_1', 'like', "%{$search}%")
+                        ->orWhere('sealing_condition_2', 'like', "%{$search}%")
+                        ->orWhere('sealing_condition_3', 'like', "%{$search}%")
+                        ->orWhere('sealing_condition_4', 'like', "%{$search}%")
+                        ->orWhere('sealing_condition_5', 'like', "%{$search}%")
+
+                        // sealing vacuum
+                        ->orWhere('sealing_vacuum_1', 'like', "%{$search}%")
+                        ->orWhere('sealing_vacuum_2', 'like', "%{$search}%")
+                        ->orWhere('sealing_vacuum_3', 'like', "%{$search}%")
+                        ->orWhere('sealing_vacuum_4', 'like', "%{$search}%")
+                        ->orWhere('sealing_vacuum_5', 'like', "%{$search}%")
+
+                        // berat & pcs
+                        ->orWhere('standard_weight', 'like', "%{$search}%")
+                        ->orWhere('avg_weight', 'like', "%{$search}%")
+                        ->orWhere('avg_long_pcs', 'like', "%{$search}%")
+                        ->orWhere('avg_weight_pcs', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         foreach ($reports as $report) {
             $totalNonConform = 0;
 
             foreach ($report->details as $detail) {
                 $check = $detail->checklist;
-
                 if (!$check) continue;
 
-                $fieldsToCheck = [
+                foreach ([
                     'sampling_result',
                     'verif_md',
-                    'sealing_condition_1', 'sealing_condition_2', 'sealing_condition_3',
-                    'sealing_condition_4', 'sealing_condition_5',
-                    'sealing_vacuum_1', 'sealing_vacuum_2', 'sealing_vacuum_3',
-                    'sealing_vacuum_4', 'sealing_vacuum_5',
-                ];
-
-                foreach ($fieldsToCheck as $field) {
+                    'sealing_condition_1','sealing_condition_2','sealing_condition_3',
+                    'sealing_condition_4','sealing_condition_5',
+                    'sealing_vacuum_1','sealing_vacuum_2','sealing_vacuum_3',
+                    'sealing_vacuum_4','sealing_vacuum_5',
+                ] as $field) {
                     if (isset($check->$field) && $check->$field === 'Tidak OK') {
                         $totalNonConform++;
                     }
                 }
             }
 
-            // simpan hasil ke properti tambahan
             $report->ketidaksesuaian = $totalNonConform;
         }
 
         return view('report_packaging_verifs.index', compact('reports'));
     }
-
-
 
     public function create()
     {

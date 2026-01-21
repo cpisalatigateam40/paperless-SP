@@ -19,9 +19,91 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportWeightStufferController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportWeightStuffer::with('details')->latest()->paginate(10);
+    //     return view('report_weight_stuffers.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
     {
-        $reports = ReportWeightStuffer::with('details')->latest()->paginate(10);
+        $query = ReportWeightStuffer::with([
+            'area',
+            'details.product',
+            'details.townsend',
+            'details.hitech',
+            'details.cases',
+            'details.weights'
+        ])->latest();
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL
+                $q->orWhereHas('details', function ($d) use ($search) {
+
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('time', 'like', "%{$search}%")
+                    ->orWhere('weight_standard', 'like', "%{$search}%")
+                    ->orWhere('long_standard', 'like', "%{$search}%")
+                    ->orWhere('machine', 'like', "%{$search}%");
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 TOWNSEND
+                    $d->orWhereHas('townsend', function ($t) use ($search) {
+                        $t->where('stuffer_speed', 'like', "%{$search}%")
+                        ->orWhere('trolley_total', 'like', "%{$search}%")
+                        ->orWhere('avg_weight', 'like', "%{$search}%")
+                        ->orWhere('avg_long', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 HITECH
+                    $d->orWhereHas('hitech', function ($h) use ($search) {
+                        $h->where('stuffer_speed', 'like', "%{$search}%")
+                        ->orWhere('trolley_total', 'like', "%{$search}%")
+                        ->orWhere('avg_weight', 'like', "%{$search}%")
+                        ->orWhere('avg_long', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 CASE STUFFER
+                    $d->orWhereHas('cases', function ($c) use ($search) {
+                        $c->where('actual_case_1', 'like', "%{$search}%")
+                        ->orWhere('actual_case_2', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 WEIGHT MEASUREMENT
+                    $d->orWhereHas('weights', function ($w) use ($search) {
+                        $w->where('actual_weight', 'like', "%{$search}%")
+                        ->orWhere('actual_long', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
         return view('report_weight_stuffers.index', compact('reports'));
     }
 
