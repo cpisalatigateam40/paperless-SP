@@ -17,33 +17,123 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportFreezPackagingController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportFreezPackaging::with(['area', 'details.kartoning'])->latest()->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportFreezPackaging::with(['area', 'details.kartoning'])->latest()->paginate(10);
 
-        // Hitung ketidaksesuaian
+    //     // Hitung ketidaksesuaian
+    //     foreach ($reports as $report) {
+    //         $count = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             // 1️⃣ Cek verifikasi setelah tindakan koreksi
+    //             if ($detail->verif_after === 'x') {
+    //                 $count++;
+    //                 continue; // tidak perlu cek karton jika sudah x
+    //             }
+
+    //             // 2️⃣ Cek kondisi karton
+    //             if (optional($detail->kartoning)->carton_condition === 'x') {
+    //                 $count++;
+    //             }
+    //         }
+
+    //         // Tambahkan properti agar bisa dipakai di Blade
+    //         $report->ketidaksesuaian = $count;
+    //     }
+
+    //     return view('report_freez_packagings.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $search = $request->search;
+
+        $reports = ReportFreezPackaging::with([
+                'area',
+                'details.product',
+                'details.freezing',
+                'details.kartoning'
+            ])
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($qq) use ($search) {
+
+                    /* ================= HEADER ================= */
+                    $qq->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
+
+                    /* ================= AREA ================= */
+                    $qq->orWhereHas('area', function ($qa) use ($search) {
+                        $qa->where('name', 'like', "%{$search}%");
+                    });
+
+                    /* ================= DETAIL ================= */
+                    $qq->orWhereHas('details', function ($qd) use ($search) {
+                        $qd->where('start_time', 'like', "%{$search}%")
+                        ->orWhere('end_time', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%")
+                        ->orWhere('best_before', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verif_after', 'like', "%{$search}%")
+
+                        /* PRODUCT */
+                        ->orWhereHas('product', function ($qp) use ($search) {
+                            $qp->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('production_code', 'like', "%{$search}%");
+                        })
+
+                        /* FREEZING */
+                        ->orWhereHas('freezing', function ($qf) use ($search) {
+                            $qf->where('start_product_temp', 'like', "%{$search}%")
+                                ->orWhere('end_product_temp', 'like', "%{$search}%")
+                                ->orWhere('iqf_room_temp', 'like', "%{$search}%")
+                                ->orWhere('iqf_suction_temp', 'like', "%{$search}%")
+                                ->orWhere('freezing_time_display', 'like', "%{$search}%")
+                                ->orWhere('freezing_time_actual', 'like', "%{$search}%")
+                                ->orWhere('standard_temp', 'like', "%{$search}%");
+                        })
+
+                        /* CARTONING */
+                        ->orWhereHas('kartoning', function ($qk) use ($search) {
+                            $qk->where('carton_code', 'like', "%{$search}%")
+                                ->orWhere('carton_condition', 'like', "%{$search}%")
+                                ->orWhere('carton_weight_standard', 'like', "%{$search}%")
+                                ->orWhere('carton_weight_actual', 'like', "%{$search}%")
+                                ->orWhere('avg_weight', 'like', "%{$search}%")
+                                ->orWhere('content_rtg', 'like', "%{$search}%");
+                        });
+                    });
+
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        /* ================= HITUNG KETIDAKSESUAIAN ================= */
         foreach ($reports as $report) {
             $count = 0;
 
             foreach ($report->details as $detail) {
-                // 1️⃣ Cek verifikasi setelah tindakan koreksi
                 if ($detail->verif_after === 'x') {
                     $count++;
-                    continue; // tidak perlu cek karton jika sudah x
+                    continue;
                 }
 
-                // 2️⃣ Cek kondisi karton
                 if (optional($detail->kartoning)->carton_condition === 'x') {
                     $count++;
                 }
             }
 
-            // Tambahkan properti agar bisa dipakai di Blade
             $report->ketidaksesuaian = $count;
         }
 
         return view('report_freez_packagings.index', compact('reports'));
     }
+
 
 
     public function create()

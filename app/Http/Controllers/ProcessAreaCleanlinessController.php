@@ -18,22 +18,107 @@ class ProcessAreaCleanlinessController extends Controller
 {
     use HasRoles;
 
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportProcessAreaCleanliness::with('details.items.followups', 'area')
+    //         ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+    //             $query->where('area_uuid', Auth::user()->area_uuid);
+    //         })
+    //         ->latest()
+    //         ->paginate(20);
+
+    //     // 🔹 Hitung ketidaksesuaian untuk setiap report
+    //     foreach ($reports as $report) {
+    //         $count = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             foreach ($detail->items as $item) {
+    //                 // Cek kondisi "Kotor" atau "Tidak OK"
+    //                 if (
+    //                     strtolower($item->condition ?? '') === 'kotor' ||
+    //                     $item->verification == 0
+    //                 ) {
+    //                     $count++;
+    //                 }
+
+    //                 // Jika ada follow-up juga tidak OK
+    //                 foreach ($item->followups as $followup) {
+    //                     if ($followup->verification == 0) {
+    //                         $count++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // Tambahkan properti dinamis ke model
+    //         $report->ketidaksesuaian = $count;
+    //     }
+
+    //     return view('cleanliness_PA.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
     {
-        $reports = ReportProcessAreaCleanliness::with('details.items.followups', 'area')
+        $search = $request->search;
+
+        $reports = ReportProcessAreaCleanliness::with([
+                'details.items.followups',
+                'area'
+            ])
             ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
                 $query->where('area_uuid', Auth::user()->area_uuid);
             })
-            ->latest()
-            ->paginate(20);
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
 
-        // 🔹 Hitung ketidaksesuaian untuk setiap report
+                    /* ================= HEADER ================= */
+                    $q->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('section_name', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
+
+                    /* ================= AREA ================= */
+                    $q->orWhereHas('area', function ($qa) use ($search) {
+                        $qa->where('name', 'like', "%{$search}%");
+                    });
+
+                    /* ================= DETAIL ================= */
+                    $q->orWhereHas('details', function ($qd) use ($search) {
+                        $qd->where('inspection_hour', 'like', "%{$search}%")
+
+                        /* ================= ITEM ================= */
+                        ->orWhereHas('items', function ($qi) use ($search) {
+                            $qi->where('item', 'like', "%{$search}%")
+                                ->orWhere('condition', 'like', "%{$search}%")
+                                ->orWhere('notes', 'like', "%{$search}%")
+                                ->orWhere('corrective_action', 'like', "%{$search}%")
+                                ->orWhere('verification', 'like', "%{$search}%")
+                                ->orWhere('temperature_actual', 'like', "%{$search}%")
+                                ->orWhere('temperature_display', 'like', "%{$search}%")
+
+                                /* ============== FOLLOW UP ============== */
+                                ->orWhereHas('followups', function ($qf) use ($search) {
+                                    $qf->where('notes', 'like', "%{$search}%")
+                                        ->orWhere('action', 'like', "%{$search}%")
+                                        ->orWhere('verification', 'like', "%{$search}%");
+                                });
+                        });
+                    });
+                });
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        /* ================= HITUNG KETIDAKSESUAIAN ================= */
         foreach ($reports as $report) {
             $count = 0;
 
             foreach ($report->details as $detail) {
                 foreach ($detail->items as $item) {
-                    // Cek kondisi "Kotor" atau "Tidak OK"
+
                     if (
                         strtolower($item->condition ?? '') === 'kotor' ||
                         $item->verification == 0
@@ -41,7 +126,6 @@ class ProcessAreaCleanlinessController extends Controller
                         $count++;
                     }
 
-                    // Jika ada follow-up juga tidak OK
                     foreach ($item->followups as $followup) {
                         if ($followup->verification == 0) {
                             $count++;
@@ -50,12 +134,12 @@ class ProcessAreaCleanlinessController extends Controller
                 }
             }
 
-            // Tambahkan properti dinamis ke model
             $report->ketidaksesuaian = $count;
         }
 
         return view('cleanliness_PA.index', compact('reports'));
     }
+
 
 
     public function create()

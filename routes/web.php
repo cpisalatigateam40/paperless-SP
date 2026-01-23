@@ -1115,4 +1115,11 @@ Route::put('/{uuid}', 'update')->name('update');
     Route::get('/production-codes', [ReportRmArrivalController::class, 'productionCodes'])
     ->name('production-codes');
 
+    Route::get('/formulas/{uuid}/edit/{formulation_name}', [FormulaController::class, 'editDetail'])
+    ->name('formulas.editDetail');
+
+    Route::put('/formulas/{uuid}/update/{formulation_name}', [FormulaController::class, 'updateDetail'])
+        ->name('formulas.updateDetail');
+
+
 });

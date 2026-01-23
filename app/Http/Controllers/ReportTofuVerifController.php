@@ -14,12 +14,69 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportTofuVerifController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportTofuVerif::latest()->with(['productInfos', 'weightVerifs', 'defectVerifs'])->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportTofuVerif::latest()->with(['productInfos', 'weightVerifs', 'defectVerifs'])->paginate(10);
 
-        return view('report_tofu_verifs.index', compact('reports'));
-    }
+    //     return view('report_tofu_verifs.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportTofuVerif::with([
+            'area',
+            'productInfos',
+            'weightVerifs',
+            'defectVerifs'
+        ])->latest();
+
+        // 🔍 GLOBAL SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT INFO (KODE PRODUKSI, ED, SAMPLE)
+                $q->orWhereHas('productInfos', function ($pi) use ($search) {
+                    $pi->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('expired_date', 'like', "%{$search}%")
+                    ->orWhere('sample_amount', 'like', "%{$search}%");
+                });
+
+                // 🔹 WEIGHT VERIFICATION
+                $q->orWhereHas('weightVerifs', function ($wv) use ($search) {
+                    $wv->where('weight_category', 'like', "%{$search}%")
+                    ->orWhere('turus', 'like', "%{$search}%")
+                    ->orWhere('total', 'like', "%{$search}%")
+                    ->orWhere('percentage', 'like', "%{$search}%");
+                });
+
+                // 🔹 DEFECT VERIFICATION
+                $q->orWhereHas('defectVerifs', function ($dv) use ($search) {
+                    $dv->where('defect_type', 'like', "%{$search}%")
+                    ->orWhere('turus', 'like', "%{$search}%")
+                    ->orWhere('total', 'like', "%{$search}%")
+                    ->orWhere('percentage', 'like', "%{$search}%");
+                });
+            });
+        }
+
+    $reports = $query->paginate(10)->withQueryString();
+
+    return view('report_tofu_verifs.index', compact('reports'));
+}
 
     public function create()
     {

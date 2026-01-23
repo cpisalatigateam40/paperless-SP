@@ -16,9 +16,57 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportLabSampleController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportLabSample::with('area', 'details.product')->latest()->paginate(10);
+    //     return view('report_lab_samples.index', compact('reports'));
+    // }
+    public function index(Request $request)
     {
-        $reports = ReportLabSample::with('area', 'details.product')->latest()->paginate(10);
+        $query = ReportLabSample::with(['area', 'details.product'])
+            ->latest();
+
+        // 🔍 GLOBAL SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('storage', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('accepted_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL SAMPLE
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('best_before', 'like', "%{$search}%")
+                    ->orWhere('quantity', 'like', "%{$search}%")
+                    ->orWhere('gramase', 'like', "%{$search}%")
+                    ->orWhere('sample_type', 'like', "%{$search}%")
+                    ->orWhere('unit', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('details.product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
         return view('report_lab_samples.index', compact('reports'));
     }
 

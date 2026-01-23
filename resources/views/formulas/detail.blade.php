@@ -52,7 +52,7 @@
                             onclick="removeField(this)">Hapus</button>
                     </div>
                 </div>
-                <button type="button" onclick="addRawMaterial()" class="btn btn-secondary btn-sm mb-3">+ Tambah Raw
+                <button type="button" onclick="addRawMaterial()" class="btn btn-secondary btn-sm mb-5">+ Tambah Raw
                     Material</button>
 
                 <h5>Premixes</h5>
@@ -100,7 +100,11 @@
                                 {{ $formulationName }}
                             </button>
                         </td>
-                        <td>
+                        <td class="d-flex" style="gap: .4rem;">
+                            <a href="{{ route('formulas.editDetail', [$formula->uuid, $formulationName]) }}"
+                            class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
                             <form
                                 action="{{ route('formulas.deleteDetailByName', [$formula->uuid, $formulationName]) }}"
                                 method="POST"

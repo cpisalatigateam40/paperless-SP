@@ -8,7 +8,44 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5> Laporan Verifikasi Kebersihan Ruang Penyimpanan</h5>
-            <a href="{{ route('cleanliness.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+            
+            <div class="d-flex gap-2" style="gap: .4rem;">
+
+                {{-- 🔍 SEARCH --}}
+                <form method="GET"
+                    action="{{ route('cleanliness.index') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    {{-- pertahankan filter section --}}
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari laporan..."
+                        value="{{ request('search') }}"
+                    >
+
+                    {{-- 🔍 BUTTON CARI --}}
+                    <button type="submit" class="btn btn-outline-primary">
+                        Cari
+                    </button>
+
+                    {{-- 🔄 RESET --}}
+                    @if(request('search') || request('section'))
+                        <a href="{{ route('cleanliness.index') }}"
+                        class="btn btn-danger"
+                        title="Reset Filter">
+                            Reset
+                        </a>
+                    @endif
+
+                </form>
+
+                <a href="{{ route('cleanliness.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+            </div>
         </div>
 
         <div class="card-body">
