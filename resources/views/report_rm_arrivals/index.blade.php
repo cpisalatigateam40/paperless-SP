@@ -276,7 +276,7 @@
 
             {{-- PAGINATION --}}
             <div class="d-flex justify-content-end mt-3">
-                {{ $reports->links('pagination::Bootstrap-5') }}
+                {{ $reports->links('pagination::bootstrap-5') }}
             </div>
 
 
