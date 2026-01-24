@@ -43,7 +43,7 @@
                     @foreach($report->details as $i => $detail)
                     <div class="detail-row mb-3 p-3 border rounded bg-light">
                         <div class="row align-items-end">
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <label class="form-label">Bahan Baku</label>
                                 <select name="details[{{ $i }}][raw_material_uuid]" class="form-control" required>
                                     <option value="">-- Pilih --</option>
@@ -54,7 +54,46 @@
                                     </option>
                                     @endforeach
                                 </select>
+                            </div> -->
+                            <div class="col-md-4">
+                                <label class="form-label">Bahan Baku</label>
+                                <select name="details[{{ $i }}][material_uuid]"
+                                        class="form-control"
+                                        onchange="updateMaterialType(this)"
+                                        required>
+
+                                    <option value="">-- Pilih Bahan --</option>
+
+                                    {{-- RAW --}}
+                                    @foreach($rawMaterials as $material)
+                                        <option value="{{ $material->uuid }}"
+                                                data-type="raw"
+                                                @selected(
+                                                    $detail->material_type === 'raw'
+                                                    && $detail->raw_material_uuid === $material->uuid
+                                                )>
+                                            {{ $material->material_name }}
+                                        </option>
+                                    @endforeach
+
+                                    {{-- PREMIX --}}
+                                    @foreach($premixes as $premix)
+                                        <option value="{{ $premix->uuid }}"
+                                                data-type="premix"
+                                                @selected(
+                                                    $detail->material_type === 'premix'
+                                                    && $detail->material_uuid === $premix->uuid
+                                                )>
+                                            {{ $premix->name }} (Premix)
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <input type="hidden"
+                                    name="details[{{ $i }}][material_type]"
+                                    value="{{ $detail->material_type ?? 'raw' }}">
                             </div>
+
 
                             <div class="col-md-4">
                                 <label class="form-label">Kondisi RM</label>
@@ -182,5 +221,26 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateMaterialType(select) {
+    const option = select.options[select.selectedIndex];
+    const type = option.dataset.type || 'raw';
+
+    const wrapper = select.closest('.col-md-4').parentElement;
+    const hidden = wrapper.querySelector('input[name$="[material_type]"]');
+
+    if (hidden) hidden.value = type;
+
+    /**
+     * OPTIONAL:
+     * Kalau premix → kosongkan supplier
+     */
+    const supplierInput = wrapper.querySelector('select[name$="[supplier][]"]');
+    if (supplierInput && type === 'premix') {
+        supplierInput.value = '';
+    }
+}
+</script>
 
 @endsection

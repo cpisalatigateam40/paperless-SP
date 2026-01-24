@@ -5,7 +5,45 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Laporan Verifikasi Pemasakan Baso</h5>
-            <a href="{{ route('report_baso_cookings.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+            
+
+            <div class="d-flex gap-2" style="gap: .4rem;">
+
+                {{-- 🔍 SEARCH --}}
+                <form method="GET"
+                    action="{{ route('report_baso_cookings.index') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    {{-- pertahankan filter section --}}
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari laporan..."
+                        value="{{ request('search') }}"
+                    >
+
+                    {{-- 🔍 BUTTON CARI --}}
+                    <button type="submit" class="btn btn-outline-primary">
+                        Cari
+                    </button>
+
+                    {{-- 🔄 RESET --}}
+                    @if(request('search') || request('section'))
+                        <a href="{{ route('report_baso_cookings.index') }}"
+                        class="btn btn-danger"
+                        title="Reset Filter">
+                            Reset
+                        </a>
+                    @endif
+
+                </form>
+
+                <a href="{{ route('report_baso_cookings.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+            </div>
         </div>
 
         <div class="card-body">
@@ -14,7 +52,7 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-bordered  align-middle text-center">
+                <table class="table table-bordered align-middle text-center">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -57,10 +95,21 @@
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <a href="{{ route('report_baso_cookings.edit', $report->uuid) }}"
+                                <!-- <a href="{{ route('report_baso_cookings.edit', $report->uuid) }}"
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-edit"></i>
-                                </a>
+                                </a> -->
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_baso_cookings.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
                                 @can('edit report')
                                 <a href="{{ route('report_baso_cookings.edit_next', $report->uuid) }}"
                                     class="btn btn-sm btn-danger" title="Edit Laporan">

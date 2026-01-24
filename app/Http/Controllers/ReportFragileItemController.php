@@ -14,11 +14,73 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportFragileItemController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportFragileItem::with(['details.item'])->latest()->paginate(10);
+    //     return view('report_fragile_item.index', compact('reports'));
+    // }
+    public function index(Request $request)
     {
-        $reports = ReportFragileItem::with(['details.item'])->latest()->paginate(10);
+        $reports = ReportFragileItem::with([
+                'area',
+                'details.item'
+            ])
+
+            // 🔒 Area user (kalau bukan superadmin)
+            ->when(!Auth::user()->hasRole('Superadmin'), function ($q) {
+                $q->where('area_uuid', Auth::user()->area_uuid);
+            })
+
+            // 🔍 Tanggal
+            ->when($request->date, function ($q) use ($request) {
+                $q->whereDate('date', $request->date);
+            })
+
+            // 🔍 Shift
+            ->when($request->shift, function ($q) use ($request) {
+                $q->where('shift', $request->shift);
+            })
+
+            // 🔍 Global Search (SATU INPUT)
+            ->when($request->search, function ($q) use ($request) {
+                $search = $request->search;
+
+                $q->where(function ($qq) use ($search) {
+
+                    // 🔹 Header report
+                    $qq->where('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%")
+                    ->orWhere('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%");
+
+                    // 🔹 Area
+                    $qq->orWhereHas('area', function ($a) use ($search) {
+                        $a->where('name', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 Detail laporan
+                    $qq->orWhereHas('details', function ($d) use ($search) {
+                        $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('actual_quantity', 'like', "%{$search}%");
+
+                        // 🔹 Master Fragile Item
+                        $d->orWhereHas('item', function ($i) use ($search) {
+                            $i->where('item_name', 'like', "%{$search}%")
+                            ->orWhere('section_name', 'like', "%{$search}%")
+                            ->orWhere('owner', 'like', "%{$search}%");
+                        });
+                    });
+                });
+            })
+
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return view('report_fragile_item.index', compact('reports'));
     }
+
 
     public function create()
     {

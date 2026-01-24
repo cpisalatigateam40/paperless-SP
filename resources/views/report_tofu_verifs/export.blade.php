@@ -180,7 +180,7 @@
 
             {{-- Row: Expired Date --}}
             <tr>
-                <td class="text-start">Expired Date</td>
+                <td class="text-start">Best Before</td>
                 @foreach($products as $p)
                 <td>{{ $p->expired_date }}</td>
                 @endforeach

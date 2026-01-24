@@ -5,7 +5,44 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5> Laporan Verifikasi GMP Karyawan & Kontrol Sanitasi</h5>
-            <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+            
+            <div class="d-flex gap-2" style="gap: .4rem;">
+
+                {{-- 🔍 SEARCH --}}
+                <form method="GET"
+                    action="{{ route('gmp-employee.index') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    {{-- pertahankan filter section --}}
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari laporan..."
+                        value="{{ request('search') }}"
+                    >
+
+                    {{-- 🔍 BUTTON CARI --}}
+                    <button type="submit" class="btn btn-outline-primary">
+                        Cari
+                    </button>
+
+                    {{-- 🔄 RESET --}}
+                    @if(request('search') || request('section'))
+                        <a href="{{ route('gmp-employee.index') }}"
+                        class="btn btn-danger"
+                        title="Reset Filter">
+                            Reset
+                        </a>
+                    @endif
+
+                </form>
+
+                <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+            </div>
         </div>
 
         <div class="card-body">
@@ -65,10 +102,22 @@
                                     </button>
 
                                     {{-- Update Laporan --}}
-                                    <a href="{{ route('gmp-employee.edit', $report->uuid) }}"
+                                    <!-- <a href="{{ route('gmp-employee.edit', $report->uuid) }}"
                                         class="btn btn-sm btn-warning" title="Update Laporan">
                                         <i class="fas fa-pen"></i>
-                                    </a>
+                                    </a> -->
+
+                                    @php
+                                        $user = auth()->user();
+                                        $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                    @endphp
+
+                                    @if($canEdit)
+                                        <a href="{{ route('gmp-employee.edit', $report->uuid) }}"
+                                            class="btn btn-sm btn-warning" title="Edit Laporan">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    @endif
 
                                     @can('edit report')
                                     <a href="{{ route('gmp-employee.editnext', $report->uuid) }}"

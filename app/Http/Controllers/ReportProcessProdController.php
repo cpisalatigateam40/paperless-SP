@@ -23,12 +23,74 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportProcessProdController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportProcessProd::with([
+    //         'area',
+    //         'section',
+    //         'detail.product',
+    //         'detail.formula',
+    //         'detail.items.formulation.rawMaterial',
+    //         'detail.items.formulation.premix',
+    //         'detail.emulsifying',
+    //         'detail.sensoric',
+    //         'detail.tumbling',
+    //         'detail.aging'
+    //     ])
+    //     ->latest()
+    //     ->paginate(10);
+
+    //     // Hitung ketidaksesuaian untuk setiap report
+    //     $reports->transform(function ($report) {
+    //         $totalKetidaksesuaian = 0;
+
+    //         foreach ($report->detail as $detail) {
+    //             // 🔹 Cek dari DetailProcessProd (nilai 'x')
+    //             if (
+    //                 $detail->sensory_homogenity === 'x' ||
+    //                 $detail->sensory_stiffness === 'x' ||
+    //                 $detail->sensory_aroma === 'x'
+    //             ) {
+    //                 $totalKetidaksesuaian++;
+    //             }
+
+    //             // 🔹 Cek dari ProcessSensoric (nilai "Tidak OK" / "Terdeteksi")
+    //             if ($detail->sensoric) {
+    //                 if (
+    //                     $detail->sensoric->homogeneous === 'Tidak OK' ||
+    //                     $detail->sensoric->stiffness === 'Tidak OK' ||
+    //                     $detail->sensoric->aroma === 'Tidak OK' ||
+    //                     $detail->sensoric->foreign_object === 'Terdeteksi'
+    //                 ) {
+    //                     $totalKetidaksesuaian++;
+    //                 }
+    //             }
+
+    //             // 🔹 Cek dari ItemDetailProd (nilai "Tidak OK" di sensory)
+    //             if ($detail->items) {
+    //                 $totalKetidaksesuaian += $detail->items
+    //                     ->filter(fn($item) => $item->sensory === 'Tidak OK')
+    //                     ->count();
+    //             }
+    //         }
+
+    //         // Simpan hasilnya di properti baru
+    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
+
+    //         return $report;
+    //     });
+
+    //     return view('report_process_productions.index', compact('reports'));
+    // }
+
+
+    public function index(Request $request)
     {
-        $reports = ReportProcessProd::with([
+        $query = ReportProcessProd::with([
             'area',
             'section',
             'detail.product',
+            'detail.reworkProduct',
             'detail.formula',
             'detail.items.formulation.rawMaterial',
             'detail.items.formulation.premix',
@@ -36,25 +98,125 @@ class ReportProcessProdController extends Controller
             'detail.sensoric',
             'detail.tumbling',
             'detail.aging'
-        ])
-        ->latest()
-        ->paginate(10);
+        ])->latest();
 
-        // Hitung ketidaksesuaian untuk setiap report
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 SECTION
+                $q->orWhereHas('section', function ($s) use ($search) {
+                    $s->where('section_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL PROCESS
+                $q->orWhereHas('detail', function ($d) use ($search) {
+
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('mixing_time', 'like', "%{$search}%")
+                    ->orWhere('rework_kg', 'like', "%{$search}%")
+                    ->orWhere('rework_percent', 'like', "%{$search}%")
+                    ->orWhere('total_material', 'like', "%{$search}%")
+                    ->orWhere('sensory_homogenity', 'like', "%{$search}%")
+                    ->orWhere('sensory_stiffness', 'like', "%{$search}%")
+                    ->orWhere('sensory_aroma', 'like', "%{$search}%")
+                    ->orWhere('gramase', 'like', "%{$search}%");
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 REWORK PRODUCT
+                    $d->orWhereHas('reworkProduct', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 FORMULA
+                    $d->orWhereHas('formula', function ($f) use ($search) {
+                        $f->where('formula_name', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 ITEM DETAIL
+                    $d->orWhereHas('items', function ($i) use ($search) {
+                        $i->where('actual_weight', 'like', "%{$search}%")
+                        ->orWhere('sensory', 'like', "%{$search}%")
+                        ->orWhere('prod_code', 'like', "%{$search}%")
+                        ->orWhere('temperature', 'like', "%{$search}%");
+
+                        // Raw Material
+                        $i->orWhereHas('formulation.rawMaterial', function ($rm) use ($search) {
+                            $rm->where('material_name', 'like', "%{$search}%");
+                        });
+
+                        // Premix
+                        $i->orWhereHas('formulation.premix', function ($pm) use ($search) {
+                            $pm->where('name', 'like', "%{$search}%");
+                        });
+                    });
+
+                    // 🔹 PROCESS SENSORIC
+                    $d->orWhereHas('sensoric', function ($s) use ($search) {
+                        $s->where('homogeneous', 'like', "%{$search}%")
+                        ->orWhere('stiffness', 'like', "%{$search}%")
+                        ->orWhere('aroma', 'like', "%{$search}%")
+                        ->orWhere('foreign_object', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 EMULSIFYING
+                    $d->orWhereHas('emulsifying', function ($e) use ($search) {
+                        $e->where('average_mixture_temp', 'like', "%{$search}%")
+                        ->orWhere('actual_mixture_temp_1', 'like', "%{$search}%")
+                        ->orWhere('actual_mixture_temp_2', 'like', "%{$search}%")
+                        ->orWhere('actual_mixture_temp_3', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 TUMBLING
+                    $d->orWhereHas('tumbling', function ($t) use ($search) {
+                        $t->where('tumbling_process', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 AGING
+                    $d->orWhereHas('aging', function ($a) use ($search) {
+                        $a->where('aging_process', 'like', "%{$search}%")
+                        ->orWhere('stuffing_result', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->transform(function ($report) {
-            $totalKetidaksesuaian = 0;
+            $total = 0;
 
             foreach ($report->detail as $detail) {
-                // 🔹 Cek dari DetailProcessProd (nilai 'x')
+
                 if (
                     $detail->sensory_homogenity === 'x' ||
                     $detail->sensory_stiffness === 'x' ||
                     $detail->sensory_aroma === 'x'
                 ) {
-                    $totalKetidaksesuaian++;
+                    $total++;
                 }
 
-                // 🔹 Cek dari ProcessSensoric (nilai "Tidak OK" / "Terdeteksi")
                 if ($detail->sensoric) {
                     if (
                         $detail->sensoric->homogeneous === 'Tidak OK' ||
@@ -62,28 +224,23 @@ class ReportProcessProdController extends Controller
                         $detail->sensoric->aroma === 'Tidak OK' ||
                         $detail->sensoric->foreign_object === 'Terdeteksi'
                     ) {
-                        $totalKetidaksesuaian++;
+                        $total++;
                     }
                 }
 
-                // 🔹 Cek dari ItemDetailProd (nilai "Tidak OK" di sensory)
                 if ($detail->items) {
-                    $totalKetidaksesuaian += $detail->items
-                        ->filter(fn($item) => $item->sensory === 'Tidak OK')
+                    $total += $detail->items
+                        ->where('sensory', 'Tidak OK')
                         ->count();
                 }
             }
 
-            // Simpan hasilnya di properti baru
-            $report->ketidaksesuaian = $totalKetidaksesuaian;
-
+            $report->ketidaksesuaian = $total;
             return $report;
         });
 
         return view('report_process_productions.index', compact('reports'));
     }
-
-
 
     public function create()
     {

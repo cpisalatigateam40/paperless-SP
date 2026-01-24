@@ -5,7 +5,44 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Laporan Verifikasi Produk Tofu</h5>
-            <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+            
+            <div class="d-flex gap-2" style="gap: .4rem;">
+
+                {{-- 🔍 SEARCH --}}
+                <form method="GET"
+                    action="{{ route('report_tofu_verifs.index') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    {{-- pertahankan filter section --}}
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari laporan..."
+                        value="{{ request('search') }}"
+                    >
+
+                    {{-- 🔍 BUTTON CARI --}}
+                    <button type="submit" class="btn btn-outline-primary">
+                        Cari
+                    </button>
+
+                    {{-- 🔄 RESET --}}
+                    @if(request('search') || request('section'))
+                        <a href="{{ route('report_tofu_verifs.index') }}"
+                        class="btn btn-danger"
+                        title="Reset Filter">
+                            Reset
+                        </a>
+                    @endif
+
+                </form>
+
+                <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+            </div>
         </div>
         <div class="card-body">
             @if(session('success'))
@@ -54,10 +91,22 @@
                                 </button>
 
                                 {{-- Edit --}}
-                                <a href="{{ route('report_tofu_verifs.edit', $report->uuid) }}"
+                                <!-- <a href="{{ route('report_tofu_verifs.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Update Laporan">
                                     <i class="fas fa-pen"></i>
-                                </a>
+                                </a> -->
+
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_tofu_verifs.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
 
                                 {{-- Delete --}}
                                 <form action="{{ route('report_tofu_verifs.destroy', $report->uuid) }}" method="POST"
@@ -165,7 +214,7 @@
 
                                             {{-- Row: Expired Date --}}
                                             <tr>
-                                                <td class="text-start">Expired Date</td>
+                                                <td class="text-start">Best Before</td>
                                                 @foreach($products as $p)
                                                 <td>{{ $p->expired_date }}</td>
                                                 @endforeach

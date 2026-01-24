@@ -20,6 +20,8 @@ class DetailLabSample extends Model implements Auditable
         'quantity',
         'notes',
         'gramase',
+        'sample_type',
+        'unit',
     ];
 
     protected $auditEvents = [

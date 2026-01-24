@@ -16,9 +16,57 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportLabSampleController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportLabSample::with('area', 'details.product')->latest()->paginate(10);
+    //     return view('report_lab_samples.index', compact('reports'));
+    // }
+    public function index(Request $request)
     {
-        $reports = ReportLabSample::with('area', 'details.product')->latest()->paginate(10);
+        $query = ReportLabSample::with(['area', 'details.product'])
+            ->latest();
+
+        // 🔍 GLOBAL SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('storage', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('accepted_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL SAMPLE
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('best_before', 'like', "%{$search}%")
+                    ->orWhere('quantity', 'like', "%{$search}%")
+                    ->orWhere('gramase', 'like', "%{$search}%")
+                    ->orWhere('sample_type', 'like', "%{$search}%")
+                    ->orWhere('unit', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('details.product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
         return view('report_lab_samples.index', compact('reports'));
     }
 
@@ -55,6 +103,8 @@ class ReportLabSampleController extends Controller
                     'quantity' => $detail['quantity'],
                     'notes' => $detail['notes'],
                     'gramase' => $detail['gramase'],
+                    'sample_type' => $detail['sample_type'],
+                    'unit' => $detail['unit'],
                 ]);
             }
         });
@@ -101,6 +151,8 @@ class ReportLabSampleController extends Controller
             'quantity' => $request->quantity,
             'notes' => $request->notes,
             'gramase' => $request->gramase,
+            'sample_type' => $request->sample_type,
+            'unit' => $request->unit,
         ]);
 
         return redirect()->route('report_lab_samples.index')->with('success', 'Detail berhasil ditambahkan');
@@ -174,48 +226,50 @@ class ReportLabSampleController extends Controller
     }
 
     public function edit($uuid)
-{
-    $report = ReportLabSample::with('details.product')->where('uuid', $uuid)->firstOrFail();
-    $areas = Area::all();
-    $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
-        ->groupBy('product_name')
-        ->get();
+    {
+        $report = ReportLabSample::with('details.product')->where('uuid', $uuid)->firstOrFail();
+        $areas = Area::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
-    return view('report_lab_samples.edit', compact('report', 'areas', 'products'));
-}
+        return view('report_lab_samples.edit', compact('report', 'areas', 'products'));
+    }
 
-public function update(Request $request, $uuid)
-{
-    DB::transaction(function () use ($request, $uuid) {
-        $report = ReportLabSample::where('uuid', $uuid)->firstOrFail();
+    public function update(Request $request, $uuid)
+    {
+        DB::transaction(function () use ($request, $uuid) {
+            $report = ReportLabSample::where('uuid', $uuid)->firstOrFail();
 
-        // Update header
-        $report->update([
-            'date' => $request->date,
-            'shift' => $request->shift,
-            'storage' => implode(', ', $request->storage ?? []),
-        ]);
-
-        // Hapus detail lama
-        DetailLabSample::where('report_uuid', $report->uuid)->delete();
-
-        // Simpan ulang detail
-        foreach ($request->details as $detail) {
-            DetailLabSample::create([
-                'uuid' => Str::uuid(),
-                'report_uuid' => $report->uuid,
-                'product_uuid' => $detail['product_uuid'],
-                'production_code' => $detail['production_code'],
-                'best_before' => $detail['best_before'],
-                'quantity' => $detail['quantity'],
-                'notes' => $detail['notes'],
-                'gramase' => $detail['gramase'],
+            // Update header
+            $report->update([
+                'date' => $request->date,
+                'shift' => $request->shift,
+                'storage' => implode(', ', $request->storage ?? []),
             ]);
-        }
-    });
 
-    return redirect()->route('report_lab_samples.index')->with('success', 'Data berhasil diperbarui');
-}
+            // Hapus detail lama
+            DetailLabSample::where('report_uuid', $report->uuid)->delete();
+
+            // Simpan ulang detail
+            foreach ($request->details as $detail) {
+                DetailLabSample::create([
+                    'uuid' => Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'product_uuid' => $detail['product_uuid'],
+                    'production_code' => $detail['production_code'],
+                    'best_before' => $detail['best_before'],
+                    'quantity' => $detail['quantity'],
+                    'notes' => $detail['notes'],
+                    'gramase' => $detail['gramase'],
+                    'sample_type' => $detail['sample_type'],
+                    'unit' => $detail['unit'],
+                ]);
+            }
+        });
+
+        return redirect()->route('report_lab_samples.index')->with('success', 'Data berhasil diperbarui');
+    }
 
 
 }

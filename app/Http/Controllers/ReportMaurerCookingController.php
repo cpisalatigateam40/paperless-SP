@@ -23,31 +23,159 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportMaurerCookingController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportMaurerCooking::with([
-            'details.thermocouplePositions',
-            'details.sensoryCheck'
-        ])
-        ->latest()
-        ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportMaurerCooking::with([
+    //         'details.thermocouplePositions',
+    //         'details.sensoryCheck'
+    //     ])
+    //     ->latest()
+    //     ->paginate(10);
 
-        // Hitung kolom ketidaksesuaian
+    //     // Hitung kolom ketidaksesuaian
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $totalKetidaksesuaian = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             // 🔹 Cek Thermocouple Positions
+    //             foreach ($detail->thermocouplePositions as $pos) {
+    //                 if (strtolower($pos->position_info) === 'tidak oke' || strtolower($pos->position_info) === 'tidak ok') {
+    //                     $totalKetidaksesuaian++;
+    //                 }
+    //             }
+
+    //             // 🔹 Cek Sensory Check
+    //             if ($detail->sensoryCheck) {
+    //                 $fields = ['ripeness', 'aroma', 'texture', 'color', 'taste'];
+    //                 foreach ($fields as $field) {
+    //                     if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
+    //                         $totalKetidaksesuaian++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
+    //         return $report;
+    //     });
+
+    //     return view('report_maurer_cookings.index', compact('reports'));
+    // }
+    public function index(Request $request)
+    {
+        $query = ReportMaurerCooking::with([
+            'area',
+            'section',
+            'details.product',
+            'details.processSteps',
+            'details.thermocouplePositions',
+            'details.sensoryCheck',
+            'details.showeringCoolingDown',
+            'details.cookingLosses',
+            'details.totalProcessTime',
+        ])->latest();
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 SECTION
+                $q->orWhereHas('section', function ($s) use ($search) {
+                    $s->where('section_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL
+                $q->orWhereHas('details', function ($d) use ($search) {
+
+                    $d->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('packaging_weight', 'like', "%{$search}%")
+                    ->orWhere('trolley_count', 'like', "%{$search}%")
+                    ->orWhere('can_be_twisted', 'like', "%{$search}%");
+
+                    // 🔹 PRODUCT
+                    $d->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 PROCESS STEPS
+                    $d->orWhereHas('processSteps', function ($ps) use ($search) {
+                        $ps->where('step_name', 'like', "%{$search}%")
+                        ->orWhere('room_temperature_1', 'like', "%{$search}%")
+                        ->orWhere('room_temperature_2', 'like', "%{$search}%")
+                        ->orWhere('product_temperature_1', 'like', "%{$search}%")
+                        ->orWhere('product_temperature_2', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 THERMOCOUPLE POSITIONS
+                    $d->orWhereHas('thermocouplePositions', function ($tp) use ($search) {
+                        $tp->where('position_info', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 SENSORY CHECK
+                    $d->orWhereHas('sensoryCheck', function ($sc) use ($search) {
+                        $sc->where('ripeness', 'like', "%{$search}%")
+                        ->orWhere('aroma', 'like', "%{$search}%")
+                        ->orWhere('texture', 'like', "%{$search}%")
+                        ->orWhere('color', 'like', "%{$search}%")
+                        ->orWhere('taste', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 SHOWERING & COOLING
+                    $d->orWhereHas('showeringCoolingDown', function ($sh) use ($search) {
+                        $sh->where('showering_time', 'like', "%{$search}%")
+                        ->orWhere('avg_product_temp_after_exit', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 COOKING LOSSES
+                    $d->orWhereHas('cookingLosses', function ($cl) use ($search) {
+                        $cl->where('batch_code', 'like', "%{$search}%")
+                        ->orWhere('loss_kg', 'like', "%{$search}%")
+                        ->orWhere('loss_percent', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 TOTAL PROCESS TIME
+                    $d->orWhereHas('totalProcessTime', function ($tp) use ($search) {
+                        $tp->where('start_time', 'like', "%{$search}%")
+                        ->orWhere('end_time', 'like', "%{$search}%")
+                        ->orWhere('total_duration', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $totalKetidaksesuaian = 0;
 
             foreach ($report->details as $detail) {
-                // 🔹 Cek Thermocouple Positions
+
+                // 🔹 THERMOCOUPLE
                 foreach ($detail->thermocouplePositions as $pos) {
-                    if (strtolower($pos->position_info) === 'tidak oke' || strtolower($pos->position_info) === 'tidak ok') {
+                    if (in_array(strtolower($pos->position_info), ['tidak ok', 'tidak oke'])) {
                         $totalKetidaksesuaian++;
                     }
                 }
 
-                // 🔹 Cek Sensory Check
+                // 🔹 SENSORY CHECK
                 if ($detail->sensoryCheck) {
-                    $fields = ['ripeness', 'aroma', 'texture', 'color', 'taste'];
-                    foreach ($fields as $field) {
+                    foreach (['ripeness', 'aroma', 'texture', 'color', 'taste'] as $field) {
                         if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
                             $totalKetidaksesuaian++;
                         }

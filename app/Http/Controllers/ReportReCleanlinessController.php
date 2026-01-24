@@ -20,35 +20,138 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportReCleanlinessController extends Controller
 {
-public function index()
-{
-    $reports = ReportReCleanliness::with([
-            'roomDetails.room',
-            'roomDetails.element',
-            'equipmentDetails.equipment',
-            'equipmentDetails.part'
-        ])
-        ->latest()
-        ->paginate(10);
+// public function index()
+// {
+//     $reports = ReportReCleanliness::with([
+//             'roomDetails.room',
+//             'roomDetails.element',
+//             'equipmentDetails.equipment',
+//             'equipmentDetails.part'
+//         ])
+//         ->latest()
+//         ->paginate(10);
 
-    // hitung ketidaksesuaian berdasarkan verification "Tidak OK"
-    $reports->getCollection()->transform(function ($report) {
-        $roomIssues = $report->roomDetails
-            ->filter(fn($d) => $d->verification === 'Tidak OK')
-            ->count();
+//     // hitung ketidaksesuaian berdasarkan verification "Tidak OK"
+//     $reports->getCollection()->transform(function ($report) {
+//         $roomIssues = $report->roomDetails
+//             ->filter(fn($d) => $d->verification === 'Tidak OK')
+//             ->count();
 
-        $equipmentIssues = $report->equipmentDetails
-            ->filter(fn($d) => $d->verification === 'Tidak OK')
-            ->count();
+//         $equipmentIssues = $report->equipmentDetails
+//             ->filter(fn($d) => $d->verification === 'Tidak OK')
+//             ->count();
 
-        // total ketidaksesuaian
-        $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
+//         // total ketidaksesuaian
+//         $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
 
-        return $report;
-    });
+//         return $report;
+//     });
 
-    return view('report_re_cleanliness.index', compact('reports'));
-}
+//     return view('report_re_cleanliness.index', compact('reports'));
+// }
+    public function index(Request $request)
+    {
+        $reports = ReportReCleanliness::with([
+                'area',
+                'roomDetails.room',
+                'roomDetails.element',
+                'equipmentDetails.equipment',
+                'equipmentDetails.part'
+            ])
+
+            // 🔒 Area user
+            ->when(!Auth::user()->hasRole('Superadmin'), function ($q) {
+                $q->where('area_uuid', Auth::user()->area_uuid);
+            })
+
+            // 🔍 Tanggal
+            ->when($request->date, function ($q) use ($request) {
+                $q->whereDate('date', $request->date);
+            })
+
+            // 🔍 Global search
+            ->when($request->search, function ($q) use ($request) {
+                $search = $request->search;
+
+                $q->where(function ($qq) use ($search) {
+
+                    // 🔹 Header laporan
+                    $qq->where('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%")
+                    ->orWhere('date', 'like', "%{$search}%");
+
+                    // 🔹 Area
+                    $qq->orWhereHas('area', function ($a) use ($search) {
+                        $a->where('name', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 Room cleanliness
+                    $qq->orWhereHas('roomDetails', function ($d) use ($search) {
+                        $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verification', 'like', "%{$search}%");
+
+                        $d->orWhereHas('room', function ($r) use ($search) {
+                            $r->where('name', 'like', "%{$search}%");
+                        });
+
+                        $d->orWhereHas('element', function ($e) use ($search) {
+                            $e->where('element_name', 'like', "%{$search}%");
+                        });
+                    });
+
+                    // 🔹 Equipment cleanliness
+                    $qq->orWhereHas('equipmentDetails', function ($d) use ($search) {
+                        $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verification', 'like', "%{$search}%");
+
+                        $d->orWhereHas('equipment', function ($e) use ($search) {
+                            $e->where('name', 'like', "%{$search}%");
+                        });
+
+                        $d->orWhereHas('part', function ($p) use ($search) {
+                            $p->where('part_name', 'like', "%{$search}%");
+                        });
+                    });
+                });
+            })
+
+            // 🚨 Hanya Tidak OK
+            ->when($request->only_nc, function ($q) {
+                $q->where(function ($qq) {
+                    $qq->whereHas('roomDetails', fn ($d) =>
+                        $d->where('verification', 'Tidak OK')
+                    )
+                    ->orWhereHas('equipmentDetails', fn ($d) =>
+                        $d->where('verification', 'Tidak OK')
+                    );
+                });
+            })
+
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        // 🔢 Hitung ketidaksesuaian
+        $reports->getCollection()->transform(function ($report) {
+            $roomIssues = $report->roomDetails
+                ->where('verification', 'Tidak OK')
+                ->count();
+
+            $equipmentIssues = $report->equipmentDetails
+                ->where('verification', 'Tidak OK')
+                ->count();
+
+            $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
+
+            return $report;
+        });
+
+        return view('report_re_cleanliness.index', compact('reports'));
+    }
+
 
 
     public function create()

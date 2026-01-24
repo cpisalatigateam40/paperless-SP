@@ -114,9 +114,6 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('rooms.index') }}">Ruangan, Mesin, dan Peralatan</a>
                 <a class="collapse-item {{ Request::is('fragile-item*') ? 'active' : '' }}"
                     href="{{ route('fragile-item.index') }}">Barang Mudah Pecah</a>
-                <!-- <a class="collapse-item {{ Request::is('sharp-tools*') ? 'active' : '' }}"
-                    href="{{ route('sharp_tools.index') }}">Benda Tajam</a> -->
-                <!-- <a class="collapse-item" href="{{ route('qc-equipment.index') }}">Inventaris Peralatan QC</a> -->
                 <a class="collapse-item {{ Request::is('scales*') ? 'active' : '' }}"
                     href="{{ route('scales.index') }}">Timbangan</a>
                 <a class="collapse-item {{ Request::is('thermometers*') ? 'active' : '' }}"
@@ -126,16 +123,9 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('raw-material*') ? 'active' : '' }}"
                     href="{{ route('raw-materials.index') }}">Raw Material</a>
                 <a class="collapse-item {{ Request::is('premixes*') ? 'active' : '' }}"
-                    href="{{ route('premixes.index') }}">Premix</a>
+                    href="{{ route('premixes.index') }}">Bahan penunjang & Premix</a>
                 <a class="collapse-item {{ Request::is('formulas*') ? 'active' : '' }}"
                     href="{{ route('formulas.index') }}">Formulasi</a>
-                <!-- <a class="collapse-item {{ Request::is('standard-stuffers*') ? 'active' : '' }}"
-                    href="{{ route('standard-stuffers.index') }}">Standar Stuffer</a> -->
-
-                <!-- <a class="collapse-item {{ Request::is('maurer-standards*') ? 'active' : '' }}"
-                    href="{{ route('maurer-standards.index') }}">Standar Maurer</a>
-                <a class="collapse-item {{ Request::is('fessman-standards*') ? 'active' : '' }}"
-                    href="{{ route('fessman-standards.index') }}">Standar Fessman</a> -->
             </div>
         </div>
     </li>

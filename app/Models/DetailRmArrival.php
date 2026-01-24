@@ -15,6 +15,8 @@ class DetailRmArrival extends Model implements Auditable
         'uuid',
         'report_uuid',
         'raw_material_uuid',
+        'material_uuid',
+        'material_type',
         'supplier',
         'rm_condition',
         'time',
@@ -42,5 +44,11 @@ class DetailRmArrival extends Model implements Auditable
     public function rawMaterial()
     {
         return $this->belongsTo(RawMaterial::class, 'raw_material_uuid', 'uuid');
+    }
+
+
+    public function premix()
+    {
+        return $this->belongsTo(Premix::class, 'material_uuid', 'uuid');
     }
 }

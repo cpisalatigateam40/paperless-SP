@@ -176,6 +176,7 @@
                 <th>Gramase</th>
                 <th>Kode Produksi</th>
                 <th>Best Before</th>
+                <th>Jenis Sample</th>
                 <th>Jumlah</th>
                 <th>Catatan</th>
             </tr>
@@ -188,13 +189,14 @@
                 <td>{{ $detail->gramase }}</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
-                <td>{{ $detail->quantity }}</td>
+                <td>{{ $detail->sample_type }}</td>
+                <td>{{ $detail->quantity }} {{ $detail->unit }}</td>
                 <td>{{ $detail->notes }}</td>
             </tr>
             @endforeach
 
             <tr>
-                <td colspan="6" style="text-align: right; border: none;">QM 20 / 01</td>
+                <td colspan="8" style="text-align: right; border: none;">QM 20 / 01</td>
             </tr>
         </tbody>
     </table>

@@ -18,18 +18,100 @@ use Illuminate\Support\Facades\DB;
 
 class ReportScaleController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportScale::with([
+    //         'area',
+    //         'details.scale',
+    //         'details.measurements',
+    //         'thermometerDetails.thermometer',
+    //         'thermometerDetails.measurements',
+    //     ])->latest()->paginate(10);
+
+    //     return view('report_scales.index', compact('reports'));
+    // }
+    public function index(Request $request)
     {
         $reports = ReportScale::with([
-            'area',
-            'details.scale',
-            'details.measurements',
-            'thermometerDetails.thermometer',
-            'thermometerDetails.measurements',
-        ])->latest()->paginate(10);
+                'area',
+                'details.scale',
+                'details.measurements',
+                'thermometerDetails.thermometer',
+                'thermometerDetails.measurements',
+            ])
+
+            // 🔍 FILTER TANGGAL
+            ->when($request->date, function ($q) use ($request) {
+                $q->whereDate('date', $request->date);
+            })
+
+            // 🔍 GLOBAL SEARCH
+            ->when($request->search, function ($q) use ($request) {
+                $search = $request->search;
+
+                $q->where(function ($qq) use ($search) {
+
+                    // ===== HEADER REPORT =====
+                    $qq->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
+
+                    // ===== AREA =====
+                    $qq->orWhereHas('area', function ($a) use ($search) {
+                        $a->where('name', 'like', "%{$search}%");
+                    });
+
+                    // ===== DETAIL SCALE =====
+                    $qq->orWhereHas('details', function ($d) use ($search) {
+
+                        $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('time_1', 'like', "%{$search}%")
+                        ->orWhere('time_2', 'like', "%{$search}%");
+
+                        // SCALE MASTER
+                        $d->orWhereHas('scale', function ($s) use ($search) {
+                            $s->where('brand', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                        });
+
+                        // MEASUREMENT SCALE
+                        $d->orWhereHas('measurements', function ($m) use ($search) {
+                            $m->where('standard_weight', 'like', "%{$search}%")
+                            ->orWhere('measured_value', 'like', "%{$search}%");
+                        });
+                    });
+
+                    // ===== DETAIL THERMOMETER =====
+                    $qq->orWhereHas('thermometerDetails', function ($d) use ($search) {
+
+                        $d->where('note', 'like', "%{$search}%")
+                        ->orWhere('time_1', 'like', "%{$search}%")
+                        ->orWhere('time_2', 'like', "%{$search}%");
+
+                        // THERMOMETER MASTER
+                        $d->orWhereHas('thermometer', function ($t) use ($search) {
+                            $t->where('brand', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                        });
+
+                        // MEASUREMENT THERMOMETER
+                        $d->orWhereHas('measurements', function ($m) use ($search) {
+                            $m->where('standard_temperature', 'like', "%{$search}%")
+                            ->orWhere('measured_value', 'like', "%{$search}%");
+                        });
+                    });
+                });
+            })
+
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         return view('report_scales.index', compact('reports'));
     }
+
 
     public function create()
     {

@@ -23,54 +23,142 @@ class GmpController extends Controller
 {
     use HasRoles;
 
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportGmpEmployee::with([
+    //         'area',
+    //         'details.followups',
+    //         'sanitationCheck.sanitationArea.followups'
+    //     ])
+    //     ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+    //         $query->where('area_uuid', Auth::user()->area_uuid);
+    //     })
+    //     ->latest()
+    //     ->paginate(10);
+
+    //     // 🔹 Hitung ketidaksesuaian untuk tiap laporan
+    //     foreach ($reports as $report) {
+    //         $count = 0;
+
+    //         // 🧍 Detail pegawai
+    //         foreach ($report->details as $detail) {
+    //             if ($detail->verification == 0) {
+    //                 $count++;
+    //             }
+
+    //             // follow-up pegawai
+    //             foreach ($detail->followups as $f) {
+    //                 if ($f->verification == 0) {
+    //                     $count++;
+    //                 }
+    //             }
+    //         }
+
+    //         // 🧽 Sanitasi area
+    //         if ($report->sanitationCheck) {
+    //             foreach ($report->sanitationCheck->sanitationArea as $area) {
+    //                 if ($area->verification == 0) {
+    //                     $count++;
+    //                 }
+
+    //                 // follow-up sanitasi
+    //                 foreach ($area->followups as $f) {
+    //                     if ($f->verification == 0) {
+    //                         $count++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // Tambahkan properti dinamis
+    //         $report->ketidaksesuaian = $count;
+    //     }
+
+    //     return view('gmp_employee.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
     {
         $reports = ReportGmpEmployee::with([
             'area',
             'details.followups',
             'sanitationCheck.sanitationArea.followups'
         ])
-        ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-            $query->where('area_uuid', Auth::user()->area_uuid);
+        ->when(!Auth::user()->hasRole('Superadmin'), function ($q) {
+            $q->where('area_uuid', Auth::user()->area_uuid);
         })
-        ->latest()
-        ->paginate(10);
 
-        // 🔹 Hitung ketidaksesuaian untuk tiap laporan
+        // 🔍 FILTER GLOBAL
+        ->when(
+            $request->filled('date') ||
+            $request->filled('shift') ||
+            $request->filled('keyword') ||
+            $request->filled('sanitation_area') ||
+            $request->boolean('only_nc'),
+            function ($q) use ($request) {
+
+            $q->where(function ($qq) use ($request) {
+
+                // 📅 tanggal
+                if ($request->filled('date')) {
+                    $qq->whereDate('date', $request->date);
+                }
+
+                // 🔄 shift
+                if ($request->filled('shift')) {
+                    $qq->where('shift', $request->shift);
+                }
+
+                // 👤 pegawai / section
+                if ($request->filled('keyword')) {
+                    $qq->orWhereHas('details', function ($d) use ($request) {
+                        $d->where('employee_name', 'like', "%{$request->keyword}%")
+                        ->orWhere('section_name', 'like', "%{$request->keyword}%")
+                        ->orWhere('notes', 'like', "%{$request->keyword}%");
+                    });
+                }
+
+                // 🧽 area sanitasi
+                if ($request->filled('sanitation_area')) {
+                    $qq->orWhereHas('sanitationCheck.sanitationArea', function ($s) use ($request) {
+                        $s->where('area_name', 'like', "%{$request->sanitation_area}%");
+                    });
+                }
+
+                // ❌ hanya NC
+                if ($request->boolean('only_nc')) {
+                    $qq->orWhereHas('details', fn ($d) => $d->where('verification', 0))
+                    ->orWhereHas('details.followups', fn ($f) => $f->where('verification', 0))
+                    ->orWhereHas('sanitationCheck.sanitationArea', fn ($s) => $s->where('verification', 0))
+                    ->orWhereHas('sanitationCheck.sanitationArea.followups', fn ($f) => $f->where('verification', 0));
+                }
+            });
+        })
+
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+        // 🔢 hitung ketidaksesuaian (AMAN)
         foreach ($reports as $report) {
             $count = 0;
 
-            // 🧍 Detail pegawai
-            foreach ($report->details as $detail) {
-                if ($detail->verification == 0) {
-                    $count++;
-                }
-
-                // follow-up pegawai
-                foreach ($detail->followups as $f) {
-                    if ($f->verification == 0) {
-                        $count++;
-                    }
+            foreach ($report->details as $d) {
+                if ($d->verification == 0) $count++;
+                foreach ($d->followups as $f) {
+                    if ($f->verification == 0) $count++;
                 }
             }
 
-            // 🧽 Sanitasi area
             if ($report->sanitationCheck) {
-                foreach ($report->sanitationCheck->sanitationArea as $area) {
-                    if ($area->verification == 0) {
-                        $count++;
-                    }
-
-                    // follow-up sanitasi
-                    foreach ($area->followups as $f) {
-                        if ($f->verification == 0) {
-                            $count++;
-                        }
+                foreach ($report->sanitationCheck->sanitationArea as $a) {
+                    if ($a->verification == 0) $count++;
+                    foreach ($a->followups as $f) {
+                        if ($f->verification == 0) $count++;
                     }
                 }
             }
 
-            // Tambahkan properti dinamis
             $report->ketidaksesuaian = $count;
         }
 

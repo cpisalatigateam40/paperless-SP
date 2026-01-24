@@ -19,27 +19,105 @@ class StorageRmCleanlinessController extends Controller
 
     use HasRoles;
 
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
+    //         ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
+    //             $query->where('area_uuid', Auth::user()->area_uuid);
+    //         })
+    //         ->latest()
+    //         ->paginate(20);
+
+    //     // Hitung ketidaksesuaian
+    //     foreach ($reports as $report) {
+    //         $count = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             foreach ($detail->items as $item) {
+    //                 // Jika item tidak OK
+    //                 if ($item->verification == 0) {
+    //                     $count++;
+    //                 }
+
+    //                 // Jika ada followup dan followup-nya tidak OK juga dihitung
+    //                 foreach ($item->followups as $followup) {
+    //                     if ($followup->verification == 0) {
+    //                         $count++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // Tambahkan properti ke model
+    //         $report->ketidaksesuaian = $count;
+    //     }
+
+    //     return view('cleanliness.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
     {
-        $reports = ReportStorageRmCleanliness::with('details.items.followups', 'area')
+        $search = $request->search;
+
+        $reports = ReportStorageRmCleanliness::with([
+                'details.items.followups',
+                'area'
+            ])
             ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
                 $query->where('area_uuid', Auth::user()->area_uuid);
             })
-            ->latest()
-            ->paginate(20);
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
 
-        // Hitung ketidaksesuaian
+                    /* ================= HEADER ================= */
+                    $q->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('room_name', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
+
+                    /* ================= AREA ================= */
+                    $q->orWhereHas('area', function ($qa) use ($search) {
+                        $qa->where('name', 'like', "%{$search}%");
+                    });
+
+                    /* ================= DETAIL ================= */
+                    $q->orWhereHas('details', function ($qd) use ($search) {
+                        $qd->where('inspection_hour', 'like', "%{$search}%")
+
+                        /* ================= ITEM ================= */
+                        ->orWhereHas('items', function ($qi) use ($search) {
+                            $qi->where('item', 'like', "%{$search}%")
+                                ->orWhere('condition', 'like', "%{$search}%")
+                                ->orWhere('notes', 'like', "%{$search}%")
+                                ->orWhere('corrective_action', 'like', "%{$search}%")
+                                ->orWhere('verification', 'like', "%{$search}%")
+
+                                /* ============== FOLLOW UP ============== */
+                                ->orWhereHas('followups', function ($qf) use ($search) {
+                                    $qf->where('notes', 'like', "%{$search}%")
+                                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                                        ->orWhere('verification', 'like', "%{$search}%");
+                                });
+                        });
+                    });
+                });
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        /* ================= HITUNG KETIDAKSESUAIAN ================= */
         foreach ($reports as $report) {
             $count = 0;
 
             foreach ($report->details as $detail) {
                 foreach ($detail->items as $item) {
-                    // Jika item tidak OK
                     if ($item->verification == 0) {
                         $count++;
                     }
 
-                    // Jika ada followup dan followup-nya tidak OK juga dihitung
                     foreach ($item->followups as $followup) {
                         if ($followup->verification == 0) {
                             $count++;
@@ -48,12 +126,12 @@ class StorageRmCleanlinessController extends Controller
                 }
             }
 
-            // Tambahkan properti ke model
             $report->ketidaksesuaian = $count;
         }
 
         return view('cleanliness.index', compact('reports'));
     }
+
 
 
     public function create()

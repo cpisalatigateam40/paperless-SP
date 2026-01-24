@@ -14,11 +14,62 @@ use Illuminate\Support\Facades\DB;
 
 class ReportProductionNonconformityController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportProductionNonconformity::with('details')->latest()->paginate(10);
+    //     return view('report_production_nonconformities.index', compact('reports'));
+    // }
+    public function index(Request $request)
     {
-        $reports = ReportProductionNonconformity::with('details')->latest()->paginate(10);
+        $reports = ReportProductionNonconformity::with([
+                'area',
+                'details'
+            ])
+
+            // 🔍 FILTER TANGGAL
+            ->when($request->date, function ($q) use ($request) {
+                $q->whereDate('date', $request->date);
+            })
+
+            // 🔍 GLOBAL SEARCH
+            ->when($request->search, function ($q) use ($request) {
+                $search = $request->search;
+
+                $q->where(function ($qq) use ($search) {
+
+                    // ===== HEADER REPORT =====
+                    $qq->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
+
+                    // ===== AREA =====
+                    $qq->orWhereHas('area', function ($a) use ($search) {
+                        $a->where('name', 'like', "%{$search}%");
+                    });
+
+                    // ===== DETAIL NONCONFORMITY =====
+                    $qq->orWhereHas('details', function ($d) use ($search) {
+                        $d->where('occurrence_time', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('quantity', 'like', "%{$search}%")
+                        ->orWhere('unit', 'like', "%{$search}%")
+                        ->orWhere('hazard_category', 'like', "%{$search}%")
+                        ->orWhere('disposition', 'like', "%{$search}%")
+                        ->orWhere('remark', 'like', "%{$search}%")
+                        ->orWhere('evidence', 'like', "%{$search}%");
+                    });
+                });
+            })
+
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return view('report_production_nonconformities.index', compact('reports'));
     }
+
 
     public function create()
     {

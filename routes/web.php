@@ -1111,4 +1111,15 @@ Route::put('/{uuid}', 'update')->name('update');
 
     Route::post('user-sync', [ApiController::class, 'syncUser']);
     Route::post('user-desync', [ApiController::class, 'desyncUser']);
+
+    Route::get('/production-codes', [ReportRmArrivalController::class, 'productionCodes'])
+    ->name('production-codes');
+
+    Route::get('/formulas/{uuid}/edit/{formulation_name}', [FormulaController::class, 'editDetail'])
+    ->name('formulas.editDetail');
+
+    Route::put('/formulas/{uuid}/update/{formulation_name}', [FormulaController::class, 'updateDetail'])
+        ->name('formulas.updateDetail');
+
+
 });

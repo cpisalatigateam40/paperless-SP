@@ -55,9 +55,15 @@
         @endfor -->
 
         <div class="accordion-body card shadow">
+            <div class="row card-body">
+                <div class="col-md-6">
+                    <label>Nomor Mesin Fessman</label>
+                    <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control">
+                </div>
+            </div>
 
             {{-- Info Produk --}}
-            <div class="row card-body">
+            <div class="row card-body" style="margin-top: -2rem;">
                 <div class="col-md-6">
                     <label>Nama Produk</label>
                     <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector select2-product"
@@ -126,6 +132,11 @@
             [
             'name' => 'COOKINGII',
             'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
+            'product_temp_2', 'actual_product_temp']
+            ],
+            [
+            'name' => 'DRYING',
+            'fields' => ['time_minutes_1', 'time_minutes_2','air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
             'product_temp_2', 'actual_product_temp']
             ],
             ['name' => 'STEAM SUCTION', 'fields' => ['time_minutes_1', 'time_minutes_2']],
@@ -408,8 +419,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
 </div>
 

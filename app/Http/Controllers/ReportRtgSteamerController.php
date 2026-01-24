@@ -15,26 +15,106 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportRtgSteamerController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportRtgSteamer::with(['product', 'area', 'details'])
-            ->latest()
-            ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportRtgSteamer::with(['product', 'area', 'details'])
+    //         ->latest()
+    //         ->paginate(10);
 
-        // Tambahkan kolom ketidaksesuaian berdasarkan sensory check
+    //     // Tambahkan kolom ketidaksesuaian berdasarkan sensory check
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $totalKetidaksesuaian = 0;
+
+    //         foreach ($report->details as $detail) {
+    //             $fields = [
+    //                 'sensory_ripeness',
+    //                 'sensory_taste',
+    //                 'sensory_aroma',
+    //                 'sensory_texture',
+    //                 'sensory_color'
+    //             ];
+
+    //             foreach ($fields as $field) {
+    //                 if (isset($detail->$field) && $detail->$field === 'Tidak OK') {
+    //                     $totalKetidaksesuaian++;
+    //                 }
+    //             }
+    //         }
+
+    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
+    //         return $report;
+    //     });
+
+    //     return view('report_rtg_steamers.index', compact('reports'));
+    // }
+
+
+    public function index(Request $request)
+    {
+        $query = ReportRtgSteamer::with([
+            'product',
+            'area',
+            'details',
+        ])->latest();
+
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAILS
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('steamer', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%")
+                        ->orWhere('trolley_count', 'like', "%{$search}%")
+                        ->orWhere('room_temp', 'like', "%{$search}%")
+                        ->orWhere('product_temp', 'like', "%{$search}%")
+                        ->orWhere('time_minute', 'like', "%{$search}%")
+                        ->orWhere('start_time', 'like', "%{$search}%")
+                        ->orWhere('end_time', 'like', "%{$search}%")
+
+                        // 🔹 SENSORY
+                        ->orWhere('sensory_ripeness', 'like', "%{$search}%")
+                        ->orWhere('sensory_taste', 'like', "%{$search}%")
+                        ->orWhere('sensory_aroma', 'like', "%{$search}%")
+                        ->orWhere('sensory_texture', 'like', "%{$search}%")
+                        ->orWhere('sensory_color', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $totalKetidaksesuaian = 0;
 
             foreach ($report->details as $detail) {
-                $fields = [
+                foreach ([
                     'sensory_ripeness',
                     'sensory_taste',
                     'sensory_aroma',
                     'sensory_texture',
                     'sensory_color'
-                ];
-
-                foreach ($fields as $field) {
+                ] as $field) {
                     if (isset($detail->$field) && $detail->$field === 'Tidak OK') {
                         $totalKetidaksesuaian++;
                     }
@@ -47,7 +127,6 @@ class ReportRtgSteamerController extends Controller
 
         return view('report_rtg_steamers.index', compact('reports'));
     }
-
 
     public function create()
     {

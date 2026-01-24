@@ -12,15 +12,66 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportPremixController extends Controller
 {
-    public function index()
-    {
-        $reports = ReportPremix::with(['area', 'detailPremixes.premix'])
-            ->latest()
-            ->paginate(10);
+    // public function index()
+    // {
+    //     $reports = ReportPremix::with(['area', 'detailPremixes.premix'])
+    //         ->latest()
+    //         ->paginate(10);
 
+    //     $reports->getCollection()->transform(function ($report) {
+    //         $report->ketidaksesuaian = $report->detailPremixes
+    //             ->filter(fn($d) => $d->verification === 'x')
+    //             ->count();
+
+    //         return $report;
+    //     });
+
+    //     return view('report_premixes.index', compact('reports'));
+    // }
+
+    public function index(Request $request)
+    {
+        $query = ReportPremix::with(['area', 'detailPremixes.premix'])
+            ->latest();
+
+        // 🔍 SEARCH (HEADER + DETAIL PREMIX)
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 DETAIL PREMIX
+                $q->orWhereHas('detailPremixes', function ($dq) use ($search) {
+
+                    // kolom detail_premixes
+                    $dq->where('production_code', 'like', "%{$search}%")
+                    ->orWhere('used_for_batch', 'like', "%{$search}%")
+                    ->orWhere('weight', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
+                    ->orWhere('corrective_action', 'like', "%{$search}%")
+                    ->orWhere('verification', 'like', "%{$search}%")
+
+                    // 🔥 nama premix dari relasi
+                    ->orWhereHas('premix', function ($pq) use ($search) {
+                            $pq->where('name', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
+
+        // 🔥 HITUNG KETIDAKSESUAIAN
         $reports->getCollection()->transform(function ($report) {
             $report->ketidaksesuaian = $report->detailPremixes
-                ->filter(fn($d) => $d->verification === 'x')
+                ->filter(fn ($d) => $d->verification === 'x')
                 ->count();
 
             return $report;

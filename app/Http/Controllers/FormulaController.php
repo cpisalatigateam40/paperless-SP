@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Formula;
 use App\Models\Formulation;
 use App\Models\Product;
+use App\Models\RawMaterial;
+use App\Models\Premix;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\FormulaTemplateExport;
 use App\Imports\FormulaImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class FormulaController extends Controller
 {
@@ -177,5 +180,84 @@ class FormulaController extends Controller
             ->route('formulas.index')
             ->with('success', 'Formula berhasil diimport');
     }
+
+    public function editDetail($uuid, $formulation_name)
+    {
+        $formula = Formula::with([
+            'formulations.rawMaterial',
+            'formulations.premix'
+        ])->where('uuid', $uuid)->firstOrFail();
+
+        $details = $formula->formulations
+            ->where('formulation_name', $formulation_name);
+
+        $rawMaterials = RawMaterial::all();
+        $premixes = Premix::all();
+
+        return view('formulas.edit-detail', compact(
+            'formula',
+            'formulation_name',
+            'details',
+            'rawMaterials',
+            'premixes'
+        ));
+    }
+
+    public function updateDetail(Request $request, $uuid, $formulation_name)
+    {
+        $formula = Formula::where('uuid', $uuid)->firstOrFail();
+
+        $request->validate([
+            'formulation_name' => 'required|string|max:255',
+
+            'raw_material_uuid.*' => 'nullable|exists:raw_materials,uuid',
+            'raw_material_weight.*' => 'nullable|numeric|min:0',
+
+            'premix_uuid.*' => 'nullable|exists:premixes,uuid',
+            'premix_weight.*' => 'nullable|numeric|min:0',
+        ]);
+
+        DB::transaction(function () use ($request, $formula, $formulation_name) {
+
+            // 🔥 hapus semua detail lama
+            Formulation::where('formula_uuid', $formula->uuid)
+                ->where('formulation_name', $formulation_name)
+                ->delete();
+
+            // simpan raw material
+            foreach ($request->raw_material_uuid ?? [] as $i => $raw_uuid) {
+                if (!$raw_uuid) continue;
+
+                Formulation::create([
+                    'uuid' => Str::uuid(),
+                    'formula_uuid' => $formula->uuid,
+                    'formulation_name' => $request->formulation_name,
+                    'raw_material_uuid' => $raw_uuid,
+                    'premix_uuid' => null,
+                    'weight' => $request->raw_material_weight[$i] ?? 0,
+                ]);
+            }
+
+            // simpan premix
+            foreach ($request->premix_uuid ?? [] as $i => $premix_uuid) {
+                if (!$premix_uuid) continue;
+
+                Formulation::create([
+                    'uuid' => Str::uuid(),
+                    'formula_uuid' => $formula->uuid,
+                    'formulation_name' => $request->formulation_name,
+                    'raw_material_uuid' => null,
+                    'premix_uuid' => $premix_uuid,
+                    'weight' => $request->premix_weight[$i] ?? 0,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('formulas.detail', $formula->uuid)
+            ->with('success', 'Formulasi berhasil diperbarui.');
+    }
+
+
 
 }

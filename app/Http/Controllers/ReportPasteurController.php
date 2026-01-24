@@ -20,14 +20,92 @@ use Illuminate\Support\Facades\DB;
 
 class ReportPasteurController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $reports = ReportPasteur::with([
+    //         'details.steps.standardStep',
+    //         'details.steps.drainageStep',
+    //         'details.steps.finishStep',
+    //         'area'
+    //     ])
+    //     ->latest()
+    //     ->paginate(10);
+
+    //     return view('report_pasteurs.index', compact('reports'));
+    // }
+    public function index(Request $request)
     {
-        $reports = ReportPasteur::with([
+        $query = ReportPasteur::with([
+            'details.product',
             'details.steps.standardStep',
             'details.steps.drainageStep',
             'details.steps.finishStep',
             'area'
-        ])->paginate(10);
+        ])->latest();
+
+        // 🔍 GLOBAL SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('problem', 'like', "%{$search}%")
+                ->orWhere('corrective_action', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL PASTEUR
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('program_number', 'like', "%{$search}%")
+                    ->orWhere('product_code', 'like', "%{$search}%")
+                    ->orWhere('for_packaging_gr', 'like', "%{$search}%")
+                    ->orWhere('trolley_count', 'like', "%{$search}%")
+                    ->orWhere('product_temp', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('details.product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 STEP PASTEUR (STANDARD / DRAINAGE / FINISH)
+                $q->orWhereHas('details.steps', function ($s) use ($search) {
+                    $s->where('step_name', 'like', "%{$search}%")
+                    ->orWhere('step_type', 'like', "%{$search}%");
+                });
+
+                // 🔹 STANDARD STEP
+                $q->orWhereHas('details.steps.standardStep', function ($st) use ($search) {
+                    $st->where('water_temp', 'like', "%{$search}%")
+                    ->orWhere('pressure', 'like', "%{$search}%")
+                    ->orWhere('start_time', 'like', "%{$search}%")
+                    ->orWhere('end_time', 'like', "%{$search}%");
+                });
+
+                // 🔹 DRAINAGE STEP
+                $q->orWhereHas('details.steps.drainageStep', function ($dr) use ($search) {
+                    $dr->where('start_time', 'like', "%{$search}%")
+                    ->orWhere('end_time', 'like', "%{$search}%");
+                });
+
+                // 🔹 FINISH STEP
+                $q->orWhereHas('details.steps.finishStep', function ($fs) use ($search) {
+                    $fs->where('product_core_temp', 'like', "%{$search}%")
+                    ->orWhere('sortation', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $reports = $query->paginate(10)->withQueryString();
 
         return view('report_pasteurs.index', compact('reports'));
     }

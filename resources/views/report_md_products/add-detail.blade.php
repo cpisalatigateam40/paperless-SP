@@ -53,19 +53,22 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="mb-3">
-                    <label>Kode Produksi</label>
-                    <input type="text" name="details[0][production_code]" class="form-control">
+                <div class="detail-row">
+                    <div class="mb-3">
+                        <label>Kode Produksi</label>
+                        <input type="text" name="details[0][production_code]" class="form-control production-code">
+                    </div>
+                    <div class="mb-3">
+                        <label>Best Before</label>
+                        <input type="date" name="details[0][best_before]" class="form-control best-before" readonly>
+                    </div>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label>Gramase</label>
                     <input type="number" name="details[0][gramase]" class="form-control">
-                </div>
+                </div> -->
 
-                <div class="mb-3">
-                    <label>Best Before</label>
-                    <input type="date" name="details[0][best_before]" class="form-control" readonly>
-                </div>
+                
                 <div class="mb-3">
                     <label>Nomor Program</label>
                     <input type="text" name="details[0][program_number]" class="form-control">
@@ -157,5 +160,96 @@ function updateBestBefore(select, index) {
         document.querySelector(`input[name="details[${index}][best_before]"]`).value = bestBeforeStr;
     }
 }
+</script>
+
+<script>
+function formatDateLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function parseBatchCodeToDate(batchCode) {
+    if (!batchCode || batchCode.length < 4) {
+        return null;
+    }
+
+    try {
+        const yearChar = batchCode[0].toUpperCase();
+        const baseYear = 2009;
+        const year = baseYear + (yearChar.charCodeAt(0) - 'A'.charCodeAt(0));
+
+        const monthChar = batchCode[1].toUpperCase();
+        const month = (monthChar.charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
+
+        const day = parseInt(batchCode.substring(2, 4), 10);
+
+        if (
+            isNaN(year) ||
+            isNaN(month) || month < 1 || month > 12 ||
+            isNaN(day) || day < 1 || day > 31
+        ) {
+            return null;
+        }
+
+        return new Date(year, month - 1, day);
+    } catch (e) {
+        return null;
+    }
+}
+
+function calculateExpirationDate(batchCode, expirationMonths) {
+    const productionDate = parseBatchCodeToDate(batchCode);
+
+    if (!productionDate || isNaN(expirationMonths)) {
+        return null;
+    }
+
+    const originalDay = productionDate.getDate();
+
+    let expirationDate = new Date(
+        productionDate.getFullYear(),
+        productionDate.getMonth(),
+        originalDay
+    );
+
+    expirationDate.setMonth(expirationDate.getMonth() + expirationMonths);
+
+    const lastDayOfNewMonth = new Date(
+        expirationDate.getFullYear(),
+        expirationDate.getMonth() + 1,
+        0
+    ).getDate();
+
+    expirationDate.setDate(Math.min(originalDay, lastDayOfNewMonth));
+
+    return {
+        production_date: formatDateLocal(productionDate),
+        expiration_date: formatDateLocal(expirationDate)
+    };
+}
+
+
+document.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('production-code')) return;
+
+    const row = e.target.closest('.detail-row');
+    const bestBeforeInput = row.querySelector('.best-before');
+
+    // ambil QA01
+    const match = e.target.value.match(/([A-Z]{2}\d{2})/i);
+    if (!match) {
+        bestBeforeInput.value = '';
+        return;
+    }
+
+    const batchCode = match[1].toUpperCase();
+    const expirationMonths = 24;
+
+    const result = calculateExpirationDate(batchCode, expirationMonths);
+    bestBeforeInput.value = result ? result.expiration_date : '';
+});
+
 </script>
 @endsection
