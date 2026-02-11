@@ -59,7 +59,7 @@
                                             <input type="text" name="details[0][production_code]" class="form-control">
                                         </td>
 
-                                        <td><input type="number" name="details[0][weight]" class="form-control"
+                                        <td><input type="number" name="details[0][weight]" class="form-control" step="0.001"
                                                 required></td>
                                         <td><input type="text" name="details[0][used_for_batch]" class="form-control">
                                         </td>
