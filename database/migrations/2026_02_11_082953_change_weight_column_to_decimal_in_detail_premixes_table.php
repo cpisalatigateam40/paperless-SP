@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('detail_premixes', function (Blueprint $table) {
-            $table->decimal('weight', 8, places: 2)->nullable()->change();
+            $table->decimal('weight', 12, places: 3)->nullable()->change();
         });
     }
 
