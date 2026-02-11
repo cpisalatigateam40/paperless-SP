@@ -117,18 +117,18 @@
                 <div class="card-header">A. Rumah Asap (Smoke House)</div>
                 <div class="card-body p-2">
                     <div class="table-responsive">
-                        <table class="table table-bordered small">
+                        <table class="table table-bordered small" style="table-layout:fixed; width:100%;">
                             <thead class="text-center">
                                 <tr>
-                                    <th>Nama Proses</th>
-                                    <th>Suhu Ruang Standard</th>
-                                    <th>Suhu Ruang Aktual</th>
-                                    <th>RH Standard</th>
-                                    <th>RH Aktual</th>
-                                    <th>Waktu (menit) Standard</th>
-                                    <th>Waktu (menit) Aktual</th>
-                                    <th>Suhu Produk Standard</th>
-                                    <th>Suhu Produk AKtual</th>
+                                    <th style="width:150px">Nama Proses</th>
+                                    <th style="width:120px">Suhu Ruang Standard</th>
+                                    <th style="width:120px">Suhu Ruang Aktual</th>
+                                    <th style="width:120px">RH Standard</th>
+                                    <th style="width:120px">RH Aktual</th>
+                                    <th style="width:120px">Waktu (menit) Standard</th>
+                                    <th style="width:120px">Waktu (menit) Aktual</th>
+                                    <th style="width:120px">Suhu Produk Standard</th>
+                                    <th style="width:120px">Suhu Produk AKtual</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -227,9 +227,9 @@
                     'Rasa' => 'taste'
                     ]
                     as $label => $field)
-                    <div class="col">
+                    <div class="col-md-6">
                         <label>{{ $label }}</label>
-                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control">
+                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control mb-2">
                             <option value="1">OK</option>
                             <option value="0">Tidak OK</option>
                         </select>

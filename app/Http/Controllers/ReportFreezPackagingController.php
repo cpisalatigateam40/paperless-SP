@@ -134,8 +134,6 @@ class ReportFreezPackagingController extends Controller
         return view('report_freez_packagings.index', compact('reports'));
     }
 
-
-
     public function create()
     {
         $areas = Area::all();
