@@ -9,14 +9,14 @@ Request::is('report-premixes*') ||
 Request::is('report-metal-detectors*') ||
 Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
-Request::is('report-sauces*') ||
 Request::is('report-siomays*') ||
 Request::is('report-process-productions*');
 $isCooking =
 Request::is('report-maurer-cookings*') ||
 Request::is('report-fessman-cookings*') ||
 Request::is('report-baso-cookings*') ||
-Request::is('report-rtg-steamers*');
+Request::is('report-rtg-steamers*') ||
+Request::is('report-sauces*');
 $isPacking =
 Request::is('report-lab-samples*') ||
 Request::is('report-md-products*') ||
@@ -206,10 +206,7 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_weight_stuffers.index') }}">
                     Verifikasi Berat Stuffer
                 </a>
-                <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
-                    href="{{ route('report_sauces.index') }}">
-                    Pemasakan Produk Di Steam Kettle
-                </a>
+                
                 <a class="collapse-item {{ Request::is('report-siomays*') ? 'active' : '' }}"
                     href="{{ route('report_siomays.index') }}">
                     Pembuatan Kulit Siomay
@@ -243,6 +240,10 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
                     href="{{ route('report_baso_cookings.index') }}">
                     Verifikasi Pemasakan Baso
+                </a>
+                <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
+                    href="{{ route('report_sauces.index') }}">
+                    Pemasakan Produk Di Steam Kettle
                 </a>
             </div>
         </div>

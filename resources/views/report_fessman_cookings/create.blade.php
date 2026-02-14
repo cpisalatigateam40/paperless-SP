@@ -150,19 +150,19 @@
                 <div class="card-header">TAHAP PEMASAKAN (Setting / Aktual)</div>
                 <div class="card-body p-2">
                     <div class="table-responsive">
-                        <table class="table table-bordered small">
+                        <table class="table table-bordered small" style="table-layout:fixed; width:100%;">
                             <thead class="text-center">
                                 <tr>
-                                    <th style="min-width: 280px;">Nama Step</th>
-                                    <th>Waktu 1</th>
-                                    <th>Waktu 2</th>
-                                    <th>Suhu Ruang 1</th>
-                                    <th>Suhu Ruang 2</th>
-                                    <th>Sirkulasi Udara 1</th>
-                                    <th>Sirkulasi Udara 2</th>
-                                    <th>Suhu Produk 1</th>
-                                    <th>Suhu Produk 2</th>
-                                    <th>Suhu Aktual Produk</th>
+                                    <th style="width:210px">Nama Step</th>
+                                    <th style="width:120px">Waktu 1</th>
+                                    <th style="width:120px">Waktu 2</th>
+                                    <th style="width:120px">Suhu Ruang 1</th>
+                                    <th style="width:120px">Suhu Ruang 2</th>
+                                    <th style="width:120px">Sirkulasi Udara 1</th>
+                                    <th style="width:120px">Sirkulasi Udara 2</th>
+                                    <th style="width:120px">Suhu Produk 1</th>
+                                    <th style="width:120px">Suhu Produk 2</th>
+                                    <th style="width:120px">Suhu Aktual Produk</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -207,16 +207,16 @@
                     @foreach(['Kematangan' => 'ripeness', 'Aroma' => 'aroma', 'Rasa' => 'taste', 'Tekstur'
                     => 'texture', 'Warna' => 'color']
                     as $label => $field)
-                    <div class="col-md-2">
+                    <div class="col-md-6">
                         <label>{{ $label }}</label>
-                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control">
+                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control mb-2">
                             <option value="1">OK</option>
                             <option value="0">Tidak OK</option>
                         </select>
                     </div>
                     @endforeach
 
-                    <div class="col-md-2">
+                    <div class="col-md-6">
                         <label>Bisa / Tidak Bisa Di Ulir</label>
                         <select name="details[{{ $i }}][sensory_check][can_be_twisted]" class="form-control">
                             <option value="1">Bisa</option>
@@ -258,27 +258,27 @@
                 <div class="card-header">Tahap Cooling (Setting / Aktual)</div>
                 <div class="card-body p-2">
                     <div class="table-responsive">
-                        <table class="table table-bordered small">
+                        <table class="table table-bordered small" style="table-layout:fixed; width:100%;">
                             <thead class="text-center">
                                 <tr>
-                                    <th rowspan="2" style="min-width: 280px;">Nama Tahap</th>
-                                    <th colspan="2">Waktu (menit)</th>
-                                    <th colspan="2">RH (%)</th>
-                                    <th colspan="3">Suhu Pusat Produk Setelah Keluar (°C)</th>
-                                    <th rowspan="2">Suhu Rata-rata</th>
-                                    <th rowspan="2">Berat Mentah</th>
-                                    <th rowspan="2">Berat Matang</th>
-                                    <th rowspan="2">Loss (kg)</th>
-                                    <th rowspan="2">Loss (%)</th>
+                                    <th rowspan="2" style="width:300px;">Nama Tahap</th>
+                                    <th colspan="2" style="width:240px">Waktu (menit)</th>
+                                    <th colspan="2" style="width:240px">RH (%)</th>
+                                    <th colspan="3" style="width:360px">Suhu Pusat Produk Setelah Keluar (°C)</th>
+                                    <th rowspan="2" style="width:120px">Suhu Rata-rata</th>
+                                    <th rowspan="2" style="width:120px">Berat Mentah</th>
+                                    <th rowspan="2" style="width:120px">Berat Matang</th>
+                                    <th rowspan="2" style="width:120px">Loss (kg)</th>
+                                    <th rowspan="2" style="width:120px">Loss (%)</th>
                                 </tr>
                                 <tr>
-                                    <th>1</th>
-                                    <th>2</th>
-                                    <th>1</th>
-                                    <th>2</th>
-                                    <th>1</th>
-                                    <th>2</th>
-                                    <th>3</th>
+                                    <th style="width:120px">1</th>
+                                    <th style="width:120px">2</th>
+                                    <th style="width:120px">1</th>
+                                    <th style="width:120px">2</th>
+                                    <th style="width:120px">1</th>
+                                    <th style="width:120px">2</th>
+                                    <th style="width:120px">3</th>
                                 </tr>
                             </thead>
 

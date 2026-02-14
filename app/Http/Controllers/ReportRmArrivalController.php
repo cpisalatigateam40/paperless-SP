@@ -114,11 +114,6 @@ class ReportRmArrivalController extends Controller
 
         return view('report_rm_arrivals.index', compact('reports'));
     }
-
-
-
-
-
     public function create()
     {
         return view('report_rm_arrivals.create', [

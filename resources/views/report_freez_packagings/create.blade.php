@@ -214,7 +214,6 @@ function addDetailRow() {
     </div>
 </div>
 `;
-
     container.insertAdjacentHTML('beforeend', html);
     index++;
 }
