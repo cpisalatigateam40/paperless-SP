@@ -58,7 +58,8 @@
                                     <td><input type="text" name="details[{{ $index }}][production_code]"
                                             value="{{ $detail->production_code }}" class="form-control"></td>
                                     <td><input type="number" name="details[{{ $index }}][weight]"
-                                            value="{{ $detail->weight }}" class="form-control" step="0.001" required></td>
+                                            value="{{ $detail->weight }}" class="form-control" step="0.001" required>
+                                    </td>
                                     <td><input type="text" name="details[{{ $index }}][used_for_batch]"
                                             value="{{ $detail->used_for_batch }}" class="form-control"></td>
                                     <td><input type="text" name="details[{{ $index }}][notes]"

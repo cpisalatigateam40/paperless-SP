@@ -165,12 +165,16 @@ class ReportSiomayController extends Controller
     {
         DB::beginTransaction();
         try {
+            $shift = auth()->user()->hasRole('QC Inspector')
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
+
             // 1. Simpan HEADER laporan
             $report = ReportSiomay::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => $request->date,
-                'shift' => $request->shift,
+                'shift' => $shift,
                 'product_uuid' => $request->product_uuid,
                 'production_code' => $request->production_code,
                 'start_time' => $request->start_time,

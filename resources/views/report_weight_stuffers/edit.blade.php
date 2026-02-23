@@ -9,13 +9,13 @@
         <div class="card shadow mb-4">
             <div class="card-header">Edit Laporan Verifikasi Berat Stuffer</div>
             <div class="card-body row g-3">
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>Tanggal</label>
                     <input type="date" name="date" class="form-control"
                         value="{{ $report->date ? \Carbon\Carbon::parse($report->date)->toDateString() : '' }}"
                         required>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-6">
                     <label>Shift</label>
                     <input type="text" name="shift" class="form-control" value="{{ $report->shift }}" required>
                 </div>

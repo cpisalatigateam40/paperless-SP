@@ -12,13 +12,13 @@
                 @method('PUT')
 
                 <div class="mb-4">
-                    <div class="d-flex" style="gap: 1rem;">
-                        <div class="col-md-5 mb-3">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label>Tanggal:</label>
                             <input type="date" name="date" class="form-control"
                                 value="{{ $report->date }}" required>
                         </div>
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label>Shift:</label>
                             <input type="text" name="shift" class="form-control"
                                 value="{{ $report->shift }}" required>
@@ -26,7 +26,7 @@
                     </div>
 
                     <label>Area:</label>
-                    <select name="section_name" class="form-control col-md-5 mb-5" required>
+                    <select name="section_name" class="form-control col-md-6 mb-5" required>
                         <option value="">-- Pilih Area --</option>
                         <option value="MP" {{ $report->section_name == 'MP' ? 'selected' : '' }}>MP</option>
                         <option value="Cooking" {{ $report->section_name == 'Cooking' ? 'selected' : '' }}>Cooking</option>
@@ -41,7 +41,7 @@
                     <div class="inspection-block border rounded p-3 mb-3 position-relative">
                         <label>Jam Inspeksi:</label>
                         <input type="time" name="details[{{ $dIndex }}][inspection_hour]"
-                            class="form-control mb-3 col-md-5"
+                            class="form-control mb-3 col-md-6"
                             value="{{ $detail->inspection_hour }}" required>
 
                         <table class="table">

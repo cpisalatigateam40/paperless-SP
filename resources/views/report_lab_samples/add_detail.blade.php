@@ -43,7 +43,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>Jenis Sample</label>
-                        <select name="sample_type" class="form-control mb-3">
+                        <select name="sample_type" class="form-control mb-3" required>
                             <option value="">-- Pilih Jenis Sample --</option>
                             <option value="Sampel Lab">Sampel Lab</option>
                             <option value="Sampel Retained">Sampel Retained</option>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="col-md-6">
                         <label>Satuan</label>
-                        <select name="unit" class="form-control mb-3">
+                        <select name="unit" class="form-control mb-3" required>
                             <option value="">-- Pilih Satuan --</option>
                             <option value="pcs">pcs</option>
                             <option value="pack">pack</option>

@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>Shift:</label>
-                        <input type="text" name="shift" class="form-control" required>
+                        <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
                     </div>
                     <div class="col-md-6 mb-5">
                         <label>Area:</label>
@@ -44,7 +44,7 @@
                 <template id="inspection-template">
                     <div class="inspection-block border rounded p-3 mb-3 position-relative">
                         <label>Jam Inspeksi:</label>
-                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5"
+                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-6"
                             value="{{ now()->format('H:i') }}" required>
 
                         <table class="table">

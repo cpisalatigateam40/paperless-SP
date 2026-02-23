@@ -8,58 +8,61 @@
                 Laporan Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang
             </h5>
 
-            <div class="d-flex gap-2" style="gap: .4rem;">
+            <div class="d-flex flex-wrap align-items-center gap-2">
                 {{-- FILTER SECTION --}}
                 <form method="GET" action="{{ route('report_rm_arrivals.index') }}">
-                    <select name="section" class="form-select form-control form-select-sm" onchange="this.form.submit()">
+                    <select name="section" class="form-select form-control-sm form-control" onchange="this.form.submit()">
                         <option value="">Semua Section</option>
-                        <option value="Chillroom" {{ request('section') == 'Chillroom' ? 'selected' : '' }}>
-                            Chillroom
-                        </option>
-                        <option value="Seasoning" {{ request('section') == 'Seasoning' ? 'selected' : '' }}>
-                            Seasoning
-                        </option>
+                        <option value="Chillroom" {{ request('section') == 'Chillroom' ? 'selected' : '' }}>Chillroom</option>
+                        <option value="Seasoning" {{ request('section') == 'Seasoning' ? 'selected' : '' }}>Seasoning</option>
                     </select>
                 </form>
 
-                {{-- 🔍 SEARCH --}}
-                <form method="GET"
-                    action="{{ route('report_rm_arrivals.index') }}"
-                    class="d-flex align-items-center"
-                    style="gap: .4rem;">
-
-                    {{-- pertahankan filter section --}}
+                {{-- SEARCH --}}
+                <form method="GET" action="{{ route('report_rm_arrivals.index') }}" class="d-flex align-items-center gap-1" style="gap: .4rem;;">
                     <input type="hidden" name="section" value="{{ request('section') }}">
-
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        placeholder="Cari laporan..."
-                        value="{{ request('search') }}"
-                    >
-
-                    {{-- 🔍 BUTTON CARI --}}
-                    <button type="submit" class="btn btn-outline-primary">
-                        Cari
-                    </button>
-
-                    {{-- 🔄 RESET --}}
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="search" class="form-control form-control-sm mr-2"
+                            placeholder="Cari laporan..." value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Cari</button>
+                    </div>
                     @if(request('search') || request('section'))
-                        <a href="{{ route('report_rm_arrivals.index') }}"
-                        class="btn btn-danger"
-                        title="Reset Filter">
-                            Reset
-                        </a>
+                        <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-sm btn-outline-danger">Reset</a>
                     @endif
-
                 </form>
 
+                <div class="vr"></div>
 
+                {{-- IMPORT --}}
+                <form action="{{ route('report_rm_arrivals.import') }}" method="POST"
+                    enctype="multipart/form-data" class="d-flex align-items-center gap-1">
+                    @csrf
+                    <select name="section_uuid" class="form-select form-control-sm form-control mr-2" required>
+                        <option value="">-- Section --</option>
+                        @foreach($sections as $section)
+                            <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
+                        @endforeach
+                    </select>
+                    <label class="btn btn-sm btn-outline-secondary mb-0" style="cursor:pointer;">
+                        <i class="bi bi-upload"></i> Import
+                        <input type="file" name="file" required hidden
+                            onchange="this.closest('form').querySelector('#btnImport').click()">
+                    </label>
+                    <button id="btnImport" type="submit" class="d-none"></button>
+                </form>
 
-                <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
-                    Tambah Laporan
+                {{-- DOWNLOAD TEMPLATE --}}
+                <a href="{{ route('report_rm_arrivals.template') }}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-download"></i> Template
                 </a>
+
+                <div class="vr"></div>
+
+                {{-- TAMBAH --}}
+                <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg"></i> Tambah
+                </a>
+
             </div>
         </div>
 

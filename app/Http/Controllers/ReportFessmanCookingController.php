@@ -53,7 +53,7 @@ class ReportFessmanCookingController extends Controller
 
 
     
-public function index(Request $request)
+    public function index(Request $request)
     {
         $query = ReportFessmanCooking::with([
             'area',
@@ -205,13 +205,17 @@ public function index(Request $request)
         DB::beginTransaction();
 
         try {
+            $shift = auth()->user()->hasRole('QC Inspector')
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
+
             // Buat report utama
             $report = ReportFessmanCooking::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'section_uuid' => $request['section_uuid'] ?? null,
                 'date' => $request['date'],
-                'shift' => $request['shift'],
+                'shift' => $shift,
                 'created_by' => Auth::user()->name,
             ]);
 

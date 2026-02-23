@@ -11,43 +11,12 @@ use App\Models\AgingEmulsionMaking;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\EmulsionMakingTemplateExport;
+use App\Imports\EmulsionMakingImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportEmulsionMakingController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportEmulsionMaking::with('header.details', 'header.agings')
-    //     ->latest()
-    //     ->paginate(10);
-
-    //     $reports->getCollection()->transform(function ($report) {
-    //         $ketidaksesuaian = 0;
-
-    //         // 🔹 Cek dari tabel details
-    //         if ($report->header && $report->header->details) {
-    //             $ketidaksesuaian += $report->header->details
-    //                 ->filter(fn($d) => $d->conformity === 'x')
-    //                 ->count();
-    //         }
-
-    //         // 🔹 Cek dari tabel agings
-    //         if ($report->header && $report->header->agings) {
-    //             $ketidaksesuaian += $report->header->agings->filter(function ($a) {
-    //                 return $a->sensory_color === 'x'
-    //                     || $a->sensory_texture === 'x'
-    //                     || $a->emulsion_result === 'Tidak OK';
-    //             })->count();
-    //         }
-
-    //         $report->ketidaksesuaian = $ketidaksesuaian;
-
-    //         return $report;
-    //     });
-
-    //     $rawMaterials = \App\Models\RawMaterial::all();
-    //     return view('report_emulsion_makings.index', compact('reports', 'rawMaterials'));
-    // }
-
     public function index(Request $request)
     {
         $query = ReportEmulsionMaking::with([
@@ -144,12 +113,16 @@ class ReportEmulsionMakingController extends Controller
 
     public function store(Request $request)
     {
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // 1. Buat report
         $report = new ReportEmulsionMaking();
         $report->uuid = Str::uuid();
         $report->area_uuid = Auth::user()->area_uuid;
         $report->date = $request->date;
-        $report->shift = $request->shift;
+        $report->shift = $shift;
         $report->created_by = Auth::user()->name;
         $report->save();
 
@@ -454,6 +427,27 @@ class ReportEmulsionMakingController extends Controller
         }
 
         return redirect()->route('report_emulsion_makings.index')->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new EmulsionMakingTemplateExport,
+            'template_verifikasi_pembuatan_emulsi.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new EmulsionMakingImport, $request->file('file'));
+
+        return redirect()
+            ->route('report_emulsion_makings.index')
+            ->with('success', 'Data Excel berhasil diimport.');
     }
 
 }

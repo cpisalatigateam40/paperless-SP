@@ -38,8 +38,24 @@
                             Reset
                         </a>
                     @endif
-
                 </form>
+
+                {{-- IMPORT --}}
+                <form action="{{ route('report_emulsion_makings.import') }}" method="POST"
+                    enctype="multipart/form-data" class="d-flex align-items-center gap-1">
+                    @csrf
+                    <label class="btn btn-sm btn-outline-secondary mb-0" style="cursor:pointer;">
+                        <i class="bi bi-upload"></i> Import
+                        <input type="file" name="file" required hidden
+                            onchange="this.closest('form').querySelector('#btnImport').click()">
+                    </label>
+                    <button id="btnImport" type="submit" class="d-none"></button>
+                </form>
+
+                {{-- DOWNLOAD TEMPLATE --}}
+                <a href="{{ route('report_emulsion_makings.template') }}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-download"></i> Template
+                </a>
 
 
 

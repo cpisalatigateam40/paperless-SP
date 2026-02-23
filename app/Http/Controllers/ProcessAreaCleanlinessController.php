@@ -140,8 +140,6 @@ class ProcessAreaCleanlinessController extends Controller
         return view('cleanliness_PA.index', compact('reports'));
     }
 
-
-
     public function create()
     {
         return view('cleanliness_PA.create');
@@ -151,11 +149,15 @@ class ProcessAreaCleanlinessController extends Controller
     {
         DB::beginTransaction();
         try {
+            $shift = auth()->user()->hasRole('QC Inspector')
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
+
             $report = ReportProcessAreaCleanliness::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => now()->toDateString(),
-                'shift' => $request->shift,
+                'shift' => $shift,
                 'section_name' => $request->section_name,
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,

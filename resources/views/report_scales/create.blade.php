@@ -22,7 +22,7 @@
 
                     <div class="col-md-3">
                         <label for="shift">Shift</label>
-                        <input type="text" name="shift" class="form-control @error('shift') is-invalid @enderror"
+                        <input type="text" name="shift" class="form-control @error('shift') is-invalid @enderror" value="{{ session('shift_number') }}-{{ session('shift_group') }}"
                             required>
                         @error('shift') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>

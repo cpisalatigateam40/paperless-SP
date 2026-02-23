@@ -152,11 +152,15 @@ class ReportPasteurController extends Controller
      */
     public function store(Request $request)
     {
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // 1. Simpan Report
         $report = ReportPasteur::create([
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
             'problem' => $request->problem,
             'corrective_action' => $request->corrective_action,

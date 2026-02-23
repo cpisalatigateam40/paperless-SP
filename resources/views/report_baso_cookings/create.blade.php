@@ -20,7 +20,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="shift" class="form-label">Shift</label>
-                        <input type="text" id="shift" name="shift" class="form-control" required>
+                        <input type="text" id="shift" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
                     </div>
 
                 </div>

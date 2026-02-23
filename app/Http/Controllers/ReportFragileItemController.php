@@ -92,14 +92,17 @@ class ReportFragileItemController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'shift' => 'required|string',
         ]);
+
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
 
         $report = ReportFragileItem::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
             'known_by' => $request->known_by,
             'approved_by' => $request->approved_by,

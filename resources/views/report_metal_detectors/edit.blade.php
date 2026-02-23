@@ -88,16 +88,16 @@
                             <div class="col-md-4">
                                 <label>Ketidaksesuaian</label>
                                 <input type="text" name="details[{{ $i }}][nonconformity]" class="form-control"
-                                    value="{{ $detail->nonconformity }}" required>
+                                    value="{{ $detail->nonconformity }}">
                             </div>
                             <div class="col-md-4">
                                 <label>Tindakan Koreksi</label>
                                 <input type="text" name="details[{{ $i }}][corrective_action]" class="form-control"
-                                    value="{{ $detail->corrective_action }}" required>
+                                    value="{{ $detail->corrective_action }}">
                             </div>
                             <div class="col-md-4">
                                 <label>Verifikasi Setelah Tindakan Koreksi</label>
-                                <select name="details[{{ $i }}][verif_after_correct]" class="form-control" required>
+                                <select name="details[{{ $i }}][verif_after_correct]" class="form-control">
                                     <option value="√" {{ $detail->verif_after_correct == '√' ? 'selected' : '' }}>√
                                     </option>
                                     <option value="x" {{ $detail->verif_after_correct == 'x' ? 'selected' : '' }}>x

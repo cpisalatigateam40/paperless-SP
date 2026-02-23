@@ -9,15 +9,18 @@
         <div class="card-body">
             <form action="{{ route('report_lab_samples.store') }}" method="POST">
                 @csrf
-                <div class="mb-2">
-                    <label>Tanggal</label>
-                    <input type="date" name="date" class="form-control" value="{{ old('date', date('Y-m-d')) }}"
-                        required>
+                <div class="row mb-3">
+                    <div class="mb-2 col-md-6">
+                        <label>Tanggal</label>
+                        <input type="date" name="date" class="form-control" value="{{ old('date', date('Y-m-d')) }}"
+                            required>
+                    </div>
+                    <div class="mb-2 col-md-6">
+                        <label>Shift</label>
+                        <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <label>Shift</label>
-                    <input type="text" name="shift" class="form-control" required>
-                </div>
+                
                 <div class="mb-2">
                     <label>Sampel Storage</label><br>
                     <div class="form-check form-check-inline">
@@ -74,7 +77,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>Jenis Sample</label>
-                                <select name="details[0][sample_type]" class="form-control mb-3">
+                                <select name="details[0][sample_type]" class="form-control mb-3" required>
                                     <option value="">-- Pilih Jenis Sample --</option>
                                     <option value="Sampel Lab">Sampel Lab</option>
                                     <option value="Sampel Retained">Sampel Retained</option>
@@ -92,7 +95,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Satuan</label>
-                                <select name="details[0][unit]" class="form-control mb-3">
+                                <select name="details[0][unit]" class="form-control mb-3" required>
                                     <option value="">-- Pilih Satuan --</option>
                                     <option value="pcs">pcs</option>
                                     <option value="pack">pack</option>

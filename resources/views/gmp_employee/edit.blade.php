@@ -11,18 +11,20 @@
             <form action="{{ route('gmp-employee.update', $report->uuid) }}" method="POST">
                 @csrf
                 @method('PUT')
+                <div class="row mb-3">
+                    <div class="mb-3 col-md-6">
+                        <label>Tanggal</label>
+                        <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}"
+                            required>
+                    </div>
 
-                <div class="mb-3">
-                    <label>Tanggal</label>
-                    <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}"
-                        required>
+                    <div class="mb-3 col-md-6">
+                        <label>Shift</label>
+                        <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}"
+                            required>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label>Shift</label>
-                    <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}"
-                        required>
-                </div>
 
                 {{-- Tabs --}}
                 <ul class="nav nav-tabs">

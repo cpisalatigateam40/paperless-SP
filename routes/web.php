@@ -67,6 +67,7 @@ use App\Http\Controllers\ReportPasteurController;
 use App\Http\Controllers\ReportSauceController;
 use App\Http\Controllers\ReportSiomayController;
 use App\Http\Controllers\ReportWaterbathController;
+use App\Http\Controllers\ShiftController;
 
 
 Route::get('/', function () {
@@ -78,9 +79,16 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
+    
+    Route::get('/shift/select', [ShiftController::class, 'showShiftSelection'])->name('shift.select');
+    Route::post('/shift/store', [ShiftController::class, 'storeShiftSelection'])->name('shift.store');
+    Route::get('/shift/change', [ShiftController::class, 'changeShift'])->name('shift.change');
+
+    Route::middleware(['shift.selected'])->group(function () {
+    
     Route::get('/dashboard', function () {
-        return view('dashboard');
-    });
+            return view('dashboard');
+        })->name('dashboard');
 
     // USER ROUTES
     Route::prefix('users')
@@ -451,6 +459,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     // MD PREMIX
@@ -657,6 +667,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{report_uuid}/export-pdf', 'exportPdf')->name('export_pdf');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     Route::prefix('report-retains')
@@ -718,8 +730,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
-Route::put('/{uuid}', 'update')->name('update');
-
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     Route::prefix('report-retain-exterminations')
@@ -937,6 +950,8 @@ Route::put('/{uuid}', 'update')->name('update');
             Route::post('/{id}/known', 'known')->name('known');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
+            Route::get('/template', 'downloadTemplate')->name('template');
+            Route::post('/import', 'import')->name('import');
         });
 
     Route::prefix('report-process-productions')
@@ -1121,5 +1136,5 @@ Route::put('/{uuid}', 'update')->name('update');
     Route::put('/formulas/{uuid}/update/{formulation_name}', [FormulaController::class, 'updateDetail'])
         ->name('formulas.updateDetail');
 
-
+    });
 });

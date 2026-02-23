@@ -91,8 +91,6 @@ class ReportPremixController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'shift' => 'required|string|max:20',
-
             'details' => 'required|array|min:1',
             'details.*.premix_uuid' => 'required|exists:premixes,uuid',
             'details.*.weight' => 'required|numeric',
@@ -102,12 +100,16 @@ class ReportPremixController extends Controller
             'details.*.verification' => 'nullable|string|max:10',
         ]);
 
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // Simpan header laporan
         $report = ReportPremix::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
             'known_by' => $request->known_by,
             'approved_by' => $request->approved_by,

@@ -84,11 +84,15 @@ class ReportLabSampleController extends Controller
     public function store(Request $request)
     {
         DB::transaction(function () use ($request) {
+            $shift = auth()->user()->hasRole('QC Inspector')
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
+
             $report = ReportLabSample::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => $request->date,
-                'shift' => $request->shift,
+                'shift' => $shift,
                 'storage' => implode(', ', $request->storage ?? []),
                 'created_by' => Auth::user()->name,
             ]);

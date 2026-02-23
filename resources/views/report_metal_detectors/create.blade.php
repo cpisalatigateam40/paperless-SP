@@ -10,15 +10,18 @@
             <form action="{{ route('report_metal_detectors.store') }}" method="POST">
                 @csrf
 
-                <div class="mb-3">
-                    <label>Tanggal</label>
-                    <input type="date" name="date" class="form-control"
-                        value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label>Tanggal</label>
+                        <input type="date" name="date" class="form-control"
+                            value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label>Shift</label>
+                        <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label>Shift</label>
-                    <input type="text" name="shift" class="form-control" required>
-                </div>
+                
 
                 <hr>
                 <h5>Detail Pemeriksaan</h5>
@@ -80,15 +83,15 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label>Ketidaksesuaian</label>
-                                <input type="text" name="details[0][nonconformity]" class="form-control" required>
+                                <input type="text" name="details[0][nonconformity]" class="form-control">
                             </div>
                             <div class="col-md-4">
                                 <label>Tindakan Koreksi</label>
-                                <input type="text" name="details[0][corrective_action]" class="form-control" required>
+                                <input type="text" name="details[0][corrective_action]" class="form-control">
                             </div>
                             <div class="col-md-4">
                                 <label>Verifikasi Setelah Tindakan Koreksi</label>
-                                <select name="details[0][verif_after_correct]" class="form-control" required>
+                                <select name="details[0][verif_after_correct]" class="form-control">
                                     <option value="√">√ </option>
                                     <option value="x">x </option>
                                 </select>

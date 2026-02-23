@@ -13,19 +13,19 @@
                 <!-- Header -->
                 <div class="mb-4">
                     <div class="d-flex" style="gap: 1rem;">
-                        <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
+                        <div class="col-md-6 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Tanggal:</label>
                             <input type="date" name="date" class="form-control"
                                 value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
                         </div>
-                        <div class="col-md-5 mb-3" style="margin-inline: unset; padding-inline: unset;">
+                        <div class="col-md-6 mb-3" style="margin-inline: unset; padding-inline: unset;">
                             <label>Shift:</label>
-                            <input type="text" name="shift" class="form-control" required>
+                            <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
                         </div>
                     </div>
 
                     <label>Area (Room Name):</label>
-                    <select id="roomSelect" name="room_name" class="form-control col-md-5 mb-5" required>
+                    <select id="roomSelect" name="room_name" class="form-control col-md-6 mb-5" required>
                         <option value="">-- Pilih Area --</option>
                         <option value="Seasoning">Seasoning</option>
                         <option value="Chillroom">Chillroom</option>
@@ -46,7 +46,7 @@
                     <div class="inspection-block border rounded p-3 mb-3 position-relative" data-index="__index__">
 
                         <label>Jam Inspeksi:</label>
-                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-5"
+                        <input type="time" name="details[__index__][inspection_hour]" class="form-control mb-3 col-md-6"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
 
                         <table class="table">

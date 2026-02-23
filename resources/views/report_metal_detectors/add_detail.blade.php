@@ -66,15 +66,15 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label>Ketidaksesuaian</label>
-                        <input type="text" name="nonconformity" class="form-control" required>
+                        <input type="text" name="nonconformity" class="form-control">
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
-                        <input type="text" name="corrective_action" class="form-control" required>
+                        <input type="text" name="corrective_action" class="form-control" >
                     </div>
                     <div class="col-md-4">
                         <label>Verifikasi Setelah Tindakan Koreksi</label>
-                        <select name="verif_after_correct" class="form-control" required>
+                        <select name="verif_after_correct" class="form-control">
                             <option value="√">√ </option>
                             <option value="x">x </option>
                         </select>

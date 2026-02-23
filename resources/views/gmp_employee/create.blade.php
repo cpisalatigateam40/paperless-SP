@@ -11,16 +11,19 @@
             <form action="{{ route('gmp-employee.store') }}" method="POST">
                 @csrf
 
-                <div class="mb-3">
-                    <label>Tanggal</label>
-                    <input type="date" name="date" class="form-control"
-                        value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
-                </div>
+                <div class="row mb-3">
+                    <div class="mb-3 col-md-6">
+                        <label>Tanggal</label>
+                        <input type="date" name="date" class="form-control"
+                            value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                    </div>
 
-                <div class="mb-3">
-                    <label>Shift</label>
-                    <input type="text" name="shift" class="form-control" required>
+                    <div class="mb-3 col-md-6">
+                        <label>Shift</label>
+                        <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
+                    </div>
                 </div>
+                
 
                 {{-- Tabs --}}
                 <ul class="nav nav-tabs" id="gmpTabs" role="tablist">

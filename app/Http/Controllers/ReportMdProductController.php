@@ -12,36 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Services\BestBeforeService;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\MdProductImport;
+use App\Exports\MdProductTemplateExport;
 
 class ReportMdProductController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportMdProduct::with(['details.positions'])->latest()->paginate(10);
-
-    //     foreach ($reports as $report) {
-    //         $totalNonConform = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             // 1️⃣ Cek verifikasi setelah perbaikan
-    //             if (isset($detail->verification) && $detail->verification == 0) {
-    //                 $totalNonConform++;
-    //                 continue; // langsung lanjut, tidak perlu cek posisi lagi
-    //             }
-
-    //             // 2️⃣ Cek posisi (status = 0 berarti Tidak OK)
-    //             if ($detail->positions->contains('status', 0)) {
-    //                 $totalNonConform++;
-    //             }
-    //         }
-
-    //         // Tambahkan properti untuk dipakai di view
-    //         $report->ketidaksesuaian = $totalNonConform;
-    //     }
-
-    //     return view('report_md_products.index', compact('reports'));
-    // }
-
     public function index(Request $request)
     {
         $query = ReportMdProduct::with([
@@ -137,29 +113,29 @@ class ReportMdProductController extends Controller
         return view('report_md_products.index', compact('reports'));
     }
 
-
-
     public function create()
     {
         $products = Product::all();
         return view('report_md_products.create', compact('products'));
     }
 
-
     public function store(Request $request)
     {
         // Validasi minimal header, sesuaikan sesuai kebutuhan
         $request->validate([
             'date' => 'required|date',
-            'shift' => 'required|string',
         ]);
+
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
 
         // Simpan header report
         $report = ReportMdProduct::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
         ]);
 
@@ -380,6 +356,28 @@ class ReportMdProductController extends Controller
 
         return redirect()->route('report_md_products.index')
             ->with('success', 'Report berhasil diperbarui.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new MdProductTemplateExport,
+            'template-md-produk.xlsx'
+        );
+    }
+
+    /* ================= IMPORT EXCEL ================= */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new MdProductImport, $request->file('file'));
+
+        return redirect()
+            ->route('report_md_products.index')
+            ->with('success', 'Import MD Produk berhasil.');
     }
 
 

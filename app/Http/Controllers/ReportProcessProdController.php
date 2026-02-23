@@ -257,13 +257,17 @@ class ReportProcessProdController extends Controller
 
     public function store(Request $request)
     {
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // Buat Report Utama
         $report = ReportProcessProd::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
         ]);
 

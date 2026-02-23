@@ -127,16 +127,19 @@ class ReportScaleController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'shift' => 'required|string|max:50',
             'data' => 'nullable|array',
             'thermo_data' => 'nullable|array',
         ]);
+
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
 
         $report = ReportScale::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
         ]);
 

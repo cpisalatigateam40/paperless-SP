@@ -13,30 +13,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\MetalDetectorTemplateExport;
+use App\Imports\MetalDetectorImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportMetalDetectorController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportMetalDetector::with(['area', 'section', 'details.product'])
-    //         ->latest()
-    //         ->paginate(10);
-
-    //     $reports->getCollection()->transform(function ($report) {
-    //         $report->ketidaksesuaian = $report->details->filter(function ($d) {
-    //             return in_array('x', [
-    //                 $d->result_fe,
-    //                 $d->result_non_fe,
-    //                 $d->result_sus316,
-    //                 $d->verif_loma,
-    //             ]);
-    //         })->count();
-
-    //         return $report;
-    //     });
-
-    //     return view('report_metal_detectors.index', compact('reports'));
-    // }
 
     public function index(Request $request)
     {
@@ -125,7 +107,6 @@ class ReportMetalDetectorController extends Controller
         // Validasi (minimal)
         $request->validate([
             'date' => 'required|date',
-            'shift' => 'required',
             'section_uuid' => 'nullable',
             'details' => 'required|array',
             'details.*.product_uuid' => 'required',
@@ -134,11 +115,15 @@ class ReportMetalDetectorController extends Controller
             'details.*.notes' => 'nullable',
         ]);
 
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // Buat report
         $report = ReportMetalDetector::create([
             'uuid' => Str::uuid(),
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'created_by' => Auth::user()->name,
@@ -347,6 +332,27 @@ class ReportMetalDetectorController extends Controller
         }
 
         return redirect()->route('report_metal_detectors.index')->with('success', 'Data berhasil diperbarui!');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new MetalDetectorTemplateExport,
+            'template_pemeriksaan_md_adonan.xlsx'
+        );
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new MetalDetectorImport, $request->file('file'));
+
+        return redirect()
+            ->route('report_metal_detectors.index')
+            ->with('success', 'Data Excel berhasil diimport.');
     }
 
 

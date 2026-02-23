@@ -132,8 +132,6 @@ class StorageRmCleanlinessController extends Controller
         return view('cleanliness.index', compact('reports'));
     }
 
-
-
     public function create()
     {
         return view('cleanliness.form');
@@ -143,12 +141,16 @@ class StorageRmCleanlinessController extends Controller
     {
         DB::beginTransaction();
         try {
+            $shift = auth()->user()->hasRole('QC Inspector')
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
+
             // Simpan Report
             $report = ReportStorageRmCleanliness::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
                 'date' => now()->toDateString(),
-                'shift' => $request->shift,
+                'shift' => $shift,
                 'room_name' => $request->room_name,
                 'created_by' => Auth::user()->name,
                 'known_by' => $request->known_by,

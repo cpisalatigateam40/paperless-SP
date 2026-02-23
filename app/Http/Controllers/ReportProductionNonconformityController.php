@@ -80,7 +80,6 @@ class ReportProductionNonconformityController extends Controller
     {
         $validated = $request->validate([
             'date' => 'required|date',
-            'shift' => 'required|string',
             'details' => 'required|array',
             'details.*.occurrence_time' => 'required',
             'details.*.description' => 'required',
@@ -92,12 +91,16 @@ class ReportProductionNonconformityController extends Controller
             'details.*.remark' => 'nullable|string',
         ]);
 
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // Simpan report header
         $report = ReportProductionNonconformity::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'date' => $validated['date'],
-            'shift' => $request->shift,
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
         ]);
 

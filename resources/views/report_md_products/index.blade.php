@@ -41,6 +41,23 @@
 
                 </form>
 
+                {{-- IMPORT --}}
+                <form action="{{ route('report_md_products.import') }}" method="POST"
+                    enctype="multipart/form-data" class="d-flex align-items-center gap-1">
+                    @csrf
+                    <label class="btn btn-sm btn-outline-secondary mb-0" style="cursor:pointer;">
+                        <i class="bi bi-upload"></i> Import
+                        <input type="file" name="file" required hidden
+                            onchange="this.closest('form').querySelector('#btnImport').click()">
+                    </label>
+                    <button id="btnImport" type="submit" class="d-none"></button>
+                </form>
+
+                {{-- DOWNLOAD TEMPLATE --}}
+                <a href="{{ route('report_md_products.template') }}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-download"></i> Template
+                </a>
+
                 <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
             </div>
         </div>

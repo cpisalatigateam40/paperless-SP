@@ -11,16 +11,18 @@
                 @csrf
                 @method('PUT')
 
-                <div class="mb-2">
-                    <label>Tanggal</label>
-                    <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}"
-                        required>
-                </div>
+                <div class="row mb-3">
+                    <div class="mb-2 col-md-6">
+                        <label>Tanggal</label>
+                        <input type="date" name="date" class="form-control" value="{{ old('date', $report->date) }}"
+                            required>
+                    </div>
 
-                <div class="mb-2">
-                    <label>Shift</label>
-                    <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}"
-                        required>
+                    <div class="mb-2 col-md-6">
+                        <label>Shift</label>
+                        <input type="text" name="shift" class="form-control" value="{{ old('shift', $report->shift) }}"
+                            required>
+                    </div>
                 </div>
 
                 <div class="mb-2">
@@ -89,7 +91,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>Jenis Sample</label>
-                                <select name="details[{{ $i }}][sample_type]" class="form-control mb-3">
+                                <select name="details[{{ $i }}][sample_type]" class="form-control mb-3" required>
                                     <option value="">-- Pilih Jenis Sample --</option>
                                     <option value="Sampel Lab" @selected($detail->sample_type === 'Sampel Lab')>Sampel Lab</option>
                                     <option value="Sampel Retained" @selected($detail->sample_type === 'Sampel Retained')>Sampel Retained</option>
@@ -108,7 +110,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Satuan</label>
-                                <select name="details[{{ $i }}][unit]" class="form-control mb-3">
+                                <select name="details[{{ $i }}][unit]" class="form-control mb-3" required>
                                     <option value="">-- Pilih Satuan --</option>
                                     <option value="pcs" @selected($detail->unit === 'pcs')>pcs</option>
                                     <option value="pack" @selected($detail->unit === 'pack')>pack</option>

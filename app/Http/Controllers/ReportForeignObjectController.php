@@ -136,7 +136,6 @@ class ReportForeignObjectController extends Controller
         // dd($request->details);
         $request->validate([
             'date' => 'required|date',
-            'shift' => 'required|string',
             'section_uuid' => 'required|uuid',
             'details' => 'required|array|min:1',
             'details.*.time' => 'required',
@@ -152,10 +151,14 @@ class ReportForeignObjectController extends Controller
             'details.*.engineering_paraf' => 'nullable|string',
         ]);
 
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         $report = ReportForeignObject::create([
             'uuid' => Str::uuid(),
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'created_by' => Auth::user()->name,

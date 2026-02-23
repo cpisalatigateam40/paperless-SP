@@ -13,6 +13,9 @@ use App\Models\RawMaterial;
 use App\Models\Premix;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\RmArrivalTemplateExport;
+use App\Imports\RmArrivalImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportRmArrivalController extends Controller
 {
@@ -112,7 +115,12 @@ class ReportRmArrivalController extends Controller
             return $report;
         });
 
-        return view('report_rm_arrivals.index', compact('reports'));
+        $sections = \App\Models\Section::where('area_uuid', auth()->user()->area_uuid)
+        ->whereIn('section_name', ['Seasoning', 'Chillroom'])
+        ->orderBy('section_name')
+        ->get();
+
+        return view('report_rm_arrivals.index', compact('reports', 'sections'));
     }
     public function create()
     {
@@ -126,12 +134,17 @@ class ReportRmArrivalController extends Controller
 
     public function store(Request $request)
     {
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         $report = ReportRmArrival::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'date' => $request->date,
-            'shift' => $request->shift,
+            // 'shift' => session('shift_number') . '-' . session('shift_group'),
+            'shift' => $shift,
             'created_by' => Auth::user()->name,
         ]);
 
@@ -404,6 +417,26 @@ class ReportRmArrivalController extends Controller
             ->pluck('production_code');
     }
 
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new RmArrivalTemplateExport,
+            'template_laporan_kedatangan_bahan.xlsx'
+        );
+    }
 
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file'         => 'required|mimes:xlsx,xls',
+            'section_uuid' => 'required|uuid',
+        ]);
+
+        Excel::import(new RmArrivalImport($request->section_uuid), $request->file('file'));
+
+        return redirect()
+            ->route('report_rm_arrivals.index')
+            ->with('success', 'Data Excel berhasil diimport.');
+    }
 
 }

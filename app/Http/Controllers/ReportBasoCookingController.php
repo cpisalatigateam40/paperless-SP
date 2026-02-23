@@ -181,12 +181,16 @@ class ReportBasoCookingController extends Controller
 
     public function store(Request $request)
     {
+        $shift = auth()->user()->hasRole('QC Inspector')
+        ? session('shift_number') . '-' . session('shift_group')
+        : ($request->shift ?? 'NON-SHIFT');
+
         // Simpan header (report)
         $report = ReportBasoCooking::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid ?? null,
             'date' => $request->date,
-            'shift' => $request->shift,
+            'shift' => $shift,
             'product_uuid' => $request->product_uuid,
             'std_core_temp' => $request->std_core_temp,
             'std_weight' => $request->std_weight,
