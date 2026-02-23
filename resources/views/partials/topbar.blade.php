@@ -9,14 +9,6 @@
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
         {{-- 🔹 SHIFT INFO --}}
-        <!-- @if(get_current_shift())
-        <li class="nav-item d-flex align-items-center mr-3">
-            <span class="badge badge-pill badge-primary px-3 py-2">
-                <i class="fas fa-clock mr-1"></i>
-                {{ get_current_shift() }}
-            </span>
-        </li>
-        @endif -->
 
         <div class="topbar-divider d-none d-sm-block"></div>
 
