@@ -51,7 +51,7 @@
                     </a>
                 @endif
 
-                {{-- Hapus --}}
+                @can('delete report')
                 <form action="{{ route('process-area-cleanliness.destroy', $report->id) }}" method="POST"
                     style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
                     @csrf @method('DELETE')
@@ -59,6 +59,7 @@
                         <i class="fas fa-trash"></i>
                     </button>
                 </form>
+                @endcan
 
                 {{-- Known --}}
                 @can('known report')
@@ -170,12 +171,14 @@
                 </div>
                 @endforeach
 
+                @can('create report')
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('process-area-cleanliness.detail.create', $report->id) }}"
                         class="btn btn-sm btn-primary mt-3">
                         + Tambah Detail Inspeksi
                     </a>
                 </div>
+                @endcan
             </td>
         </tr>
 

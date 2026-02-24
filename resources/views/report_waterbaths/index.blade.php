@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_waterbaths.create') }}" class="btn btn-primary">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -91,6 +93,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 @endif
+                                @can('delete report')
                                 <form action="{{ route('report_waterbaths.destroy', $report->uuid) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus laporan ini?')">
                                     @csrf
@@ -98,6 +101,7 @@
                                     <button type="submit" class="btn btn-danger btn-sm"><i
                                             class="fas fa-trash"></i></button>
                                 </form>
+                                @endcan
                                 {{-- Known --}}
                                 @can('known report')
                                 @if(!$report->known_by)
@@ -268,12 +272,14 @@
                         @endfor
                     </tbody>
                 </table>
+                @can('create report')
                 <div class="d-flex justify-content-end mt-2">
                     <a href="{{ route('report_waterbaths.add_detail', $report->uuid) }}"
                         class="btn btn-sm btn-secondary">
                         + Tambah Detail
                     </a>
                 </div>
+                @endcan
             </div>
             </td>
             </tr>

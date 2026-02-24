@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report-re-cleanliness.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -114,7 +116,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Delete --}}
+                                @can('delete report')
                                 <form action="{{ route('report-re-cleanliness.destroy', $report->uuid) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus laporan ini?')">
                                     @csrf
@@ -123,6 +125,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')

@@ -255,11 +255,39 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
     $(document).ready(function() {
+
+        function customMatcher(params, data) {
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+
+            if (typeof data.text === 'undefined') {
+                return null;
+            }
+
+            let searchTerm = params.term.replace(/\s+/g, '').toLowerCase();
+            let text = data.text.replace(/\s+/g, '').toLowerCase();
+
+            // MATCH NORMAL
+            if (text.indexOf(searchTerm) > -1) {
+                return data;
+            }
+
+            // MATCH TERBALIK (jika user kelebihan huruf)
+            if (searchTerm.indexOf(text) > -1) {
+                return data;
+            }
+
+            return null;
+        }
+
         $('.select2-product').select2({
             placeholder: '-- Pilih Produk --',
             allowClear: true,
-            width: '100%'
+            width: '100%',
+            matcher: customMatcher
         });
+
     });
     </script>
 

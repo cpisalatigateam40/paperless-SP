@@ -40,9 +40,9 @@
 
                 </form>
 
-
-
+                @can('create report')
                 <a href="{{ route('report-premixes.create') }}" class=" btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -119,7 +119,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report-premixes.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin hapus laporan ini?')">
                                     @csrf
@@ -128,6 +128,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')

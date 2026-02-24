@@ -41,7 +41,7 @@
 
                 </form>
 
-                {{-- IMPORT --}}
+                @can('import report')
                 <form action="{{ route('report_md_products.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -57,8 +57,11 @@
                 <a href="{{ route('report_md_products.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
+                @endcan
 
+                @can('create report')
                 <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -132,7 +135,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Delete --}}
+                                @can('delete report')
                                 <form method="POST" action="{{ route('report_md_products.destroy', $report->uuid) }}"
                                     onsubmit="return confirm('Hapus report ini?')">
                                     @csrf
@@ -141,6 +144,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -276,12 +280,14 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+                                    @can('create report')
                                     <div class="mt-2 d-flex justify-content-end">
                                         <a href="{{ route('report_md_products.add-detail', $report->uuid) }}"
                                             class="btn btn-sm btn-secondary">
                                             Tambah Detail Pemeriksaan
                                         </a>
                                     </div>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

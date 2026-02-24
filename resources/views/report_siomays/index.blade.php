@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -103,12 +105,14 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 @endif
+                                @can('delete report')
                                 <form action="{{ route('report_siomays.destroy', $r->uuid) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus laporan ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                 </form>
+                                @endcan
                                 {{-- Known --}}
                                 @can('known report')
                                 @if(!$r->known_by)
@@ -262,12 +266,14 @@
                                         @endforeach
                                     </table>
                                 </div>
+                                @can('create report')
                                 <div class="d-flex justify-content-end">
                                     <a href="{{ route('report_siomays.add_detail', $r->uuid) }}"
                                         class="btn btn-sm btn-outline-secondary mt-2" title="Tambah Detail">
                                         Tambah Detail
                                     </a>
                                 </div>
+                                @endcan
                             </td>
                         </tr>
                         @empty

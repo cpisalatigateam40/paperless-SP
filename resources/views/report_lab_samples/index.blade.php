@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_lab_samples.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -109,7 +111,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Delete --}}
+                                @can('delete report')
                                 <form action="{{ route('report_lab_samples.destroy', $report->id) }}" method="POST"
                                     onsubmit="return confirm('Yakin?')">
                                     @csrf
@@ -118,6 +120,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -213,12 +216,14 @@
                                             @endforeach
                                         </tbody>
                                     </table>
+                                    @can('create report')
                                     <div class="d-flex justify-content-end">
                                         <a href="{{ route('report_lab_samples.details.create', $report->uuid) }}"
                                             class="btn btn-sm btn-secondary mt-2">
                                             + Tambah Detail
                                         </a>
                                     </div>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('process-area-cleanliness.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 

@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_maurer_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -114,7 +116,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Delete --}}
+                                @can('delete report')
                                 <form action="{{ route('report_maurer_cookings.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Are you sure?');">
                                     @csrf
@@ -123,6 +125,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')

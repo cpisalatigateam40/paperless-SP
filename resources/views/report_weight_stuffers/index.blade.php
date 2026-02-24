@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_weight_stuffers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body table-responsive">
@@ -107,7 +109,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report_weight_stuffers.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
                                     @csrf
@@ -116,6 +118,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -298,12 +301,14 @@
 
                                 </div>
 
+                                @can('create report')
                                 <div class="d-flex justify-content-end">
                                     <a href="{{ route('report_weight_stuffers.add-detail', $report->uuid) }}"
                                         class="btn btn-secondary btn-sm">
                                         Tambah Detail
                                     </a>
                                 </div>
+                                @endcan
                             </td>
                         </tr>
 

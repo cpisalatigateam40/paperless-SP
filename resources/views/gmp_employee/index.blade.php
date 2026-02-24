@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -126,7 +128,7 @@
                                     </a>
                                     @endcan
 
-                                    {{-- Hapus --}}
+                                    @can('delete report')
                                     <form action="{{ route('gmp-employee.destroy', $report->id) }}" method="POST"
                                         onsubmit="return confirm('Yakin ingin menghapus laporan ini?')"
                                         class="d-inline-block">
@@ -136,6 +138,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
 
                                     {{-- Known --}}
                                     @can('known report')
@@ -246,12 +249,14 @@
                                         </tbody>
                                     </table>
 
+                                    @can('create report')
                                     <div class="d-flex justify-content-end">
                                         <a href="{{ route('gmp-employee.detail.create', $report->id) }}"
                                             class="btn btn-sm btn-primary mt-3">
                                             + Tambah Detail
                                         </a>
                                     </div>
+                                    @endcan
 
                                     {{-- TABEL SANITASI AREA --}}
                                     @if($report->sanitationCheck && $report->sanitationCheck->count())

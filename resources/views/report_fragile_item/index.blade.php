@@ -42,7 +42,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report-fragile-item.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
             </div>
         </div>
@@ -116,7 +118,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report-fragile-item.destroy', $report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
                                     @csrf
@@ -125,6 +127,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')

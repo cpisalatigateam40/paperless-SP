@@ -33,7 +33,7 @@
 
                 <div class="vr"></div>
 
-                {{-- IMPORT --}}
+                @can('import report')
                 <form action="{{ route('report_rm_arrivals.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -55,13 +55,15 @@
                 <a href="{{ route('report_rm_arrivals.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
+                @endcan
 
                 <div class="vr"></div>
 
-                {{-- TAMBAH --}}
+                @can('create report')
                 <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
                     <i class="bi bi-plus-lg"></i> Tambah
                 </a>
+                @endcan
 
             </div>
         </div>
@@ -135,7 +137,7 @@
 
 
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report_rm_arrivals.destroy', $report->uuid) }}"
                                     method="POST" class="d-inline"
                                     onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
@@ -145,6 +147,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -259,12 +262,14 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                @can('create report')
                                 <div class="mb-2 d-flex justify-content-end mt-3">
                                     <a href="{{ route('report_rm_arrivals.add_detail', $report->uuid) }}"
                                         class="btn btn-sm btn-outline-primary">
                                         + Tambah Pemeriksaan
                                     </a>
                                 </div>
+                                @endcan
                             </td>
                         </tr>
 

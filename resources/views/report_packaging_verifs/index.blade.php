@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_packaging_verifs.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -116,7 +118,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Delete --}}
+                                @can('delete report')
                                 <form action="{{ route('report_packaging_verifs.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Yakin hapus?')">
                                     @csrf
@@ -125,6 +127,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -348,12 +351,14 @@
 
             </div>
 
+            @can('create report')
             <div class="d-flex justify-content-end">
                 <a href="{{ route('report_packaging_verifs.add-detail', $report->uuid) }}"
                     class="btn btn-secondary btn-sm">
                     Tambah Detail
                 </a>
             </div>
+            @endcan
             </td>
             </tr>
             @endforeach

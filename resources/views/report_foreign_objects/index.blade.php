@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report-foreign-objects.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -109,7 +111,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report-foreign-objects.destroy', $report->uuid) }}"
                                     method="POST" class="d-inline"
                                     onsubmit="return confirm('Yakin ingin menghapus seluruh laporan ini?')">
@@ -119,6 +121,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -250,12 +253,14 @@
 
                                 </div>
 
+                                @can('create report')
                                 <div class="mt-2 d-flex justify-content-end">
                                     <a href="{{ route('report-foreign-objects.add-detail', $report->uuid) }}"
                                         class="btn btn-sm btn-outline-secondary">
-                                        Tambah Detail Temuan Kontaminasi
+                                        Tambah Detail
                                     </a>
                                 </div>
+                                @endcan
                             </td>
                         </tr>
                         @endforeach

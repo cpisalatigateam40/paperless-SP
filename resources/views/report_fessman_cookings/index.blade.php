@@ -40,7 +40,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_fessman_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -114,7 +116,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Delete --}}
+                                @can('delete report')
                                 <form action="{{ route('report_fessman_cookings.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Yakin?')">
                                     @csrf @method('DELETE')
@@ -122,6 +124,7 @@
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')

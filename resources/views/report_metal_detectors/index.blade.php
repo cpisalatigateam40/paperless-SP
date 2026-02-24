@@ -41,7 +41,7 @@
 
                 </form>
 
-                {{-- IMPORT --}}
+                @can('import report')
                 <form action="{{ route('report_metal_detectors.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -57,8 +57,11 @@
                 <a href="{{ route('report_metal_detectors.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
+                @endcan
 
+                @can('create report')
                 <a href="{{ route('report_metal_detectors.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -132,7 +135,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report_metal_detectors.destroy', $report->id) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus?')">
                                     @csrf
@@ -141,6 +144,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -245,13 +249,14 @@
                                         </tbody>
                                     </table>
 
+                                    @can('create report')
                                     <div class="mt-2 d-flex justify-content-end">
                                         <a href="{{ route('report_metal_detectors.add_detail', $report->uuid) }}"
                                             class="btn btn-sm btn-outline-secondary">
                                             Tambah Detail Pemeriksaan
                                         </a>
                                     </div>
-
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

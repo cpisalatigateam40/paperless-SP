@@ -40,7 +40,7 @@
                     @endif
                 </form>
 
-                {{-- IMPORT --}}
+                @can('import report')
                 <form action="{{ route('report_emulsion_makings.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -56,10 +56,11 @@
                 <a href="{{ route('report_emulsion_makings.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
+                @endcan
 
-
-
+                @can('create report')
                 <a href="{{ route('report_emulsion_makings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -134,7 +135,7 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus --}}
+                                @can('delete report')
                                 <form action="{{ route('report_emulsion_makings.destroy', $report->uuid) }}"
                                     method="POST" onsubmit="return confirm('Yakin hapus?')">
                                     @csrf
@@ -143,6 +144,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                @endcan
 
                                 {{-- Known --}}
                                 @can('known report')
@@ -302,12 +304,14 @@
                                         </tbody>
                                     </table>
 
+                                    @can('create report')
                                     <div class="d-flex justify-content-end mt-2">
                                         <a href="{{ route('report_emulsion_makings.add-detail', $report->uuid) }}"
                                             class="btn btn-secondary btn-sm">
                                             Tambah Detail
                                         </a>
                                     </div>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

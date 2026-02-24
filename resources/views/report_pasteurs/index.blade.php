@@ -41,7 +41,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_pasteurs.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
         <div class="card-body">
@@ -92,6 +94,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 @endif
+                                @can('delete report')
                                 <form action="{{ route('report_pasteurs.destroy', $report->uuid) }}" method="POST"
                                     onsubmit="return confirm('Hapus report ini?')">
                                     @csrf
@@ -99,6 +102,7 @@
                                     <button type="submit" class="btn btn-danger btn-sm"><i
                                             class="fas fa-trash"></i></button>
                                 </form>
+                                @endcan
                                 {{-- Known --}}
                                 @can('known report')
                                 @if(!$report->known_by)
@@ -332,12 +336,14 @@
                                         </tbody>
                                     </table>
 
+                                    @can('create report')
                                     <div class="d-flex justify-content-end mt-3">
                                         <a href="{{ route('report_pasteurs.add_detail', $report->uuid) }}"
                                             class="btn btn-outline-secondary btn-sm">
                                             Tambah Detail
                                         </a>
                                     </div>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

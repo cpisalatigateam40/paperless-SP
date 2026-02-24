@@ -42,7 +42,9 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_baso_cookings.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
+                @endcan
             </div>
         </div>
 
@@ -165,12 +167,14 @@
                                 </span>
                                 @endif
                                 @endcan
+                                @can('delete report')
                                 <form action="{{ route('report_baso_cookings.destroy', $report->uuid) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus laporan?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger"> <i class="fas fa-trash"></i></button>
                                 </form>
+                                @endcan
                                 <a href="{{ route('report_baso_cookings.export_pdf', $report->uuid) }}"
                                     class="btn btn-outline-secondary btn-sm" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
@@ -275,13 +279,14 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @can('create report')
                                 <div class="d-flex justify-content-end mt-2">
                                     <a href="{{ route('report_baso_cookings.add_detail', $report->uuid) }}"
                                         class="btn btn-outline-secondary btn-sm" title="Tambah Detail">
                                         Tambah Detail
                                     </a>
                                 </div>
-
+                                @endcan
                             </td>
                         </tr>
                         @empty

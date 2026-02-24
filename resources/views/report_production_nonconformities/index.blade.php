@@ -41,9 +41,11 @@
 
                 </form>
 
+                @can('create report')
                 <a href="{{ route('report_production_nonconformities.create') }}" class="btn btn-sm btn-primary">
                 Tambah Laporan
-            </a>
+                </a>
+                @endcan
             </div>
         </div>
 
@@ -111,7 +113,7 @@
                                         </a>
                                     @endif
 
-                                    {{-- Hapus --}}
+                                    @can('delete report')
                                     <form
                                         action="{{ route('report_production_nonconformities.destroy', $report->uuid) }}"
                                         method="POST" style="display:inline-block;"
@@ -122,6 +124,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
 
                                     {{-- Known --}}
                                     @can('known report')
@@ -224,10 +227,12 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+                                    @can('create report')
                                     <div class="d-flex justify-content-end">
                                         <a href="{{ route('report_production_nonconformities.add-detail', $report->uuid) }}"
                                             class="btn btn-sm btn-primary">+ Tambah Detail</a>
                                     </div>
+                                    @endcan
                                 </td>
                             </tr>
                             @empty
