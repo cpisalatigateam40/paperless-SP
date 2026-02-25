@@ -52,12 +52,12 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu awal produk</label>
-                                    <input type="number" name="pasteurisasi[0][initial_product_temp]"
+                                    <input type="number" step="0.01" name="pasteurisasi[0][initial_product_temp]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu awal air</label>
-                                    <input type="number" name="pasteurisasi[0][initial_water_temp]"
+                                    <input type="number" step="0.01" name="pasteurisasi[0][initial_water_temp]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -72,30 +72,30 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setelah produk dimasukkan panel</label>
-                                    <input type="number" name="pasteurisasi[0][water_temp_after_input_panel]"
+                                    <input type="number" step="0.01" name="pasteurisasi[0][water_temp_after_input_panel]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setelah produk dimasukkan aktual</label>
-                                    <input type="number" name="pasteurisasi[0][water_temp_after_input_actual]"
+                                    <input type="number" step="0.01" name="pasteurisasi[0][water_temp_after_input_actual]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setting</label>
-                                    <input type="number" name="pasteurisasi[0][water_temp_setting]"
+                                    <input type="number" step="0.01" name="pasteurisasi[0][water_temp_setting]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air aktual</label>
-                                    <input type="number" name="pasteurisasi[0][water_temp_actual]" class="form-control">
+                                    <input type="number" step="0.01" name="pasteurisasi[0][water_temp_actual]" class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir air</label>
-                                    <input type="number" name="pasteurisasi[0][water_temp_final]" class="form-control">
+                                    <input type="number" step="0.01" name="pasteurisasi[0][water_temp_final]" class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir produk</label>
-                                    <input type="number" name="pasteurisasi[0][product_temp_final]"
+                                    <input type="number" step="0.01" name="pasteurisasi[0][product_temp_final]"
                                         class="form-control">
                                 </div>
 
@@ -107,7 +107,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu awal air</label>
-                                    <input type="number" name="cooling_shocks[0][initial_water_temp]"
+                                    <input type="number" step="0.01" name="cooling_shocks[0][initial_water_temp]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -122,22 +122,22 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setting </label>
-                                    <input type="number" name="cooling_shocks[0][water_temp_setting]"
+                                    <input type="number" step="0.01" name="cooling_shocks[0][water_temp_setting]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air aktual </label>
-                                    <input type="number" name="cooling_shocks[0][water_temp_actual]"
+                                    <input type="number" step="0.01" name="cooling_shocks[0][water_temp_actual]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir air </label>
-                                    <input type="number" name="cooling_shocks[0][water_temp_final]"
+                                    <input type="number" step="0.01" name="cooling_shocks[0][water_temp_final]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir produk </label>
-                                    <input type="number" name="cooling_shocks[0][product_temp_final]"
+                                    <input type="number" step="0.01" name="cooling_shocks[0][product_temp_final]"
                                         class="form-control">
                                 </div>
 
@@ -159,16 +159,16 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu Zona Panas</label>
-                                    <input type="number" name="drippings[0][hot_zone_temperature]" class="form-control">
+                                    <input type="number" step="0.01" name="drippings[0][hot_zone_temperature]" class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu Zona Dingin</label>
-                                    <input type="number" name="drippings[0][cold_zone_temperature]"
+                                    <input type="number" step="0.01" name="drippings[0][cold_zone_temperature]"
                                         class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu Akhir Produk</label>
-                                    <input type="number" name="drippings[0][product_temp_final]" class="form-control">
+                                    <input type="number" step="0.01" name="drippings[0][product_temp_final]" class="form-control">
                                 </div>
                             </div>
 

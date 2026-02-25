@@ -71,12 +71,12 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu awal produk</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][initial_product_temp]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][initial_product_temp]"
                                         class="form-control" value="{{ $p->initial_product_temp ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu awal air</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][initial_water_temp]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][initial_water_temp]"
                                         class="form-control" value="{{ $p->initial_water_temp ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -91,32 +91,32 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setelah produk dimasukkan panel</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][water_temp_after_input_panel]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][water_temp_after_input_panel]"
                                         class="form-control" value="{{ $p->water_temp_after_input_panel ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setelah produk dimasukkan aktual</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][water_temp_after_input_actual]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][water_temp_after_input_actual]"
                                         class="form-control" value="{{ $p->water_temp_after_input_actual ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setting</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][water_temp_setting]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][water_temp_setting]"
                                         class="form-control" value="{{ $p->water_temp_setting ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air aktual</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][water_temp_actual]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][water_temp_actual]"
                                         class="form-control" value="{{ $p->water_temp_actual ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir air</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][water_temp_final]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][water_temp_final]"
                                         class="form-control" value="{{ $p->water_temp_final ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir produk</label>
-                                    <input type="number" name="pasteurisasi[{{ $i }}][product_temp_final]"
+                                    <input type="number" step="0.01" name="pasteurisasi[{{ $i }}][product_temp_final]"
                                         class="form-control" value="{{ $p->product_temp_final ?? '' }}">
                                 </div>
                             </div>
@@ -129,7 +129,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu awal air</label>
-                                    <input type="number" name="cooling_shocks[{{ $i }}][initial_water_temp]"
+                                    <input type="number" step="0.01" name="cooling_shocks[{{ $i }}][initial_water_temp]"
                                         class="form-control" value="{{ $c->initial_water_temp ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -144,22 +144,22 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air setting</label>
-                                    <input type="number" name="cooling_shocks[{{ $i }}][water_temp_setting]"
+                                    <input type="number" step="0.01" name="cooling_shocks[{{ $i }}][water_temp_setting]"
                                         class="form-control" value="{{ $c->water_temp_setting ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu air aktual</label>
-                                    <input type="number" name="cooling_shocks[{{ $i }}][water_temp_actual]"
+                                    <input type="number" step="0.01" name="cooling_shocks[{{ $i }}][water_temp_actual]"
                                         class="form-control" value="{{ $c->water_temp_actual ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir air</label>
-                                    <input type="number" name="cooling_shocks[{{ $i }}][water_temp_final]"
+                                    <input type="number" step="0.01" name="cooling_shocks[{{ $i }}][water_temp_final]"
                                         class="form-control" value="{{ $c->water_temp_final ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu akhir produk</label>
-                                    <input type="number" name="cooling_shocks[{{ $i }}][product_temp_final]"
+                                    <input type="number" step="0.01" name="cooling_shocks[{{ $i }}][product_temp_final]"
                                         class="form-control" value="{{ $c->product_temp_final ?? '' }}">
                                 </div>
                             </div>
@@ -182,17 +182,17 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu Zona Panas</label>
-                                    <input type="number" name="drippings[{{ $i }}][hot_zone_temperature]"
+                                    <input type="number" step="0.01" name="drippings[{{ $i }}][hot_zone_temperature]"
                                         class="form-control" value="{{ $dr->hot_zone_temperature ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu Zona Dingin</label>
-                                    <input type="number" name="drippings[{{ $i }}][cold_zone_temperature]"
+                                    <input type="number" step="0.01" name="drippings[{{ $i }}][cold_zone_temperature]"
                                         class="form-control" value="{{ $dr->cold_zone_temperature ?? '' }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Suhu Akhir Produk</label>
-                                    <input type="number" name="drippings[{{ $i }}][product_temp_final]"
+                                    <input type="number" step="0.01" name="drippings[{{ $i }}][product_temp_final]"
                                         class="form-control" value="{{ $dr->product_temp_final ?? '' }}">
                                 </div>
                             </div>
