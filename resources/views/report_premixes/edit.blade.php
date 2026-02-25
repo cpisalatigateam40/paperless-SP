@@ -128,7 +128,7 @@ function addRow() {
             </select>
         </td>
         <td><input type="text" name="details[${rowIdx}][production_code]" class="form-control"></td>
-        <td><input type="number" name="details[${rowIdx}][weight]" class="form-control" required></td>
+        <td><input type="number" step="0.001" name="details[${rowIdx}][weight]" class="form-control" required></td>
         <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control"></td>
         <td><input type="text" name="details[${rowIdx}][notes]" class="form-control"></td>
         <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control"></td>
