@@ -1136,5 +1136,9 @@ Route::put('/{uuid}', 'update')->name('update');
     Route::put('/formulas/{uuid}/update/{formulation_name}', [FormulaController::class, 'updateDetail'])
         ->name('formulas.updateDetail');
 
+    Route::get('/check-vars', function () {
+    dd(php_ini_loaded_file(), ini_get('max_input_vars'));
+});
+
     });
 });

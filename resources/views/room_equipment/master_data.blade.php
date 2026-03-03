@@ -99,6 +99,7 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Nama</th>
                                     <th>Area</th>
                                     <th>Elemen</th>
@@ -108,6 +109,7 @@
                             <tbody>
                                 @foreach($rooms as $room)
                                 <tr>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $room->name }}</td>
                                     <td>{{ optional($room->area)->name }}</td>
                                     <td>
@@ -178,6 +180,7 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Nama</th>
                                     <th>Area</th>
                                     <th>Parts</th>
@@ -187,6 +190,7 @@
                             <tbody>
                                 @foreach($equipments as $eq)
                                 <tr>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $eq->name }}</td>
                                     <td>{{ optional($eq->area)->name }}</td>
                                     <td>
