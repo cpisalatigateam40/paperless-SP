@@ -199,10 +199,15 @@
                 <table class="table table-sm mb-0 table-borderless">
                     @foreach($d->rawMaterials as $rm)
                     <tr>
-                        <td style="text-align: start !important; border: none;">
-                            {{ $rm->rawMaterial->material_name ?? '-' }}</td>
-                        <td style="text-align: start !important; border: none;">{{ $rm->amount }}</td>
-                        <td style="text-align: start !important; border: none;">{{ $rm->sensory }}</td>
+                        <td style="text-align: start !important; border: none;;">
+                            @if($rm->material_type === 'premix')
+                                {{ $rm->premix->name ?? '-' }} (Premix)
+                            @else
+                                {{ $rm->rawMaterial->material_name ?? '-' }}
+                            @endif
+                        </td>
+                        <td style="text-align: start !important; border: none;;">{{ $rm->amount }}</td>
+                        <td style="text-align: start !important; border: none;;">{{ $rm->sensory }}</td>
                     </tr>
                     @endforeach
                 </table>

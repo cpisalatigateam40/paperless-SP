@@ -16,6 +16,8 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\RmArrivalTemplateExport;
 use App\Imports\RmArrivalImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\RmArrivalExport;
+use Carbon\Carbon;
 
 class ReportRmArrivalController extends Controller
 {
@@ -122,6 +124,7 @@ class ReportRmArrivalController extends Controller
 
         return view('report_rm_arrivals.index', compact('reports', 'sections'));
     }
+
     public function create()
     {
         return view('report_rm_arrivals.create', [
@@ -437,6 +440,41 @@ class ReportRmArrivalController extends Controller
         return redirect()
             ->route('report_rm_arrivals.index')
             ->with('success', 'Data Excel berhasil diimport.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportRmArrival::with(['details.rawMaterial', 'details.premix', 'section'])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'RM_Arrival_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new RmArrivalExport($reports, $periodLabel), $filename);
     }
 
 }

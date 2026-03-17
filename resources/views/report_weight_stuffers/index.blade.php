@@ -41,6 +41,11 @@
 
                 </form>
 
+                {{-- Tombol Export Excel --}}
+                <x-export-excel-modal 
+                    :route="route('report_weight_stuffers.export')" 
+                    title="Verifikasi Berat Stuffer" />
+
                 @can('create report')
                 <a href="{{ route('report_weight_stuffers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan

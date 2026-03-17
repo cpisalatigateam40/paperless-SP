@@ -186,7 +186,7 @@
         <thead>
             <tr>
                 <th rowspan="3">No</th>
-                <th rowspan="3">Jenis dan Kode Timbangan</th>
+                <th rowspan="3">Jenis dan Kode Thermometer</th>
                 <th colspan="2">
                     Pemeriksaan Pukul:
                     {{ optional($report->thermometerDetails->pluck('time_1')->filter()->first()) ? \Carbon\Carbon::parse($report->thermometerDetails->pluck('time_1')->filter()->first())->format('H:i') : '-' }}

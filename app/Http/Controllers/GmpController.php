@@ -18,64 +18,14 @@ use Spatie\Permission\Traits\HasRoles;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Milon\Barcode\DNS1D;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\GmpEmployeeExport;
+use App\Exports\GmpSanitationExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class GmpController extends Controller
 {
     use HasRoles;
-
-    // public function index()
-    // {
-    //     $reports = ReportGmpEmployee::with([
-    //         'area',
-    //         'details.followups',
-    //         'sanitationCheck.sanitationArea.followups'
-    //     ])
-    //     ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-    //         $query->where('area_uuid', Auth::user()->area_uuid);
-    //     })
-    //     ->latest()
-    //     ->paginate(10);
-
-    //     // 🔹 Hitung ketidaksesuaian untuk tiap laporan
-    //     foreach ($reports as $report) {
-    //         $count = 0;
-
-    //         // 🧍 Detail pegawai
-    //         foreach ($report->details as $detail) {
-    //             if ($detail->verification == 0) {
-    //                 $count++;
-    //             }
-
-    //             // follow-up pegawai
-    //             foreach ($detail->followups as $f) {
-    //                 if ($f->verification == 0) {
-    //                     $count++;
-    //                 }
-    //             }
-    //         }
-
-    //         // 🧽 Sanitasi area
-    //         if ($report->sanitationCheck) {
-    //             foreach ($report->sanitationCheck->sanitationArea as $area) {
-    //                 if ($area->verification == 0) {
-    //                     $count++;
-    //                 }
-
-    //                 // follow-up sanitasi
-    //                 foreach ($area->followups as $f) {
-    //                     if ($f->verification == 0) {
-    //                         $count++;
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         // Tambahkan properti dinamis
-    //         $report->ketidaksesuaian = $count;
-    //     }
-
-    //     return view('gmp_employee.index', compact('reports'));
-    // }
 
     public function index(Request $request)
     {
@@ -566,125 +516,172 @@ class GmpController extends Controller
             ->with('isEditNext', true);
     }
 
-public function updateNext(Request $request, $uuid)
-{
-    DB::beginTransaction();
+    public function updateNext(Request $request, $uuid)
+    {
+        DB::beginTransaction();
 
-    try {
-        $report = ReportGmpEmployee::where('uuid', $uuid)->firstOrFail();
+        try {
+            $report = ReportGmpEmployee::where('uuid', $uuid)->firstOrFail();
 
-        // 🧹 Hapus detail & followup lama (hindari dobel)
-        $oldDetails = DetailGmpEmployee::where('report_uuid', $report->uuid)->get();
-        foreach ($oldDetails as $oldDetail) {
-            $oldDetail->followups()->delete();
-            $oldDetail->delete();
-        }
+            // 🧹 Hapus detail & followup lama (hindari dobel)
+            $oldDetails = DetailGmpEmployee::where('report_uuid', $report->uuid)->get();
+            foreach ($oldDetails as $oldDetail) {
+                $oldDetail->followups()->delete();
+                $oldDetail->delete();
+            }
 
-        // 🧩 Simpan detail baru (jam berikutnya)
-        if ($request->has('details')) {
-            foreach ($request->details as $detail) {
-                $newDetail = DetailGmpEmployee::create([
-                    'uuid' => Str::uuid(),
-                    'report_uuid' => $report->uuid,
-                    'inspection_hour' => $detail['inspection_hour'] ?? null,
-                    'section_name' => $detail['section_name'] ?? null,
-                    'employee_name' => $detail['employee_name'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                    'corrective_action' => $detail['corrective_action'] ?? null,
-                    'verification' => $detail['verification'] ?? null,
+            // 🧩 Simpan detail baru (jam berikutnya)
+            if ($request->has('details')) {
+                foreach ($request->details as $detail) {
+                    $newDetail = DetailGmpEmployee::create([
+                        'uuid' => Str::uuid(),
+                        'report_uuid' => $report->uuid,
+                        'inspection_hour' => $detail['inspection_hour'] ?? null,
+                        'section_name' => $detail['section_name'] ?? null,
+                        'employee_name' => $detail['employee_name'] ?? null,
+                        'notes' => $detail['notes'] ?? null,
+                        'corrective_action' => $detail['corrective_action'] ?? null,
+                        'verification' => $detail['verification'] ?? null,
+                    ]);
+
+                    if (!empty($detail['followups'])) {
+                        foreach ($detail['followups'] as $followup) {
+                            $newDetail->followups()->create([
+                                'notes' => $followup['notes'] ?? null,
+                                'action' => $followup['action'] ?? null,
+                                'verification' => $followup['verification'] ?? null,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // 🧼 Update data sanitasi (jam 1 & jam 2)
+            $sanitationCheck = $report->sanitationCheck;
+            if ($sanitationCheck) {
+                $sanitationCheck->update([
+                    'hour_2' => $request->input('sanitation.hour_2'),
                 ]);
 
-                if (!empty($detail['followups'])) {
-                    foreach ($detail['followups'] as $followup) {
-                        $newDetail->followups()->create([
-                            'notes' => $followup['notes'] ?? null,
-                            'action' => $followup['action'] ?? null,
-                            'verification' => $followup['verification'] ?? null,
-                        ]);
-                    }
-                }
-            }
-        }
+                if ($request->has('sanitation_area')) {
+                    foreach ($request->sanitation_area as $areaInput) {
+                        $area = $sanitationCheck->sanitationArea()
+                            ->where('area_name', $areaInput['area_name'])
+                            ->first();
 
-        // 🧼 Update data sanitasi (jam 1 & jam 2)
-        $sanitationCheck = $report->sanitationCheck;
-        if ($sanitationCheck) {
-            $sanitationCheck->update([
-                'hour_2' => $request->input('sanitation.hour_2'),
-            ]);
+                        if ($area) {
+                            $area->update([
+                                'chlorine_std' => $areaInput['chlorine_std'] ?? null,
+                                'notes' => $areaInput['notes'] ?? null,
+                                'corrective_action' => $areaInput['corrective_action'] ?? null,
+                                'verification' => $areaInput['verification'] ?? null,
+                            ]);
 
-            if ($request->has('sanitation_area')) {
-                foreach ($request->sanitation_area as $areaInput) {
-                    $area = $sanitationCheck->sanitationArea()
-                        ->where('area_name', $areaInput['area_name'])
-                        ->first();
-
-                    if ($area) {
-                        $area->update([
-                            'chlorine_std' => $areaInput['chlorine_std'] ?? null,
-                            'notes' => $areaInput['notes'] ?? null,
-                            'corrective_action' => $areaInput['corrective_action'] ?? null,
-                            'verification' => $areaInput['verification'] ?? null,
-                        ]);
-
-                        // ✅ Update atau buat hasil JAM 1
-                        if (isset($areaInput['result'][1])) {
-                            $result1 = $area->sanitationResult()->where('hour_to', 1)->first();
-                            if ($result1) {
-                                $result1->update([
-                                    'chlorine_level' => $areaInput['result'][1]['chlorine_level'] ?? null,
-                                    'temperature' => $areaInput['result'][1]['temperature'] ?? null,
-                                ]);
-                            } else {
-                                $area->sanitationResult()->create([
-                                    'hour_to' => 1,
-                                    'chlorine_level' => $areaInput['result'][1]['chlorine_level'] ?? null,
-                                    'temperature' => $areaInput['result'][1]['temperature'] ?? null,
-                                ]);
+                            // ✅ Update atau buat hasil JAM 1
+                            if (isset($areaInput['result'][1])) {
+                                $result1 = $area->sanitationResult()->where('hour_to', 1)->first();
+                                if ($result1) {
+                                    $result1->update([
+                                        'chlorine_level' => $areaInput['result'][1]['chlorine_level'] ?? null,
+                                        'temperature' => $areaInput['result'][1]['temperature'] ?? null,
+                                    ]);
+                                } else {
+                                    $area->sanitationResult()->create([
+                                        'hour_to' => 1,
+                                        'chlorine_level' => $areaInput['result'][1]['chlorine_level'] ?? null,
+                                        'temperature' => $areaInput['result'][1]['temperature'] ?? null,
+                                    ]);
+                                }
                             }
-                        }
 
-                        // ✅ Update atau buat hasil JAM 2
-                        if (isset($areaInput['result'][2])) {
-                            $result2 = $area->sanitationResult()->where('hour_to', 2)->first();
-                            if ($result2) {
-                                $result2->update([
-                                    'chlorine_level' => $areaInput['result'][2]['chlorine_level'] ?? null,
-                                    'temperature' => $areaInput['result'][2]['temperature'] ?? null,
-                                ]);
-                            } else {
-                                $area->sanitationResult()->create([
-                                    'hour_to' => 2,
-                                    'chlorine_level' => $areaInput['result'][2]['chlorine_level'] ?? null,
-                                    'temperature' => $areaInput['result'][2]['temperature'] ?? null,
-                                ]);
+                            // ✅ Update atau buat hasil JAM 2
+                            if (isset($areaInput['result'][2])) {
+                                $result2 = $area->sanitationResult()->where('hour_to', 2)->first();
+                                if ($result2) {
+                                    $result2->update([
+                                        'chlorine_level' => $areaInput['result'][2]['chlorine_level'] ?? null,
+                                        'temperature' => $areaInput['result'][2]['temperature'] ?? null,
+                                    ]);
+                                } else {
+                                    $area->sanitationResult()->create([
+                                        'hour_to' => 2,
+                                        'chlorine_level' => $areaInput['result'][2]['chlorine_level'] ?? null,
+                                        'temperature' => $areaInput['result'][2]['temperature'] ?? null,
+                                    ]);
+                                }
                             }
-                        }
 
-                        // 🔁 Update follow-up jam ke-2
-                        $area->followups()->delete();
-                        if (!empty($areaInput['followups'])) {
-                            foreach ($areaInput['followups'] as $followup) {
-                                $area->followups()->create([
-                                    'notes' => $followup['notes'] ?? null,
-                                    'action' => $followup['action'] ?? null,
-                                    'verification' => $followup['verification'] ?? null,
-                                ]);
+                            // 🔁 Update follow-up jam ke-2
+                            $area->followups()->delete();
+                            if (!empty($areaInput['followups'])) {
+                                foreach ($areaInput['followups'] as $followup) {
+                                    $area->followups()->create([
+                                        'notes' => $followup['notes'] ?? null,
+                                        'action' => $followup['action'] ?? null,
+                                        'verification' => $followup['verification'] ?? null,
+                                    ]);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        DB::commit();
-        return redirect()->route('gmp-employee.index')->with('success', 'Laporan jam berikutnya berhasil diperbarui.');
-    } catch (\Exception $e) {
-        DB::rollback();
-        return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+            DB::commit();
+            return redirect()->route('gmp-employee.index')->with('success', 'Laporan jam berikutnya berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
     }
-}
 
-
-
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'export_type' => 'required|in:gmp,sanitation',
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $suffix   = $dateFrom->format('Ymd') . '_' . $dateTo->format('Ymd');
+        $baseQuery = ReportGmpEmployee::query()
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift');
+    
+        if ($request->export_type === 'gmp') {
+            $reports = $baseQuery->with(['details'])->get();
+            return Excel::download(
+                new GmpEmployeeExport($reports, $periodLabel),
+                "GMP_Karyawan_{$suffix}.xlsx"
+            );
+        }
+    
+        // sanitation
+        $reports = $baseQuery->with([
+            'sanitationCheck.sanitationArea.sanitationResult',
+            'details',
+            'area',
+        ])->get();
+    
+        return Excel::download(
+            new GmpSanitationExport($reports, $periodLabel),
+            "Sanitasi_{$suffix}.xlsx"
+        );
+    }
 }

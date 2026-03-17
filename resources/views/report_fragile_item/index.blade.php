@@ -42,6 +42,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report-fragile-item.export_excel')" 
+                    title="Verifikasi Barang Mudah Pecah" />
+
                 @can('create report')
                 <a href="{{ route('report-fragile-item.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
@@ -94,10 +98,10 @@
                                 </button>
 
                                 {{-- Update --}}
-                                <!-- <a href="{{ route('report-fragile-item.edit', $report->uuid) }}"
+                                <a href="{{ route('report-fragile-item.edit', $report->uuid) }}"
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-pen"></i>
-                                </a> -->
+                                </a>
 
                                 <!-- @can('edit report')
                                 <a href="{{ route('report-fragile-item.edit-next', $report->uuid) }}"
@@ -106,7 +110,7 @@
                                 </a>
                                 @endcan -->
 
-                                @php
+                                <!-- @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                 @endphp
@@ -116,7 +120,7 @@
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                @endif
+                                @endif -->
 
                                 @can('delete report')
                                 <form action="{{ route('report-fragile-item.destroy', $report->uuid) }}" method="POST"

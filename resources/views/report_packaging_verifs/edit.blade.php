@@ -88,21 +88,22 @@
                                 <label class="form-label">Upload MD BPOM (Multiple)</label>
 
                                 @if(!empty($detail->upload_md_multi))
-                                    @php
-                                        $files = json_decode($detail->upload_md_multi, true);
-                                    @endphp
+                                @php
+                                $files = json_decode($detail->upload_md_multi, true);
+                                @endphp
 
-                                    <div class="mb-2">
-                                        @foreach($files as $file)
-                                            <a href="{{ asset('storage/' . $file) }}" target="_blank">
-                                                <img src="{{ asset('storage/' . $file) }}" alt="Preview" width="60" height="60"
-                                                    style="object-fit: cover; border: 1px solid #ccc; border-radius: 4px; margin-right: 6px;">
-                                            </a>
-                                        @endforeach
-                                    </div>
+                                <div class="mb-2">
+                                    @foreach($files as $file)
+                                    <a href="{{ asset('storage/' . $file) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $file) }}" alt="Preview" width="60" height="60"
+                                            style="object-fit: cover; border: 1px solid #ccc; border-radius: 4px; margin-right: 6px;">
+                                    </a>
+                                    @endforeach
+                                </div>
                                 @endif
 
-                                <input type="file" name="details[{{ $i }}][upload_md_multi][]" class="form-control" multiple>
+                                <input type="file" name="details[{{ $i }}][upload_md_multi][]" class="form-control"
+                                    multiple>
                             </div>
 
 
@@ -353,78 +354,231 @@
 @section('script')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const actualInputs = document.querySelectorAll('.actual-input');
-    const avgInput = document.getElementById('avg-long-pcs');
 
-    function calculateAverage() {
-        let sum = 0;
-        let count = 0;
+    // ===== Rata-rata Panjang Pcs =====
+    const actualLongInputs = document.querySelectorAll('.actual-input');
+    const avgLongInput = document.getElementById('avg-long-pcs');
 
-        actualInputs.forEach(input => {
-            const value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                sum += value;
+    function calcAvgLong() {
+        let sum = 0,
+            count = 0;
+        actualLongInputs.forEach(i => {
+            const v = parseFloat(i.value);
+            if (!isNaN(v)) {
+                sum += v;
                 count++;
             }
         });
-
-        const avg = count > 0 ? (sum / count).toFixed(2) : '';
-        avgInput.value = avg;
+        avgLongInput.value = count > 0 ? (sum / count).toFixed(2) : '';
     }
+    actualLongInputs.forEach(i => i.addEventListener('input', calcAvgLong));
 
-    actualInputs.forEach(input => {
-        input.addEventListener('input', calculateAverage);
-    });
-});
+    // ===== Rata-rata Berat Pcs =====
+    const actualWpcsInputs = document.querySelectorAll('.actual-input-wpcs');
+    const avgWpcsInput = document.getElementById('avg-weight-pcs');
 
-document.addEventListener('DOMContentLoaded', function() {
-    const actualInputs = document.querySelectorAll('.actual-input-wpcs');
-    const avgInput = document.getElementById('avg-weight-pcs');
-
-    function calculateAverage() {
-        let sum = 0;
-        let count = 0;
-
-        actualInputs.forEach(input => {
-            const value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                sum += value;
+    function calcAvgWpcs() {
+        let sum = 0,
+            count = 0;
+        actualWpcsInputs.forEach(i => {
+            const v = parseFloat(i.value);
+            if (!isNaN(v)) {
+                sum += v;
                 count++;
             }
         });
-
-        const avg = count > 0 ? (sum / count).toFixed(2) : '';
-        avgInput.value = avg;
+        avgWpcsInput.value = count > 0 ? (sum / count).toFixed(2) : '';
     }
+    actualWpcsInputs.forEach(i => i.addEventListener('input', calcAvgWpcs));
 
-    actualInputs.forEach(input => {
-        input.addEventListener('input', calculateAverage);
-    });
-});
+    // ===== Rata-rata Berat Pack =====
+    const actualWInputs = document.querySelectorAll('.actual-input-w');
+    const avgWInput = document.getElementById('avg-weight');
 
-document.addEventListener('DOMContentLoaded', function() {
-    const actualInputs = document.querySelectorAll('.actual-input-w');
-    const avgInput = document.getElementById('avg-weight');
-
-    function calculateAverage() {
-        let sum = 0;
-        let count = 0;
-
-        actualInputs.forEach(input => {
-            const value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                sum += value;
+    function calcAvgW() {
+        let sum = 0,
+            count = 0;
+        actualWInputs.forEach(i => {
+            const v = parseFloat(i.value);
+            if (!isNaN(v)) {
+                sum += v;
                 count++;
             }
         });
+        avgWInput.value = count > 0 ? (sum / count).toFixed(2) : '';
+    }
+    actualWInputs.forEach(i => i.addEventListener('input', calcAvgW));
 
-        const avg = count > 0 ? (sum / count).toFixed(2) : '';
-        avgInput.value = avg;
+    // ===== Compress & Validasi Upload File =====
+    const MAX_SIZE_MB = 2;
+    const MAX_FILES = 10;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+    const COMPRESS_QUALITY = 0.7;
+
+    function compressImage(file, quality) {
+        return new Promise((resolve) => {
+            if (!file.type.startsWith('image/')) {
+                resolve(file);
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_DIMENSION = 1920;
+                    if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                        if (width > height) {
+                            height = Math.round((height * MAX_DIMENSION) / width);
+                            width = MAX_DIMENSION;
+                        } else {
+                            width = Math.round((width * MAX_DIMENSION) / height);
+                            height = MAX_DIMENSION;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        resolve(new File([blob], file.name.replace(/\.[^.]+$/,
+                        '.jpg'), {
+                            type: 'image/jpeg',
+                            lastModified: Date.now(),
+                        }));
+                    }, 'image/jpeg', quality);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
     }
 
-    actualInputs.forEach(input => {
-        input.addEventListener('input', calculateAverage);
+    async function handleFileChange(input) {
+        const files = Array.from(input.files);
+        const col = input.closest('.col-md-4');
+        const preview = col.querySelector('.preview-md-multi');
+
+        if (preview) preview.innerHTML = '';
+
+        // Buat errorBox dinamis jika belum ada
+        let errBox = col.querySelector('.invalid-feedback-custom');
+        if (!errBox) {
+            errBox = document.createElement('div');
+            errBox.className = 'invalid-feedback-custom text-danger mt-1';
+            errBox.style.cssText = 'font-size: 0.85rem; display: none;';
+            input.parentNode.insertBefore(errBox, preview);
+        }
+
+        errBox.style.display = 'none';
+        errBox.innerHTML = '';
+
+        if (files.length > MAX_FILES) {
+            errBox.classList.remove('text-info');
+            errBox.classList.add('text-danger');
+            errBox.innerText = `Maksimal ${MAX_FILES} file yang diizinkan.`;
+            errBox.style.display = 'block';
+            input.value = '';
+            return;
+        }
+
+        // Loading
+        errBox.classList.remove('text-danger');
+        errBox.classList.add('text-info');
+        errBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengompresi gambar...';
+        errBox.style.display = 'block';
+
+        const compressedFiles = await Promise.all(
+            files.map(file => compressImage(file, COMPRESS_QUALITY))
+        );
+
+        errBox.style.display = 'none';
+        errBox.classList.remove('text-info');
+        errBox.classList.add('text-danger');
+
+        // Validasi ukuran setelah compress
+        let errors = [];
+        compressedFiles.forEach(function(file) {
+            if (file.size > MAX_SIZE_BYTES) {
+                const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+                errors.push(
+                    `"${file.name}" (${fileSizeMB} MB) masih melebihi ${MAX_SIZE_MB} MB setelah dikompresi.`
+                    );
+            }
+        });
+
+        if (errors.length > 0) {
+            errBox.innerHTML = errors.join('<br>');
+            errBox.style.display = 'block';
+            input.value = '';
+            return;
+        }
+
+        // Replace files dengan hasil compress
+        const dataTransfer = new DataTransfer();
+        compressedFiles.forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+
+        // Preview
+        if (preview) {
+            compressedFiles.forEach(function(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.cssText = 'display: inline-block; text-align: center;';
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText =
+                        'width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6; display: block;';
+
+                    const sizeLabel = document.createElement('small');
+                    sizeLabel.style.cssText = 'font-size: 10px; color: #6c757d;';
+                    sizeLabel.innerText = (file.size / 1024).toFixed(0) + ' KB';
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(sizeLabel);
+                    preview.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    // Event delegation — berlaku untuk semua input upload di halaman ini
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('upload-md-multi')) {
+            handleFileChange(e.target);
+        }
     });
+
+    // Blokir submit jika masih ada file > 2MB
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let hasError = false;
+            let errorFiles = [];
+
+            document.querySelectorAll('input[type="file"]').forEach(function(input) {
+                Array.from(input.files).forEach(function(file) {
+                    if (file.size > MAX_SIZE_BYTES) {
+                        hasError = true;
+                        const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+                        errorFiles.push(`${file.name} (${fileSizeMB} MB)`);
+                    }
+                });
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                e.stopPropagation();
+                alert('❌ File berikut masih melebihi batas 2 MB:\n\n' + errorFiles.join('\n') +
+                    '\n\nSilakan hapus dan pilih ulang file.');
+            }
+        });
+    }
+
 });
 </script>
 @endsection

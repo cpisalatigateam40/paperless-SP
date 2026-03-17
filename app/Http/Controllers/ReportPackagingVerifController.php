@@ -10,46 +10,12 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\PackagingVerifExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportPackagingVerifController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportPackagingVerif::with('details.checklist')
-    //     ->latest()
-    //     ->paginate(10);
-
-    //     foreach ($reports as $report) {
-    //         $totalNonConform = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             $check = $detail->checklist;
-
-    //             if (!$check) continue;
-
-    //             $fieldsToCheck = [
-    //                 'sampling_result',
-    //                 'verif_md',
-    //                 'sealing_condition_1', 'sealing_condition_2', 'sealing_condition_3',
-    //                 'sealing_condition_4', 'sealing_condition_5',
-    //                 'sealing_vacuum_1', 'sealing_vacuum_2', 'sealing_vacuum_3',
-    //                 'sealing_vacuum_4', 'sealing_vacuum_5',
-    //             ];
-
-    //             foreach ($fieldsToCheck as $field) {
-    //                 if (isset($check->$field) && $check->$field === 'Tidak OK') {
-    //                     $totalNonConform++;
-    //                 }
-    //             }
-    //         }
-
-    //         // simpan hasil ke properti tambahan
-    //         $report->ketidaksesuaian = $totalNonConform;
-    //     }
-
-    //     return view('report_packaging_verifs.index', compact('reports'));
-    // }
-
     public function index(Request $request)
     {
         $query = ReportPackagingVerif::with([
@@ -209,16 +175,6 @@ class ReportPackagingVerifController extends Controller
                 $filename = time() . '_ed_' . $index . '_' . $file->getClientOriginalName();
                 $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
             }
-
-            // if (isset($detail['upload_md_multi']) && is_array($detail['upload_md_multi'])) {
-            //     foreach ($detail['upload_md_multi'] as $fileIndex => $file) {
-            //         if ($file instanceof \Illuminate\Http\UploadedFile) {
-            //             $filename = time() . "_md_multi_{$index}_{$fileIndex}_" . $file->getClientOriginalName();
-            //             $path = $file->storeAs('upload_packaging', $filename, 'public');
-            //             $uploadMdMulti[] = $path;
-            //         }
-            //     }
-            // }
 
             if (!empty($detail['upload_md_multi']) && is_array($detail['upload_md_multi'])) {
 
@@ -513,113 +469,148 @@ class ReportPackagingVerifController extends Controller
         return $pdf->stream('report-packaging-' . $report->date . '.pdf');
     }
 
-public function edit($uuid)
-{
-    $report = ReportPackagingVerif::with(['details.checklist','details.product'])
-                ->where('uuid', $uuid)
-                ->firstOrFail();
+    public function edit($uuid)
+    {
+        $report = ReportPackagingVerif::with(['details.checklist','details.product'])
+                    ->where('uuid', $uuid)
+                    ->firstOrFail();
 
-    $products = \App\Models\Product::all();
-    $areas = \App\Models\Area::all();
-    $sections = \App\Models\Section::all();
+        $products = \App\Models\Product::all();
+        $areas = \App\Models\Area::all();
+        $sections = \App\Models\Section::all();
 
-    $details = $report->details; // <-- penting
+        $details = $report->details; // <-- penting
 
-    return view('report_packaging_verifs.edit', compact('report','details','products','areas','sections'));
-}
-
-
-
-public function update(Request $request, $uuid)
-{
-    $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
-
-    $report->update([
-        'section_uuid' => $request->section_uuid,
-        'date' => $request->date,
-        'shift' => $request->shift,
-        'updated_by' => Auth::user()->name,
-    ]);
-
-    // Hapus detail lama
-    DetailPackagingVerif::where('report_uuid', $report->uuid)->delete();
-
-    // Simpan ulang semua detail baru
-    foreach ($request->details as $index => $detail) {
-        $uploadMd = null;
-        $uploadQr = null;
-        $uploadEd = null;
-        $uploadMdMulti = [];
-
-        // Upload file jika ada file baru
-        if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
-            $file = $detail['upload_md'];
-            $filename = time() . '_md_' . $index . '_' . $file->getClientOriginalName();
-            $uploadMd = $file->storeAs('upload_packaging', $filename, 'public');
-        } elseif (!empty($detail['old_upload_md'])) {
-            $uploadMd = $detail['old_upload_md'];
-        }
-
-        if (isset($detail['upload_qr']) && $detail['upload_qr'] instanceof \Illuminate\Http\UploadedFile) {
-            $file = $detail['upload_qr'];
-            $filename = time() . '_qr_' . $index . '_' . $file->getClientOriginalName();
-            $uploadQr = $file->storeAs('upload_packaging', $filename, 'public');
-        } elseif (!empty($detail['old_upload_qr'])) {
-            $uploadQr = $detail['old_upload_qr'];
-        }
-
-        if (isset($detail['upload_ed']) && $detail['upload_ed'] instanceof \Illuminate\Http\UploadedFile) {
-            $file = $detail['upload_ed'];
-            $filename = time() . '_ed_' . $index . '_' . $file->getClientOriginalName();
-            $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
-        } elseif (!empty($detail['old_upload_ed'])) {
-            $uploadEd = $detail['old_upload_ed'];
-        }
-
-        if (!empty($detail['upload_md_multi'])) {
-            foreach ($detail['upload_md_multi'] as $fileMulti) {
-                if ($fileMulti instanceof \Illuminate\Http\UploadedFile) {
-                    $filename = time() . '_md_multi_' . $index . '_' . $fileMulti->getClientOriginalName();
-                    $uploadMdMulti[] = $fileMulti->storeAs('upload_packaging', $filename, 'public');
-                }
-            }
-        }
-
-        $detailModel = DetailPackagingVerif::create([
-            'uuid' => Str::uuid(),
-            'report_uuid' => $report->uuid,
-            'product_uuid' => $detail['product_uuid'],
-            'time' => $detail['time'],
-            'upload_md' => $uploadMd,
-            'upload_qr' => $uploadQr,
-            'upload_ed' => $uploadEd,
-            'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
-
-        ]);
-
-        // checklist seperti store()
-        $checklistData = $detail['checklist'];
-        $checklistData['uuid'] = Str::uuid();
-        $checklistData['detail_uuid'] = $detailModel->uuid;
-
-        // Mapping khusus radio
-        $inCutting = $checklistData['in_cutting'] ?? null;
-        for ($i = 1; $i <= 5; $i++) {
-            $checklistData['in_cutting_manual_' . $i] = ($i == 1 && $inCutting == 'Manual') ? 'OK' : null;
-            $checklistData['in_cutting_machine_' . $i] = ($i == 1 && $inCutting == 'Mesin') ? 'OK' : null;
-        }
-
-        $packaging = $checklistData['packaging'] ?? null;
-        for ($i = 1; $i <= 5; $i++) {
-            $checklistData['packaging_thermoformer_' . $i] = ($i == 1 && $packaging == 'Thermoformer') ? 'OK' : null;
-            $checklistData['packaging_manual_' . $i] = ($i == 1 && $packaging == 'Manual') ? 'OK' : null;
-        }
-
-        ChecklistPackagingDetail::create($checklistData);
+        return view('report_packaging_verifs.edit', compact('report','details','products','areas','sections'));
     }
 
-    return redirect()->route('report_packaging_verifs.index')->with('success', 'Laporan berhasil diperbarui.');
-}
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
 
+        $report->update([
+            'section_uuid' => $request->section_uuid,
+            'date' => $request->date,
+            'shift' => $request->shift,
+            'updated_by' => Auth::user()->name,
+        ]);
+
+        // Hapus detail lama
+        DetailPackagingVerif::where('report_uuid', $report->uuid)->delete();
+
+        // Simpan ulang semua detail baru
+        foreach ($request->details as $index => $detail) {
+            $uploadMd = null;
+            $uploadQr = null;
+            $uploadEd = null;
+            $uploadMdMulti = [];
+
+            // Upload file jika ada file baru
+            if (isset($detail['upload_md']) && $detail['upload_md'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_md'];
+                $filename = time() . '_md_' . $index . '_' . $file->getClientOriginalName();
+                $uploadMd = $file->storeAs('upload_packaging', $filename, 'public');
+            } elseif (!empty($detail['old_upload_md'])) {
+                $uploadMd = $detail['old_upload_md'];
+            }
+
+            if (isset($detail['upload_qr']) && $detail['upload_qr'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_qr'];
+                $filename = time() . '_qr_' . $index . '_' . $file->getClientOriginalName();
+                $uploadQr = $file->storeAs('upload_packaging', $filename, 'public');
+            } elseif (!empty($detail['old_upload_qr'])) {
+                $uploadQr = $detail['old_upload_qr'];
+            }
+
+            if (isset($detail['upload_ed']) && $detail['upload_ed'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $detail['upload_ed'];
+                $filename = time() . '_ed_' . $index . '_' . $file->getClientOriginalName();
+                $uploadEd = $file->storeAs('upload_packaging', $filename, 'public');
+            } elseif (!empty($detail['old_upload_ed'])) {
+                $uploadEd = $detail['old_upload_ed'];
+            }
+
+            if (!empty($detail['upload_md_multi'])) {
+                foreach ($detail['upload_md_multi'] as $fileMulti) {
+                    if ($fileMulti instanceof \Illuminate\Http\UploadedFile) {
+                        $filename = time() . '_md_multi_' . $index . '_' . $fileMulti->getClientOriginalName();
+                        $uploadMdMulti[] = $fileMulti->storeAs('upload_packaging', $filename, 'public');
+                    }
+                }
+            }
+
+            $detailModel = DetailPackagingVerif::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'product_uuid' => $detail['product_uuid'],
+                'time' => $detail['time'],
+                'upload_md' => $uploadMd,
+                'upload_qr' => $uploadQr,
+                'upload_ed' => $uploadEd,
+                'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
+
+            ]);
+
+            // checklist seperti store()
+            $checklistData = $detail['checklist'];
+            $checklistData['uuid'] = Str::uuid();
+            $checklistData['detail_uuid'] = $detailModel->uuid;
+
+            // Mapping khusus radio
+            $inCutting = $checklistData['in_cutting'] ?? null;
+            for ($i = 1; $i <= 5; $i++) {
+                $checklistData['in_cutting_manual_' . $i] = ($i == 1 && $inCutting == 'Manual') ? 'OK' : null;
+                $checklistData['in_cutting_machine_' . $i] = ($i == 1 && $inCutting == 'Mesin') ? 'OK' : null;
+            }
+
+            $packaging = $checklistData['packaging'] ?? null;
+            for ($i = 1; $i <= 5; $i++) {
+                $checklistData['packaging_thermoformer_' . $i] = ($i == 1 && $packaging == 'Thermoformer') ? 'OK' : null;
+                $checklistData['packaging_manual_' . $i] = ($i == 1 && $packaging == 'Manual') ? 'OK' : null;
+            }
+
+            ChecklistPackagingDetail::create($checklistData);
+        }
+
+        return redirect()->route('report_packaging_verifs.index')->with('success', 'Laporan berhasil diperbarui.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportPackagingVerif::with([
+                'details.product',
+                'details.checklist',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Packaging_Verif_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new PackagingVerifExport($reports, $periodLabel), $filename);
+    }
 
 }

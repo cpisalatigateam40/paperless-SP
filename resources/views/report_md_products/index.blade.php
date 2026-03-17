@@ -41,7 +41,7 @@
 
                 </form>
 
-                @can('import report')
+                <!-- @can('import report')
                 <form action="{{ route('report_md_products.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -57,7 +57,11 @@
                 <a href="{{ route('report_md_products.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
-                @endcan
+                @endcan -->
+
+                <x-export-excel-modal 
+                    :route="route('report_md_products.export')" 
+                    title="Verifikasi Metal Detector Produk" />
 
                 @can('create report')
                 <a href="{{ route('report_md_products.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>

@@ -41,6 +41,11 @@
 
                 </form>
 
+                {{-- Tombol Export Excel --}}
+                <x-export-excel-modal 
+                    :route="route('report_siomays.export')" 
+                    title="Verifikasi Pembuatan Kulit Siomay, Gioza & Mandu" />
+
                 @can('create report')
                 <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan

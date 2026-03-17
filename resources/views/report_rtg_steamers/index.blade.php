@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_rtg_steamers.export')" 
+                    title="Verifikasi Pemasakan Dengan Steamer" />
+
                 @can('create report')
                 <a href="{{ route('report_rtg_steamers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan

@@ -129,30 +129,6 @@
                                 </select>
                             </div>
                         </div>
-
-
-                        <!-- <h6 class="mt-3">Paraf</h6>
-                        <div class="row mb-2">
-                            <div class="col-md-4">
-                                <label class="form-label">Paraf QC</label>
-                                <canvas id="qc-canvas-0" class="border" width="300" height="150"
-                                    data-input="qc_paraf_input_0"></canvas>
-                                <input type="hidden" name="details[0][qc_paraf]" id="qc_paraf_input_0">
-                                <button type="button"
-                                    class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Paraf Produksi</label>
-                                <canvas id="prod-canvas-0" class="border" width="300" height="150"
-                                    data-input="production_paraf_input_0"></canvas>
-                                <input type="hidden" name="details[0][production_paraf]" id="production_paraf_input_0">
-                                <button type="button"
-                                    class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
-                            </div>
-                        </div> -->
-
-
                     </div>
                 </div>
 

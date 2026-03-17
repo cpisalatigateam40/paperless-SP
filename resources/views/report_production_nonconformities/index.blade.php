@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_production_nonconformities.export')" 
+                    title="Verifikasi Ketidaksesuaian Proses Produksi" />
+
                 @can('create report')
                 <a href="{{ route('report_production_nonconformities.create') }}" class="btn btn-sm btn-primary">
                 Tambah Laporan

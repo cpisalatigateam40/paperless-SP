@@ -10,15 +10,13 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\FragileItemExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 
 class ReportFragileItemController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportFragileItem::with(['details.item'])->latest()->paginate(10);
-    //     return view('report_fragile_item.index', compact('reports'));
-    // }
     public function index(Request $request)
     {
         $reports = ReportFragileItem::with([
@@ -80,7 +78,6 @@ class ReportFragileItemController extends Controller
 
         return view('report_fragile_item.index', compact('reports'));
     }
-
 
     public function create()
     {
@@ -225,32 +222,67 @@ class ReportFragileItemController extends Controller
     }
 
     public function editNext($uuid)
-{
-    $report = ReportFragileItem::with('details')->where('uuid', $uuid)->firstOrFail();
-    $fragileItems = FragileItem::all();
+    {
+        $report = ReportFragileItem::with('details')->where('uuid', $uuid)->firstOrFail();
+        $fragileItems = FragileItem::all();
 
-    // isEdit = false agar form aktif untuk waktu akhir (time_end)
-    return view('report_fragile_item.editnext', compact('report', 'fragileItems'))->with('isEdit', true);
-}
-
-public function updateNext(Request $request, $uuid)
-{
-    $report = ReportFragileItem::where('uuid', $uuid)->firstOrFail();
-
-    foreach ($request->items as $uuidItem => $data) {
-        $detail = $report->details->where('fragile_item_uuid', $uuidItem)->first();
-
-        if ($detail) {
-            $detail->update([
-                'time_start' => $data['time_start'] ?? 0,
-                'time_end' => $data['time_end'] ?? 0,
-                'notes' => $data['notes'] ?? 0,
-            ]);
-        }
+        // isEdit = false agar form aktif untuk waktu akhir (time_end)
+        return view('report_fragile_item.editnext', compact('report', 'fragileItems'))->with('isEdit', true);
     }
 
-    return redirect()->route('report-fragile-item.index')->with('success', 'Laporan tahap 2 berhasil diperbarui.');
-}
+    public function updateNext(Request $request, $uuid)
+    {
+        $report = ReportFragileItem::where('uuid', $uuid)->firstOrFail();
+
+        foreach ($request->items as $uuidItem => $data) {
+            $detail = $report->details->where('fragile_item_uuid', $uuidItem)->first();
+
+            if ($detail) {
+                $detail->update([
+                    'time_start' => $data['time_start'] ?? 0,
+                    'time_end' => $data['time_end'] ?? 0,
+                    'notes' => $data['notes'] ?? 0,
+                ]);
+            }
+        }
+
+        return redirect()->route('report-fragile-item.index')->with('success', 'Laporan tahap 2 berhasil diperbarui.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportFragileItem::with(['details.item'])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Barang_Mudah_Pecah_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new FragileItemExport($reports, $periodLabel), $filename);
+    }
 
 }
 

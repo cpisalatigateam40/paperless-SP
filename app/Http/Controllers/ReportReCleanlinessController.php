@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+use App\Exports\ReCleanlinessExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportReCleanlinessController extends Controller
 {
@@ -132,95 +135,6 @@ class ReportReCleanlinessController extends Controller
             'equipments' => Equipment::with('parts')->get(),
         ]);
     }
-
-    // public function store(Request $request)
-    // {
-    //     // Simpan header laporan
-    //     $report = ReportReCleanliness::create([
-    //         'uuid' => Str::uuid(),
-    //         'area_uuid' => Auth::user()->area_uuid,
-    //         'date' => $request->date,
-    //         'created_by' => Auth::user()->name,
-    //     ]);
-
-    //     /** ====================== ROOM ====================== **/
-    // foreach ($request->input('rooms', []) as $room_uuid => $roomData) {
-
-    //     if (!empty($roomData['elements'])) {
-
-    //         foreach ($roomData['elements'] as $element_uuid => $data) {
-
-    //             $condition = $data['condition'] === 'clean' ? 'clean' : 'dirty';
-
-    //             $detail = DetailRoomCleanliness::create([
-    //                 'uuid' => Str::uuid(),
-    //                 'report_re_uuid' => $report->uuid,
-    //                 'room_uuid' => $room_uuid,
-    //                 'room_element_uuid' => $element_uuid,
-    //                 'condition' => $condition,
-    //                 'notes' => $data['notes'] ?? null,
-    //                 'corrective_action' => $data['corrective_action'] ?? null,
-    //                 'verification' => $data['verification'] ?? null,
-    //             ]);
-    //         }
-
-    //     } else {
-    //     // Tidak ada elements → cek apakah checkbox room level di-centang
-    //     $condition = isset($roomData['condition']) && $roomData['condition'] === 'clean'
-    //         ? 'clean'
-    //         : 'dirty';
-
-    //     DetailRoomCleanliness::create([
-    //         'uuid' => Str::uuid(),
-    //         'report_re_uuid' => $report->uuid,
-    //         'room_uuid' => $room_uuid,
-    //         'room_element_uuid' => null,
-    //         'condition' => $condition,
-    //     ]);
-    // }
-
-    // }
-
-
-    // /** ====================== EQUIPMENT ====================== **/
-    // foreach ($request->input('equipments', []) as $equipment_uuid => $equipmentData) {
-
-    //     if (!empty($equipmentData['parts'])) {
-
-    //         foreach ($equipmentData['parts'] as $part_uuid => $data) {
-
-    //             $condition = $data['condition'] === 'clean' ? 'clean' : 'dirty';
-
-    //             $detail = DetailEquipmentCleanliness::create([
-    //                 'uuid' => Str::uuid(),
-    //                 'report_re_uuid' => $report->uuid,
-    //                 'equipment_uuid' => $equipment_uuid,
-    //                 'equipment_part_uuid' => $part_uuid,
-    //                 'condition' => $condition,
-    //                 'notes' => $data['notes'] ?? null,
-    //                 'corrective_action' => $data['corrective_action'] ?? null,
-    //                 'verification' => $data['verification'] ?? null,
-    //             ]);
-    //         }
-
-    // } else {
-    //     $condition = isset($equipmentData['condition']) && $equipmentData['condition'] === 'clean'
-    //         ? 'clean'
-    //         : 'dirty';
-
-    //     DetailEquipmentCleanliness::create([
-    //         'uuid' => Str::uuid(),
-    //         'report_re_uuid' => $report->uuid,
-    //         'equipment_uuid' => $equipment_uuid,
-    //         'equipment_part_uuid' => null,
-    //         'condition' => $condition,
-    //     ]);
-    // }
-
-    // }
-    //     return redirect()->route('report-re-cleanliness.index')
-    //         ->with('success', 'Laporan berhasil disimpan.');
-    // }
 
     public function store(Request $request)
     {
@@ -540,5 +454,44 @@ class ReportReCleanlinessController extends Controller
 
         return redirect()->route('report-re-cleanliness.index')
             ->with('success', 'Laporan berhasil diperbarui.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportReCleanliness::with([
+                'roomDetails.room',
+                'roomDetails.element',
+                'equipmentDetails.equipment',
+                'equipmentDetails.part',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->get();
+    
+        $filename = 'Kebersihan_RE_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new ReCleanlinessExport($reports, $periodLabel), $filename);
     }
 }

@@ -16,6 +16,9 @@ use App\Models\WeightStufferMeasurement;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\WeightStufferExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportWeightStufferController extends Controller
 {
@@ -351,99 +354,140 @@ class ReportWeightStufferController extends Controller
     }
 
     public function edit($uuid)
-{
-    $report = ReportWeightStuffer::where('uuid', $uuid)
-        ->with([
-            'details.product',
-            'details.townsend',
-            'details.hitech',
-            'details.cases',
-            'details.weights',
-        ])->firstOrFail();
+    {
+        $report = ReportWeightStuffer::where('uuid', $uuid)
+            ->with([
+                'details.product',
+                'details.townsend',
+                'details.hitech',
+                'details.cases',
+                'details.weights',
+            ])->firstOrFail();
 
-    $products = Product::all();
-    $standards = StandardStuffer::with('product')->get();
+        $products = Product::all();
+        $standards = StandardStuffer::with('product')->get();
 
-    return view('report_weight_stuffers.edit', compact('report', 'products', 'standards'));
-}
-
-public function update(Request $request, $uuid)
-{
-    $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
-
-    // Update header
-    $report->update([
-        'date'  => $request->date,
-        'shift' => $request->shift,
-    ]);
-
-    // Hapus detail lama agar bisa replace data baru
-    foreach ($report->details as $oldDetail) {
-        TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
-        HitechStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
-        CaseStuffer::where('stuffer_id', $oldDetail->id)->delete();
-        WeightStufferMeasurement::where('stuffer_id', $oldDetail->id)->delete();
-        $oldDetail->delete();
+        return view('report_weight_stuffers.edit', compact('report', 'products', 'standards'));
     }
 
-    // Simpan detail baru dari form
-    foreach ($request->details as $detail) {
-        $detailModel = DetailWeightStuffer::create([
-            'uuid' => Str::uuid(),
-            'report_uuid' => $report->uuid,
-            'product_uuid' => $detail['product_uuid'],
-            'production_code' => $detail['production_code'],
-            'time' => $detail['time'],
-            'weight_standard' => $detail['weight_standard'] ?? null,
-            'long_standard' => $detail['long_standard'] ?? null,
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
+
+        // Update header
+        $report->update([
+            'date'  => $request->date,
+            'shift' => $request->shift,
         ]);
 
-        if ($detail['machine'] === 'townsend') {
-            TownsendStuffer::create([
-                'detail_uuid' => $detailModel->uuid,
-                'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                'avg_weight' => $detail['avg_weight'] ?? null,
-                'avg_long' => $detail['avg_long'] ?? null,
-                'notes' => $detail['notes'] ?? null,
-            ]);
+        // Hapus detail lama agar bisa replace data baru
+        foreach ($report->details as $oldDetail) {
+            TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+            HitechStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+            CaseStuffer::where('stuffer_id', $oldDetail->id)->delete();
+            WeightStufferMeasurement::where('stuffer_id', $oldDetail->id)->delete();
+            $oldDetail->delete();
         }
 
-        if ($detail['machine'] === 'hitech') {
-            HitechStuffer::create([
-                'detail_uuid' => $detailModel->uuid,
-                'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                'avg_weight' => $detail['avg_weight'] ?? null,
-                'avg_long' => $detail['avg_long'] ?? null,
-                'notes' => $detail['notes'] ?? null,
+        // Simpan detail baru dari form
+        foreach ($request->details as $detail) {
+            $detailModel = DetailWeightStuffer::create([
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'product_uuid' => $detail['product_uuid'],
+                'production_code' => $detail['production_code'],
+                'time' => $detail['time'],
+                'weight_standard' => $detail['weight_standard'] ?? null,
+                'long_standard' => $detail['long_standard'] ?? null,
             ]);
-        }
 
-        if (isset($detail['cases'])) {
-            foreach ($detail['cases'] as $case) {
-                CaseStuffer::create([
-                    'stuffer_id' => $detailModel->id,
-                    'actual_case_2' => $case['actual_case_2'],
+            if ($detail['machine'] === 'townsend') {
+                TownsendStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
                 ]);
             }
-        }
 
-        if (isset($detail['weights'])) {
-            foreach ($detail['weights'] as $weightSet) {
-                foreach ($weightSet as $key => $value) {
-                    if (strpos($key, 'actual_weight_') === 0) {
-                        $index = str_replace('actual_weight_', '', $key);
-                        WeightStufferMeasurement::create([
-                            'stuffer_id' => $detailModel->id,
-                            'actual_weight' => $value ?? null,
-                            'actual_long' => $weightSet['actual_long_' . $index] ?? null,
-                        ]);
+            if ($detail['machine'] === 'hitech') {
+                HitechStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if (isset($detail['cases'])) {
+                foreach ($detail['cases'] as $case) {
+                    CaseStuffer::create([
+                        'stuffer_id' => $detailModel->id,
+                        'actual_case_2' => $case['actual_case_2'],
+                    ]);
+                }
+            }
+
+            if (isset($detail['weights'])) {
+                foreach ($detail['weights'] as $weightSet) {
+                    foreach ($weightSet as $key => $value) {
+                        if (strpos($key, 'actual_weight_') === 0) {
+                            $index = str_replace('actual_weight_', '', $key);
+                            WeightStufferMeasurement::create([
+                                'stuffer_id' => $detailModel->id,
+                                'actual_weight' => $value ?? null,
+                                'actual_long' => $weightSet['actual_long_' . $index] ?? null,
+                            ]);
+                        }
                     }
                 }
             }
         }
+
+        return redirect()->route('report_weight_stuffers.index')->with('success', 'Laporan berhasil diperbarui.');
     }
 
-    return redirect()->route('report_weight_stuffers.index')->with('success', 'Laporan berhasil diperbarui.');
-}
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportWeightStuffer::with([
+                'details.product',
+                'details.townsend',
+                'details.hitech',
+                'details.cases',
+                'details.weights',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Weight_Stuffer_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new WeightStufferExport($reports, $periodLabel), $filename);
+    }
 
 }

@@ -68,6 +68,7 @@ use App\Http\Controllers\ReportSauceController;
 use App\Http\Controllers\ReportSiomayController;
 use App\Http\Controllers\ReportWaterbathController;
 use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\ReportThawingController;
 
 
 Route::get('/', function () {
@@ -182,6 +183,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/create', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{report}/add-detail', 'createDetail')->name('detail.create');
@@ -200,6 +202,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/create', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{report}/add-detail', 'createDetail')->name('detail.create');
@@ -218,6 +221,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/store', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/{uuid}/edit', 'edit')->whereUuid('uuid')->name('edit');
             Route::put('/{uuid}', 'update')->whereUuid('uuid')->name('update');
             Route::delete('/{id}', 'destroy')->name('destroy');
@@ -254,6 +258,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export_excel');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
@@ -315,6 +320,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index'); // daftar laporan
             Route::get('/create', 'create')->name('create'); // form create (isi + detail)
             Route::post('/', 'store')->name('store'); // simpan header + detail
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/{uuid}/edit', 'edit')->name('edit'); // edit header
             Route::put('/{uuid}', 'update')->name('update'); // update header
             Route::delete('/{uuid}', 'destroy')->name('destroy'); // hapus laporan
@@ -370,6 +376,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
@@ -451,6 +458,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetail')->name('add_detail');
             Route::post('/{uuid}/store-detail', 'storeDetail')->name('store_detail');
@@ -481,6 +489,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
+        Route::post('/export-excel', 'exportExcel')->name('export');
         Route::delete('/{uuid}', 'destroy')->name('destroy');
         Route::post('/{id}/known', 'known')->name('known');
         Route::post('/{id}/approve', 'approve')->name('approve');
@@ -497,6 +506,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/{uuid}/add-detail', 'createDetail')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
@@ -577,6 +587,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/store', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
@@ -625,9 +636,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{id}', 'destroy')->name('destroy');
-
-            // (opsional) fungsi approve, export pdf, tambah detail
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
             Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
@@ -659,6 +669,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::get('/{report_uuid}/add-detail', 'addDetail')->name('add_detail');
             Route::post('/{report_uuid}/store-detail', 'storeDetail')->name('store_detail');
@@ -723,6 +734,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -800,6 +812,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -862,6 +875,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export_excel');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
@@ -892,6 +906,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -909,6 +924,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -942,6 +958,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -1020,6 +1037,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/add-detail/{reportUuid}', [ReportBasoCookingController::class, 'addDetail'])->name('add_detail');
             Route::post('/add-detail/{reportUuid}', [ReportBasoCookingController::class, 'storeDetail'])->name('store_detail');
@@ -1039,6 +1057,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
@@ -1078,6 +1097,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
@@ -1085,8 +1105,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
-Route::put('/{uuid}', 'update')->name('update');
-
+            Route::put('/{uuid}', 'update')->name('update');
         });
 
     Route::prefix('report-siomays')
@@ -1096,6 +1115,7 @@ Route::put('/{uuid}', 'update')->name('update');
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::post('/export-excel', 'exportExcel')->name('export');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
@@ -1121,6 +1141,35 @@ Route::put('/{uuid}', 'update')->name('update');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
+        });
+
+    Route::prefix('report-thawings')
+        ->name('report_thawings.')
+        ->controller(ReportThawingController::class)
+        ->group(function () {
+
+            Route::get('/', 'index')->name('index');
+
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+
+            Route::post('/export-excel', 'exportExcel')->name('export');
+
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+
+            Route::post('/{id}/known', 'known')->name('known');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export_pdf');
+
+            Route::get('/{uuid}/details/create', 'addDetail')
+                ->name('details.create');
+
+            Route::post('/{uuid}/details', 'storeDetail')
+                ->name('details.store');
 
         });
 

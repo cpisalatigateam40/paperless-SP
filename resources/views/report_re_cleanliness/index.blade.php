@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report-re-cleanliness.export')" 
+                    title="Verifikasi Kebersihan Ruangan, Mesin, dan Peralatan" />
+
                 @can('create report')
                 <a href="{{ route('report-re-cleanliness.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan

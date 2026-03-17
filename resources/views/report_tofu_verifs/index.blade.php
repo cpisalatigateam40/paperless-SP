@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_tofu_verifs.export_excel')" 
+                    title="Verifikasi Produk Tofu" />
+
                 @can('create report')
                 <a href="{{ route('report_tofu_verifs.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan

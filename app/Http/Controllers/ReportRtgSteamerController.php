@@ -12,43 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\RtgSteamerExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportRtgSteamerController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportRtgSteamer::with(['product', 'area', 'details'])
-    //         ->latest()
-    //         ->paginate(10);
-
-    //     // Tambahkan kolom ketidaksesuaian berdasarkan sensory check
-    //     $reports->getCollection()->transform(function ($report) {
-    //         $totalKetidaksesuaian = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             $fields = [
-    //                 'sensory_ripeness',
-    //                 'sensory_taste',
-    //                 'sensory_aroma',
-    //                 'sensory_texture',
-    //                 'sensory_color'
-    //             ];
-
-    //             foreach ($fields as $field) {
-    //                 if (isset($detail->$field) && $detail->$field === 'Tidak OK') {
-    //                     $totalKetidaksesuaian++;
-    //                 }
-    //             }
-    //         }
-
-    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
-    //         return $report;
-    //     });
-
-    //     return view('report_rtg_steamers.index', compact('reports'));
-    // }
-
-
     public function index(Request $request)
     {
         $query = ReportRtgSteamer::with([
@@ -384,6 +353,41 @@ class ReportRtgSteamerController extends Controller
 
         return redirect()->route('report_rtg_steamers.index')
             ->with('success', 'Report berhasil diperbarui.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportRtgSteamer::with(['product', 'details'])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'RTG_Steamer_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new RtgSteamerExport($reports, $periodLabel), $filename);
     }
 
 
