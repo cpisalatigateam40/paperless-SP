@@ -20,70 +20,12 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\ProcessProdExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportProcessProdController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportProcessProd::with([
-    //         'area',
-    //         'section',
-    //         'detail.product',
-    //         'detail.formula',
-    //         'detail.items.formulation.rawMaterial',
-    //         'detail.items.formulation.premix',
-    //         'detail.emulsifying',
-    //         'detail.sensoric',
-    //         'detail.tumbling',
-    //         'detail.aging'
-    //     ])
-    //     ->latest()
-    //     ->paginate(10);
-
-    //     // Hitung ketidaksesuaian untuk setiap report
-    //     $reports->transform(function ($report) {
-    //         $totalKetidaksesuaian = 0;
-
-    //         foreach ($report->detail as $detail) {
-    //             // 🔹 Cek dari DetailProcessProd (nilai 'x')
-    //             if (
-    //                 $detail->sensory_homogenity === 'x' ||
-    //                 $detail->sensory_stiffness === 'x' ||
-    //                 $detail->sensory_aroma === 'x'
-    //             ) {
-    //                 $totalKetidaksesuaian++;
-    //             }
-
-    //             // 🔹 Cek dari ProcessSensoric (nilai "Tidak OK" / "Terdeteksi")
-    //             if ($detail->sensoric) {
-    //                 if (
-    //                     $detail->sensoric->homogeneous === 'Tidak OK' ||
-    //                     $detail->sensoric->stiffness === 'Tidak OK' ||
-    //                     $detail->sensoric->aroma === 'Tidak OK' ||
-    //                     $detail->sensoric->foreign_object === 'Terdeteksi'
-    //                 ) {
-    //                     $totalKetidaksesuaian++;
-    //                 }
-    //             }
-
-    //             // 🔹 Cek dari ItemDetailProd (nilai "Tidak OK" di sensory)
-    //             if ($detail->items) {
-    //                 $totalKetidaksesuaian += $detail->items
-    //                     ->filter(fn($item) => $item->sensory === 'Tidak OK')
-    //                     ->count();
-    //             }
-    //         }
-
-    //         // Simpan hasilnya di properti baru
-    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
-
-    //         return $report;
-    //     });
-
-    //     return view('report_process_productions.index', compact('reports'));
-    // }
-
-
     public function index(Request $request)
     {
         $query = ReportProcessProd::with([
@@ -647,6 +589,51 @@ class ReportProcessProdController extends Controller
         })->select('uuid', 'formula_name')->get();
 
         return response()->json($formulas);
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportProcessProd::with([
+                'section',
+                'detail.product',
+                'detail.formula',
+                'detail.items.formulation.rawMaterial',
+                'detail.items.formulation.premix',
+                'detail.emulsifying',
+                'detail.sensoric',
+                'detail.tumbling',
+                'detail.aging',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Process_Production_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new ProcessProdExport($reports, $periodLabel), $filename);
     }
 
 

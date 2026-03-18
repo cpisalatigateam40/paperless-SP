@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_process_productions.export_excel')" 
+                    title="Verifikasi Proses Produksi" />
+
                 @can('create report')
                 <a href="{{ route('report_process_productions.create') }}" class="btn btn-primary btn-sm">Tambah
                 Laporan</a>

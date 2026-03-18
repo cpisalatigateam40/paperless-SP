@@ -38,8 +38,11 @@
                             Reset
                         </a>
                     @endif
-
                 </form>
+
+                <x-export-excel-modal 
+                    :route="route('report_pasteurs.export')" 
+                    title="Verifikasi Pasteurisasi" />
 
                 @can('create report')
                 <a href="{{ route('report_pasteurs.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>

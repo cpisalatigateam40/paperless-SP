@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_waterbaths.export')" 
+                    title="Verifikasi Pasteurisasi Waterbath" />
+
                 @can('create report')
                 <a href="{{ route('report_waterbaths.create') }}" class="btn btn-primary">Tambah Laporan</a>
                 @endcan

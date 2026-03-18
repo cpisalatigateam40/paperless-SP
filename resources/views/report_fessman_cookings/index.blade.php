@@ -40,6 +40,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_fessman_cookings.export')" 
+                    title="Verifikasi Pemasakan Fessman" />
+
                 @can('create report')
                 <a href="{{ route('report_fessman_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
