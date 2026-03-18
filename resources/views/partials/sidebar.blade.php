@@ -10,6 +10,7 @@ Request::is('report-metal-detectors*') ||
 Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
 Request::is('report-siomays*') ||
+Request::is('report-thawings*') ||
 Request::is('report-process-productions*');
 $isCooking =
 Request::is('report-maurer-cookings*') ||
@@ -68,7 +69,6 @@ $isKetidaksesuaian = Request::is([
     border: 1px solid #ddd;
     border-radius: 0.25rem;
 }
-
 </style>
 
 <!-- Sidebar -->
@@ -206,12 +206,16 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_weight_stuffers.index') }}">
                     Verifikasi Berat Stuffer
                 </a>
-                
+
                 <a class="collapse-item {{ Request::is('report-siomays*') ? 'active' : '' }}"
                     href="{{ route('report_siomays.index') }}">
                     Pembuatan Kulit Siomay
                 </a>
 
+                <a class="collapse-item {{ Request::is('report-thawings*') ? 'active' : '' }}"
+                    href="{{ route('report_thawings.index') }}">
+                    Pemeriksaan Proses Thawing
+                </a>
             </div>
         </div>
     </li>
@@ -276,7 +280,7 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
                     href="{{ route('report_lab_samples.index') }}">
                     Verifikasi Pengambilan Sample
-                </a>   
+                </a>
             </div>
         </div>
     </li>
@@ -439,4 +443,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-

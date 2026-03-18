@@ -14,37 +14,12 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\FreezPackagingExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportFreezPackagingController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportFreezPackaging::with(['area', 'details.kartoning'])->latest()->paginate(10);
-
-    //     // Hitung ketidaksesuaian
-    //     foreach ($reports as $report) {
-    //         $count = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             // 1️⃣ Cek verifikasi setelah tindakan koreksi
-    //             if ($detail->verif_after === 'x') {
-    //                 $count++;
-    //                 continue; // tidak perlu cek karton jika sudah x
-    //             }
-
-    //             // 2️⃣ Cek kondisi karton
-    //             if (optional($detail->kartoning)->carton_condition === 'x') {
-    //                 $count++;
-    //             }
-    //         }
-
-    //         // Tambahkan properti agar bisa dipakai di Blade
-    //         $report->ketidaksesuaian = $count;
-    //     }
-
-    //     return view('report_freez_packagings.index', compact('reports'));
-    // }
-
     public function index(Request $request)
     {
         $search = $request->search;
@@ -346,87 +321,126 @@ class ReportFreezPackagingController extends Controller
     }
 
     public function edit($uuid)
-{
-    $report = ReportFreezPackaging::with([
-        'details.freezing',
-        'details.kartoning'
-    ])->where('uuid', $uuid)->firstOrFail();
+    {
+        $report = ReportFreezPackaging::with([
+            'details.freezing',
+            'details.kartoning'
+        ])->where('uuid', $uuid)->firstOrFail();
 
-    $areas = Area::all();
-    $products = Product::all();
+        $areas = Area::all();
+        $products = Product::all();
 
-    return view('report_freez_packagings.edit', compact('report', 'areas', 'products'));
-}
-
-public function update(Request $request, $uuid)
-{
-    $report = ReportFreezPackaging::where('uuid', $uuid)->firstOrFail();
-
-    DB::beginTransaction();
-
-    try {
-        // Update header
-        $report->update([
-            'date' => $request->date,
-            'shift' => $request->shift,
-        ]);
-
-        // Hapus detail lama beserta freezing & kartoning
-        foreach ($report->details as $detail) {
-            $detail->freezing()->delete();
-            $detail->kartoning()->delete();
-        }
-        $report->details()->delete();
-
-        // Simpan detail baru
-        foreach ($request->details as $detail) {
-            $detailModel = $report->details()->create([
-                'uuid' => Str::uuid(),
-                'product_uuid' => $detail['product_uuid'],
-                'production_code' => $detail['production_code'],
-                'best_before' => $detail['best_before'],
-                'start_time' => $detail['start_time'] ?? null,
-                'end_time' => $detail['end_time'] ?? null,
-                'corrective_action' => $detail['corrective_action'] ?? null,
-                'verif_after' => $detail['verif_after'] ?? null,
-            ]);
-
-            $detailModel->freezing()->create([
-                'uuid' => Str::uuid(),
-                'detail_uuid' => $detailModel->uuid,
-                'start_product_temp' => $detail['freezing']['start_product_temp'] ?? null,
-                'standard_temp' => $detail['freezing']['standard_temp'] ?? null,
-                'end_product_temp' => $detail['freezing']['end_product_temp'] ?? null,
-                'iqf_room_temp' => $detail['freezing']['iqf_room_temp'] ?? null,
-                'iqf_suction_temp' => $detail['freezing']['iqf_suction_temp'] ?? null,
-                'freezing_time_display' => $detail['freezing']['freezing_time_display'] ?? null,
-                'freezing_time_actual' => $detail['freezing']['freezing_time_actual'] ?? null,
-            ]);
-
-            $detailModel->kartoning()->create([
-                'uuid' => Str::uuid(),
-                'detail_uuid' => $detailModel->uuid,
-                'carton_code' => $detail['kartoning']['carton_code'] ?? null,
-                'content_bag' => $detail['kartoning']['content_bag'] ?? null,
-                'content_binded' => $detail['kartoning']['content_binded'] ?? null,
-                'carton_weight_standard' => $detail['kartoning']['carton_weight_standard'] ?? null,
-                'carton_weight_actual' => $detail['kartoning']['carton_weight_actual'] ?? null,
-                'weight_1' => $detail['kartoning']['weight_1'] ?? null,
-                'weight_2' => $detail['kartoning']['weight_2'] ?? null,
-                'weight_3' => $detail['kartoning']['weight_3'] ?? null,
-                'weight_4' => $detail['kartoning']['weight_4'] ?? null,
-                'weight_5' => $detail['kartoning']['weight_5'] ?? null,
-                'avg_weight' => $detail['kartoning']['avg_weight'] ?? null,
-                'content_rtg' => $detail['kartoning']['content_rtg'] ?? null,
-                'carton_condition' => $detail['kartoning']['carton_condition'] ?? null,
-            ]);
-        }
-
-        DB::commit();
-        return redirect()->route('report_freez_packagings.index')->with('success', 'Data berhasil diperbarui');
-    } catch (\Throwable $e) {
-        DB::rollBack();
-        return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        return view('report_freez_packagings.edit', compact('report', 'areas', 'products'));
     }
-}
+
+    public function update(Request $request, $uuid)
+    {
+        $report = ReportFreezPackaging::where('uuid', $uuid)->firstOrFail();
+
+        DB::beginTransaction();
+
+        try {
+            // Update header
+            $report->update([
+                'date' => $request->date,
+                'shift' => $request->shift,
+            ]);
+
+            // Hapus detail lama beserta freezing & kartoning
+            foreach ($report->details as $detail) {
+                $detail->freezing()->delete();
+                $detail->kartoning()->delete();
+            }
+            $report->details()->delete();
+
+            // Simpan detail baru
+            foreach ($request->details as $detail) {
+                $detailModel = $report->details()->create([
+                    'uuid' => Str::uuid(),
+                    'product_uuid' => $detail['product_uuid'],
+                    'production_code' => $detail['production_code'],
+                    'best_before' => $detail['best_before'],
+                    'start_time' => $detail['start_time'] ?? null,
+                    'end_time' => $detail['end_time'] ?? null,
+                    'corrective_action' => $detail['corrective_action'] ?? null,
+                    'verif_after' => $detail['verif_after'] ?? null,
+                ]);
+
+                $detailModel->freezing()->create([
+                    'uuid' => Str::uuid(),
+                    'detail_uuid' => $detailModel->uuid,
+                    'start_product_temp' => $detail['freezing']['start_product_temp'] ?? null,
+                    'standard_temp' => $detail['freezing']['standard_temp'] ?? null,
+                    'end_product_temp' => $detail['freezing']['end_product_temp'] ?? null,
+                    'iqf_room_temp' => $detail['freezing']['iqf_room_temp'] ?? null,
+                    'iqf_suction_temp' => $detail['freezing']['iqf_suction_temp'] ?? null,
+                    'freezing_time_display' => $detail['freezing']['freezing_time_display'] ?? null,
+                    'freezing_time_actual' => $detail['freezing']['freezing_time_actual'] ?? null,
+                ]);
+
+                $detailModel->kartoning()->create([
+                    'uuid' => Str::uuid(),
+                    'detail_uuid' => $detailModel->uuid,
+                    'carton_code' => $detail['kartoning']['carton_code'] ?? null,
+                    'content_bag' => $detail['kartoning']['content_bag'] ?? null,
+                    'content_binded' => $detail['kartoning']['content_binded'] ?? null,
+                    'carton_weight_standard' => $detail['kartoning']['carton_weight_standard'] ?? null,
+                    'carton_weight_actual' => $detail['kartoning']['carton_weight_actual'] ?? null,
+                    'weight_1' => $detail['kartoning']['weight_1'] ?? null,
+                    'weight_2' => $detail['kartoning']['weight_2'] ?? null,
+                    'weight_3' => $detail['kartoning']['weight_3'] ?? null,
+                    'weight_4' => $detail['kartoning']['weight_4'] ?? null,
+                    'weight_5' => $detail['kartoning']['weight_5'] ?? null,
+                    'avg_weight' => $detail['kartoning']['avg_weight'] ?? null,
+                    'content_rtg' => $detail['kartoning']['content_rtg'] ?? null,
+                    'carton_condition' => $detail['kartoning']['carton_condition'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('report_freez_packagings.index')->with('success', 'Data berhasil diperbarui');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportFreezPackaging::with([
+                'details.product',
+                'details.freezing',
+                'details.kartoning',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Freez_Packaging_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new FreezPackagingExport($reports, $periodLabel), $filename);
+    }
 }

@@ -38,8 +38,11 @@
                             Reset
                         </a>
                     @endif
-
                 </form>
+
+                <x-export-excel-modal 
+                    :route="route('report_sauces.export')" 
+                    title="Verifikasi Pemasakan Produk Di Steam Kettle" />
 
                 @can('create report')
                 <a href="{{ route('report_sauces.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
@@ -239,10 +242,14 @@
                                                     @foreach($d->rawMaterials as $rm)
                                                     <tr>
                                                         <td style="text-align: start !important;">
-                                                            {{ $rm->rawMaterial->material_name ?? '-' }}</td>
-                                                        <td style="text-align: start !important;">{{ $rm->amount }}</td>
-                                                        <td style="text-align: start !important;">{{ $rm->sensory }}
+                                                            @if($rm->material_type === 'premix')
+                                                                {{ $rm->premix->name ?? '-' }} (Premix)
+                                                            @else
+                                                                {{ $rm->rawMaterial->material_name ?? '-' }}
+                                                            @endif
                                                         </td>
+                                                        <td style="text-align: start !important;">{{ $rm->amount }}</td>
+                                                        <td style="text-align: start !important;">{{ $rm->sensory }}</td>
                                                     </tr>
                                                     @endforeach
                                                 </table>

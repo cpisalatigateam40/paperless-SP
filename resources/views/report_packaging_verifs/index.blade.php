@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_packaging_verifs.export')" 
+                    title="Verifikasi Pemeriksaan Kemasan Plastik" />
+
                 @can('create report')
                 <a href="{{ route('report_packaging_verifs.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan

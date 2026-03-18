@@ -38,4 +38,14 @@ class TofuProductInfo extends Model implements Auditable
     {
         return $this->belongsTo(ReportTofuVerif::class, 'report_uuid', 'uuid');
     }
+
+    public function weightVerifs()
+    {
+        return $this->hasMany(TofuWeightVerif::class, 'product_info_uuid', 'uuid');
+    }
+
+    public function defectVerifs()
+    {
+        return $this->hasMany(TofuDefectVerif::class, 'product_info_uuid', 'uuid');
+    }
 }

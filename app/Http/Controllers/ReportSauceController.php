@@ -7,6 +7,7 @@ use App\Models\DetailSauce;
 use App\Models\RmSauce;
 use App\Models\Product;
 use App\Models\RawMaterial;
+use App\Models\Premix;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -14,47 +15,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\SauceExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportSauceController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportSauce::with([
-    //         'product',
-    //         'area',
-    //         'details.rawMaterials.rawMaterial',
-    //     ])->latest()->paginate(10);
-
-    //     // Gunakan transform() karena paginate() menghasilkan paginator
-    //     $reports->getCollection()->transform(function ($report) {
-    //         $totalKetidaksesuaian = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             // 🔹 1. Cek kolom sensory di detail (color, aroma, taste, texture)
-    //             if (
-    //                 $detail->color === 'Tidak OK' ||
-    //                 $detail->aroma === 'Tidak OK' ||
-    //                 $detail->taste === 'Tidak OK' ||
-    //                 $detail->texture === 'Tidak OK'
-    //             ) {
-    //                 $totalKetidaksesuaian++;
-    //             }
-
-    //             // 🔹 2. Cek raw materials di setiap detail
-    //             if ($detail->rawMaterials) {
-    //                 $totalKetidaksesuaian += $detail->rawMaterials
-    //                     ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
-    //                     ->count();
-    //             }
-    //         }
-
-    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
-
-    //         return $report;
-    //     });
-
-    //     return view('report_sauces.index', compact('reports'));
-    // }
 
     public function index(Request $request)
     {
@@ -62,6 +28,7 @@ class ReportSauceController extends Controller
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
+            'details.rawMaterials.premix',
         ])->latest();
 
         // 🔍 SEARCH
@@ -154,15 +121,15 @@ class ReportSauceController extends Controller
         return view('report_sauces.index', compact('reports'));
     }
 
-    // 2. Create: tampilkan form tambah
     public function create()
     {
         $products = Product::all();
         $rawMaterials = RawMaterial::all();
-        return view('report_sauces.create', compact('products', 'rawMaterials'));
+        $premixes = Premix::orderBy('name')->get(); // tambah
+
+        return view('report_sauces.create', compact('products', 'rawMaterials', 'premixes'));
     }
 
-    // 3. Store: simpan data header + detail + raw material
     public function store(Request $request)
     {
         DB::beginTransaction();
@@ -207,12 +174,16 @@ class ReportSauceController extends Controller
                     // simpan raw materials untuk detail ini
                     if (isset($detail['raw_materials'])) {
                         foreach ($detail['raw_materials'] as $rm) {
-                            if (!empty($rm['raw_material_uuid'])) {
+                            if (!empty($rm['material_uuid'])) {
+                                $materialType = $rm['material_type'] ?? 'raw';
+
                                 $detailModel->rawMaterials()->create([
-                                    'uuid' => Str::uuid(),
-                                    'raw_material_uuid' => $rm['raw_material_uuid'],
-                                    'amount' => $rm['amount'] ?? null,
-                                    'sensory' => $rm['sensory'] ?? null,
+                                    'uuid'             => Str::uuid(),
+                                    'raw_material_uuid' => $materialType === 'raw' ? $rm['material_uuid'] : null,
+                                    'material_uuid'    => $rm['material_uuid'],
+                                    'material_type'    => $materialType,
+                                    'amount'           => $rm['amount'] ?? null,
+                                    'sensory'          => $rm['sensory'] ?? null,
                                 ]);
                             }
                         }
@@ -227,8 +198,6 @@ class ReportSauceController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
-
 
     // 4. Destroy: hapus laporan + relasi
     public function destroy($uuid)
@@ -276,6 +245,7 @@ class ReportSauceController extends Controller
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
+            'details.rawMaterials.premix',
         ])->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
@@ -313,8 +283,9 @@ class ReportSauceController extends Controller
     {
         $report = ReportSauce::where('uuid', $reportUuid)->firstOrFail();
         $rawMaterials = RawMaterial::all();
+        $premixes = Premix::orderBy('name')->get(); // tambah
 
-        return view('report_sauces.add_detail', compact('report', 'rawMaterials'));
+        return view('report_sauces.add_detail', compact('report', 'rawMaterials', 'premixes'));
     }
 
     // Simpan detail baru
@@ -356,12 +327,16 @@ class ReportSauceController extends Controller
         // ✅ Simpan raw materials ke tabel rm_sauces lewat detail_uuid
         if (!empty($detailData['raw_materials'])) {
             foreach ($detailData['raw_materials'] as $rm) {
-                if (!empty($rm['raw_material_uuid'])) {
+                if (!empty($rm['material_uuid'])) {
+                    $materialType = $rm['material_type'] ?? 'raw';
+
                     $detail->rawMaterials()->create([
-                        'uuid' => Str::uuid(),
-                        'raw_material_uuid' => $rm['raw_material_uuid'],
-                        'amount' => $rm['amount'] ?? null,
-                        'sensory' => $rm['sensory'] ?? null,
+                        'uuid'             => Str::uuid(),
+                        'raw_material_uuid' => $materialType === 'raw' ? $rm['material_uuid'] : null,
+                        'material_uuid'    => $rm['material_uuid'],
+                        'material_type'    => $materialType,
+                        'amount'           => $rm['amount'] ?? null,
+                        'sensory'          => $rm['sensory'] ?? null,
                     ]);
                 }
             }
@@ -372,80 +347,121 @@ class ReportSauceController extends Controller
     }
 
     public function edit($uuid)
-{
-    $report = ReportSauce::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
-    $products = Product::all();
-    $rawMaterials = RawMaterial::all();
+    {
+        $report = ReportSauce::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
+        $products = Product::all();
+        $rawMaterials = RawMaterial::all();
+        $premixes = Premix::orderBy('name')->get(); // tambah
 
-    return view('report_sauces.edit', compact('report', 'products', 'rawMaterials'));
-}
+        return view('report_sauces.edit', compact('report', 'products', 'rawMaterials', 'premixes'));
+    }
 
-public function update(Request $request, $uuid)
-{
-    DB::beginTransaction();
-    try {
-        $report = ReportSauce::where('uuid', $uuid)->firstOrFail();
+    public function update(Request $request, $uuid)
+    {
+        DB::beginTransaction();
+        try {
+            $report = ReportSauce::where('uuid', $uuid)->firstOrFail();
 
-        // ✅ Update header laporan
-        $report->update([
-            'date' => $request->date,
-            'shift' => $request->shift,
-            'product_uuid' => $request->product_uuid,
-            'production_code' => $request->production_code,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'sensory' => $request->sensory,
-        ]);
+            // ✅ Update header laporan
+            $report->update([
+                'date' => $request->date,
+                'shift' => $request->shift,
+                'product_uuid' => $request->product_uuid,
+                'production_code' => $request->production_code,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'sensory' => $request->sensory,
+            ]);
 
-        // ✅ Hapus detail lama (biar tidak dobel data nested)
-        $report->details()->each(function ($detail) {
-            $detail->rawMaterials()->delete();
-            $detail->delete();
-        });
+            // ✅ Hapus detail lama (biar tidak dobel data nested)
+            $report->details()->each(function ($detail) {
+                $detail->rawMaterials()->delete();
+                $detail->delete();
+            });
 
-        // ✅ Simpan ulang detail baru
-        if ($request->has('details')) {
-            foreach ($request->details as $detail) {
-                $detailModel = $report->details()->create([
-                    'uuid' => Str::uuid(),
-                    'time' => $detail['time'] ?? null,
-                    'process_step' => $detail['process_step'] ?? null,
-                    'duration' => $detail['duration'] ?? null,
-                    'pressure' => $detail['pressure'] ?? null,
-                    'target_temperature' => $detail['target_temperature'] ?? null,
-                    'actual_temperature' => $detail['actual_temperature'] ?? null,
-                    'color' => $detail['color'] ?? null,
-                    'aroma' => $detail['aroma'] ?? null,
-                    'taste' => $detail['taste'] ?? null,
-                    'texture' => $detail['texture'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                    'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
-                    'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
-                ]);
+            // ✅ Simpan ulang detail baru
+            if ($request->has('details')) {
+                foreach ($request->details as $detail) {
+                    $detailModel = $report->details()->create([
+                        'uuid' => Str::uuid(),
+                        'time' => $detail['time'] ?? null,
+                        'process_step' => $detail['process_step'] ?? null,
+                        'duration' => $detail['duration'] ?? null,
+                        'pressure' => $detail['pressure'] ?? null,
+                        'target_temperature' => $detail['target_temperature'] ?? null,
+                        'actual_temperature' => $detail['actual_temperature'] ?? null,
+                        'color' => $detail['color'] ?? null,
+                        'aroma' => $detail['aroma'] ?? null,
+                        'taste' => $detail['taste'] ?? null,
+                        'texture' => $detail['texture'] ?? null,
+                        'notes' => $detail['notes'] ?? null,
+                        'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
+                        'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
+                    ]);
 
-                if (isset($detail['raw_materials'])) {
-                    foreach ($detail['raw_materials'] as $rm) {
-                        if (!empty($rm['raw_material_uuid'])) {
-                            $detailModel->rawMaterials()->create([
-                                'uuid' => Str::uuid(),
-                                'raw_material_uuid' => $rm['raw_material_uuid'],
-                                'amount' => $rm['amount'] ?? null,
-                                'sensory' => $rm['sensory'] ?? null,
-                            ]);
+                    if (isset($detail['raw_materials'])) {
+                        foreach ($detail['raw_materials'] as $rm) {
+                            if (!empty($rm['material_uuid'])) {
+                                $materialType = $rm['material_type'] ?? 'raw';
+
+                                $detailModel->rawMaterials()->create([
+                                    'uuid'              => Str::uuid(),
+                                    'raw_material_uuid' => $materialType === 'raw' ? $rm['material_uuid'] : null,
+                                    'material_uuid'     => $rm['material_uuid'],
+                                    'material_type'     => $materialType,
+                                    'amount'            => $rm['amount'] ?? null,
+                                    'sensory'           => $rm['sensory'] ?? null,
+                                ]);
+                            }
                         }
                     }
                 }
             }
+
+            DB::commit();
+            return redirect()->route('report_sauces.index')->with('success', 'Laporan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        DB::commit();
-        return redirect()->route('report_sauces.index')->with('success', 'Laporan berhasil diperbarui.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
-}
 
-
-
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportSauce::with([
+                'product',
+                'details.rawMaterials.rawMaterial',
+                'details.rawMaterials.premix',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Sauce_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new SauceExport($reports, $periodLabel), $filename);
+    }
 }

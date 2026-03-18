@@ -45,4 +45,9 @@ class RawMaterial extends Model
     {
         return $this->hasMany(Formulation::class, 'raw_material_uuid', 'uuid');
     }
+
+    public function thawingDetails()
+    {
+        return $this->hasMany(DetailThawing::class, 'raw_material_uuid', 'uuid');
+    }
 }

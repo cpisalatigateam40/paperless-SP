@@ -40,7 +40,7 @@
                     @endif
                 </form>
 
-                @can('import report')
+                <!-- @can('import report')
                 <form action="{{ route('report_emulsion_makings.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -56,7 +56,11 @@
                 <a href="{{ route('report_emulsion_makings.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
-                @endcan
+                @endcan -->
+
+                <x-export-excel-modal 
+                :route="route('report_emulsion_makings.export')" 
+                title="Verifikasi Pembuatan Emulsi" />
 
                 @can('create report')
                 <a href="{{ route('report_emulsion_makings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
@@ -328,6 +332,8 @@
         </div>
     </div>
 </div>
+
+
 @endsection
 
 @section('script')

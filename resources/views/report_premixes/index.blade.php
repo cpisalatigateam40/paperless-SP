@@ -40,6 +40,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                :route="route('report-premixes.export')" 
+                title="Premix" />
+
                 @can('create report')
                 <a href="{{ route('report-premixes.create') }}" class=" btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
@@ -227,14 +231,14 @@
                 </table>
             </div>
 
-
-
             <div class="mt-3">
                 {{ $reports->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
 </div>
+
+
 @endsection
 
 @section('script')

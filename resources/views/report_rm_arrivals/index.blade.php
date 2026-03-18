@@ -33,7 +33,7 @@
 
                 <div class="vr"></div>
 
-                @can('import report')
+                <!-- @can('import report')
                 <form action="{{ route('report_rm_arrivals.import') }}" method="POST"
                     enctype="multipart/form-data" class="d-flex align-items-center gap-1">
                     @csrf
@@ -55,9 +55,14 @@
                 <a href="{{ route('report_rm_arrivals.template') }}" class="btn btn-sm btn-outline-success">
                     <i class="bi bi-download"></i> Template
                 </a>
-                @endcan
+                @endcan -->
 
-                <div class="vr"></div>
+                <!-- <div class="vr"></div> -->
+
+                {{-- Tombol Export Excel --}}
+                <x-export-excel-modal 
+                    :route="route('report_rm_arrivals.export')" 
+                    title="RM Arrival" />
 
                 @can('create report')
                 <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
@@ -291,6 +296,8 @@
         </div>
     </div>
 </div>
+
+
 @endsection
 
 @section('script')

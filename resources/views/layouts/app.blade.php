@@ -291,6 +291,43 @@
     });
     </script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    
+        // ── Toggle range / month untuk setiap modal export ───────────────────────
+        document.querySelectorAll('.export-filter-type').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                // Ambil modalId dari nama class section yang ada di modal yang sama
+                const form    = this.closest('form')
+                const modalId = form.dataset.modalId
+                const isRange = this.value === 'range'
+    
+                form.querySelector('.export-section-range_' + modalId)
+                    .classList.toggle('d-none', !isRange)
+                form.querySelector('.export-section-month_' + modalId)
+                    .classList.toggle('d-none', isRange)
+            })
+        })
+    
+        // ── Loading state saat submit ─────────────────────────────────────────────
+        document.querySelectorAll('[id^="formExport_"]').forEach(function (form) {
+            form.addEventListener('submit', function () {
+                const modalId = form.dataset.modalId
+                const btn     = document.getElementById('btnExport_' + modalId)
+    
+                btn.disabled  = true
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...'
+    
+                setTimeout(function () {
+                    btn.disabled  = false
+                    btn.innerHTML = '<i class="fas fa-file-excel me-1"></i> Download Excel'
+                }, 5000)
+            })
+        })
+    
+    })
+    </script>
+
     @yield('script')
 </body>
 

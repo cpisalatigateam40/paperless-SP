@@ -32,6 +32,8 @@
                         <option value="Cooking" {{ $report->section_name == 'Cooking' ? 'selected' : '' }}>Cooking</option>
                         <option value="Packing" {{ $report->section_name == 'Packing' ? 'selected' : '' }}>Packing</option>
                         <option value="Cartoning" {{ $report->section_name == 'Cartoning' ? 'selected' : '' }}>Cartoning</option>
+                        <option value="Cooking Bakso" {{ $report->section_name == 'Cooking Bakso' ? 'selected' : '' }}>Cooking Bakso</option>
+                        <option value="Pasteurisasi" {{ $report->section_name == 'Pasteurisasi' ? 'selected' : '' }}>Pasteurisasi</option>
                     </select>
                 </div>
 

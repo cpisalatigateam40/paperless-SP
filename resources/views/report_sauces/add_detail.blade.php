@@ -29,13 +29,25 @@
                     <div class="row mb-2 raw-material-item">
                         <div class="col-md-4">
                             <label class="form-label">Bahan Baku</label>
-                            <select name="details[0][raw_materials][0][raw_material_uuid]" class="form-control"
-                                required>
-                                <option value="">-- pilih bahan baku --</option>
-                                @foreach($rawMaterials as $rm)
-                                <option value="{{ $rm->uuid }}">{{ $rm->material_name }}</option>
+                            <select name="details[0][raw_materials][0][material_uuid]"
+                                    class="form-control"
+                                    onchange="updateRmMaterialType(this)"
+                                    required>
+                                <option value="">-- Pilih Bahan Baku --</option>
+                                @foreach($rawMaterials as $material)
+                                    <option value="{{ $material->uuid }}" data-type="raw">
+                                        {{ $material->material_name }}
+                                    </option>
+                                @endforeach
+                                @foreach($premixes as $premix)
+                                    <option value="{{ $premix->uuid }}" data-type="premix">
+                                        {{ $premix->name }} (Premix)
+                                    </option>
                                 @endforeach
                             </select>
+                            <input type="hidden"
+                                name="details[0][raw_materials][0][material_type]"
+                                value="raw">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Berat (kg)</label>
@@ -51,13 +63,9 @@
                         </div>
                     </div>
                 </div>
+
                 <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
                     Baku</button>
-
-
-
-
-
 
 
                 <div class="row mb-2">
@@ -149,27 +157,53 @@ let rmIndex = 1;
 function addRawMaterial() {
     let wrapper = document.getElementById('raw-materials-wrapper');
     let html = `
-        <div class="row mb-2 raw-material-item">
+        <div class="row mb-2 raw-material-item mt-3">
             <div class="col-md-4">
-                <select name="details[0][raw_materials][${rmIndex}][raw_material_uuid]" class="form-control" required>
-                    <option value="">-- pilih bahan baku --</option>
-                    @foreach($rawMaterials as $rm)
-                        <option value="{{ $rm->uuid }}">{{ $rm->material_name }}</option>
+                <select name="details[0][raw_materials][${rmIndex}][material_uuid]"
+                        class="form-control"
+                        onchange="updateRmMaterialType(this)"
+                        required>
+                    <option value="">-- Pilih Bahan Baku --</option>
+                    @foreach($rawMaterials as $material)
+                        <option value="{{ $material->uuid }}" data-type="raw">
+                            {{ $material->material_name }}
+                        </option>
+                    @endforeach
+                    @foreach($premixes as $premix)
+                        <option value="{{ $premix->uuid }}" data-type="premix">
+                            {{ $premix->name }} (Premix)
+                        </option>
                     @endforeach
                 </select>
+                <input type="hidden"
+                       name="details[0][raw_materials][${rmIndex}][material_type]"
+                       value="raw">
             </div>
             <div class="col-md-4">
-                <input type="number" step="0.01" name="details[0][raw_materials][${rmIndex}][amount]" class="form-control" placeholder="Berat (kg)">
+                <input type="number" step="0.01"
+                       name="details[0][raw_materials][${rmIndex}][amount]"
+                       class="form-control" placeholder="Berat (kg)">
             </div>
             <div class="col-md-4">
-                <select name="details[0][raw_materials][${rmIndex}][sensory]" class="form-control" required>
-                    <option value="OK">OK</option>
-                    <option value="Tidak OK">Tidak OK</option>
-                </select>
+                <div class="d-flex gap-2">
+                    <select name="details[0][raw_materials][${rmIndex}][sensory]"
+                            class="form-control" required>
+                        <option value="OK">OK</option>
+                        <option value="Tidak OK">Tidak OK</option>
+                    </select>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            onclick="this.closest('.raw-material-item').remove()">✕</button>
+                </div>
             </div>
         </div>`;
     wrapper.insertAdjacentHTML('beforeend', html);
     rmIndex++;
+}
+
+function updateRmMaterialType(selectEl) {
+    const type = selectEl.options[selectEl.selectedIndex].getAttribute('data-type') || 'raw';
+    const hiddenInput = selectEl.closest('div').querySelector('input[type="hidden"]');
+    if (hiddenInput) hiddenInput.value = type;
 }
 </script>
 @endsection

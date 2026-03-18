@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_lab_samples.export')" 
+                    title="Verifikasi Lab Sample" />
+
                 @can('create report')
                 <a href="{{ route('report_lab_samples.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan

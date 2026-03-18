@@ -13,49 +13,13 @@ use Spatie\Permission\Traits\HasRoles;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\ItemFollowup;
+use App\Exports\ProcessAreaCleanlinessExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ProcessAreaCleanlinessController extends Controller
 {
     use HasRoles;
-
-    // public function index()
-    // {
-    //     $reports = ReportProcessAreaCleanliness::with('details.items.followups', 'area')
-    //         ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-    //             $query->where('area_uuid', Auth::user()->area_uuid);
-    //         })
-    //         ->latest()
-    //         ->paginate(20);
-
-    //     // 🔹 Hitung ketidaksesuaian untuk setiap report
-    //     foreach ($reports as $report) {
-    //         $count = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             foreach ($detail->items as $item) {
-    //                 // Cek kondisi "Kotor" atau "Tidak OK"
-    //                 if (
-    //                     strtolower($item->condition ?? '') === 'kotor' ||
-    //                     $item->verification == 0
-    //                 ) {
-    //                     $count++;
-    //                 }
-
-    //                 // Jika ada follow-up juga tidak OK
-    //                 foreach ($item->followups as $followup) {
-    //                     if ($followup->verification == 0) {
-    //                         $count++;
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         // Tambahkan properti dinamis ke model
-    //         $report->ketidaksesuaian = $count;
-    //     }
-
-    //     return view('cleanliness_PA.index', compact('reports'));
-    // }
 
     public function index(Request $request)
     {
@@ -406,7 +370,38 @@ class ProcessAreaCleanlinessController extends Controller
         }
     }
 
-
-
-
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportProcessAreaCleanliness::with(['details.items'])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Kebersihan_Area_Proses_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new ProcessAreaCleanlinessExport($reports, $periodLabel), $filename);
+    }
 }

@@ -15,18 +15,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\WaterbathExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportWaterbathController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportWaterbath::with(['details', 'pasteurisasi', 'coolingShocks', 'drippings'])
-    //         ->latest()
-    //         ->paginate(10);
-
-    //     return view('report_waterbaths.index', compact('reports'));
-    // }
-
     public function index(Request $request)
     {
         $search = $request->search;
@@ -461,5 +455,43 @@ class ReportWaterbathController extends Controller
             ->with('success', 'Report Waterbath berhasil diperbarui');
     }
 
-
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportWaterbath::with([
+                'details.product',
+                'pasteurisasi',
+                'coolingShocks',
+                'drippings',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Waterbath_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new WaterbathExport($reports, $periodLabel), $filename);
+    }
 }

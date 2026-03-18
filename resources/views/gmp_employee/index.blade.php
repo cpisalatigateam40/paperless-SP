@@ -41,6 +41,11 @@
 
                 </form>
 
+                <button type="button" class="btn btn-success btn-sm"
+                    data-bs-toggle="modal" data-bs-target="#modalGmpExport">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </button>
+
                 @can('create report')
                 <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
@@ -104,12 +109,12 @@
                                     </button>
 
                                     {{-- Update Laporan --}}
-                                    <!-- <a href="{{ route('gmp-employee.edit', $report->uuid) }}"
+                                    <a href="{{ route('gmp-employee.edit', $report->uuid) }}"
                                         class="btn btn-sm btn-warning" title="Update Laporan">
                                         <i class="fas fa-pen"></i>
-                                    </a> -->
+                                    </a>
 
-                                    @php
+                                    <!-- @php
                                         $user = auth()->user();
                                         $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                     @endphp
@@ -119,7 +124,7 @@
                                             class="btn btn-sm btn-warning" title="Edit Laporan">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                    @endif
+                                    @endif -->
 
                                     @can('edit report')
                                     <a href="{{ route('gmp-employee.editnext', $report->uuid) }}"
@@ -370,6 +375,122 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalGmpExport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+ 
+            <div class="modal-header text-white"
+                style="background: linear-gradient(135deg, #CC7064, #D68B72);">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-excel me-2"></i>
+                    Export Excel — GMP Karyawan & Sanitasi
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"></button>
+            </div>
+ 
+            <form action="{{ route('gmp-employee.export') }}" method="POST"
+                id="formGmpExport">
+                @csrf
+ 
+                <div class="modal-body px-4 py-3">
+ 
+                    {{-- Pilih tipe export --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">
+                            Pilih Data yang Diexport
+                        </label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input" type="radio"
+                                    name="export_type" id="exp_gmp"
+                                    value="gmp" checked>
+                                <label class="form-check-label" for="exp_gmp">
+                                    GMP Karyawan
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                    name="export_type" id="exp_sanitation"
+                                    value="sanitation">
+                                <label class="form-check-label" for="exp_sanitation">
+                                    Sanitasi
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {{-- Tipe filter --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">
+                            Tipe Filter
+                        </label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input export-filter-type"
+                                    type="radio" name="filter_type"
+                                    id="opt_range_gmp" value="range" checked>
+                                <label class="form-check-label" for="opt_range_gmp">
+                                    Range Tanggal
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input export-filter-type"
+                                    type="radio" name="filter_type"
+                                    id="opt_month_gmp" value="month">
+                                <label class="form-check-label" for="opt_month_gmp">
+                                    Per Bulan
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {{-- Range Tanggal --}}
+                    <div id="gmp_section_range">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold text-muted">
+                                    Dari Tanggal
+                                </label>
+                                <input type="date" class="form-control form-control-sm"
+                                    name="date_from"
+                                    value="{{ now()->startOfMonth()->format('Y-m-d') }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold text-muted">
+                                    Sampai Tanggal
+                                </label>
+                                <input type="date" class="form-control form-control-sm"
+                                    name="date_to"
+                                    value="{{ now()->format('Y-m-d') }}">
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {{-- Per Bulan --}}
+                    <div id="gmp_section_month" class="d-none">
+                        <label class="form-label small fw-semibold text-muted">
+                            Pilih Bulan
+                        </label>
+                        <input type="month" class="form-control form-control-sm"
+                            name="month" value="{{ now()->format('Y-m') }}">
+                    </div>
+ 
+                </div>
+ 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success btn-sm"
+                        id="btnGmpExport">
+                        <i class="fas fa-file-excel me-1"></i> Download Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -380,5 +501,25 @@ $(document).ready(function() {
         $('#error-alert').fadeOut('slow');
     }, 3000);
 });
+
+// Toggle range / month
+document.querySelectorAll('#formGmpExport .export-filter-type').forEach(function (r) {
+    r.addEventListener('change', function () {
+        const isRange = this.value === 'range'
+        document.getElementById('gmp_section_range').classList.toggle('d-none', !isRange)
+        document.getElementById('gmp_section_month').classList.toggle('d-none', isRange)
+    })
+})
+ 
+// Loading state
+document.getElementById('formGmpExport').addEventListener('submit', function () {
+    const btn = document.getElementById('btnGmpExport')
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...'
+    setTimeout(function () {
+        btn.disabled = false
+        btn.innerHTML = '<i class="fas fa-file-excel me-1"></i> Download Excel'
+    }, 5000)
+})
 </script>
 @endsection

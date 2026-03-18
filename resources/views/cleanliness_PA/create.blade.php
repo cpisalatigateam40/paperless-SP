@@ -28,6 +28,8 @@
                             <option value="Cooking">Cooking</option>
                             <option value="Packing">Packing</option>
                             <option value="Cartoning">Cartoning</option>
+                            <option value="Cooking Bakso">Cooking Bakso</option>
+                            <option value="Pasteurisasi">Pasteurisasi</option>
                         </select>
                     </div>
                 </div>

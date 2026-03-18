@@ -17,42 +17,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\FessmanCookingExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportFessmanCookingController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportFessmanCooking::with([
-    //         'details.sensoryCheck'
-    //     ])
-    //     ->latest()
-    //     ->paginate(10);
-
-    //     // Hitung ketidaksesuaian berdasarkan sensory check
-    //     $reports->getCollection()->transform(function ($report) {
-    //         $totalKetidaksesuaian = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             if ($detail->sensoryCheck) {
-    //                 $fields = ['ripeness', 'aroma', 'taste', 'texture', 'color'];
-    //                 foreach ($fields as $field) {
-    //                     // Nilai 0 = Tidak OK
-    //                     if (isset($detail->sensoryCheck->$field) && $detail->sensoryCheck->$field == 0) {
-    //                         $totalKetidaksesuaian++;
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
-    //         return $report;
-    //     });
-
-    //     return view('report_fessman_cookings.index', compact('reports'));
-    // }
-
-
-    
     public function index(Request $request)
     {
         $query = ReportFessmanCooking::with([
@@ -523,6 +493,47 @@ class ReportFessmanCookingController extends Controller
             ->setPaper('a4', 'portrait');
 
         return $pdf->stream('Report_Fessman_Cooking.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportFessmanCooking::with([
+                'section',
+                'details.product',
+                'details.processSteps',
+                'details.coolingDowns',
+                'details.sensoryCheck',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Fessman_Cooking_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new FessmanCookingExport($reports, $periodLabel), $filename);
     }
 
 

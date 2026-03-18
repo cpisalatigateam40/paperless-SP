@@ -14,48 +14,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\SiomayExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportSiomayController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportSiomay::with([
-    //         'product',
-    //         'area',
-    //         'details.rawMaterials.rawMaterial',
-    //     ])->latest()->paginate(10);
-
-    //     // transform() agar tetap bekerja dengan pagination
-    //     $reports->getCollection()->transform(function ($report) {
-    //         $totalKetidaksesuaian = 0;
-
-    //         foreach ($report->details as $detail) {
-    //             // 🔹 Cek di level detail proses (color, aroma, taste, texture)
-    //             if (
-    //                 $detail->color === 'Tidak OK' ||
-    //                 $detail->aroma === 'Tidak OK' ||
-    //                 $detail->taste === 'Tidak OK' ||
-    //                 $detail->texture === 'Tidak OK'
-    //             ) {
-    //                 $totalKetidaksesuaian++;
-    //             }
-
-    //             // 🔹 Cek di level bahan baku (raw materials)
-    //             if ($detail->rawMaterials) {
-    //                 $totalKetidaksesuaian += $detail->rawMaterials
-    //                     ->filter(fn($rm) => $rm->sensory === 'Tidak OK')
-    //                     ->count();
-    //             }
-    //         }
-
-    //         $report->ketidaksesuaian = $totalKetidaksesuaian;
-
-    //         return $report;
-    //     });
-
-    //     return view('report_siomays.index', compact('reports'));
-    // }
-
     public function index(Request $request)
     {
         $query = ReportSiomay::with([
@@ -435,5 +399,43 @@ class ReportSiomayController extends Controller
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportSiomay::with([
+                'product',
+                'details.rawMaterials.rawMaterial',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Siomay_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new SiomayExport($reports, $periodLabel), $filename);
     }
 }

@@ -42,6 +42,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_baso_cookings.export')" 
+                    title="Verifikasi Pemasakan Baso" />
+
                 @can('create report')
                 <a href="{{ route('report_baso_cookings.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan

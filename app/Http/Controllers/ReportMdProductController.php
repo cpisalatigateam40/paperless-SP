@@ -15,6 +15,8 @@ use App\Services\BestBeforeService;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\MdProductImport;
 use App\Exports\MdProductTemplateExport;
+use App\Exports\MdProductExport;
+use Carbon\Carbon;
 
 class ReportMdProductController extends Controller
 {
@@ -378,6 +380,44 @@ class ReportMdProductController extends Controller
         return redirect()
             ->route('report_md_products.index')
             ->with('success', 'Import MD Produk berhasil.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportMdProduct::with([
+                'details.product',
+                'details.positions',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'MD_Produk_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new MdProductExport($reports, $periodLabel), $filename);
     }
 
 

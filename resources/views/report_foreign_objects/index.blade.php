@@ -38,8 +38,11 @@
                             Reset
                         </a>
                     @endif
-
                 </form>
+
+                <x-export-excel-modal 
+                    :route="route('report-foreign-objects.export')" 
+                    title="Verifikasi Kontaminasi Benda Asing" />
 
                 @can('create report')
                 <a href="{{ route('report-foreign-objects.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>

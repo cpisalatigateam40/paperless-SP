@@ -15,21 +15,13 @@ use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+use App\Exports\ScaleExport;
+use App\Exports\ThermometerExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportScaleController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportScale::with([
-    //         'area',
-    //         'details.scale',
-    //         'details.measurements',
-    //         'thermometerDetails.thermometer',
-    //         'thermometerDetails.measurements',
-    //     ])->latest()->paginate(10);
-
-    //     return view('report_scales.index', compact('reports'));
-    // }
     public function index(Request $request)
     {
         $reports = ReportScale::with([
@@ -111,7 +103,6 @@ class ReportScaleController extends Controller
 
         return view('report_scales.index', compact('reports'));
     }
-
 
     public function create()
     {
@@ -501,5 +492,44 @@ class ReportScaleController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'export_type' => 'required|in:scale,thermometer',
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $suffix = $dateFrom->format('Ymd') . '_' . $dateTo->format('Ymd');
+    
+        $baseQuery = ReportScale::query()
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift');
+    
+        if ($request->export_type === 'scale') {
+            $reports = $baseQuery->with(['details.scale', 'details.measurements'])->get();
+            return Excel::download(new ScaleExport($reports, $periodLabel), "Timbangan_{$suffix}.xlsx");
+        }
+    
+        $reports = $baseQuery->with(['thermometerDetails.thermometer', 'thermometerDetails.measurements'])->get();
+        return Excel::download(new ThermometerExport($reports, $periodLabel), "Thermometer_{$suffix}.xlsx");
     }
 }

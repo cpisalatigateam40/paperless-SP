@@ -41,6 +41,10 @@
 
                 </form>
 
+                <x-export-excel-modal 
+                    :route="route('report_freez_packagings.export')" 
+                    title="Verifikasi Pembekuan IQF & Pengemasan Karton Box" />
+
                 @can('create report')
                 <a href="{{ route('report_freez_packagings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan

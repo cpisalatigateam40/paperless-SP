@@ -253,4 +253,9 @@ class Area extends Model
     {
         return $this->hasMany(DetailWaterbath::class, 'product_uuid', 'uuid');
     }
+
+    public function reportThawings()
+    {
+        return $this->hasMany(ReportThawing::class, 'area_uuid', 'uuid');
+    }
 }

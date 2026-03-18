@@ -41,6 +41,11 @@
 
                 </form>
 
+                <button type="button" class="btn btn-success btn-sm"
+                    data-bs-toggle="modal" data-bs-target="#modalScaleExport">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </button>
+
                 @can('create report')
                 <a href="{{ route('report-scales.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
@@ -249,7 +254,7 @@
                                     <thead class="text-center">
                                         <tr>
                                             <th rowspan="3">No</th>
-                                            <th rowspan="3">Jenis dan Kode Timbangan</th>
+                                            <th rowspan="3">Jenis dan Kode Thermometer</th>
                                             <th colspan="2">
                                                 Pemeriksaan Pukul:
                                                 {{ optional($report->thermometerDetails->pluck('time_1')->filter()->first())->format('H:i') ?? '-' }}
@@ -310,6 +315,110 @@
         </div>
     </div>
 </div>
+
+{{-- Modal --}}
+<div class="modal fade" id="modalScaleExport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+ 
+            <div class="modal-header text-white"
+                style="background: linear-gradient(135deg, #CC7064, #D68B72);">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-excel me-2"></i>
+                    Export Excel — Timbangan & Thermometer
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"></button>
+            </div>
+ 
+            <form action="{{ route('report-scales.export') }}" method="POST"
+                id="formScaleExport">
+                @csrf
+ 
+                <div class="modal-body px-4 py-3">
+ 
+                    {{-- Pilih tipe export --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">
+                            Pilih Data yang Diexport
+                        </label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input" type="radio"
+                                    name="export_type" id="exp_scale"
+                                    value="scale" checked>
+                                <label class="form-check-label" for="exp_scale">
+                                    Timbangan
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                    name="export_type" id="exp_thermo"
+                                    value="thermometer">
+                                <label class="form-check-label" for="exp_thermo">
+                                    Thermometer
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {{-- Tipe filter --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">Tipe Filter</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input" type="radio"
+                                    name="filter_type" id="scale_opt_range"
+                                    value="range" checked>
+                                <label class="form-check-label" for="scale_opt_range">Range Tanggal</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                    name="filter_type" id="scale_opt_month"
+                                    value="month">
+                                <label class="form-check-label" for="scale_opt_month">Per Bulan</label>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {{-- Range Tanggal --}}
+                    <div id="scale_section_range">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold text-muted">Dari Tanggal</label>
+                                <input type="date" class="form-control form-control-sm"
+                                    name="date_from"
+                                    value="{{ now()->startOfMonth()->format('Y-m-d') }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold text-muted">Sampai Tanggal</label>
+                                <input type="date" class="form-control form-control-sm"
+                                    name="date_to"
+                                    value="{{ now()->format('Y-m-d') }}">
+                            </div>
+                        </div>
+                    </div>
+ 
+                    {{-- Per Bulan --}}
+                    <div id="scale_section_month" class="d-none">
+                        <label class="form-label small fw-semibold text-muted">Pilih Bulan</label>
+                        <input type="month" class="form-control form-control-sm"
+                            name="month" value="{{ now()->format('Y-m') }}">
+                    </div>
+ 
+                </div>
+ 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success btn-sm" id="btnScaleExport">
+                        <i class="fas fa-file-excel me-1"></i> Download Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -337,5 +446,23 @@ document.querySelectorAll('.toggle-detail').forEach(button => {
         }
     });
 });
+
+document.querySelectorAll('#formScaleExport input[name="filter_type"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+        const isRange = this.value === 'range'
+        document.getElementById('scale_section_range').classList.toggle('d-none', !isRange)
+        document.getElementById('scale_section_month').classList.toggle('d-none', isRange)
+    })
+})
+ 
+document.getElementById('formScaleExport').addEventListener('submit', function () {
+    const btn = document.getElementById('btnScaleExport')
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...'
+    setTimeout(function () {
+        btn.disabled = false
+        btn.innerHTML = '<i class="fas fa-file-excel me-1"></i> Download Excel'
+    }, 5000)
+})
 </script>
 @endsection

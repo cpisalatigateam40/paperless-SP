@@ -11,72 +11,69 @@ use App\Models\TofuDefectVerif;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Exports\TofuVerifExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportTofuVerifController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportTofuVerif::latest()->with(['productInfos', 'weightVerifs', 'defectVerifs'])->paginate(10);
-
-    //     return view('report_tofu_verifs.index', compact('reports'));
-    // }
 
     public function index(Request $request)
-    {
-        $query = ReportTofuVerif::with([
-            'area',
-            'productInfos',
-            'weightVerifs',
-            'defectVerifs'
-        ])->latest();
+        {
+            $query = ReportTofuVerif::with([
+                'area',
+                'productInfos',
+                'weightVerifs',
+                'defectVerifs'
+            ])->latest();
 
-        // 🔍 GLOBAL SEARCH
-        if ($request->filled('search')) {
-            $search = $request->search;
+            // 🔍 GLOBAL SEARCH
+            if ($request->filled('search')) {
+                $search = $request->search;
 
-            $query->where(function ($q) use ($search) {
+                $query->where(function ($q) use ($search) {
 
-                // 🔹 HEADER REPORT
-                $q->where('date', 'like', "%{$search}%")
-                ->orWhere('shift', 'like', "%{$search}%")
-                ->orWhere('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%");
+                    // 🔹 HEADER REPORT
+                    $q->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
 
-                // 🔹 AREA
-                $q->orWhereHas('area', function ($a) use ($search) {
-                    $a->where('name', 'like', "%{$search}%");
+                    // 🔹 AREA
+                    $q->orWhereHas('area', function ($a) use ($search) {
+                        $a->where('name', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 PRODUCT INFO (KODE PRODUKSI, ED, SAMPLE)
+                    $q->orWhereHas('productInfos', function ($pi) use ($search) {
+                        $pi->where('production_code', 'like', "%{$search}%")
+                        ->orWhere('expired_date', 'like', "%{$search}%")
+                        ->orWhere('sample_amount', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 WEIGHT VERIFICATION
+                    $q->orWhereHas('weightVerifs', function ($wv) use ($search) {
+                        $wv->where('weight_category', 'like', "%{$search}%")
+                        ->orWhere('turus', 'like', "%{$search}%")
+                        ->orWhere('total', 'like', "%{$search}%")
+                        ->orWhere('percentage', 'like', "%{$search}%");
+                    });
+
+                    // 🔹 DEFECT VERIFICATION
+                    $q->orWhereHas('defectVerifs', function ($dv) use ($search) {
+                        $dv->where('defect_type', 'like', "%{$search}%")
+                        ->orWhere('turus', 'like', "%{$search}%")
+                        ->orWhere('total', 'like', "%{$search}%")
+                        ->orWhere('percentage', 'like', "%{$search}%");
+                    });
                 });
+            }
 
-                // 🔹 PRODUCT INFO (KODE PRODUKSI, ED, SAMPLE)
-                $q->orWhereHas('productInfos', function ($pi) use ($search) {
-                    $pi->where('production_code', 'like', "%{$search}%")
-                    ->orWhere('expired_date', 'like', "%{$search}%")
-                    ->orWhere('sample_amount', 'like', "%{$search}%");
-                });
+        $reports = $query->paginate(10)->withQueryString();
 
-                // 🔹 WEIGHT VERIFICATION
-                $q->orWhereHas('weightVerifs', function ($wv) use ($search) {
-                    $wv->where('weight_category', 'like', "%{$search}%")
-                    ->orWhere('turus', 'like', "%{$search}%")
-                    ->orWhere('total', 'like', "%{$search}%")
-                    ->orWhere('percentage', 'like', "%{$search}%");
-                });
-
-                // 🔹 DEFECT VERIFICATION
-                $q->orWhereHas('defectVerifs', function ($dv) use ($search) {
-                    $dv->where('defect_type', 'like', "%{$search}%")
-                    ->orWhere('turus', 'like', "%{$search}%")
-                    ->orWhere('total', 'like', "%{$search}%")
-                    ->orWhere('percentage', 'like', "%{$search}%");
-                });
-            });
-        }
-
-    $reports = $query->paginate(10)->withQueryString();
-
-    return view('report_tofu_verifs.index', compact('reports'));
-}
+        return view('report_tofu_verifs.index', compact('reports'));
+    }
 
     public function create()
     {
@@ -278,6 +275,45 @@ class ReportTofuVerifController extends Controller
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('Laporan Verifikasi Tofu - ' . $report->date . '.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'filter_type' => 'required|in:range,month',
+            'date_from'   => 'required_if:filter_type,range|nullable|date',
+            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+        ]);
+    
+        if ($request->filter_type === 'month') {
+            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $dateTo      = $dateFrom->copy()->endOfMonth();
+            $periodLabel = $dateFrom->translatedFormat('F Y');
+        } else {
+            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
+            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
+        }
+    
+        $reports = ReportTofuVerif::with([
+                'productInfos',
+                'weightVerifs',
+                'defectVerifs',
+            ])
+            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
+                $q->where('area_uuid', auth()->user()->area_uuid)
+            )
+            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+            ->orderBy('date')
+            ->orderBy('shift')
+            ->get();
+    
+        $filename = 'Tofu_Verif_'
+            . $dateFrom->format('Ymd') . '_'
+            . $dateTo->format('Ymd') . '.xlsx';
+    
+        return Excel::download(new TofuVerifExport($reports, $periodLabel), $filename);
     }
 
 }
