@@ -37,20 +37,32 @@
     </div>
 </div>
 
+<!-- <pre>{{ $details->count() }} details</pre>
+<pre>{{ json_encode($details, JSON_PRETTY_PRINT) }}</pre> -->
+
 <script>
+
 let index = 0;
-const products = `@foreach($products as $product)
-    <option value="{{ $product->uuid }}"
-        data-shelf-life="{{ $product->shelf_life }}"
-        data-created-at="{{ $product->created_at }}">
-        {{ $product->product_name }} - {{ $product->nett_weight }} g
-    </option>
-@endforeach`;
+// Simpan sebagai array JSON dulu
+const productList = @json($products);
+
+function renderProductOptions(selectedUuid = '') {
+    return productList.map(p =>
+        `<option value="${p.uuid}"
+            data-shelf-life="${p.shelf_life}"
+            data-created-at="${p.created_at}"
+            ${p.uuid === selectedUuid ? 'selected' : ''}>
+            ${p.product_name} - ${p.nett_weight} g
+        </option>`
+    ).join('');
+}
 
 function addDetailRow(detail = null) {
     const container = document.getElementById('detail-container');
     const now = new Date();
     const currentTime = now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+
+    const currentIndex = index;
     
     const html = `
 <div class="card mb-4 p-3 border">
@@ -64,7 +76,7 @@ function addDetailRow(detail = null) {
             <label>Produk</label>
             <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})" required>
                 <option value="">- Pilih Produk -</option>
-                ${products}
+                ${renderProductOptions(detail?.product_uuid ?? '')}
             </select>
         </div>
         <div class="col-md-6 mb-3">
@@ -93,6 +105,16 @@ function addDetailRow(detail = null) {
     </div>
 
     <h6 class="mt-5 mb-3" style="font-weight:bold;">Pembekuan</h6>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Mesin IQF</label>
+            <select name="details[${index}][freezing][iqf_machine]" class="form-control">
+                <option value="">-- Pilih Mesin --</option>
+                <option value="IQF 1" ${detail?.freezing?.iqf_machine === 'IQF 1' ? 'selected' : ''}>IQF 1</option>
+                <option value="IQF 2" ${detail?.freezing?.iqf_machine === 'IQF 2' ? 'selected' : ''}>IQF 2</option>
+            </select>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-6">
             <label>Suhu Akhir Produk (°C)</label>
@@ -178,7 +200,7 @@ function addDetailRow(detail = null) {
         </div>`).join('')}
         <div class="col-md-2">
             <label>Rata-Rata Berat</label>
-            <input type="number" step="0.01" name="details[${index}][kartoning][avg_weight]" class="form-control avg-weight" readonly
+            <input type="number" step="0.01" name="details[${index}][kartoning][avg_weight]" class="form-control avg-weight"
                 value="${detail?.kartoning?.avg_weight ?? ''}">
         </div>
     </div>
@@ -202,23 +224,27 @@ function addDetailRow(detail = null) {
 `;
     container.insertAdjacentHTML('beforeend', html);
     index++;
-
-    $(document).ready(function() {
-        $('.select2-product').select2({
-            placeholder: '-- Pilih Produk --',
-            allowClear: true,
-            width: '100%'
-        });
-        if(detail) $('select[name="details['+ (index-1) +'][product_uuid]"]').val(detail.product_uuid).trigger('change');
-    });
 }
 
 // Prefill existing details
-@if($report->details)
-    @foreach($report->details as $detail)
-        addDetailRow(@json($detail));
-    @endforeach
-@endif
+const existingDetails = @json($details);
+existingDetails.forEach(detail => addDetailRow(detail));
+console.log('existingDetails:', existingDetails); // cek di browser console
+console.log('jumlah detail:', existingDetails.length);
+
+// Init select2 semua sekaligus setelah semua detail ter-render
+$('.select2-product').select2({
+    placeholder: '-- Pilih Produk --',
+    allowClear: true,
+    width: '100%'
+});
+
+// Set selected value untuk semua
+existingDetails.forEach((detail, i) => {
+    if (detail.product_uuid) {
+        $('select[name="details['+ i +'][product_uuid]"]').val(detail.product_uuid).trigger('change');
+    }
+});
 
 document.addEventListener("input", function(e){
     if(e.target.classList.contains("weight-input")){
@@ -238,5 +264,7 @@ document.addEventListener("input", function(e){
         avgInput.value = count > 0 ? (total/count).toFixed(2) : "";
     }
 });
+
+
 </script>
 @endsection

@@ -213,11 +213,12 @@
                                                 <th rowspan="2">Tindakan Koreksi</th>
                                                 <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
 
-                                                <th colspan="6">PEMBEKUAN</th>
+                                                <th colspan="7">PEMBEKUAN</th>
                                                 <th colspan="12">KARTONING</th>
 
                                             </tr>
                                             <tr>
+                                                <th>Mesin IQF</th>
                                                 <th>Suhu Akhir</th>
                                                 <th>Standar Suhu</th>
                                                 <th>Suhu IQF Room</th>
@@ -256,6 +257,9 @@
                                                 <td class="align-middle">{{ $detail->verif_after ?? '-' }}</td>
 
                                                 {{-- Freezing --}}
+                                                <td class="align-middle">
+                                                    {{ $detail->freezing->iqf_machine ?? '-' }}
+                                                </td>
                                                 <td class="align-middle">
                                                     {{ $detail->freezing->end_product_temp ?? '-' }}
                                                 </td>

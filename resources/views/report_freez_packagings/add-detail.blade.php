@@ -81,6 +81,16 @@ function addDetailRow() {
     </div>
 
     <h6 class="mt-5 mb-3" style="font-weight: bold;">Pembekuan</h6>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Mesin IQF</label>
+            <select name="details[${index}][freezing][iqf_machine]" class="form-control">
+                <option value="">-- Pilih Mesin --</option>
+                <option value="IQF 1">IQF 1</option>
+                <option value="IQF 2">IQF 2</option>
+            </select>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-6">
             <label>Suhu Akhir Produk (°C)</label>
@@ -173,7 +183,7 @@ function addDetailRow() {
         </div>
         <div class="col-md-2">
             <label>Rata-Rata Berat</label>
-            <input type="number" step="0.01" name="details[${index}][kartoning][avg_weight]" class="form-control avg-weight" readonly>
+            <input type="number" step="0.01" name="details[${index}][kartoning][avg_weight]" class="form-control avg-weight">
         </div>
     </div>
     

@@ -159,6 +159,7 @@ class ReportFreezPackagingController extends Controller
                     'iqf_suction_temp' => $detail['freezing']['iqf_suction_temp'] ?? null,
                     'freezing_time_display' => $detail['freezing']['freezing_time_display'] ?? null,
                     'freezing_time_actual' => $detail['freezing']['freezing_time_actual'] ?? null,
+                    'iqf_machine' => $detail['freezing']['iqf_machine'] ?? null,
                 ]);
 
                 $detailModel->kartoning()->create([
@@ -228,6 +229,7 @@ class ReportFreezPackagingController extends Controller
                 'iqf_suction_temp' => $item['freezing']['iqf_suction_temp'],
                 'freezing_time_display' => $item['freezing']['freezing_time_display'],
                 'freezing_time_actual' => $item['freezing']['freezing_time_actual'],
+                'iqf_machine' => $item['freezing']['iqf_machine'] ?? null,
             ]);
 
             $detail->kartoning()->create([
@@ -328,9 +330,53 @@ class ReportFreezPackagingController extends Controller
         ])->where('uuid', $uuid)->firstOrFail();
 
         $areas = Area::all();
-        $products = Product::all();
+        
+        $products = Product::all()->map(fn($p) => [
+            'uuid' => $p->uuid,
+            'product_name' => $p->product_name,
+            'nett_weight' => $p->nett_weight,
+            'shelf_life' => $p->shelf_life,
+            'created_at' => $p->created_at,
+        ])->values();
 
-        return view('report_freez_packagings.edit', compact('report', 'areas', 'products'));
+        // Mapping details beserta relasinya
+        $details = $report->details->map(fn($d) => [
+            'uuid' => $d->uuid,
+            'product_uuid' => $d->product_uuid,
+            'production_code' => $d->production_code,
+            'best_before' => $d->best_before,
+            'start_time' => $d->start_time,
+            'end_time' => $d->end_time,
+            'corrective_action' => $d->corrective_action,
+            'verif_after' => $d->verif_after,
+            'freezing' => $d->freezing ? [
+                'iqf_machine' => $d->freezing->iqf_machine,
+                'start_product_temp' => $d->freezing->start_product_temp,
+                'end_product_temp' => $d->freezing->end_product_temp,
+                'standard_temp' => $d->freezing->standard_temp,
+                'iqf_room_temp' => $d->freezing->iqf_room_temp,
+                'iqf_suction_temp' => $d->freezing->iqf_suction_temp,
+                'freezing_time_display' => $d->freezing->freezing_time_display,
+                'freezing_time_actual' => $d->freezing->freezing_time_actual,
+            ] : null,
+            'kartoning' => $d->kartoning ? [
+                'carton_condition' => $d->kartoning->carton_condition,
+                'content_bag' => $d->kartoning->content_bag,
+                'content_binded' => $d->kartoning->content_binded,
+                'content_rtg' => $d->kartoning->content_rtg,
+                'carton_weight_standard' => $d->kartoning->carton_weight_standard,
+                'carton_weight_actual' => $d->kartoning->carton_weight_actual,
+                'weight_1' => $d->kartoning->weight_1,
+                'weight_2' => $d->kartoning->weight_2,
+                'weight_3' => $d->kartoning->weight_3,
+                'weight_4' => $d->kartoning->weight_4,
+                'weight_5' => $d->kartoning->weight_5,
+                'avg_weight' => $d->kartoning->avg_weight,
+                'carton_code' => $d->kartoning->carton_code,
+            ] : null,
+        ])->values();
+
+        return view('report_freez_packagings.edit', compact('report', 'areas', 'products', 'details'));
     }
 
     public function update(Request $request, $uuid)
@@ -376,6 +422,7 @@ class ReportFreezPackagingController extends Controller
                     'iqf_suction_temp' => $detail['freezing']['iqf_suction_temp'] ?? null,
                     'freezing_time_display' => $detail['freezing']['freezing_time_display'] ?? null,
                     'freezing_time_actual' => $detail['freezing']['freezing_time_actual'] ?? null,
+                    'iqf_machine' => $detail['freezing']['iqf_machine'] ?? null,
                 ]);
 
                 $detailModel->kartoning()->create([

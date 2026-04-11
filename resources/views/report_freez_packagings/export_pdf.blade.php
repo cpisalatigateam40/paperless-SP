@@ -113,6 +113,7 @@
                 <th rowspan="2">Best Before</th>
                 <th rowspan="2">Tindakan Koreksi</th>
                 <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
+                <th rowspan="2">Mesin IQF</th>
                 <th rowspan="2">Suhu Produk After IQF</th>
                 <th rowspan="2">Standar Suhu</th>
                 <th colspan="2">Suhu IQF</th>
@@ -153,6 +154,7 @@
                 <td>{{ $detail->verif_after }}</td>
 
                 {{-- Freezing --}}
+                <td>{{ $detail->freezing->iqf_machine ?? '' }}</td>
                 <td>{{ $detail->freezing->end_product_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->standard_temp ?? '' }}</td>
                 <td>{{ $detail->freezing->iqf_room_temp ?? '' }}</td>
@@ -175,7 +177,7 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="24" style="text-align: right; border: none;">QM 39 / 02</td>
+                <td colspan="25" style="text-align: right; border: none;">QM 39 / 02</td>
             </tr>
         </tbody>
     </table>
