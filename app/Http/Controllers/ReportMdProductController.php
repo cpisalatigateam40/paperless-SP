@@ -22,65 +22,69 @@ class ReportMdProductController extends Controller
 {
     public function index(Request $request)
     {
+        // 🔹 Ambil semua process_type yang tersedia untuk tab
+        $processTypes = \App\Models\DetailMdProduct::distinct()
+            ->orderBy('process_type')
+            ->pluck('process_type')
+            ->filter()
+            ->values();
+
+        $activeTab = $request->input('process_type'); // null = semua
+
         $query = ReportMdProduct::with([
             'area',
             'details.product',
             'details.positions'
         ])->latest();
 
-        // 🔍 GLOBAL SEARCH
+        // 🔹 FILTER BY PROCESS TYPE (TAB)
+        if ($activeTab) {
+            $query->whereHas('details', function ($d) use ($activeTab) {
+                $d->where('process_type', $activeTab);
+            });
+        }
+
+        // 🔍 GLOBAL SEARCH (existing code unchanged)
         if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
-                // 🔹 HEADER REPORT
                 $q->where('date', 'like', "%{$search}%")
-                ->orWhere('shift', 'like', "%{$search}%")
-                ->orWhere('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%");
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
 
-                // 🔹 AREA
                 $q->orWhereHas('area', function ($a) use ($search) {
                     $a->where('name', 'like', "%{$search}%");
                 });
 
-                // 🔹 DETAIL MD PRODUCT
                 $q->orWhereHas('details', function ($d) use ($search) {
-
                     $d->where('production_code', 'like', "%{$search}%")
-                    ->orWhere('program_number', 'like', "%{$search}%")
-                    ->orWhere('process_type', 'like', "%{$search}%")
-                    ->orWhere('corrective_action', 'like', "%{$search}%")
-                    ->orWhere('gramase', 'like', "%{$search}%")
-                    ->orWhere('best_before', 'like', "%{$search}%")
-                    ->orWhere('time', 'like', "%{$search}%");
+                        ->orWhere('program_number', 'like', "%{$search}%")
+                        ->orWhere('process_type', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('gramase', 'like', "%{$search}%")
+                        ->orWhere('best_before', 'like', "%{$search}%")
+                        ->orWhere('time', 'like', "%{$search}%");
 
-                    // 🔹 VERIFICATION (boolean)
                     if (strtolower($search) === 'ok') {
                         $d->orWhere('verification', true);
                     }
-
                     if (strtolower($search) === 'tidak ok') {
                         $d->orWhere('verification', false);
                     }
 
-                    // 🔹 PRODUCT
                     $d->orWhereHas('product', function ($p) use ($search) {
                         $p->where('product_name', 'like', "%{$search}%")
-                        ->orWhere('production_code', 'like', "%{$search}%");
+                            ->orWhere('production_code', 'like', "%{$search}%");
                     });
 
-                    // 🔹 POSITIONS (PALING DALAM)
                     $d->orWhereHas('positions', function ($pos) use ($search) {
                         $pos->where('specimen', 'like', "%{$search}%")
                             ->orWhere('position', 'like', "%{$search}%");
-
                         if (strtolower($search) === 'ok') {
                             $pos->orWhere('status', true);
                         }
-
                         if (strtolower($search) === 'tidak ok') {
                             $pos->orWhere('status', false);
                         }
@@ -91,28 +95,22 @@ class ReportMdProductController extends Controller
 
         $reports = $query->paginate(10)->withQueryString();
 
-        // 🔥 HITUNG KETIDAKSESUAIAN
+        // 🔥 HITUNG KETIDAKSESUAIAN (unchanged)
         foreach ($reports as $report) {
             $totalNonConform = 0;
-
             foreach ($report->details as $detail) {
-
-                // 1️⃣ Verifikasi setelah perbaikan
                 if ($detail->verification === false) {
                     $totalNonConform++;
                     continue;
                 }
-
-                // 2️⃣ Posisi MD (status = false)
                 if ($detail->positions->contains('status', false)) {
                     $totalNonConform++;
                 }
             }
-
             $report->ketidaksesuaian = $totalNonConform;
         }
 
-        return view('report_md_products.index', compact('reports'));
+        return view('report_md_products.index', compact('reports', 'processTypes', 'activeTab'));
     }
 
     public function create()
