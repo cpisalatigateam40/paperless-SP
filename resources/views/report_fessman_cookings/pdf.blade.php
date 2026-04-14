@@ -177,16 +177,13 @@
             'DRYINGIII',
             'DRYINGIV',
             'DRYINGV',
-            'DOOR OPENING SECTION 1',
             'PUT CORE PROBE',
             'SMOKING',
             'COOKINGI',
             'COOKINGII',
             'DRYING',
             'STEAM SUCTION',
-            'DOOR OPENING SECTION 1',
             'REMOVE CORE PROBE',
-            'FURTHER TRANSPORT'
             ];
             $fields = [
             ['db' => 'time_minutes', 'label' => 'Waktu (menit)'],
