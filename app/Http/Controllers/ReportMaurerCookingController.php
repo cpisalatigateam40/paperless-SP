@@ -197,8 +197,7 @@ class ReportMaurerCookingController extends Controller
             'maurerStandardMap' => $maurerStandardMap, // <- Ini penting
         ]);
     }
-
-
+    
     public function destroy($uuid)
     {
         $report = ReportMaurerCooking::where('uuid', $uuid)->firstOrFail();
@@ -224,6 +223,7 @@ class ReportMaurerCookingController extends Controller
                 'date' => $request['date'],
                 'shift' => $shift,
                 'created_by' => Auth::user()->name,
+                'notes' => $request['notes'] ?? null,
             ]);
 
             foreach ($request['details'] as $detailData) {
@@ -240,6 +240,7 @@ class ReportMaurerCookingController extends Controller
                     'packaging_weight' => $detailData['packaging_weight'] ?? null,
                     'trolley_count' => $detailData['trolley_count'] ?? null,
                     'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
+                    'stick_count' => $detailData['stick_count'] ?? null,
                 ]);
 
                 // child: process_steps
@@ -311,11 +312,21 @@ class ReportMaurerCookingController extends Controller
                     ShSensoryCheck::create([
                         'uuid' => Str::uuid(),
                         'report_detail_uuid' => $detail->uuid,
+
                         'ripeness' => $detailData['sensory_check']['ripeness'] ?? null,
+                        'ripeness_note' => $detailData['sensory_check']['ripeness_note'] ?? null,
+
                         'aroma' => $detailData['sensory_check']['aroma'] ?? null,
+                        'aroma_note' => $detailData['sensory_check']['aroma_note'] ?? null,
+
                         'texture' => $detailData['sensory_check']['texture'] ?? null,
+                        'texture_note' => $detailData['sensory_check']['texture_note'] ?? null,
+
                         'color' => $detailData['sensory_check']['color'] ?? null,
+                        'color_note' => $detailData['sensory_check']['color_note'] ?? null,
+
                         'taste' => $detailData['sensory_check']['taste'] ?? null,
+                        'taste_note' => $detailData['sensory_check']['taste_note'] ?? null,
                     ]);
                 }
 
@@ -426,6 +437,7 @@ class ReportMaurerCookingController extends Controller
                 'section_uuid' => $request['section_uuid'] ?? null,
                 'date' => $request['date'],
                 'shift' => $request['shift'],
+                'notes' => $request['notes'] ?? null,
             ]);
 
             // Ambil UUID detail yang dikirim dari form
@@ -461,6 +473,7 @@ class ReportMaurerCookingController extends Controller
                         'packaging_weight' => $detailData['packaging_weight'] ?? null,
                         'trolley_count' => $detailData['trolley_count'] ?? null,
                         'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
+                        'stick_count' => $detailData['stick_count'] ?? null,
                     ]);
                 } else {
                     // Kalau detail baru → create
@@ -472,6 +485,7 @@ class ReportMaurerCookingController extends Controller
                         'packaging_weight' => $detailData['packaging_weight'] ?? null,
                         'trolley_count' => $detailData['trolley_count'] ?? null,
                         'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
+                        'stick_count' => $detailData['stick_count'] ?? null,
                     ]);
                 }
 
@@ -540,15 +554,36 @@ class ReportMaurerCookingController extends Controller
 
                 // sensory_check
                 $detail->sensoryCheck()->delete();
+
                 if (!empty($detailData['sensory_check'])) {
                     ShSensoryCheck::create([
                         'uuid' => Str::uuid(),
                         'report_detail_uuid' => $detail->uuid,
+
                         'ripeness' => $detailData['sensory_check']['ripeness'] ?? null,
+                        'ripeness_note' => ($detailData['sensory_check']['ripeness'] ?? null) == 0
+    ? ($detailData['sensory_check']['ripeness_note'] ?? null)
+    : null,
+
                         'aroma' => $detailData['sensory_check']['aroma'] ?? null,
+                        'aroma_note' => ($detailData['sensory_check']['aroma'] ?? null) == 0
+                    ? ($detailData['sensory_check']['aroma_note'] ?? null)
+                    : null,
+
                         'texture' => $detailData['sensory_check']['texture'] ?? null,
+                        'texture_note' => ($detailData['sensory_check']['texture'] ?? null) == 0
+    ? ($detailData['sensory_check']['texture_note'] ?? null)
+    : null,
+
                         'color' => $detailData['sensory_check']['color'] ?? null,
+                        'color_note' => ($detailData['sensory_check']['color'] ?? null) == 0
+    ? ($detailData['sensory_check']['color_note'] ?? null)
+    : null,
+
                         'taste' => $detailData['sensory_check']['taste'] ?? null,
+                        'taste_note' => ($detailData['sensory_check']['taste'] ?? null) == 0
+    ? ($detailData['sensory_check']['taste_note'] ?? null)
+    : null,
                     ]);
                 }
 

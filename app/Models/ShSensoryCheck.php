@@ -22,6 +22,11 @@ class ShSensoryCheck extends Model implements Auditable
         'texture',
         'color',
         'taste',
+        'ripeness_note',
+        'aroma_note',
+        'texture_note',
+        'color_note',
+        'taste_note',
     ];
 
     protected $auditEvents = [

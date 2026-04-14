@@ -118,7 +118,6 @@ class ReportFreezPackagingController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->details);
 
         DB::beginTransaction();
 

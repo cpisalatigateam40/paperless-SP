@@ -60,7 +60,7 @@
         <div class="accordion-body card shadow">
             {{-- Info Produk --}}
             <div class="row g-3 mb-3 card-body">
-                <div class="col-md-4">
+                <div class="col-md-6 mb-3">
                     <label>Nama Produk</label>
                     <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector select2-product"
                         data-index="{{ $i }}">
@@ -71,17 +71,21 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6 mb-3">
                     <label>Kode Produksi</label>
                     <input type="text" name="details[{{ $i }}][production_code]" class="form-control">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-6 mb-3">
                     <label>Untuk Kemasan (gr)</label>
                     <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-6 mb-3">
                     <label>Jumlah Trolley</label>
                     <input type="number" name="details[{{ $i }}][trolley_count]" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Jumlah Stick</label>
+                    <input type="number" name="details[{{ $i }}][stick_count]" class="form-control">
                 </div>
             </div>
 
@@ -225,15 +229,27 @@
                     'Tekstur' => 'texture',
                     'Warna' => 'color',
                     'Rasa' => 'taste'
-                    ]
-                    as $label => $field)
+                    ] as $label => $field)
+
                     <div class="col-md-6">
                         <label>{{ $label }}</label>
-                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control mb-2">
+
+                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]"
+                            class="form-control mb-2 sensory-select"
+                            data-target="note-{{ $i }}-{{ $field }}">
+                            <option value="">-- Pilih --</option>
                             <option value="1">OK</option>
                             <option value="0">Tidak OK</option>
                         </select>
+
+                        {{-- Input keterangan --}}
+                        <input type="text"
+                            name="details[{{ $i }}][sensory_check][{{ $field }}_note]"
+                            class="form-control d-none note-field mb-3"
+                            id="note-{{ $i }}-{{ $field }}"
+                            placeholder="Masukkan keterangan...">
                     </div>
+
                     @endforeach
                 </div>
             </div>
@@ -362,6 +378,11 @@
                         </table>
                     </div>
                 </div>
+                <!-- <div class="col-md-6 mb-3 mt-4">
+                    <label>Catatan</label>
+                    <textarea name="notes" class="form-control" rows="4"
+                        placeholder="Masukkan catatan tambahan..."></textarea>
+                </div>   -->
             </div>
         </div>
 
@@ -469,5 +490,21 @@ function calculateAverage(i) {
 //         }
 //     });
 // });
+</script>
+
+<script id="f1b8dl">
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('sensory-select')) {
+        const targetId = e.target.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+
+        if (e.target.value == '0') {
+            input.classList.remove('d-none'); // tampilkan
+        } else {
+            input.classList.add('d-none'); // sembunyikan
+            input.value = ''; // reset
+        }
+    }
+});
 </script>
 @endsection

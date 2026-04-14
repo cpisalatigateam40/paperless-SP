@@ -171,6 +171,12 @@
                 <td>{{ $detail->trolley_count ?? '-' }}</td>
                 @endforeach
             </tr>
+            <tr>
+                <td>Jumlah Stick</td>
+                @foreach ($report->details as $detail)
+                <td>{{ $detail->stick_count ?? '-' }}</td>
+                @endforeach
+            </tr>
 
 
             {{-- A. Rumah Asap --}}
@@ -385,17 +391,28 @@
                 <td></td>
                 @endforeach
             </tr>
-            @foreach(['ripeness' => 'Kematangan', 'aroma' => 'Rasa Aroma', 'texture' => 'Tekstur', 'color' => 'Warna',
-            'taste' => 'Rasa']
-            as $field =>
-            $label)
+            @foreach(['ripeness'=>'Kematangan','aroma'=>'Aroma','texture'=>'Tekstur','color'=>'Warna','taste'=>'Rasa'] as $field => $label)
             <tr>
                 <td>{{ $label }}</td>
                 @foreach ($report->details as $detail)
-                @php
-                $value = optional($detail->sensoryCheck)->$field;
-                @endphp
-                <td>{{ $value === null ? '-' : ($value ? 'OK' : 'Tidak OK') }}</td>
+                    @php
+                        $sens = optional($detail->sensoryCheck);
+                        $value = $sens->$field;
+                        $note = $sens->{$field . '_note'};
+                    @endphp
+
+                    <td>
+                        @if ($value === null)
+                            -
+                        @elseif ($value == 1)
+                            OK
+                        @else
+                            Tidak OK
+                            @if (!empty($note))
+                                <small class="text-danger">({{ $note }})</small>
+                            @endif
+                        @endif
+                    </td>
                 @endforeach
             </tr>
             @endforeach

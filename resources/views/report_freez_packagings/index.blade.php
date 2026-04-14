@@ -106,14 +106,14 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                <!-- @can('edit report')
+                                @can('edit report')
                                 <a href="{{ route('report_freez_packagings.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan -->
+                                @endcan
 
-                                @php
+                                <!-- @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                 @endphp
@@ -123,7 +123,7 @@
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                @endif
+                                @endif -->
 
                                 @can('delete report')
                                 <form action="{{ route('report_freez_packagings.destroy', $report->uuid) }}"
