@@ -143,7 +143,7 @@
                                 <div class="col-md-6">
                                     <label>Jumlah stik</label>
                                     <input type="number" name="details[{{ $i }}][stick_count]" class="form-control"
-                                        value="{{ $detail->trolley_count ?? '' }}">
+                                        value="{{ $detail->stick_count ?? '' }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label>Jumlah Trolley</label>
@@ -225,21 +225,35 @@
                             <div class="card mb-3">
                                 <div class="card-header">Pemeriksaan Sensorik</div>
                                 <div class="card-body row g-3">
-                                    @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Rasa'=>'taste','Tekstur'=>'texture','Warna'=>'color']
-                                    as $label => $field)
+                                    @foreach(['Kematangan'=>'ripeness','Aroma'=>'aroma','Rasa'=>'taste','Tekstur'=>'texture','Warna'=>'color'] as $label => $field)
+
+                                    @php
+                                        $sens = optional($detail?->sensoryCheck);
+                                        $value = $sens->$field;
+                                        $note = $sens->{$field . '_note'};
+                                    @endphp
+
                                     <div class="col-md-6">
                                         <label>{{ $label }}</label>
+
                                         <select name="details[{{ $i }}][sensory_check][{{ $field }}]"
-                                            class="form-control mb-2">
+                                            class="form-control mb-2 sensory-select"
+                                            data-target="note-{{ $i }}-{{ $field }}">
+
                                             <option value="">-- Pilih --</option>
-                                            <option value="1"
-                                                {{ optional($detail?->sensoryCheck)->$field == 1 ? 'selected' : '' }}>OK
-                                            </option>
-                                            <option value="0"
-                                                {{ optional($detail?->sensoryCheck)->$field == 0 ? 'selected' : '' }}>
-                                                Tidak OK</option>
+                                            <option value="1" {{ $value == 1 ? 'selected' : '' }}>OK</option>
+                                            <option value="0" {{ $value == 0 ? 'selected' : '' }}>Tidak OK</option>
                                         </select>
+
+                                        {{-- Input keterangan --}}
+                                        <input type="text"
+                                            name="details[{{ $i }}][sensory_check][{{ $field }}_note]"
+                                            id="note-{{ $i }}-{{ $field }}"
+                                            class="form-control note-field mb-3 {{ $value == 0 ? '' : 'd-none' }}"
+                                            value="{{ old("details.$i.sensory_check.$field"."_note", $note) }}"
+                                            placeholder="Masukkan keterangan...">
                                     </div>
+
                                     @endforeach
 
                                     <div class="col-md-6">
@@ -389,6 +403,22 @@
 //         }
 //     });
 // });
+</script>
+
+<script>
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('sensory-select')) {
+        const targetId = e.target.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+
+        if (e.target.value == '0') {
+            input.classList.remove('d-none');
+        } else {
+            input.classList.add('d-none');
+            input.value = '';
+        }
+    }
+});
 </script>
 
 @endsection

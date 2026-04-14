@@ -205,15 +205,23 @@
             <div class="card mb-3">
                 <div class="card-header">Pemeriksaan Sensorik</div>
                 <div class="card-body row g-3">
-                    @foreach(['Kematangan' => 'ripeness', 'Aroma' => 'aroma', 'Rasa' => 'taste', 'Tekstur'
-                    => 'texture', 'Warna' => 'color']
-                    as $label => $field)
+                    @foreach(['Kematangan' => 'ripeness', 'Aroma' => 'aroma', 'Rasa' => 'taste', 'Tekstur' => 'texture', 'Warna' => 'color'] as $label => $field)
                     <div class="col-md-6">
                         <label>{{ $label }}</label>
-                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]" class="form-control mb-2">
+
+                        <select name="details[{{ $i }}][sensory_check][{{ $field }}]"
+                            class="form-control mb-2 sensory-select"
+                            data-target="note-{{ $i }}-{{ $field }}">
+                            <option value="">-- Pilih --</option>
                             <option value="1">OK</option>
                             <option value="0">Tidak OK</option>
                         </select>
+
+                        <input type="text"
+                            name="details[{{ $i }}][sensory_check][{{ $field }}_note]"
+                            class="form-control d-none note-field mb-3"
+                            id="note-{{ $i }}-{{ $field }}"
+                            placeholder="Masukkan keterangan...">
                     </div>
                     @endforeach
 
@@ -480,5 +488,21 @@
 //         }
 //     });
 // });
+</script>
+
+<script>
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('sensory-select')) {
+        const targetId = e.target.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+
+        if (e.target.value == '0') {
+            input.classList.remove('d-none');
+        } else {
+            input.classList.add('d-none');
+            input.value = '';
+        }
+    }
+});
 </script>
 @endsection

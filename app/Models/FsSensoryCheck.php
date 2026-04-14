@@ -23,6 +23,11 @@ class FsSensoryCheck extends Model implements Auditable
         'texture',
         'color',
         'can_be_twisted',
+        'ripeness_note',
+        'aroma_note',
+        'taste_note',
+        'texture_note',
+        'color_note',
     ];
 
     protected $auditEvents = [
