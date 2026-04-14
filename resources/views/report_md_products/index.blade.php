@@ -15,6 +15,7 @@
                     style="gap: .4rem;">
 
                     {{-- pertahankan filter section --}}
+                    <input type="hidden" name="process_type" value="{{ $activeTab }}">
                     <input type="hidden" name="section" value="{{ request('section') }}">
 
                     <input
@@ -84,6 +85,23 @@
                 </ul>
             </div>
             @endif
+
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <a class="nav-link {{ is_null($activeTab) ? 'active' : '' }}"
+                    href="{{ route('report_md_products.index', array_merge(request()->except(['process_type', 'page']), [])) }}">
+                        Semua
+                    </a>
+                </li>
+                @foreach ($processTypes as $type)
+                <li class="nav-item">
+                    <a class="nav-link {{ $activeTab === $type ? 'active' : '' }}"
+                    href="{{ route('report_md_products.index', array_merge(request()->except(['process_type', 'page']), ['process_type' => $type])) }}">
+                        {{ $type }}
+                    </a>
+                </li>
+                @endforeach
+            </ul>
 
             <div class="table-responsive">
                 <table class="table table-bordered">
