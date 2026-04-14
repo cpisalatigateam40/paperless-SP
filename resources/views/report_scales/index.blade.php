@@ -108,7 +108,7 @@
                                 </a>
                                 @endcan -->
 
-                                @php
+                                <!-- @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                 @endphp
@@ -118,7 +118,11 @@
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                @endif
+                                @endif -->
+                                <a href="{{ route('report-scales.edit-next', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
                                 @can('delete report')
                                 <form action="{{ route('report-scales.destroy', $report->uuid) }}" method="POST"
