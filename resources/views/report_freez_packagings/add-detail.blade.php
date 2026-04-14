@@ -54,7 +54,7 @@ function addDetailRow() {
     <div class="row">
         <div class="col-md-6 mb-3">
             <label>Produk</label>
-            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})" required>
+            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})">
                 <option value="">- Pilih Produk -</option>
                 ${productOptions}
             </select>

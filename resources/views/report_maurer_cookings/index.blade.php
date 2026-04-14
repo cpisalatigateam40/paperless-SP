@@ -108,7 +108,7 @@
                                     class="btn btn-sm btn-warning" title="Update Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a> -->
-                                @php
+                                <!-- @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                 @endphp
@@ -118,7 +118,11 @@
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                @endif
+                                @endif -->
+                                <a href="{{ route('report_maurer_cookings.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
                                 @can('delete report')
                                 <form action="{{ route('report_maurer_cookings.destroy', $report->uuid) }}"
@@ -227,6 +231,12 @@
                                                 <td>Jumlah Trolly</td>
                                                 @foreach ($report->details as $detail)
                                                 <td>{{ $detail->trolley_count ?? '-' }}</td>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
+                                                <td>Jumlah Stick</td>
+                                                @foreach ($report->details as $detail)
+                                                <td>{{ $detail->stick_count ?? '-' }}</td>
                                                 @endforeach
                                             </tr>
 
@@ -366,16 +376,28 @@
                                                 <td></td>
                                                 @endforeach
                                             </tr>
-                                            @foreach(['ripeness'=>'Kematangan','aroma'=>'Aroma','texture'=>'Tekstur','color'=>'Warna',
-                                            'taste'=>'Rasa']
-                                            as $field => $label)
+                                            @foreach(['ripeness'=>'Kematangan','aroma'=>'Aroma','texture'=>'Tekstur','color'=>'Warna','taste'=>'Rasa'] as $field => $label)
                                             <tr>
                                                 <td>{{ $label }}</td>
                                                 @foreach ($report->details as $detail)
-                                                @php
-                                                $value = optional($detail->sensoryCheck)->$field;
-                                                @endphp
-                                                <td>{{ $value === null ? '-' : ($value ? 'OK' : 'Tidak OK') }}</td>
+                                                    @php
+                                                        $sens = optional($detail->sensoryCheck);
+                                                        $value = $sens->$field;
+                                                        $note = $sens->{$field . '_note'};
+                                                    @endphp
+
+                                                    <td>
+                                                        @if ($value === null)
+                                                            -
+                                                        @elseif ($value == 1)
+                                                            OK
+                                                        @else
+                                                            Tidak OK
+                                                            @if (!empty($note))
+                                                                <small class="text-danger">({{ $note }})</small>
+                                                            @endif
+                                                        @endif
+                                                    </td>
                                                 @endforeach
                                             </tr>
                                             @endforeach
@@ -473,6 +495,12 @@
                                                 <td>{{ $scd->avg_product_temp_after_exit ?? '-' }}</td>
                                                 @endforeach
                                             </tr>
+                                            <!-- <tr>
+                                                <td>Keterangan</td>
+                                                <td colspan="{{ $report->details->count() }}">
+                                                    {{ $report->notes ?? '-' }}
+                                                </td>
+                                            </tr> -->
                                         </tbody>
                                     </table>
                                 </div>

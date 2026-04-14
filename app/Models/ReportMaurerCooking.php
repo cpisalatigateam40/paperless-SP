@@ -24,7 +24,8 @@ class ReportMaurerCooking extends Model implements Auditable
         'created_by',
         'known_by',
         'approved_by',
-        'approved_at'
+        'approved_at',
+        'notes',
     ];
 
     protected $auditEvents = [

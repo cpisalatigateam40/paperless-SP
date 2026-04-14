@@ -115,6 +115,7 @@ class MaurerCookingStepsSheet implements WithEvents
                 $infoSub = [
                     'No','Tanggal','Shift','Time','QC','Group','Section',
                     'Nama Produk','Kode Prod','Kemasan (gr)','Jml Trolley',
+                    'Jumlah Stick', // ✅ TAMBAH INI
                     'Bisa Di-ulir','Mulai Proses','Selesai Proses',
                 ];
                 foreach ($infoSub as $idx => $label) {
@@ -183,6 +184,7 @@ class MaurerCookingStepsSheet implements WithEvents
                             $detail->production_code ?? '-',
                             $detail->packaging_weight ?? '-',
                             $detail->trolley_count ?? '-',
+                            $detail->stick_count ?? '-', // ✅ TAMBAH INI
                             $detail->can_be_twisted ? 'Bisa' : 'Tidak Bisa',
                             $tpt?->start_time ?? '-',
                             $tpt?->end_time ?? '-',

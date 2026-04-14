@@ -15,11 +15,11 @@
                     <div class="col-md-6">
                         <label>Tanggal</label>
                         <input type="date" name="date" class="form-control"
-                            value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                            value="{{ \Carbon\Carbon::today()->toDateString() }}" >
                     </div>
                     <div class="col-md-6">
                         <label>Shift</label>
-                        <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
+                        <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" >
                     </div>
                 </div>
 
@@ -75,7 +75,7 @@ function addDetailRow() {
     <div class="row mb-3 detail-row">
         <div class="col-md-6 mb-3">
             <label>Produk</label>
-            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})" required>
+            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})">
                 <option value="">- Pilih Produk -</option>
                 ${productOptions}
             </select>

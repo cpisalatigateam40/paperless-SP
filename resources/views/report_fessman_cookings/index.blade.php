@@ -104,11 +104,11 @@
                                 </button>
 
                                 {{-- Edit --}}
-                                <!-- <a href="{{ route('report_fessman_cookings.edit', $report->uuid) }}"
+                                <a href="{{ route('report_fessman_cookings.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Update Laporan">
                                     <i class="fa fa-pen"></i>
-                                </a> -->
-                                @php
+                                </a>
+                                <!-- @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                 @endphp
@@ -118,7 +118,7 @@
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                @endif
+                                @endif -->
 
                                 @can('delete report')
                                 <form action="{{ route('report_fessman_cookings.destroy', $report->uuid) }}"
