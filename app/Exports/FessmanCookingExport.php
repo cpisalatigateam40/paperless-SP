@@ -31,10 +31,8 @@ class FessmanCookingExport implements WithMultipleSheets
 class FessmanCookingStepsSheet implements WithEvents
 {
     const STEPS = [
-        'DRYINGI','DRYINGII','DRYINGIII','DRYINGIV','DRYINGV',
-        'DOOROPENINGSECTION1','PUTCOREPROBE','SMOKING',
-        'COOKINGI','COOKINGII','DRYING','STEAMSUCTION',
-        'DOOROPENINGSECTION1','REMOVECOREPROBE','FURTHERTRANSPORT',
+        'DRYINGI','DRYINGII','DRYINGIII','DRYINGIV','DRYINGV','PUTCOREPROBE','SMOKING',
+        'COOKINGI','COOKINGII','DRYING','STEAMSUCTION','REMOVECOREPROBE',
     ];
 
     const STEP_FIELDS = [
@@ -61,7 +59,7 @@ class FessmanCookingStepsSheet implements WithEvents
                 $sheet = $event->sheet->getDelegate();
                 $sheet->setTitle('Process Steps');
 
-                $infoColCount = 12;
+                $infoColCount = 13;
                 $stepColCount = count(self::STEPS) * count(self::STEP_FIELDS);
                 $sensoryCount = 6;
                 $totalCols    = $infoColCount + $stepColCount + $sensoryCount;
@@ -99,7 +97,7 @@ class FessmanCookingStepsSheet implements WithEvents
 
                 $infoSub = [
                     'No','Tanggal','Shift','Time','QC','Group','Section',
-                    'No Fessman','Nama Produk','Kode Prod','Kemasan (gr)','Jml Trolley',
+                    'No Fessman','Nama Produk','Kode Prod','Kemasan (gr)','Jml Trolley','Jumlah Stick',
                 ];
                 foreach ($infoSub as $idx => $label) {
                     $col = $this->colLetter($idx + 1);
@@ -161,6 +159,7 @@ class FessmanCookingStepsSheet implements WithEvents
                             $detail->production_code ?? '-',
                             $detail->packaging_weight ?? '-',
                             $detail->trolley_count ?? '-',
+                            $detail->stick_count ?? '-',
                         ];
                         foreach ($infoVals as $idx => $val) {
                             $sheet->setCellValue($this->colLetter($idx + 1) . $dataRow, $val);
