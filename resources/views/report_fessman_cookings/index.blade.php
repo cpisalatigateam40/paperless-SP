@@ -222,6 +222,12 @@
                                                 @endforeach
                                             </tr>
                                             <tr>
+                                                <td>Jumlah Stick</td>
+                                                @foreach ($report->details as $detail)
+                                                <td>{{ $detail->stick_count ?? '-' }}</td>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
                                                 <td>Jumlah Trolley</td>
                                                 @foreach ($report->details as $detail)
                                                 <td>{{ $detail->trolley_count ?? '-' }}</td>
@@ -249,11 +255,9 @@
                                             </tr>
                                             @php
                                             $steps = [
-                                            'DRYINGI','DRYINGII','DRYINGIII','DRYINGIV','DRYINGV','DOOR OPENING SECTION
-                                            1',
+                                            'DRYINGI','DRYINGII','DRYINGIII','DRYINGIV','DRYINGV',
                                             'PUT CORE PROBE','SMOKING','COOKINGI','COOKINGII', 'DRYING',
-                                            'STEAM SUCTION','DOOR OPENING SECTION 1','REMOVE CORE PROBE','FURTHER
-                                            TRANSPORT'
+                                            'STEAM SUCTION','REMOVE CORE PROBE',
                                             ];
                                             $fields = [
                                             ['db'=>'time_minutes','label'=>'Waktu (menit)'],
@@ -325,14 +329,33 @@
                                                 <td colspan="{{ 1 + $report->details->count() }}"
                                                     class="text-start fw-semibold">B. Sensorik</td>
                                             </tr>
-                                            @foreach(['ripeness'=>'Kematangan','aroma'=>'Aroma','taste'=>'Rasa','texture'=>'Tekstur','color'=>'Warna']
-                                            as $field=>$label)
+                                            @foreach(['ripeness'=>'Kematangan','aroma'=>'Aroma','taste'=>'Rasa','texture'=>'Tekstur','color'=>'Warna'] as $field => $label)
                                             <tr>
                                                 <td>{{ $label }}</td>
+
                                                 @foreach ($report->details as $detail)
-                                                @php $value = optional($detail->sensoryCheck)->$field; @endphp
-                                                <td>{{ $value === null ? '-' : ($value ? 'OK' : 'Tidak OK') }}</td>
+                                                    @php
+                                                        $sens = optional($detail->sensoryCheck);
+                                                        $value = $sens->$field;
+                                                        $note = $sens->{$field . '_note'};
+                                                    @endphp
+
+                                                    <td>
+                                                        @if ($value === null)
+                                                            -
+                                                        @elseif ($value == 1)
+                                                            OK
+                                                        @else
+                                                            <span class="text-danger">
+                                                                Tidak OK
+                                                                @if (!empty($note))
+                                                                    <small>({{ $note }})</small>
+                                                                @endif
+                                                            </span>
+                                                        @endif
+                                                    </td>
                                                 @endforeach
+
                                             </tr>
                                             @endforeach
                                             <tr>

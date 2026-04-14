@@ -205,6 +205,7 @@ class ReportFessmanCookingController extends Controller
                     'start_time' => $detailData['start_time'] ?? null,
                     'end_time' => $detailData['end_time'] ?? null,
                     'no_fessman' => $detailData['no_fessman'] ?? null,
+                    'stick_count' => $detailData['stick_count'] ?? null,
                 ]);
 
                 // Child: process_steps
@@ -232,11 +233,32 @@ class ReportFessmanCookingController extends Controller
                     FsSensoryCheck::create([
                         'uuid' => Str::uuid(),
                         'report_detail_uuid' => $detail->uuid,
+
                         'ripeness' => $detailData['sensory_check']['ripeness'] ?? null,
+                        'ripeness_note' => ($detailData['sensory_check']['ripeness'] ?? null) == 0
+                            ? ($detailData['sensory_check']['ripeness_note'] ?? null)
+                            : null,
+
                         'aroma' => $detailData['sensory_check']['aroma'] ?? null,
+                        'aroma_note' => ($detailData['sensory_check']['aroma'] ?? null) == 0
+                            ? ($detailData['sensory_check']['aroma_note'] ?? null)
+                            : null,
+
                         'taste' => $detailData['sensory_check']['taste'] ?? null,
+                        'taste_note' => ($detailData['sensory_check']['taste'] ?? null) == 0
+                            ? ($detailData['sensory_check']['taste_note'] ?? null)
+                            : null,
+
                         'texture' => $detailData['sensory_check']['texture'] ?? null,
+                        'texture_note' => ($detailData['sensory_check']['texture'] ?? null) == 0
+                            ? ($detailData['sensory_check']['texture_note'] ?? null)
+                            : null,
+
                         'color' => $detailData['sensory_check']['color'] ?? null,
+                        'color_note' => ($detailData['sensory_check']['color'] ?? null) == 0
+                            ? ($detailData['sensory_check']['color_note'] ?? null)
+                            : null,
+
                         'can_be_twisted' => $detailData['sensory_check']['can_be_twisted'] ?? null,
                     ]);
                 }
@@ -360,6 +382,7 @@ class ReportFessmanCookingController extends Controller
                     'start_time' => $detailData['start_time'] ?? null,
                     'end_time' => $detailData['end_time'] ?? null,
                     'no_fessman' => $detailData['no_fessman'] ?? null,
+                    'stick_count' => $detailData['stick_count'] ?? null,
                 ]);
 
                 // Process Steps
@@ -405,16 +428,37 @@ class ReportFessmanCookingController extends Controller
                     }
                 }
 
-                // Sensory Check
+                $detail->sensoryCheck()->delete();
                 if (!empty($detailData['sensory_check'])) {
                     FsSensoryCheck::create([
                         'uuid' => Str::uuid(),
                         'report_detail_uuid' => $detail->uuid,
+
                         'ripeness' => $detailData['sensory_check']['ripeness'] ?? null,
+                        'ripeness_note' => ($detailData['sensory_check']['ripeness'] ?? null) == 0
+                            ? ($detailData['sensory_check']['ripeness_note'] ?? null)
+                            : null,
+
                         'aroma' => $detailData['sensory_check']['aroma'] ?? null,
+                        'aroma_note' => ($detailData['sensory_check']['aroma'] ?? null) == 0
+                            ? ($detailData['sensory_check']['aroma_note'] ?? null)
+                            : null,
+
                         'taste' => $detailData['sensory_check']['taste'] ?? null,
+                        'taste_note' => ($detailData['sensory_check']['taste'] ?? null) == 0
+                            ? ($detailData['sensory_check']['taste_note'] ?? null)
+                            : null,
+
                         'texture' => $detailData['sensory_check']['texture'] ?? null,
+                        'texture_note' => ($detailData['sensory_check']['texture'] ?? null) == 0
+                            ? ($detailData['sensory_check']['texture_note'] ?? null)
+                            : null,
+
                         'color' => $detailData['sensory_check']['color'] ?? null,
+                        'color_note' => ($detailData['sensory_check']['color'] ?? null) == 0
+                            ? ($detailData['sensory_check']['color_note'] ?? null)
+                            : null,
+
                         'can_be_twisted' => $detailData['sensory_check']['can_be_twisted'] ?? null,
                     ]);
                 }
