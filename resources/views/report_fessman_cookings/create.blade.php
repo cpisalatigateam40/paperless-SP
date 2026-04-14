@@ -60,10 +60,6 @@
                     <label>Nomor Mesin Fessman</label>
                     <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control">
                 </div>
-            </div>
-
-            {{-- Info Produk --}}
-            <div class="row card-body" style="margin-top: -2rem;">
                 <div class="col-md-6">
                     <label>Nama Produk</label>
                     <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector select2-product"
@@ -76,6 +72,14 @@
                         @endforeach
                     </select>
                 </div>
+            </div>
+
+            {{-- Info Produk --}}
+            <div class="row card-body" style="margin-top: -2rem;">
+                <div class="col-md-6">
+                    <label>Untuk Kemasan (gr)</label>
+                    <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
+                </div>
                 <div class="col-md-6">
                     <label>Kode Produksi</label>
                     <input type="text" name="details[{{ $i }}][production_code]" class="form-control">
@@ -85,8 +89,8 @@
 
             <div class="row g-3 card-body" style="margin-top: -2rem;">
                 <div class="col-md-6">
-                    <label>Untuk Kemasan (gr)</label>
-                    <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
+                    <label>Jumlah Stik</label>
+                    <input type="number" name="details[{{ $i }}][stick_count]" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <label>Jumlah Trolley</label>
@@ -120,7 +124,6 @@
             'room_temp_2']],
             ['name' => 'DRYINGV', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
             'room_temp_2']],
-            ['name' => 'DOOR OPENING SECTION 1', 'fields' => []],
             ['name' => 'PUT CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2']],
             ['name' => 'SMOKING', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
             'room_temp_2']],
@@ -140,9 +143,7 @@
             'product_temp_2', 'actual_product_temp']
             ],
             ['name' => 'STEAM SUCTION', 'fields' => ['time_minutes_1', 'time_minutes_2']],
-            ['name' => 'DOOR OPENING SECTION 1', 'fields' => []],
             ['name' => 'REMOVE CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2']],
-            ['name' => 'FURTHER TRANSPORT', 'fields' => []],
             ];
             @endphp
 
@@ -156,8 +157,8 @@
                                     <th style="width:210px">Nama Step</th>
                                     <th style="width:120px">Waktu 1</th>
                                     <th style="width:120px">Waktu 2</th>
-                                    <th style="width:120px">Suhu Ruang 1</th>
-                                    <th style="width:120px">Suhu Ruang 2</th>
+                                    <th style="width:120px">Suhu Setting</th>
+                                    <th style="width:120px">Suhu Aktual</th>
                                     <th style="width:120px">Sirkulasi Udara 1</th>
                                     <th style="width:120px">Sirkulasi Udara 2</th>
                                     <th style="width:120px">Suhu Produk 1</th>

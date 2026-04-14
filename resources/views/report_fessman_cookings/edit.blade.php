@@ -51,7 +51,6 @@
                 ['name'=>'DRYINGIII','fields'=>['time_minutes_1','time_minutes_2','room_temp_1','room_temp_2']],
                 ['name'=>'DRYINGIV','fields'=>['time_minutes_1','time_minutes_2','room_temp_1','room_temp_2']],
                 ['name'=>'DRYINGV','fields'=>['time_minutes_1','time_minutes_2','room_temp_1','room_temp_2']],
-                ['name'=>'DOOR OPENING SECTION 1','fields'=>[]],
                 ['name'=>'PUT CORE PROBE','fields'=>['time_minutes_1','time_minutes_2']],
                 ['name'=>'SMOKING','fields'=>['time_minutes_1','time_minutes_2','room_temp_1','room_temp_2']],
                 [
@@ -70,9 +69,7 @@
                 'product_temp_2', 'actual_product_temp']
                 ],
                 ['name'=>'STEAM SUCTION','fields'=>['time_minutes_1','time_minutes_2']],
-                ['name'=>'DOOR OPENING SECTION 1','fields'=>[]],
                 ['name'=>'REMOVE CORE PROBE','fields'=>['time_minutes_1','time_minutes_2']],
-                ['name'=>'FURTHER TRANSPORT','fields'=>[]],
                 ];
 
                 $coolingSteps = [
@@ -108,16 +105,12 @@
                     <div id="produk{{ $i }}" class="accordion-collapse collapse {{ $isOpen ? 'show' : '' }}"
                         data-bs-parent="#produkAccordion">
                         <div class="accordion-body card shadow">
-                            <div class="row card-body" >
+                            <div class="card-body row g-3 mt-2">
                                 <div class="col-md-6">
                                     <label>Nomor Mesin Fessman</label>
                                     <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control"
                                         value="{{ $detail->no_fessman ?? '' }}">
                                 </div>
-                            </div>
-
-                            {{-- Info Produk --}}
-                            <div class="row g-3 card-body mb-3" style="margin-top: -3rem;">
                                 <div class="col-md-6">
                                     <label>Nama Produk</label>
                                     <select name="details[{{ $i }}][product_uuid]"
@@ -131,21 +124,34 @@
                                         @endforeach
                                     </select>
                                 </div>
+                            </div>
+                            <div class="card-body row g-3" style="margin-top: -3rem;">
+                                <div class="col-md-6">
+                                    <label>Untuk Kemasan (gr)</label>
+                                    <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control"
+                                        value="{{ $detail->packaging_weight ?? '' }}">
+                                </div>
                                 <div class="col-md-6">
                                     <label>Kode Produksi</label>
                                     <input type="text" name="details[{{ $i }}][production_code]" class="form-control"
                                         value="{{ $detail->production_code ?? '' }}">
                                 </div>
-                                <div class="col-md-6 mt-3">
-                                    <label>Untuk Kemasan (gr)</label>
-                                    <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control"
-                                        value="{{ $detail->packaging_weight ?? '' }}">
+                            </div>
+
+                            {{-- Info Produk --}}
+                            <div class="row g-3 card-body mb-3" style="margin-top: -3rem;">
+                                <div class="col-md-6">
+                                    <label>Jumlah stik</label>
+                                    <input type="number" name="details[{{ $i }}][stick_count]" class="form-control"
+                                        value="{{ $detail->trolley_count ?? '' }}">
                                 </div>
-                                <div class="col-md-6 mt-3">
+                                <div class="col-md-6">
                                     <label>Jumlah Trolley</label>
                                     <input type="number" name="details[{{ $i }}][trolley_count]" class="form-control"
                                         value="{{ $detail->trolley_count ?? '' }}">
                                 </div>
+                            </div>
+                            <div class="row g-3 card-body mb-3" style="margin-top: -5rem;">
                                 <div class="col-md-6 mt-3">
                                     <label>Jam Mulai</label>
                                     <input type="time" name="details[{{ $i }}][start_time]" class="form-control"
@@ -156,7 +162,6 @@
                                     <input type="time" name="details[{{ $i }}][end_time]" class="form-control"
                                         value="{{ $detail->end_time ?? '' }}">
                                 </div>
-
                             </div>
 
                             {{-- Process Steps --}}
