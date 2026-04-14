@@ -82,7 +82,7 @@
                                 value="{{ $detail->no_fessman ?? '' }}">
                         </div>
                     @endif
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Nama Produk</label>
                         <select name="details[{{ $i }}][product_uuid]"
                             class="form-control product-selector select2-product" data-index="{{ $i }}">
@@ -100,27 +100,27 @@
                         <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control"
                             value="{{ $detail->packaging_weight ?? '' }}">
                     </div> -->
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Kode Produksi</label>
                         <input type="text" name="details[{{ $i }}][production_code]" class="form-control"
                             value="{{ $detail->production_code ?? '' }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Jumlah Stik</label>
                         <input type="number" name="details[{{ $i }}][stick_count]" class="form-control"
                             value="{{ $detail->stick_count ?? '' }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Jumlah Trolley</label>
                         <input type="number" name="details[{{ $i }}][trolley_count]" class="form-control"
                             value="{{ $detail->trolley_count ?? '' }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Jam Mulai</label>
                         <input type="time" name="details[{{ $i }}][start_time]" class="form-control"
                             value="{{ $detail->start_time ?? '' }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Jam Selesai</label>
                         <input type="time" name="details[{{ $i }}][end_time]" class="form-control"
                             value="{{ $detail->end_time ?? '' }}">

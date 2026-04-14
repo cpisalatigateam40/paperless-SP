@@ -74,20 +74,16 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
-
-            {{-- Info Produk --}}
-            <div class="row card-body" style="margin-top: -2rem;">
-                <!-- <div class="col-md-6">
-                    <label>Untuk Kemasan (gr)</label>
-                    <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
-                </div> -->
                 <div class="col-md-6">
                     <label>Kode Produksi</label>
                     <input type="text" name="details[{{ $i }}][production_code]" class="form-control">
                 </div>
-
             </div>
+
+            <!-- <div class="col-md-6">
+                <label>Untuk Kemasan (gr)</label>
+                <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
+            </div> -->
 
             <div class="row g-3 card-body" style="margin-top: -2rem;">
                 <div class="col-md-6">
