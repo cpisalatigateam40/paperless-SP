@@ -75,11 +75,13 @@
 
                 {{-- Info Produk --}}
                 <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label>Nomor Mesin Fessman</label>
-                        <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control"
-                            value="{{ $detail->no_fessman ?? '' }}">
-                    </div>
+                    @if(in_array(auth()->user()->area->name, ['Bandung', 'Ngoro - Mojokerto']))
+                        <div class="col-md-6">
+                            <label>Nomor Mesin Fessman</label>
+                            <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control"
+                                value="{{ $detail->no_fessman ?? '' }}">
+                        </div>
+                    @endif
                     <div class="col-md-6">
                         <label>Nama Produk</label>
                         <select name="details[{{ $i }}][product_uuid]"
@@ -93,11 +95,11 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <label>Untuk Kemasan (gr)</label>
                         <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control"
                             value="{{ $detail->packaging_weight ?? '' }}">
-                    </div>
+                    </div> -->
                     <div class="col-md-6">
                         <label>Kode Produksi</label>
                         <input type="text" name="details[{{ $i }}][production_code]" class="form-control"

@@ -56,10 +56,12 @@
 
         <div class="accordion-body card shadow">
             <div class="row card-body">
-                <div class="col-md-6">
-                    <label>Nomor Mesin Fessman</label>
-                    <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control">
-                </div>
+                @if(in_array(auth()->user()->area->name, ['Bandung', 'Ngoro - Mojokerto']))
+                    <div class="col-md-6">
+                        <label>Nomor Mesin Fessman</label>
+                        <input type="text" name="details[{{ $i }}][no_fessman]" class="form-control">
+                    </div>
+                @endif
                 <div class="col-md-6">
                     <label>Nama Produk</label>
                     <select name="details[{{ $i }}][product_uuid]" class="form-control product-selector select2-product"
@@ -76,10 +78,10 @@
 
             {{-- Info Produk --}}
             <div class="row card-body" style="margin-top: -2rem;">
-                <div class="col-md-6">
+                <!-- <div class="col-md-6">
                     <label>Untuk Kemasan (gr)</label>
                     <input type="number" name="details[{{ $i }}][packaging_weight]" class="form-control">
-                </div>
+                </div> -->
                 <div class="col-md-6">
                     <label>Kode Produksi</label>
                     <input type="text" name="details[{{ $i }}][production_code]" class="form-control">

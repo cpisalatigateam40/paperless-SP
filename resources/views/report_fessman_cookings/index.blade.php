@@ -190,11 +190,14 @@
                                 <div class="table-responsive">
                                     <table class="table table-bordered small">
                                         <tbody>
+                                            @if(in_array(auth()->user()->area->name, ['Bandung', 'Ngoro - Mojokerto']))
                                             <tr>
                                                 <td>Nomor Mesin Fessman</td>
                                                 @foreach ($report->details as $detail)
                                                 <td>{{ $detail->no_fessman ?? '-' }}</td>
                                                 @endforeach
+                                            </tr>
+                                            @endif
                                             </tr>
                                             {{-- Produk --}}
                                             <tr>
@@ -215,12 +218,12 @@
                                                 <td>{{ $detail->production_code ?? '-' }}</td>
                                                 @endforeach
                                             </tr>
-                                            <tr>
+                                            <!-- <tr>
                                                 <td>Untuk Kemasan (gr)</td>
                                                 @foreach ($report->details as $detail)
                                                 <td>{{ $detail->packaging_weight ?? '-' }}</td>
                                                 @endforeach
-                                            </tr>
+                                            </tr> -->
                                             <tr>
                                                 <td>Jumlah Stick</td>
                                                 @foreach ($report->details as $detail)
