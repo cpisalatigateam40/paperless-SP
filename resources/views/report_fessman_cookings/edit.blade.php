@@ -173,14 +173,14 @@
                                             <thead class="text-center">
                                                 <tr>
                                                     <th style="width:210px">Nama Step</th>
-                                                    <th style="width:120px">Waktu 1</th>
-                                                    <th style="width:120px">Waktu 2</th>
-                                                    <th style="width:120px">Suhu Ruang 1</th>
-                                                    <th style="width:120px">Suhu Ruang 2</th>
+                                                    <th style="width:120px">Waktu Setting</th>
+                                                    <th style="width:120px">Waktu Aktual</th>
+                                                    <th style="width:120px">Suhu Ruang Setting</th>
+                                                    <th style="width:120px">Suhu Ruang Aktual</th>
                                                     <th style="width:120px">Sirkulasi Udara 1</th>
                                                     <th style="width:120px">Sirkulasi Udara 2</th>
-                                                    <th style="width:120px">Suhu Produk 1</th>
-                                                    <th style="width:120px">Suhu Produk 2</th>
+                                                    <th style="width:120px">Suhu Produk Setting</th>
+                                                    <th style="width:120px">Suhu Produk Aktual</th>
                                                     <th style="width:120px">Suhu Aktual Produk</th>
                                                 </tr>
                                             </thead>
