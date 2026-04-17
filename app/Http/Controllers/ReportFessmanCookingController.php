@@ -565,9 +565,7 @@ class ReportFessmanCookingController extends Controller
                 'details.coolingDowns',
                 'details.sensoryCheck',
             ])
-            ->when(auth()->user()->hasRole('QC Inspector'), fn($q) =>
-                $q->where('area_uuid', auth()->user()->area_uuid)
-            )
+            ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')
             ->orderBy('shift')
