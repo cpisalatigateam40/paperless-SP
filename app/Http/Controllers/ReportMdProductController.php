@@ -17,9 +17,13 @@ use App\Imports\MdProductImport;
 use App\Exports\MdProductTemplateExport;
 use App\Exports\MdProductExport;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportMdProductController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportMdProduct::class;
+
     public function index(Request $request)
     {
         // 🔹 Ambil semua process_type yang tersedia untuk tab
@@ -115,7 +119,9 @@ class ReportMdProductController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_md_products.create', compact('products'));
     }
 
@@ -189,7 +195,9 @@ class ReportMdProductController extends Controller
     public function addDetailForm($uuid)
     {
         $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
-        $products = \App\Models\Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_md_products.add-detail', compact('report', 'products'));
     }
 
@@ -302,7 +310,9 @@ class ReportMdProductController extends Controller
             ->where('uuid', $uuid)
             ->firstOrFail();
 
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         return view('report_md_products.edit', compact('report', 'products'));
     }
 

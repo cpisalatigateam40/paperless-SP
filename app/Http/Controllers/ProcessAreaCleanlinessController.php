@@ -16,10 +16,13 @@ use App\Models\ItemFollowup;
 use App\Exports\ProcessAreaCleanlinessExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ProcessAreaCleanlinessController extends Controller
 {
     use HasRoles;
+    use HasBulkApproval;
+    protected string $bulkModel = ReportProcessAreaCleanliness::class;
 
     public function index(Request $request)
     {

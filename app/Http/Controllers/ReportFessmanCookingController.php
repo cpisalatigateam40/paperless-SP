@@ -20,9 +20,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\FessmanCookingExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportFessmanCookingController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportFessmanCooking::class;
+    
     public function index(Request $request)
     {
         $query = ReportFessmanCooking::with([
@@ -129,7 +133,9 @@ class ReportFessmanCookingController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $sections = Section::all();
         $areas = Area::all();
 
@@ -187,6 +193,8 @@ class ReportFessmanCookingController extends Controller
                 'date' => $request['date'],
                 'shift' => $shift,
                 'created_by' => Auth::user()->name,
+                'section_uuid' => $request['section_uuid'] ?? null,
+                'notes' => $request['notes'] ?? null,
             ]);
 
             foreach ($request['details'] as $detailData) {
@@ -206,6 +214,7 @@ class ReportFessmanCookingController extends Controller
                     'end_time' => $detailData['end_time'] ?? null,
                     'no_fessman' => $detailData['no_fessman'] ?? null,
                     'stick_count' => $detailData['stick_count'] ?? null,
+                    'gramase' => $detailData['gramase'] ?? null,
                 ]);
 
                 // Child: process_steps
@@ -224,6 +233,8 @@ class ReportFessmanCookingController extends Controller
                             'product_temp_1' => $step['product_temp_1'] ?? null,
                             'product_temp_2' => $step['product_temp_2'] ?? null,
                             'actual_product_temp' => $step['actual_product_temp'] ?? null,
+                            'rh_setting' => $step['rh_setting'] ?? null,
+                            'rh_actual' => $step['rh_actual'] ?? null,
                         ]);
                     }
                 }
@@ -311,7 +322,9 @@ class ReportFessmanCookingController extends Controller
             'details.sensoryCheck'
         ])->where('uuid', $uuid)->firstOrFail();
 
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         $sections = Section::all();
 
         $fessmanStandards = FessmanStandard::with('processStep')->get();
@@ -357,6 +370,7 @@ class ReportFessmanCookingController extends Controller
                 'date' => $request->date,
                 'shift' => $request->shift,
                 'section_uuid' => $request->section_uuid,
+                'notes' => $request->notes,
             ]);
 
             // Hapus detail lama
@@ -383,6 +397,7 @@ class ReportFessmanCookingController extends Controller
                     'end_time' => $detailData['end_time'] ?? null,
                     'no_fessman' => $detailData['no_fessman'] ?? null,
                     'stick_count' => $detailData['stick_count'] ?? null,
+                    'gramase' => $detailData['gramase'] ?? null,
                 ]);
 
                 // Process Steps
@@ -401,6 +416,8 @@ class ReportFessmanCookingController extends Controller
                             'product_temp_1' => $step['product_temp_1'] ?? null,
                             'product_temp_2' => $step['product_temp_2'] ?? null,
                             'actual_product_temp' => $step['actual_product_temp'] ?? null,
+                            'rh_setting' => $step['rh_setting'] ?? null,
+                            'rh_actual' => $step['rh_actual'] ?? null,
                         ]);
                     }
                 }

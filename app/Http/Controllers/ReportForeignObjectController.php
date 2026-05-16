@@ -17,9 +17,13 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\ForeignObjectExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportForeignObjectController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportForeignObject::class;
+
     public function index(Request $request)
     {
         $reports = ReportForeignObject::with([
@@ -95,7 +99,9 @@ class ReportForeignObjectController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_foreign_objects.create', compact('areas', 'sections', 'products'));
     }
@@ -198,6 +204,8 @@ class ReportForeignObjectController extends Controller
                 'qc_paraf' => $qcParafPath,
                 'production_paraf' => $productionParafPath,
                 'engineering_paraf' => $engineeringParafPath,
+                'production_code' => $detail['production_code'] ?? null,
+                'gramase' => $detail['gramase'] ?? null,
             ]);
         }
 
@@ -207,7 +215,9 @@ class ReportForeignObjectController extends Controller
     public function createDetail($uuid)
     {
         $report = ReportForeignObject::where('uuid', $uuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_foreign_objects.add_detail', compact('report', 'products'));
     }
@@ -267,6 +277,7 @@ class ReportForeignObjectController extends Controller
             'qc_paraf' => $qcParafPath,
             'production_paraf' => $productionParafPath,
             'engineering_paraf' => $engineeringParafPath,
+            'gramase' => $request->gramase,
         ]);
 
         return redirect()->route('report-foreign-objects.index')->with('success', 'Detail berhasil ditambahkan');
@@ -364,7 +375,9 @@ class ReportForeignObjectController extends Controller
         $report = ReportForeignObject::with('details')->where('uuid', $uuid)->firstOrFail();
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         return view('report_foreign_objects.edit', compact('report', 'areas', 'sections', 'products'));
     }
@@ -430,6 +443,7 @@ class ReportForeignObjectController extends Controller
                     'qc_paraf' => $qcParafPath,
                     'production_paraf' => $productionParafPath,
                     'engineering_paraf' => $engineeringParafPath,
+                    'gramase' => $detail['gramase'] ?? null,
                 ]);
             }
 

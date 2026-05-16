@@ -14,7 +14,7 @@ class DetailWaterbath extends Model implements Auditable
     protected $table = 'detail_waterbaths';
     protected $fillable = [
         'uuid', 'report_uuid', 'product_uuid',
-        'batch_code', 'amount', 'unit', 'note'
+        'batch_code', 'amount', 'unit', 'note', 'gramase'
     ];
 
     protected $auditEvents = [

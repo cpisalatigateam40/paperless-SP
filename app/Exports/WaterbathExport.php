@@ -146,7 +146,10 @@ class WaterbathExport implements WithEvents, WithTitle
                         $sheet->setCellValue("E{$dataRow}", $shiftGroup ?: '-');
                         $sheet->setCellValue("F{$dataRow}", $det?->note ?? '-');
                         // Detail produk
-                        $sheet->setCellValue("G{$dataRow}", $det?->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$dataRow}",
+                            trim(($det->product->product_name ?? '-') . ' - ' . ($det->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$dataRow}", $det?->batch_code ?? '-');
                         $sheet->setCellValue("I{$dataRow}", $det?->amount ?? '-');
                         $sheet->setCellValue("J{$dataRow}", $det?->unit ?? '-');

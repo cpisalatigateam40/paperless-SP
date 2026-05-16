@@ -31,33 +31,49 @@
                     @endif
                 </form>
 
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-rm-arrival.bulk-known"
+                    count-route="report-rm-arrival.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-rm-arrival.bulk-approve"
+                    count-route="report-rm-arrival.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
                 <div class="vr"></div>
-
-                <!-- @can('import report')
-                <form action="{{ route('report_rm_arrivals.import') }}" method="POST"
-                    enctype="multipart/form-data" class="d-flex align-items-center gap-1">
-                    @csrf
-                    <select name="section_uuid" class="form-select form-control-sm form-control mr-2" required>
-                        <option value="">-- Section --</option>
-                        @foreach($sections as $section)
-                            <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
-                        @endforeach
-                    </select>
-                    <label class="btn btn-sm btn-outline-secondary mb-0" style="cursor:pointer;">
-                        <i class="bi bi-upload"></i> Import
-                        <input type="file" name="file" required hidden
-                            onchange="this.closest('form').querySelector('#btnImport').click()">
-                    </label>
-                    <button id="btnImport" type="submit" class="d-none"></button>
-                </form>
-
-                {{-- DOWNLOAD TEMPLATE --}}
-                <a href="{{ route('report_rm_arrivals.template') }}" class="btn btn-sm btn-outline-success">
-                    <i class="bi bi-download"></i> Template
-                </a>
-                @endcan -->
-
-                <!-- <div class="vr"></div> -->
 
                 {{-- Tombol Export Excel --}}
                 <x-export-excel-modal 

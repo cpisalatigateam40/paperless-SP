@@ -41,6 +41,48 @@
 
                 </form>
 
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-maurer-cookings.bulk-known"
+                    count-route="report-maurer-cookings.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-maurer-cookings.bulk-approve"
+                    count-route="report-maurer-cookings.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
                 <x-export-excel-modal 
                     :route="route('report_maurer_cookings.export')" 
                     title="Verifikasi Pemasakan Maurer" />
@@ -212,7 +254,9 @@
                                                 <td>Gramase</td>
                                                 @foreach ($report->details as $detail)
                                                 <td>
-                                                    {{ $detail->product->nett_weight ?? '-' }} g</td>
+                                                    {{ !empty($detail->packaging_weight) 
+                                                        ? $detail->packaging_weight 
+                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
                                                 @endforeach
                                             </tr>
                                             <tr>
@@ -224,7 +268,7 @@
                                             <tr>
                                                 <td>Untuk Kemasan (gr)</td>
                                                 @foreach ($report->details as $detail)
-                                                <td>{{ $detail->packaging_weight ?? '-' }}</td>
+                                                <td>{{ $detail->packaging_weight ?? '-' }} g</td>
                                                 @endforeach
                                             </tr>
                                             <tr>
@@ -495,12 +539,12 @@
                                                 <td>{{ $scd->avg_product_temp_after_exit ?? '-' }}</td>
                                                 @endforeach
                                             </tr>
-                                            <!-- <tr>
+                                            <tr>
                                                 <td>Keterangan</td>
                                                 <td colspan="{{ $report->details->count() }}">
                                                     {{ $report->notes ?? '-' }}
                                                 </td>
-                                            </tr> -->
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

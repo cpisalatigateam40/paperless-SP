@@ -77,14 +77,23 @@ class WeightStufferExport implements WithEvents, WithTitle
                     foreach ($report->details as $detail) {
                         // Tentukan mesin & ambil data mesin
                         $machine = null;
+                        $machineName = '-';
+
                         if ($detail->townsend) {
-                            $machine     = $detail->townsend;
+                            $machine = $detail->townsend;
                             $machineName = 'Townsend';
                         } elseif ($detail->hitech) {
-                            $machine     = $detail->hitech;
+                            $machine = $detail->hitech;
                             $machineName = 'Hitech';
-                        } else {
-                            $machineName = '-';
+                        } elseif ($detail->vemag) {
+                            $machine = $detail->vemag;
+                            $machineName = 'Vemag';
+                        } elseif ($detail->vemag2) {
+                            $machine = $detail->vemag2;
+                            $machineName = 'Vemag 2';
+                        } elseif ($detail->handtmann) {
+                            $machine = $detail->handtmann;
+                            $machineName = 'Handtmann';
                         }
 
                         // Aktual berat: gabungkan semua WeightStufferMeasurement
@@ -110,7 +119,10 @@ class WeightStufferExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $detail->time ?? '-');
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$row}",
+                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$row}", $detail->production_code ?? '-');
                         $sheet->setCellValue("I{$row}", $machineName);
                         $sheet->setCellValue("J{$row}", $machine?->stuffer_speed ?? '-');

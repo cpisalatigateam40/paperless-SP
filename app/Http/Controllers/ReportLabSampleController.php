@@ -16,9 +16,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\LabSampleExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportLabSampleController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportLabSample::class;
+
     public function index(Request $request)
     {
         $query = ReportLabSample::with(['area', 'details.product'])

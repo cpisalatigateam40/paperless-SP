@@ -110,7 +110,10 @@ class SiomayExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $time);
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $report->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$row}",
+                            trim(($report->product->product_name ?? '-') . ' - ' . ($report->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$row}", $report->production_code ?? '-');
                         $sheet->setCellValue("I{$row}", $report->start_time ?? '-');
                         $sheet->setCellValue("J{$row}", $report->end_time ?? '-');

@@ -24,6 +24,7 @@ class DetailFreezPackaging extends Model implements Auditable
         'best_before',
         'corrective_action',
         'verif_after',
+        'gramase'
     ];
 
     protected $auditEvents = [

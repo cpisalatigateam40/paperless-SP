@@ -24,9 +24,30 @@
 
         <div id="productDetails">
             @foreach($report->details as $i => $detail)
-            @php
+            <!-- @php
             $machineType = $detail->townsend ? 'townsend' : ($detail->hitech ? 'hitech' : '');
             $machineData = $machineType === 'townsend' ? $detail->townsend : $detail->hitech;
+            @endphp -->
+            @php
+                if ($detail->townsend) {
+                    $machineType = 'townsend';
+                    $machineData = $detail->townsend;
+                } elseif ($detail->hitech) {
+                    $machineType = 'hitech';
+                    $machineData = $detail->hitech;
+                } elseif ($detail->vemag) {
+                    $machineType = 'vemag';
+                    $machineData = $detail->vemag;
+                } elseif ($detail->vemag2) {
+                    $machineType = 'vemag2';
+                    $machineData = $detail->vemag2;
+                } elseif ($detail->handtmann) {
+                    $machineType = 'handtmann';
+                    $machineData = $detail->handtmann;
+                } else {
+                    $machineType = '';
+                    $machineData = null;
+                }
             @endphp
 
             <div class="card detail-block mb-3">
@@ -37,7 +58,7 @@
 
                     {{-- DATA PRODUK --}}
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Nama Produk</label>
                             <select name="details[{{ $i }}][product_uuid]"
                                 class="form-select form-control select2-product" required>
@@ -54,19 +75,29 @@
                                     data-diameter="{{ $standard->diameter }}"
                                     data-weight-standard="{{ $standard->weight_max }}"
                                     @endif>
-                                    {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                    {{ $product->product_name }}
                                 </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gramase</label>
+                            <input type="number" 
+                                step="0.01" 
+                                name="details[{{ $i }}][gramase]" 
+                                class="form-control"
+                                value="{{ $detail->gramase }}"
+                                placeholder="Masukkan gramase">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
                             <label>Kode Produksi</label>
                             <input type="text" name="details[{{ $i }}][production_code]" class="form-control"
                                 value="{{ $detail->production_code }}" required>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Waktu Proses</label>
                             <input type="time" name="details[{{ $i }}][time]" class="form-control"
                                 value="{{ $detail->time }}" required>
@@ -75,21 +106,37 @@
 
                     {{-- MESIN --}}
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Nama Mesin</label>
                             <select name="details[{{ $i }}][machine]" class="form-select form-control" required>
                                 <option value="">-- Pilih Mesin --</option>
-                                <option value="townsend" {{ $machineType === 'townsend' ? 'selected' : '' }}>Townsend
+                                <option value="townsend" {{ $machineType === 'townsend' ? 'selected' : '' }}>
+                                    Townsend
                                 </option>
-                                <option value="hitech" {{ $machineType === 'hitech' ? 'selected' : '' }}>Hitech</option>
+
+                                <option value="hitech" {{ $machineType === 'hitech' ? 'selected' : '' }}>
+                                    Hitech
+                                </option>
+
+                                <option value="vemag" {{ $machineType === 'vemag' ? 'selected' : '' }}>
+                                    Vemag
+                                </option>
+
+                                <option value="vemag2" {{ $machineType === 'vemag2' ? 'selected' : '' }}>
+                                    Vemag 2
+                                </option>
+
+                                <option value="handtmann" {{ $machineType === 'handtmann' ? 'selected' : '' }}>
+                                    Handtmann
+                                </option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Kecepatan Stuffer (rpm)</label>
                             <input type="number" name="details[{{ $i }}][stuffer_speed]" class="form-control"
                                 value="{{ $machineData->stuffer_speed ?? '' }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Catatan</label>
                             <input type="text" name="details[{{ $i }}][notes]" class="form-control"
                                 value="{{ $machineData->notes ?? '' }}">

@@ -48,10 +48,14 @@
                                         required>
                                         <option value="">Pilih Produk</option>
                                         @foreach($products as $product)
-                                        <option value="{{ $product->uuid }}">{{ $product->product_name }} -
-                                            {{ $product->nett_weight }} g</option>
+                                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Gramase</label>
+                                    <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
+                                        placeholder="Masukkan gramase" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Kode Produksi</label>

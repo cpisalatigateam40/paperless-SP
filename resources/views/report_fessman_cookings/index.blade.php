@@ -40,6 +40,48 @@
 
                 </form>
 
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-fessman-cookings.bulk-known"
+                    count-route="report-fessman-cookings.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-fessman-cookings.bulk-approve"
+                    count-route="report-fessman-cookings.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
                 <x-export-excel-modal 
                     :route="route('report_fessman_cookings.export')" 
                     title="Verifikasi Pemasakan Fessman" />
@@ -209,7 +251,9 @@
                                             <tr>
                                                 <td>Gramase</td>
                                                 @foreach ($report->details as $detail)
-                                                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
+                                                <td>{{ !empty($detail->gramase) 
+                                                        ? $detail->gramase 
+                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
                                                 @endforeach
                                             </tr>
                                             <tr>
@@ -225,15 +269,15 @@
                                                 @endforeach
                                             </tr> -->
                                             <tr>
-                                                <td>Jumlah Stick</td>
-                                                @foreach ($report->details as $detail)
-                                                <td>{{ $detail->stick_count ?? '-' }}</td>
-                                                @endforeach
-                                            </tr>
-                                            <tr>
                                                 <td>Jumlah Trolley</td>
                                                 @foreach ($report->details as $detail)
                                                 <td>{{ $detail->trolley_count ?? '-' }}</td>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
+                                                <td>Jumlah Stick</td>
+                                                @foreach ($report->details as $detail)
+                                                <td>{{ $detail->stick_count ?? '-' }}</td>
                                                 @endforeach
                                             </tr>
                                             <tr>
@@ -265,6 +309,7 @@
                                             $fields = [
                                             ['db'=>'time_minutes','label'=>'Waktu (menit)'],
                                             ['db'=>'room_temp','label'=>'Suhu Ruang (°C)'],
+                                            ['db'=>'rh','label'=>'RH (%)'],
                                             ['db'=>'air_circulation','label'=>'Sirkulasi Udara'],
                                             ['db'=>'product_temp','label'=>'Suhu Produk (°C)'],
                                             ['db'=>'actual_product_temp','label'=>'Suhu Aktual Produk']
@@ -278,7 +323,7 @@
                                                 <td></td>
                                                 @endforeach
                                             </tr>
-                                            @foreach ($fields as $field)
+                                            <!-- @foreach ($fields as $field)
                                             @php
                                             $hasAnyValue = false;
                                             foreach ($report->details as $detail) {
@@ -325,7 +370,117 @@
                                             </tr>
                                             @endif
                                             @endforeach
-                                            @endforeach
+                                            @endforeach -->
+@foreach ($steps as $stepName)
+
+<tr style="background-color: seashell;">
+    <td>{{ $stepName }}</td>
+    @foreach ($report->details as $detail)
+        <td></td>
+    @endforeach
+</tr>
+
+@foreach ($fields as $field)
+
+@php
+$hasAnyValue = false;
+
+foreach ($report->details as $detail) {
+
+    $stepData = optional($detail?->processSteps)->first(function($s) use($stepName) {
+        return strcasecmp(trim($s->step_name), trim($stepName)) === 0;
+    });
+
+    // actual product temp
+    if ($field['db'] == 'actual_product_temp') {
+
+        if (
+            $stepData &&
+            $stepData->actual_product_temp !== null &&
+            $stepData->actual_product_temp !== ''
+        ) {
+            $hasAnyValue = true;
+            break;
+        }
+
+    // RH
+    } elseif ($field['db'] == 'rh') {
+
+        if (
+            ($stepData->rh_setting ?? null) !== null ||
+            ($stepData->rh_actual ?? null) !== null
+        ) {
+            $hasAnyValue = true;
+            break;
+        }
+
+    // normal field
+    } else {
+
+        $f1 = $field['db'].'_1';
+        $f2 = $field['db'].'_2';
+
+        if (
+            ($stepData->$f1 ?? null) !== null ||
+            ($stepData->$f2 ?? null) !== null
+        ) {
+            $hasAnyValue = true;
+            break;
+        }
+    }
+}
+@endphp
+
+@if($hasAnyValue)
+
+<tr>
+    <td>{{ $field['label'] }}</td>
+
+    @foreach ($report->details as $detail)
+
+    @php
+    $stepData = optional($detail?->processSteps)->first(function($s) use($stepName) {
+        return strcasecmp(trim($s->step_name), trim($stepName)) === 0;
+    });
+
+    $v1 = $stepData[$field['db'].'_1'] ?? '-';
+    $v2 = $stepData[$field['db'].'_2'] ?? '-';
+    $actual = $stepData['actual_product_temp'] ?? '-';
+    @endphp
+
+    {{-- ACTUAL PRODUCT TEMP --}}
+    @if($field['db'] == 'actual_product_temp')
+
+        <td>
+            {{ $actual !== null && $actual !== '' ? $actual : '-' }}
+        </td>
+
+    {{-- RH --}}
+    @elseif($field['db'] == 'rh')
+
+        <td>
+            {{ $stepData->rh_setting ?? '-' }} /
+            {{ $stepData->rh_actual ?? '-' }}
+        </td>
+
+    {{-- DEFAULT --}}
+    @else
+
+        <td>
+            {{ ($v1 !== '-' || $v2 !== '-') ? "$v1 / $v2" : '-' }}
+        </td>
+
+    @endif
+
+    @endforeach
+
+</tr>
+
+@endif
+
+@endforeach
+
+@endforeach
 
                                             {{-- B. Sensorik --}}
                                             <tr class="table-secondary">
@@ -455,6 +610,12 @@
                                             </tr>
                                             @endif
                                             @endforeach
+                                            <tr>
+                                                <td>Keterangan</td>
+                                                <td colspan="{{ $report->details->count() }}">
+                                                    {{ $report->notes ?? '-' }}
+                                                </td>
+                                            </tr>
                                             @endforeach
                                         </tbody>
                                     </table>

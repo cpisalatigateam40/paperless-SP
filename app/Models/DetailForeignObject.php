@@ -27,6 +27,7 @@ class DetailForeignObject extends Model implements Auditable
         'qc_paraf',
         'production_paraf',
         'engineering_paraf',
+        'gramase'
     ];
 
     protected $auditEvents = [

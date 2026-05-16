@@ -18,9 +18,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\WaterbathExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportWaterbathController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportWaterbath::class;
+
     public function index(Request $request)
     {
         $search = $request->search;
@@ -101,7 +105,9 @@ class ReportWaterbathController extends Controller
 
     public function create()
     {
-        $products = Product::orderBy('product_name')->get();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_waterbaths.create', compact('products'));
     }
 
@@ -131,6 +137,7 @@ class ReportWaterbathController extends Controller
                     'amount'      => $d['amount'] ?? null,
                     'unit'        => $d['unit'] ?? null,
                     'note'        => $d['note'] ?? null,
+                    'gramase'     => $d['gramase'] ?? null,
                 ]);
             }
         }
@@ -272,7 +279,9 @@ class ReportWaterbathController extends Controller
     public function addDetail($reportUuid)
     {
         $report = ReportWaterbath::where('uuid', $reportUuid)->firstOrFail();
-        $products = Product::orderBy('product_name')->get();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         // Benar: dua string terpisah
         return view('report_waterbaths.add_detail', compact('report', 'products'));
@@ -294,6 +303,7 @@ class ReportWaterbathController extends Controller
                     'amount'      => $d['amount'] ?? null,
                     'unit'        => $d['unit'] ?? null,
                     'note'        => $d['note'] ?? null,
+                    'gramase'     => $d['gramase'] ?? null,
                 ]);
             }
         }
@@ -361,7 +371,9 @@ class ReportWaterbathController extends Controller
         $pasteurisasi = PasteurisasiWaterbath::where('report_uuid', $uuid)->get();
         $cooling_shocks = CoolingShockWaterbath::where('report_uuid', $uuid)->get();
         $drippings = DrippingWaterbath::where('report_uuid', $uuid)->get();
-        $products = Product::orderBy('product_name')->get();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         return view('report_waterbaths.edit', compact(
             'report', 'details', 'pasteurisasi', 'cooling_shocks', 'drippings', 'products'
@@ -395,6 +407,7 @@ class ReportWaterbathController extends Controller
                     'amount'      => $d['amount'] ?? null,
                     'unit'        => $d['unit'] ?? null,
                     'note'        => $d['note'] ?? null,
+                    'gramase'     => $d['gramase'] ?? null,
                 ]);
             }
         }

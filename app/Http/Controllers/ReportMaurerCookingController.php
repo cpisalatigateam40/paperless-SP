@@ -23,9 +23,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\MaurerCookingExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportMaurerCookingController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportMaurerCooking::class;
+
     public function index(Request $request)
     {
         $query = ReportMaurerCooking::with([
@@ -159,7 +163,9 @@ class ReportMaurerCookingController extends Controller
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         // Ambil semua data Maurer Standard beserta step-nya
         $maurerStandards = MaurerStandard::with('processStep')->get();
@@ -241,6 +247,7 @@ class ReportMaurerCookingController extends Controller
                     'trolley_count' => $detailData['trolley_count'] ?? null,
                     'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
                     'stick_count' => $detailData['stick_count'] ?? null,
+                    'gramase' => $detailData['gramase'] ?? null,
                 ]);
 
                 // child: process_steps
@@ -390,7 +397,9 @@ class ReportMaurerCookingController extends Controller
         ])->where('uuid', $uuid)->firstOrFail();
 
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         $maurerStandards = MaurerStandard::with('processStep')->get();
         $maurerStandardMap = [];
@@ -474,6 +483,7 @@ class ReportMaurerCookingController extends Controller
                         'trolley_count' => $detailData['trolley_count'] ?? null,
                         'can_be_twisted' => $detailData['can_be_twisted'] ?? null,
                         'stick_count' => $detailData['stick_count'] ?? null,
+                        'gramase' => $detailData['gramase'] ?? null,
                     ]);
                 } else {
                     // Kalau detail baru → create

@@ -17,9 +17,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\SiomayExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportSiomayController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportSiomay::class;
+
     public function index(Request $request)
     {
         $query = ReportSiomay::with([
@@ -120,7 +124,9 @@ class ReportSiomayController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $rawMaterials = RawMaterial::all();
         return view('report_siomays.create', compact('products', 'rawMaterials'));
     }
@@ -145,6 +151,8 @@ class ReportSiomayController extends Controller
                 'end_time' => $request->end_time,
                 'sensory' => $request->sensory,
                 'created_by' => Auth::user()->name,
+                'product_uuid' => $request->product_uuid,
+                'gramase' => $request->gramase,
             ]);
 
             // 2. Simpan DETAIL proses + raw materials per detail
@@ -329,7 +337,9 @@ class ReportSiomayController extends Controller
     public function edit($uuid)
     {
         $report = ReportSiomay::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         $rawMaterials = RawMaterial::all();
 
         return view('report_siomays.edit', compact('report', 'products', 'rawMaterials'));
@@ -350,6 +360,7 @@ class ReportSiomayController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'sensory' => $request->sensory,
+                'gramase' => $request->gramase,
             ]);
 
             // Hapus detail & raw material lama

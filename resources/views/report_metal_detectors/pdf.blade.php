@@ -161,7 +161,11 @@
             <tr>
                 <td>{{ $detail->hour }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
+                <td class="align-middle">
+                    {{ !empty($detail->gramase) 
+                        ? $detail->gramase 
+                        : ($detail->product->nett_weight ?? '-') }} g
+                </td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->result_fe }}</td>
                 <td>{{ $detail->result_non_fe }}</td>

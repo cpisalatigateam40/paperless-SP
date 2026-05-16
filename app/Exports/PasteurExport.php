@@ -173,7 +173,10 @@ class PasteurExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$dataRow}", Carbon::parse($report->created_at)->format('H:i'));
                         $sheet->setCellValue("E{$dataRow}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$dataRow}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$dataRow}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$dataRow}",
+                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->for_packaging_gr  ?? '-'))
+                        );
                         $sheet->setCellValue("H{$dataRow}", $detail->product_code ?? '-');
                         // Detail
                         $sheet->setCellValue("I{$dataRow}", $detail->program_number ?? '-');

@@ -17,9 +17,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\FreezPackagingExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportFreezPackagingController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportFreezPackaging::class;
+
     public function index(Request $request)
     {
         $search = $request->search;
@@ -112,7 +116,9 @@ class ReportFreezPackagingController extends Controller
     public function create()
     {
         $areas = Area::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_freez_packagings.create', compact('areas', 'products'));
     }
 
@@ -146,6 +152,8 @@ class ReportFreezPackagingController extends Controller
                     'end_time' => $detail['end_time'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
                     'verif_after' => $detail['verif_after'] ?? null,
+                    'start_time' => $detail['start_time'] ?? null,
+                    'gramase' => $detail['gramase'] ?? null,
                 ]);
 
                 $detailModel->freezing()->create([
@@ -198,7 +206,9 @@ class ReportFreezPackagingController extends Controller
     public function addDetailForm($uuid)
     {
         $report = ReportFreezPackaging::where('uuid', $uuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         return view('report_freez_packagings.add-detail', compact('report', 'products'));
     }
 
@@ -217,6 +227,7 @@ class ReportFreezPackagingController extends Controller
                 'end_time' => now()->setTimeFromTimeString($item['end_time']),
                 'corrective_action' => $item['corrective_action'],
                 'verif_after' => $item['verif_after'],
+                'gramase' => $item['gramase'] ?? null,
             ]);
             $detail->save();
 
@@ -330,18 +341,15 @@ class ReportFreezPackagingController extends Controller
 
         $areas = Area::all();
         
-        $products = Product::all()->map(fn($p) => [
-            'uuid' => $p->uuid,
-            'product_name' => $p->product_name,
-            'nett_weight' => $p->nett_weight,
-            'shelf_life' => $p->shelf_life,
-            'created_at' => $p->created_at,
-        ])->values();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         // Mapping details beserta relasinya
         $details = $report->details->map(fn($d) => [
             'uuid' => $d->uuid,
             'product_uuid' => $d->product_uuid,
+            'gramase' => $d->gramase ?? $d->product->nett_weight,
             'production_code' => $d->production_code,
             'best_before' => $d->best_before,
             'start_time' => $d->start_time,
@@ -409,6 +417,7 @@ class ReportFreezPackagingController extends Controller
                     'end_time' => $detail['end_time'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
                     'verif_after' => $detail['verif_after'] ?? null,
+                    'gramase' => $detail['gramase'] ?? null,
                 ]);
 
                 $detailModel->freezing()->create([

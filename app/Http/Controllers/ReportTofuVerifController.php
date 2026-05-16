@@ -14,9 +14,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\TofuVerifExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportTofuVerifController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportTofuVerif::class;
 
     public function index(Request $request)
         {

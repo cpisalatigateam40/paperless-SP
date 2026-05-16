@@ -139,7 +139,10 @@ class MdProductExport implements WithEvents, WithTitle
                             ? Carbon::parse($detail->time)->format('H:i') : '-');
                         $sheet->setCellValue("E{$dataRow}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$dataRow}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$dataRow}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$dataRow}",
+                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$dataRow}", $detail->production_code ?? '-');
                         $sheet->setCellValue("I{$dataRow}", $detail->process_type ?? '-');
                         // Fe 1.5mm

@@ -133,7 +133,9 @@
             </td>
             <td style="text-align: left; border: none;">
                 Produk: <span style="text-decoration: underline;"> {{ $report->product->product_name ?? '-' }} -
-                    {{ $report->product->nett_weight ?? '-' }} g</span>
+                    {{ !empty($report->gramase) 
+                        ? $report->gramase 
+                        : ($report->product->nett_weight ?? '-') }} g</span>
             </td>
         </tr>
     </table>

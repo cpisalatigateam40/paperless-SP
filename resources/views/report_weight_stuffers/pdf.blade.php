@@ -150,7 +150,11 @@
         <tr>
             <th class="text-start">Gramase</th>
             @foreach ($details as $d)
-            <th>{{ $d->product->nett_weight ?? '-' }} g</th>
+            <th class="align-middle">
+                {{ !empty($d->gramase) 
+                    ? $d->gramase 
+                    : ($d->product->nett_weight ?? '-') }} g
+            </th>
             @endforeach
         </tr>
         <tr>
@@ -168,7 +172,23 @@
         <tr>
             <th class="text-start">Mesin Stuffer</th>
             @foreach ($details as $d)
-            <td>{{ $d->townsend ? 'Townsend' : 'Hitech' }}</td>
+            @php
+                $machineName = '-';
+
+                if ($d->townsend) {
+                    $machineName = 'Townsend';
+                } elseif ($d->hitech) {
+                    $machineName = 'Hitech';
+                } elseif ($d->vemag) {
+                    $machineName = 'Vemag';
+                } elseif ($d->vemag2) {
+                    $machineName = 'Vemag 2';
+                } elseif ($d->handtmann) {
+                    $machineName = 'Handtmann';
+                }
+            @endphp
+
+            <td>{{ $machineName }}</td>
             @endforeach
         </tr>
 
@@ -192,7 +212,12 @@
             @foreach ($details as $d)
             @php
             // pilih mesin sesuai data yang ada
-            $stuffer = $d->townsend ?? $d->hitech;
+            $stuffer =
+                $d->townsend ??
+                $d->hitech ??
+                $d->vemag ??
+                $d->vemag2 ??
+                $d->handtmann;
             $case = $d->cases->first();
             $weight = $d->weights->first();
             @endphp

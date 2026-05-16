@@ -15,9 +15,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\RtgSteamerExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportRtgSteamerController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportRtgSteamer::class;
+
     public function index(Request $request)
     {
         $query = ReportRtgSteamer::with([
@@ -99,7 +103,9 @@ class ReportRtgSteamerController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $areas = Area::all();
         return view('report_rtg_steamers.create', compact('products', 'areas'));
     }
@@ -143,6 +149,7 @@ class ReportRtgSteamerController extends Controller
             'shift' => $shift,
             'product_uuid' => $request->product_uuid,
             'created_by' => Auth::user()->name,
+            'gramase' => $request->gramase,
         ]);
 
         if ($request->has('details')) {
@@ -310,7 +317,9 @@ class ReportRtgSteamerController extends Controller
     public function edit($uuid)
     {
         $report = ReportRtgSteamer::with('details')->where('uuid', $uuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         $areas = Area::all();
 
         return view('report_rtg_steamers.edit', compact('report', 'products', 'areas'));
@@ -324,6 +333,7 @@ class ReportRtgSteamerController extends Controller
             'date' => $request->date,
             'shift' => $request->shift,
             'product_uuid' => $request->product_uuid,
+            'gramase' => $request->gramase,
         ]);
 
         // Hapus detail lama dan insert ulang (atau bisa diupdate satu-satu)
@@ -387,6 +397,4 @@ class ReportRtgSteamerController extends Controller
     
         return Excel::download(new RtgSteamerExport($reports, $periodLabel), $filename);
     }
-
-
 }

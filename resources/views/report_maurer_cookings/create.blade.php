@@ -66,8 +66,7 @@
                         data-index="{{ $i }}">
                         <option value="">-- Pilih Produk --</option>
                         @foreach($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }} -
-                            {{ $product->nett_weight }} g</option>
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -378,11 +377,11 @@
                         </table>
                     </div>
                 </div>
-                <!-- <div class="col-md-6 mb-3 mt-4">
+                <div class="col-md-12 mb-3 mt-4">
                     <label>Catatan</label>
                     <textarea name="notes" class="form-control" rows="4"
                         placeholder="Masukkan catatan tambahan..."></textarea>
-                </div>   -->
+                </div>  
             </div>
         </div>
 

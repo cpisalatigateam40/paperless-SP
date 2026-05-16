@@ -40,6 +40,48 @@
                     @endif
                 </form>
 
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-pasteurs.bulk-known"
+                    count-route="report-pasteurs.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-pasteurs.bulk-approve"
+                    count-route="report-pasteurs.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
                 <x-export-excel-modal 
                     :route="route('report_pasteurs.export')" 
                     title="Verifikasi Pasteurisasi" />
@@ -172,7 +214,9 @@
                                                 <th style="width: 220px;">Keterangan</th>
                                                 @foreach($report->details as $detail)
                                                 <th>{{ $detail->product->product_name ?? '-' }} -
-                                                    {{ $detail->product->nett_weight ?? '-' }} g</th>
+                                                    {{ !empty($detail->for_packaging_gr ) 
+                                                        ? $detail->for_packaging_gr  
+                                                        : ($detail->product->nett_weight ?? '-') }} g</th>
                                                 @endforeach
                                             </tr>
                                         </thead>

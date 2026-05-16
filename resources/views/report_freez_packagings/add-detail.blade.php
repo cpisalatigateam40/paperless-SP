@@ -32,7 +32,7 @@ const productOptions = `
         <option value="{{ $product->uuid }}"
             data-shelf-life="{{ $product->shelf_life }}"
             data-created-at="{{ $product->created_at }}">
-            {{ $product->product_name }} - {{ $product->nett_weight }} g
+            {{ $product->product_name }}
         </option>
     @endforeach
 `;
@@ -60,6 +60,11 @@ function addDetailRow() {
             </select>
         </div>
         <div class="col-md-6 mb-3">
+            <label class="form-label">Gramase</label>
+            <input type="number" step="0.01" name="details[${index}][gramase]" class="form-control"
+                placeholder="Masukkan gramase" required>
+        </div>
+        <div class="col-md-6 mb-3">
             <label>Kode Produksi</label>
             <input type="text" name="details[${index}][production_code]" class="form-control" placeholder="Kode Batch/Produksi">
         </div>
@@ -67,6 +72,7 @@ function addDetailRow() {
             <label>Best Before</label>
             <input type="date" name="details[${index}][best_before]" class="form-control" >
         </div>
+        
     </div>
 
     <div class="row mt-3">
@@ -84,11 +90,7 @@ function addDetailRow() {
     <div class="row mb-3">
         <div class="col-md-6">
             <label>Mesin IQF</label>
-            <select name="details[${index}][freezing][iqf_machine]" class="form-control">
-                <option value="">-- Pilih Mesin --</option>
-                <option value="IQF 1">IQF 1</option>
-                <option value="IQF 2">IQF 2</option>
-            </select>
+            <input type="text" name="details[${index}][freezing][iqf_machine]" class="form-control production-code" placeholder="Nama Mesin IQF">
         </div>
     </div>
     <div class="row">

@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\ProductionNonconformityExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportProductionNonconformityController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportProductionNonconformity::class;
+
     public function index(Request $request)
     {
         $reports = ReportProductionNonconformity::with([

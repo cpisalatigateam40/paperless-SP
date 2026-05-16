@@ -35,16 +35,17 @@
                                     @foreach($products as $product)
                                     <option value="{{ $product->uuid }}"
                                         {{ $product->uuid == $detail->product_uuid ? 'selected' : '' }}>
-                                        {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                        {{ $product->product_name }}
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label>Nomor Program</label>
-                                <input type="text" name="details[{{ $dIndex }}][program_number]" class="form-control"
-                                    value="{{ $detail->program_number }}">
+                                <label>Gramase (gr)</label>
+                                <input type="number" name="details[{{ $dIndex }}][for_packaging_gr]"
+                                    class="form-control" value="{{ $detail->for_packaging_gr }}">
                             </div>
+                            
                         </div>
 
                         <div class="row mb-4">
@@ -54,9 +55,9 @@
                                     value="{{ $detail->product_code }}">
                             </div>
                             <div class="col-md-6">
-                                <label>Kemasan (gr)</label>
-                                <input type="number" name="details[{{ $dIndex }}][for_packaging_gr]"
-                                    class="form-control" value="{{ $detail->for_packaging_gr }}">
+                                <label>Nomor Program</label>
+                                <input type="text" name="details[{{ $dIndex }}][program_number]" class="form-control"
+                                    value="{{ $detail->program_number }}">
                             </div>
                         </div>
 

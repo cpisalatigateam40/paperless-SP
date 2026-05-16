@@ -27,6 +27,8 @@ class FsProcessStep extends Model implements Auditable
         'product_temp_1',
         'product_temp_2',
         'actual_product_temp',
+        'rh_setting',
+        'rh_actual',
     ];
 
     protected $auditEvents = [

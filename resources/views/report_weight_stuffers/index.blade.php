@@ -41,6 +41,48 @@
 
                 </form>
 
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-weight-stuffers.bulk-known"
+                    count-route="report-weight-stuffers.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-weight-stuffers.bulk-approve"
+                    count-route="report-weight-stuffers.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
                 {{-- Tombol Export Excel --}}
                 <x-export-excel-modal 
                     :route="route('report_weight_stuffers.export')" 
@@ -200,7 +242,11 @@
                                         <tr>
                                             <th class="text-start">Gramase</th>
                                             @foreach ($details as $d)
-                                            <th>{{ $d->product->nett_weight ?? '-' }} g</th>
+                                           <th class="align-middle">
+                                                {{ !empty($d->gramase) 
+                                                    ? $d->gramase 
+                                                    : ($d->product->nett_weight ?? '-') }} g
+                                            </th>
                                             @endforeach
                                         </tr>
                                         <tr>
@@ -218,7 +264,23 @@
                                         <tr>
                                             <th class="text-start">Mesin Stuffer</th>
                                             @foreach ($details as $d)
-                                            <td>{{ $d->townsend ? 'Townsend' : 'Hitech' }}</td>
+                                            @php
+                                                $machineName = '-';
+
+                                                if ($d->townsend) {
+                                                    $machineName = 'Townsend';
+                                                } elseif ($d->hitech) {
+                                                    $machineName = 'Hitech';
+                                                } elseif ($d->vemag) {
+                                                    $machineName = 'Vemag';
+                                                } elseif ($d->vemag2) {
+                                                    $machineName = 'Vemag 2';
+                                                } elseif ($d->handtmann) {
+                                                    $machineName = 'Handtmann';
+                                                }
+                                            @endphp
+
+                                            <td>{{ $machineName }}</td>
                                             @endforeach
                                         </tr>
 
@@ -242,7 +304,12 @@
                                             @foreach ($details as $d)
                                             @php
                                             // pilih mesin sesuai data yang ada
-                                            $stuffer = $d->townsend ?? $d->hitech;
+                                            $stuffer =
+                                                $d->townsend ??
+                                                $d->hitech ??
+                                                $d->vemag ??
+                                                $d->vemag2 ??
+                                                $d->handtmann;
                                             $case = $d->cases->first();
                                             $weight = $d->weights->first();
 

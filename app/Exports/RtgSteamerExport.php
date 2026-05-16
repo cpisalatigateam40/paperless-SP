@@ -80,7 +80,10 @@ class RtgSteamerExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $time);
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $report->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$row}",
+                            trim(($report->product->product_name ?? '-') . ' - ' . ($report->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$row}", $detail->production_code ?? '-');
                         $sheet->setCellValue("I{$row}", $detail->steamer ?? '-');
                         $sheet->setCellValue("J{$row}", $detail->trolley_count ?? '-');

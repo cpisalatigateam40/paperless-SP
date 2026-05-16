@@ -81,7 +81,10 @@ class MetalDetectorExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $detail->hour ?? '-');
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$row}",
+                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$row}", $detail->production_code ?? '-');
                         $sheet->setCellValue("I{$row}", $detail->result_fe ?? '-');
                         $sheet->setCellValue("J{$row}", $detail->result_non_fe ?? '-');

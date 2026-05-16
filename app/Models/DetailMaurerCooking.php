@@ -22,7 +22,8 @@ class DetailMaurerCooking extends Model implements Auditable
         'packaging_weight',
         'trolley_count',
         'can_be_twisted',
-        'stick_count'
+        'stick_count',
+        'gramase',
     ];
 
     protected $auditEvents = [

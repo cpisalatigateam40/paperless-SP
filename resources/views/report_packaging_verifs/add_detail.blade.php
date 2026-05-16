@@ -20,6 +20,7 @@
                         <tr>
                             <th>Jam</th>
                             <th>Produk</th>
+                            <th>Gramase</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -29,10 +30,13 @@
                             <td>
                                 <select name="details[0][product_uuid]" class="form-control select2-product">
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }} -
-                                        {{ $product->nett_weight }} g</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
                                     @endforeach
                                 </select>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
+                                    placeholder="Masukkan gramase" required>
                             </td>
                         </tr>
                     </tbody>

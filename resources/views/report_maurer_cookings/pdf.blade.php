@@ -150,7 +150,11 @@
             <tr>
                 <td>Gramase</td>
                 @foreach ($report->details as $detail)
-                <td> {{ $detail->product->nett_weight ?? '-' }} g</td>
+                <td>
+                {{ !empty($detail->packaging_weight) 
+                    ? $detail->packaging_weight 
+                    : ($detail->product->nett_weight ?? '-') }} g
+                    </td>
                 @endforeach
             </tr>
             <tr>
@@ -162,7 +166,7 @@
             <tr>
                 <td>Untuk Kemasan (gr)</td>
                 @foreach ($report->details as $detail)
-                <td>{{ $detail->packaging_weight ?? '-' }}</td>
+                <td>{{ $detail->packaging_weight ?? '-' }} g</td>
                 @endforeach
             </tr>
             <tr>
@@ -507,6 +511,12 @@
                 @endphp
                 <td>{{ $scd->avg_product_temp_after_exit ?? '-' }}</td>
                 @endforeach
+            </tr>
+            <tr>
+                <td>Keterangan</td>
+                <td colspan="{{ $report->details->count() }}">
+                    {{ $report->notes ?? '-' }}
+                </td>
             </tr>
 
             {{-- Cooking Loss --}}

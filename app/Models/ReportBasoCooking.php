@@ -28,6 +28,7 @@ class ReportBasoCooking extends Model implements Auditable
         'known_by',
         'approved_by',
         'approved_at',
+        'gramase'
     ];
 
     protected $auditEvents = [

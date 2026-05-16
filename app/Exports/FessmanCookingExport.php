@@ -36,14 +36,16 @@ class FessmanCookingStepsSheet implements WithEvents
     ];
 
     const STEP_FIELDS = [
-        ['Waktu 1',       'time_minutes_1'],
-        ['Waktu 2',       'time_minutes_2'],
-        ['Suhu Ruang 1',  'room_temp_1'],
-        ['Suhu Ruang 2',  'room_temp_2'],
-        ['Sirk. Udara 1', 'air_circulation_1'],
-        ['Sirk. Udara 2', 'air_circulation_2'],
-        ['Suhu Prod 1',   'product_temp_1'],
-        ['Suhu Prod 2',   'product_temp_2'],
+        ['Waktu Setting',       'time_minutes_1'],
+        ['Waktu Aktual',       'time_minutes_2'],
+        ['Suhu Ruang Setting',  'room_temp_1'],
+        ['Suhu Ruang Aktual',  'room_temp_2'],
+        ['RH Setting',    'rh_setting'],
+        ['RH Aktual',     'rh_actual'],
+        ['Sirk. Udara Setting', 'air_circulation_1'],
+        ['Sirk. Udara Aktual', 'air_circulation_2'],
+        ['Suhu Prod Setting',   'product_temp_1'],
+        ['Suhu Prod Aktual',   'product_temp_2'],
         ['Aktual Prod',   'actual_product_temp'],
     ];
 
@@ -157,7 +159,7 @@ class FessmanCookingStepsSheet implements WithEvents
                             $detail->no_fessman ?? '-',
                             $detail->product->product_name ?? '-',
                             $detail->production_code ?? '-',
-                            $detail->packaging_weight ?? '-',
+                            $detail->gramase ?? '-',
                             $detail->trolley_count ?? '-',
                             $detail->stick_count ?? '-',
                         ];
@@ -313,7 +315,10 @@ class FessmanCookingCoolingSheet implements WithEvents
                             $sheet->setCellValue("E{$dataRow}", $report->created_by ?? '-');
                             $sheet->setCellValue("F{$dataRow}", $shiftGroup ?: '-');
                             $sheet->setCellValue("G{$dataRow}", $report->section->section_name ?? '-');
-                            $sheet->setCellValue("H{$dataRow}", $detail->product->product_name ?? '-');
+                            $sheet->setCellValue(
+                                "H{$dataRow}",
+                                trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
+                            );
                             $sheet->setCellValue("I{$dataRow}", $detail->production_code ?? '-');
                             $sheet->setCellValue("J{$dataRow}", '-');
 

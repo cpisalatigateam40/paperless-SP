@@ -13,10 +13,14 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\FragileItemExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 
 class ReportFragileItemController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportFragileItem::class;
+
     public function index(Request $request)
     {
         $reports = ReportFragileItem::with([

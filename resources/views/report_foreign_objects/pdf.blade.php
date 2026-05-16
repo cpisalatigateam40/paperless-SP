@@ -159,7 +159,9 @@
             <tr>
                 <td>{{ $detail->time }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
+                <td>{{ !empty($detail->gramase) 
+                                                        ? $detail->gramase 
+                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->contaminant_type }}</td>
                 <td class="text-center">

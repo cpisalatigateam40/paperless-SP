@@ -79,10 +79,36 @@ class PackagingVerifExport implements WithEvents, WithTitle
                         $cl = $detail->checklist;
 
                         // Helper: gabungkan nilai aktual 1-5 jadi satu string
+                        // $join = fn(string $prefix) => collect(range(1, 5))
+                        //     ->map(fn($i) => $cl?->{"{$prefix}_{$i}"} ?? null)
+                        //     ->filter(fn($v) => $v !== null && $v !== '')
+                        //     ->implode(', ');
                         $join = fn(string $prefix) => collect(range(1, 5))
                             ->map(fn($i) => $cl?->{"{$prefix}_{$i}"} ?? null)
                             ->filter(fn($v) => $v !== null && $v !== '')
                             ->implode(', ');
+
+                        // Tambah helper khusus content_per_pack dengan fallback JSON
+                        $joinContentPerPack = function() use ($cl): string {
+                            // Coba dari JSON dulu
+                            $json = $cl?->content_per_pack_json;
+                            $values = is_array($json)
+                                ? $json
+                                : json_decode($json ?? '[]', true);
+
+                            // Fallback ke kolom lama jika JSON kosong
+                            if (empty($values)) {
+                                $values = collect(range(1, 5))
+                                    ->map(fn($i) => $cl?->{"content_per_pack_{$i}"} ?? null)
+                                    ->filter(fn($v) => $v !== null && $v !== '')
+                                    ->values()
+                                    ->toArray();
+                            }
+
+                            return collect($values)
+                                ->filter(fn($v) => $v !== null && $v !== '')
+                                ->implode(', ');
+                        };
 
                         // In cutting: cek manual_1 atau machine_1
                         $inCutting = $cl?->in_cutting_manual_1 ? 'Manual'
@@ -98,14 +124,17 @@ class PackagingVerifExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $detail->time ?? '-');
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$row}",
+                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$row}", $inCutting);
                         $sheet->setCellValue("I{$row}", $packaging);
                         $sheet->setCellValue("J{$row}", $cl?->sampling_amount ?? '-');
                         $sheet->setCellValue("K{$row}", $cl?->sampling_result ?? '-');
                         $sheet->setCellValue("L{$row}", $join('sealing_condition') ?: '-');
                         $sheet->setCellValue("M{$row}", $join('sealing_vacuum') ?: '-');
-                        $sheet->setCellValue("N{$row}", $join('content_per_pack') ?: '-');
+                        $sheet->setCellValue("N{$row}", $joinContentPerPack() ?: '-');
                         $sheet->setCellValue("O{$row}", $cl?->standard_long_pcs ?? '-');
                         $sheet->setCellValue("P{$row}", $join('actual_long_pcs') ?: '-');
                         $sheet->setCellValue("Q{$row}", $cl?->avg_long_pcs ?? '-');

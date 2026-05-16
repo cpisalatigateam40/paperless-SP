@@ -41,6 +41,48 @@
 
                 </form>
 
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-rtg-steamers.bulk-known"
+                    count-route="report-rtg-steamers.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-rtg-steamers.bulk-approve"
+                    count-route="report-rtg-steamers.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
                 <x-export-excel-modal 
                     :route="route('report_rtg_steamers.export')" 
                     title="Verifikasi Pemasakan Dengan Steamer" />
@@ -85,7 +127,9 @@
                                 @endif
                             </td>
                             <td>{{ $report->product->product_name ?? '-' }} -
-                                {{ $report->product->nett_weight ?? '-' }} g</td>
+                                {{ !empty($report->gramase) 
+                                    ? $report->gramase 
+                                    : ($report->product->nett_weight ?? '-') }} g</td>
                             <td>
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"

@@ -25,17 +25,29 @@
                 <div id="details ">
                     @foreach($details as $i => $detail)
                     <div class="card p-3 mb-3 mt-5">
-                        <div class="mb-3">
-                            <label>Produk</label>
-                            <select name="details[{{ $i }}][product_uuid]" class="form-control" required>
-                                @foreach($products as $product)
-                                <option value="{{ $product->uuid }}"
-                                    {{ $detail->product_uuid == $product->uuid ? 'selected' : '' }}>
-                                    {{ $product->product_name }} - {{ $product->nett_weight }} g
-                                </option>
-                                @endforeach
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label>Produk</label>
+                                <select name="details[{{ $i }}][product_uuid]" class="form-control" required>
+                                    @foreach($products as $product)
+                                    <option value="{{ $product->uuid }}"
+                                        {{ $detail->product_uuid == $product->uuid ? 'selected' : '' }}>
+                                        {{ $product->product_name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Gramase</label>
+                                <input type="number" 
+                                    step="0.01" 
+                                    name="details[{{ $i }}][gramase]" 
+                                    class="form-control"
+                                    value="{{ $detail->gramase }}"
+                                    placeholder="Masukkan gramase">
+                            </div>
                         </div>
+                        
                         <div class="mb-3">
                             <label>Jam</label>
                             <input type="time" name="details[{{ $i }}][hour]" class="form-control"

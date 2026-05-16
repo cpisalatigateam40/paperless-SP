@@ -23,15 +23,22 @@
                                         required>
                                         <option value="">-- Pilih Produk --</option>
                                         @foreach($products as $p)
-                                        <option value="{{ $p->uuid }}">{{ $p->product_name }} - {{ $p->nett_weight }} g
+                                        <option value="{{ $p->uuid }}">{{ $p->product_name }}
                                         </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <label class="form-label">Gramase</label>
+                                    <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
+                                        placeholder="Masukkan gramase" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <label>Batch Code</label>
                                     <input type="text" name="details[0][batch_code]" class="form-control">
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>Jumlah</label>
                                     <input type="number" name="details[0][amount]" class="form-control">
@@ -43,7 +50,6 @@
                                         <option value="tray">tray</option>
                                     </select>
                                 </div>
-
                             </div>
 
                             <hr>
