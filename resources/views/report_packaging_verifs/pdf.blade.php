@@ -155,7 +155,7 @@
             <th colspan="2">Proses Pengemasan</th>
             <th colspan="2">Sampling Kemasan</th>
             <th colspan="2">Hasil Sealing</th>
-            <th rowspan="2">Isi Per-Pack</th>
+            <th rowspan="2" style="white-space: nowrap;">Isi Per-Pack</th>
             <th colspan="3">Panjang Produk Per Pcs</th>
             <th colspan="3">Berat Produk Per Pcs</th>
             <th colspan="3">Berat Produk Per Pack (gr)</th>
@@ -184,12 +184,28 @@
 
         @foreach($report->details as $d)
         @php $checklist = $d->checklist; @endphp
+        @php
+            $contentPerPack = is_array($checklist?->content_per_pack_json)
+                ? $checklist->content_per_pack_json
+                : json_decode($checklist?->content_per_pack_json ?? '[]', true);
+
+            // Fallback ke kolom lama jika JSON kosong
+            if (empty($contentPerPack)) {
+                $contentPerPack = collect(range(1, 5))
+                    ->map(fn($i) => $checklist?->{'content_per_pack_' . $i})
+                    ->filter(fn($v) => $v !== null && $v !== '')
+                    ->values()
+                    ->toArray();
+            }
+        @endphp
 
         @for($i = 1; $i <= 5; $i++) <tr>
             @if($i == 1)
             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
-            <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
+            <td rowspan="5">{{ !empty($d->gramase) 
+                                                        ? $d->gramase 
+                                                        : ($d->product->nett_weight ?? '-') }} g</td>
             <td rowspan="5">
                 @php
                     $mdMulti = array_values(array_filter(
@@ -293,7 +309,15 @@
             {{-- Hasil sealing & isi per-pack, per baris --}}
             <td>{{ $checklist?->{'sealing_condition_' . $i} ?? '-' }}</td>
             <td>{{ $checklist?->{'sealing_vacuum_' . $i} ?? '-' }}</td>
-            <td>{{ $checklist?->{'content_per_pack_' . $i} ?? '-' }}</td>
+            <td>
+                @if(!empty($contentPerPack))
+                    @foreach($contentPerPack as $idx => $val)
+                        <div><small>Pack {{ $idx + 1 }}:</small> {{ $val ?? '-' }}</div>
+                    @endforeach
+                @else
+                    -
+                @endif
+            </td>
 
             @if($i == 1)
             <td rowspan="5">{{ $checklist?->standard_long_pcs ?? '-' }}</td>

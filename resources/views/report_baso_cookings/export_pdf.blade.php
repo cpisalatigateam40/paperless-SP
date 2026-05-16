@@ -123,7 +123,9 @@
     <p><strong>Tanggal:</strong> {{ $report->date }} |
         <strong>Shift:</strong> {{ $report->shift }} |
         <strong>Produk:</strong> {{ $report->product->product_name ?? '-' }} -
-        {{ $report->product->nett_weight ?? '-' }} g |
+        {{ !empty($report->gramase) 
+                                                        ? $report->gramase 
+                                                        : ($report->product->nett_weight ?? '-') }} g |
         <strong>STD Suhu Pusat (&deg;C):</strong> {{ $report->std_core_temp ?? '-' }} |
         <strong>STD berat akhir/potong:</strong> {{ $report->std_weight ?? '-' }} |
         <strong>Set suhu tangki perebusan 1 (&deg;C):</strong> {{ $report->set_boiling_1 ?? '-' }} |

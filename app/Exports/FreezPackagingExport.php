@@ -21,7 +21,7 @@ class FreezPackagingExport implements WithEvents, WithTitle
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastCol = 'V';
+                $lastCol = 'W';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI PEMBEKUAN IQF & PENGEMASAN KARTON BOX');
@@ -41,21 +41,22 @@ class FreezPackagingExport implements WithEvents, WithTitle
                     'E' => 'QC',
                     'F' => 'Group',
                     'G' => 'Nama Produk',
-                    'H' => 'Kode Prod',
-                    'I' => 'Best Before',
-                    'J' => "Std Suhu\nAfter IQF (°C)",
-                    'K' => "Aktual Suhu\nAfter IQF (°C)",
-                    'L' => "Setting\nRoom IQF (°C)",
-                    'M' => "Setting\nSuction IQF (°C)",
-                    'N' => "Durasi Frz\nDisplay (mnt)",
-                    'O' => "Durasi Frz\nAktual (mnt)",
-                    'P' => "Mesin IQF", // kolom baru
-                    'Q' => 'Kondisi Karton',
-                    'R' => "Kesesuaian Isi\nPer Box/Binded/Inner",
-                    'S' => "Std Berat\nKarton (kg)",
-                    'T' => "Aktual Berat\nKarton 1-5 (kg)",
-                    'U' => "Rata-rata\nBerat Karton (kg)",
-                    'V' => 'Keterangan',
+                    'H' => 'Gramase',
+                    'I' => 'Kode Prod',
+                    'J' => 'Best Before',
+                    'K' => "Std Suhu\nAfter IQF (°C)",
+                    'L' => "Aktual Suhu\nAfter IQF (°C)",
+                    'M' => "Setting\nRoom IQF (°C)",
+                    'N' => "Setting\nSuction IQF (°C)",
+                    'O' => "Durasi Frz\nDisplay (mnt)",
+                    'P' => "Durasi Frz\nAktual (mnt)",
+                    'Q' => "Mesin IQF", // kolom baru
+                    'R' => 'Kondisi Karton',
+                    'S' => "Kesesuaian Isi\nPer Box/Binded/Inner",
+                    'T' => "Std Berat\nKarton (kg)",
+                    'U' => "Aktual Berat\nKarton 1-5 (kg)",
+                    'V' => "Rata-rata\nBerat Karton (kg)",
+                    'W' => 'Keterangan',
                 ];
 
                 foreach ($headers as $col => $label) {
@@ -103,22 +104,29 @@ class FreezPackagingExport implements WithEvents, WithTitle
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
                         $sheet->setCellValue("G{$row}", $detail->product->product_name ?? '-');
-                        $sheet->setCellValue("H{$row}", $detail->production_code ?? '-');
-                        $sheet->setCellValue("I{$row}", $detail->best_before
+                        $sheet->setCellValue(
+                            "H{$row}",
+                            $detail->gramase ?? $detail->product->nett_weight ?? '-'
+                        );
+
+                        $sheet->setCellValue("I{$row}", $detail->production_code ?? '-');
+
+                        $sheet->setCellValue("J{$row}", $detail->best_before
                             ? Carbon::parse($detail->best_before)->format('d/m/Y') : '-');
-                        $sheet->setCellValue("J{$row}", $frz?->standard_temp ?? '-');
-                        $sheet->setCellValue("K{$row}", $frz?->end_product_temp ?? '-');
-                        $sheet->setCellValue("L{$row}", $frz?->iqf_room_temp ?? '-');
-                        $sheet->setCellValue("M{$row}", $frz?->iqf_suction_temp ?? '-');
-                        $sheet->setCellValue("N{$row}", $frz?->freezing_time_display ?? '-');
-                        $sheet->setCellValue("O{$row}", $frz?->freezing_time_actual ?? '-');
-                        $sheet->setCellValue("P{$row}", $frz?->iqf_machine ?? '-'); // kolom baru
-                        $sheet->setCellValue("Q{$row}", $krt?->carton_condition ?? '-');
-                        $sheet->setCellValue("R{$row}", $isiBox);
-                        $sheet->setCellValue("S{$row}", $krt?->carton_weight_standard ?? '-');
-                        $sheet->setCellValue("T{$row}", $aktualBerat ?: '-');
-                        $sheet->setCellValue("U{$row}", $krt?->avg_weight ?? '-');
-                        $sheet->setCellValue("V{$row}", $detail->corrective_action ?? '-');
+
+                        $sheet->setCellValue("K{$row}", $frz?->standard_temp ?? '-');
+                        $sheet->setCellValue("L{$row}", $frz?->end_product_temp ?? '-');
+                        $sheet->setCellValue("M{$row}", $frz?->iqf_room_temp ?? '-');
+                        $sheet->setCellValue("N{$row}", $frz?->iqf_suction_temp ?? '-');
+                        $sheet->setCellValue("O{$row}", $frz?->freezing_time_display ?? '-');
+                        $sheet->setCellValue("P{$row}", $frz?->freezing_time_actual ?? '-');
+                        $sheet->setCellValue("Q{$row}", $frz?->iqf_machine ?? '-');
+                        $sheet->setCellValue("R{$row}", $krt?->carton_condition ?? '-');
+                        $sheet->setCellValue("S{$row}", $isiBox);
+                        $sheet->setCellValue("T{$row}", $krt?->carton_weight_standard ?? '-');
+                        $sheet->setCellValue("U{$row}", $aktualBerat ?: '-');
+                        $sheet->setCellValue("V{$row}", $krt?->avg_weight ?? '-');
+                        $sheet->setCellValue("W{$row}", $detail->corrective_action ?? '-');
 
                         $sheet->getStyle("A{$row}:{$lastCol}{$row}")
                             ->getAlignment()->setHorizontal('center');

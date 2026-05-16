@@ -23,7 +23,8 @@ class DetailPackagingVerif extends Model implements Auditable
         'upload_md',
         'upload_qr',
         'upload_ed',
-        'upload_md_multi'
+        'upload_md_multi',
+        'gramase'
     ];
 
     protected $auditEvents = [

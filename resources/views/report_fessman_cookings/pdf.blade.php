@@ -124,7 +124,9 @@
             <tr>
                 <td>Gramase</td>
                 @foreach ($report->details as $detail)
-                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
+                <td>{{ !empty($detail->gramase) 
+                ? $detail->gramase 
+                : ($detail->product->nett_weight ?? '-') }} g</td>
                 @endforeach
             </tr>
             <tr>
@@ -139,16 +141,17 @@
                 <td>{{ $detail->packaging_weight ?? '-' }}</td>
                 @endforeach
             </tr> -->
-            <tr>
-                <td>Jumlah Stik</td>
-                @foreach ($report->details as $detail)
-                <td>{{ $detail->stick_count ?? '-' }}</td>
-                @endforeach
-            </tr>
+            
             <tr>
                 <td>Jumlah Trolley</td>
                 @foreach ($report->details as $detail)
                 <td>{{ $detail->trolley_count ?? '-' }}</td>
+                @endforeach
+            </tr>
+            <tr>
+                <td>Jumlah Stik</td>
+                @foreach ($report->details as $detail)
+                <td>{{ $detail->stick_count ?? '-' }}</td>
                 @endforeach
             </tr>
             <tr>
@@ -190,6 +193,7 @@
             $fields = [
             ['db' => 'time_minutes', 'label' => 'Waktu (menit)'],
             ['db' => 'room_temp', 'label' => 'Suhu Ruang (°C)'],
+            ['db'=>'rh','label'=>'RH (%)'],
             ['db' => 'air_circulation', 'label' => 'Sirkulasi Udara'],
             ['db' => 'product_temp', 'label' => 'Suhu Produk (°C)'],
             ['db' => 'actual_product_temp', 'label' => 'Suhu Aktual Produk']
@@ -204,7 +208,7 @@
                 @endforeach
             </tr>
 
-            @foreach ($fields as $field)
+            <!-- @foreach ($fields as $field)
             @php
             $hasAnyValue = false;
             foreach ($report->details as $detail) {
@@ -246,7 +250,117 @@
             </tr>
             @endif
             @endforeach
-            @endforeach
+            @endforeach -->
+            @foreach ($steps as $stepName)
+
+<tr style="background-color: seashell;">
+    <td>{{ $stepName }}</td>
+    @foreach ($report->details as $detail)
+        <td></td>
+    @endforeach
+</tr>
+
+@foreach ($fields as $field)
+
+@php
+$hasAnyValue = false;
+
+foreach ($report->details as $detail) {
+
+    $stepData = optional($detail?->processSteps)->first(function($s) use($stepName) {
+        return strcasecmp(trim($s->step_name), trim($stepName)) === 0;
+    });
+
+    // actual product temp
+    if ($field['db'] == 'actual_product_temp') {
+
+        if (
+            $stepData &&
+            $stepData->actual_product_temp !== null &&
+            $stepData->actual_product_temp !== ''
+        ) {
+            $hasAnyValue = true;
+            break;
+        }
+
+    // RH
+    } elseif ($field['db'] == 'rh') {
+
+        if (
+            ($stepData->rh_setting ?? null) !== null ||
+            ($stepData->rh_actual ?? null) !== null
+        ) {
+            $hasAnyValue = true;
+            break;
+        }
+
+    // normal field
+    } else {
+
+        $f1 = $field['db'].'_1';
+        $f2 = $field['db'].'_2';
+
+        if (
+            ($stepData->$f1 ?? null) !== null ||
+            ($stepData->$f2 ?? null) !== null
+        ) {
+            $hasAnyValue = true;
+            break;
+        }
+    }
+}
+@endphp
+
+@if($hasAnyValue)
+
+<tr>
+    <td>{{ $field['label'] }}</td>
+
+    @foreach ($report->details as $detail)
+
+    @php
+    $stepData = optional($detail?->processSteps)->first(function($s) use($stepName) {
+        return strcasecmp(trim($s->step_name), trim($stepName)) === 0;
+    });
+
+    $v1 = $stepData[$field['db'].'_1'] ?? '-';
+    $v2 = $stepData[$field['db'].'_2'] ?? '-';
+    $actual = $stepData['actual_product_temp'] ?? '-';
+    @endphp
+
+    {{-- ACTUAL PRODUCT TEMP --}}
+    @if($field['db'] == 'actual_product_temp')
+
+        <td>
+            {{ $actual !== null && $actual !== '' ? $actual : '-' }}
+        </td>
+
+    {{-- RH --}}
+    @elseif($field['db'] == 'rh')
+
+        <td>
+            {{ $stepData->rh_setting ?? '-' }} /
+            {{ $stepData->rh_actual ?? '-' }}
+        </td>
+
+    {{-- DEFAULT --}}
+    @else
+
+        <td>
+            {{ ($v1 !== '-' || $v2 !== '-') ? "$v1 / $v2" : '-' }}
+        </td>
+
+    @endif
+
+    @endforeach
+
+</tr>
+
+@endif
+
+@endforeach
+
+@endforeach
 
             {{-- B. Sensorik --}}
             <tr class="table-secondary">
@@ -389,6 +503,12 @@
             </tr>
             @endif
             @endforeach
+            <tr>
+                <td>Keterangan</td>
+                <td colspan="{{ $report->details->count() }}">
+                    {{ $report->notes ?? '-' }}
+                </td>
+            </tr>
             @endforeach
             <tr>
                 <td colspan="5" style="text-align: right; border: none;">QM 29 / 01</td>

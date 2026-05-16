@@ -40,6 +40,47 @@
                     @endif
 
                 </form>
+                {{-- Buttons --}}
+                <div class="d-flex gap-2">
+                    @role('Produksi')
+                    <button type="button" class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                    @endrole
+
+                    @role('SPV QC')
+                    <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                    @endrole
+                </div>
+
+                {{-- Modals --}}
+                @role('Produksi')
+                <x-bulk-approval-modal
+                    prefix="known"
+                    title="Produksi"
+                    color="warning"
+                    icon="fa-check-double"
+                    action-route="report-packaging-verifs.bulk-known"
+                    count-route="report-packaging-verifs.bulk-known-count"
+                    label="Approve Semua"
+                />
+                @endrole
+
+                @role('SPV QC')
+                <x-bulk-approval-modal
+                    prefix="approve"
+                    title="QC"
+                    color="success"
+                    icon="fa-check-circle"
+                    action-route="report-packaging-verifs.bulk-approve"
+                    count-route="report-packaging-verifs.bulk-approve-count"
+                    label="Approve Semua"
+                />
+                @endrole
 
                 <x-export-excel-modal 
                     :route="route('report_packaging_verifs.export')" 
@@ -214,7 +255,7 @@
                                             <th colspan="2">Proses Pengemasan</th>
                                             <th colspan="2">Sampling Kemasan</th>
                                             <th colspan="2">Hasil Sealing</th>
-                                            <th rowspan="2">Isi Per-Pack</th>
+                                            <th rowspan="2" class="text-nowrap">Isi Per-Pack</th>
                                             <th colspan="3">Panjang Produk Per Pcs</th>
                                             <th colspan="3">Berat Produk Per Pcs</th>
                                             <th colspan="3">Berat Produk Per Pack (gr)</th>
@@ -246,36 +287,28 @@
 
                                         @foreach($report->details as $d)
                                         @php $checklist = $d->checklist; @endphp
+                                        @php
+                                            $contentPerPack = is_array($checklist?->content_per_pack_json)
+                                                ? $checklist->content_per_pack_json
+                                                : json_decode($checklist?->content_per_pack_json ?? '[]', true);
+
+                                            // Fallback ke kolom lama jika JSON kosong
+                                            if (empty($contentPerPack)) {
+                                                $contentPerPack = collect(range(1, 5))
+                                                    ->map(fn($i) => $checklist?->{'content_per_pack_' . $i})
+                                                    ->filter(fn($v) => $v !== null && $v !== '')
+                                                    ->values()
+                                                    ->toArray();
+                                            }
+                                        @endphp
 
                                         @for($i = 1; $i <= 5; $i++) <tr>
                                             @if($i == 1)
                                             <td rowspan="5">{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
                                             <td rowspan="5">{{ $d->product->product_name ?? '-' }}</td>
-                                            <td rowspan="5">{{ $d->product->nett_weight ?? '-' }} g</td>
-                                            <!-- <td rowspan="5">
-                                                @if($d->upload_md)
-                                                <a href="{{ asset('storage/' . $d->upload_md) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $d->upload_md) }}" alt="Bukti"
-                                                        width="60">
-                                                </a>
-                                                @endif
-                                            </td>
-                                            <td rowspan="5">
-                                                @if($d->upload_qr)
-                                                <a href="{{ asset('storage/' . $d->upload_qr) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $d->upload_qr) }}" alt="Bukti"
-                                                        width="60">
-                                                </a>
-                                                @endif
-                                            </td>
-                                            <td rowspan="5">
-                                                @if($d->upload_ed)
-                                                <a href="{{ asset('storage/' . $d->upload_ed) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $d->upload_ed) }}" alt="Bukti"
-                                                        width="60">
-                                                </a>
-                                                @endif
-                                            </td> -->
+                                            <td rowspan="5">{{ !empty($d->gramase) 
+                                                        ? $d->gramase 
+                                                        : ($d->product->nett_weight ?? '-') }} g</td>
                                             <td rowspan="5">
                                                 @if(!empty($d->upload_md_multi))
                                                     @php
@@ -287,10 +320,15 @@
 
                                                     @foreach($files as $file)
                                                         <a href="{{ asset('storage/' . $file) }}" target="_blank">
-                                                            <img src="{{ asset('storage/' . $file) }}"
+                                                            <img 
+                                                                data-src="{{ asset('storage/' . $file) }}"
+                                                                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                                                                 alt="Bukti"
                                                                 width="60"
-                                                                style="margin:4px;">
+                                                                class="lazy-img"
+                                                                style="margin:4px; cursor:pointer;"
+                                                                onclick="window.open('{{ asset('storage/' . $file) }}', '_blank')"
+                                                            >
                                                         </a>
                                                     @endforeach
                                                 @endif
@@ -314,7 +352,15 @@
                                             {{-- Hasil sealing & isi per-pack, per baris --}}
                                             <td>{{ $checklist?->{'sealing_condition_' . $i} ?? '-' }}</td>
                                             <td>{{ $checklist?->{'sealing_vacuum_' . $i} ?? '-' }}</td>
-                                            <td>{{ $checklist?->{'content_per_pack_' . $i} ?? '-' }}</td>
+                                            <td>
+                                                @if(!empty($contentPerPack))
+                                                    @foreach($contentPerPack as $idx => $val)
+                                                        <div><small>Pack {{ $idx + 1 }}:</small> {{ $val ?? '-' }}</div>
+                                                    @endforeach
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
 
                                             @if($i == 1)
                                             <td rowspan="5">{{ $checklist?->standard_long_pcs ?? '-' }}</td>
@@ -386,6 +432,22 @@ $(document).ready(function() {
         $('#success-alert').fadeOut('slow');
         $('#error-alert').fadeOut('slow');
     }, 3000);
+});
+
+// Lazy load gambar hanya saat collapse row dibuka
+document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-bs-target');
+        const target = document.querySelector(targetId);
+
+        // Tunggu collapse selesai animasi
+        target?.addEventListener('shown.bs.collapse', function () {
+            this.querySelectorAll('img.lazy-img[data-src]').forEach(img => {
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+            });
+        }, { once: true });
+    });
 });
 </script>
 @endsection

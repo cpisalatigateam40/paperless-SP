@@ -40,7 +40,7 @@
                 <hr>
                 <h5 class="mb-4 mt-5">Detail Produk</h5>
                 <div id="details-container">
-                    <div class="detail-item mb-3 border p-2">
+                    <div class="detail-item border p-2" style="margin-bottom: 5rem; margin-top: 5rem;">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>Nama Produk</label>
@@ -108,6 +108,7 @@
                         <label>Catatan</label>
                         <input type="text" name="details[0][notes]" class="form-control mb-3">
                     </div>
+                    <hr>
                 </div>
 
                 <button type="button" onclick="addDetail()" class="btn btn-sm btn-secondary mb-2">+ Tambah
@@ -125,7 +126,7 @@ let detailIndex = 1;
 function addDetail() {
     let container = document.getElementById('details-container');
     let html = `
-        <div class="detail-item mb-3 border p-2">
+        <div class="detail-item border p-2" style="margin-bottom: 5rem; margin-top: 5rem;">
             <div class="row">
                 <div class="col-md-6">
                     <label>Nama Produk</label>
@@ -193,7 +194,8 @@ function addDetail() {
 
             <label>Catatan</label>
             <input type="text" name="details[${detailIndex}][notes]" class="form-control mb-3">
-        </div>`;
+        </div>
+        <hr>`;
     container.insertAdjacentHTML('beforeend', html);
     detailIndex++;
 }

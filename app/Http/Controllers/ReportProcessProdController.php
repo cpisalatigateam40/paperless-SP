@@ -23,9 +23,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Exports\ProcessProdExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportProcessProdController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportProcessProd::class;
+
     public function index(Request $request)
     {
         $query = ReportProcessProd::with([

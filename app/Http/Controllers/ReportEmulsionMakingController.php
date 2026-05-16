@@ -16,9 +16,13 @@ use App\Imports\EmulsionMakingImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EmulsionMakingExport;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportEmulsionMakingController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportEmulsionMaking::class;
+
     public function index(Request $request)
     {
         $query = ReportEmulsionMaking::with([

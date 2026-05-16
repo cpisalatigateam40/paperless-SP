@@ -44,18 +44,18 @@
         @php
             $detail = $report->details[$i] ?? null;
             $steps = [
-                ['name' => 'DRYINGI',           'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2']],
-                ['name' => 'DRYINGII',          'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2']],
-                ['name' => 'DRYINGIII',         'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2']],
-                ['name' => 'DRYINGIV',          'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2']],
-                ['name' => 'DRYINGV',           'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2']],
-                ['name' => 'PUT CORE PROBE',    'fields' => ['time_minutes_1', 'time_minutes_2']],
-                ['name' => 'SMOKING',           'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2']],
-                ['name' => 'COOKINGI',          'fields' => ['time_minutes_1', 'time_minutes_2', 'air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2']],
-                ['name' => 'COOKINGII',         'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2', 'actual_product_temp']],
-                ['name' => 'DRYING',            'fields' => ['time_minutes_1', 'time_minutes_2', 'air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2', 'actual_product_temp']],
-                ['name' => 'STEAM SUCTION',     'fields' => ['time_minutes_1', 'time_minutes_2']],
-                ['name' => 'REMOVE CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2']],
+                ['name' => 'DRYINGI',           'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'DRYINGII',          'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'DRYINGIII',         'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'DRYINGIV',          'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'DRYINGV',           'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'PUT CORE PROBE',    'fields' => ['time_minutes_1', 'time_minutes_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'SMOKING',           'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'COOKINGI',          'fields' => ['time_minutes_1', 'time_minutes_2', 'air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'COOKINGII',         'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2', 'actual_product_temp', 'rh_setting', 'rh_actual']],
+                ['name' => 'DRYING',            'fields' => ['time_minutes_1', 'time_minutes_2', 'air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2', 'actual_product_temp', 'rh_setting', 'rh_actual']],
+                ['name' => 'STEAM SUCTION',     'fields' => ['time_minutes_1', 'time_minutes_2', 'rh_setting', 'rh_actual']],
+                ['name' => 'REMOVE CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2', 'rh_setting', 'rh_actual']],
             ];
 
             $coolingSteps = [
@@ -90,10 +90,19 @@
                             @foreach($products as $product)
                             <option value="{{ $product->uuid }}"
                                 {{ $detail && $detail->product_uuid == $product->uuid ? 'selected' : '' }}>
-                                {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                {{ $product->product_name }}
                             </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Gramase</label>
+                        <input type="number" 
+                            step="0.01" 
+                            name="details[{{ $i }}][gramase]" 
+                            class="form-control"
+                            value="{{ $detail->gramase }}"
+                            placeholder="Masukkan gramase">
                     </div>
                     <!-- <div class="col-md-6">
                         <label>Untuk Kemasan (gr)</label>
@@ -105,15 +114,16 @@
                         <input type="text" name="details[{{ $i }}][production_code]" class="form-control"
                             value="{{ $detail->production_code ?? '' }}">
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Jumlah Stik</label>
-                        <input type="number" name="details[{{ $i }}][stick_count]" class="form-control"
-                            value="{{ $detail->stick_count ?? '' }}">
-                    </div>
+                    
                     <div class="col-md-6 mb-3">
                         <label>Jumlah Trolley</label>
                         <input type="number" name="details[{{ $i }}][trolley_count]" class="form-control"
                             value="{{ $detail->trolley_count ?? '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Jumlah Stik</label>
+                        <input type="number" name="details[{{ $i }}][stick_count]" class="form-control"
+                            value="{{ $detail->stick_count ?? '' }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>Jam Mulai</label>
@@ -140,8 +150,10 @@
                                         <th style="width:120px">Waktu Aktual</th>
                                         <th style="width:120px">Suhu Ruang Setting</th>
                                         <th style="width:120px">Suhu Ruang Aktual</th>
-                                        <th style="width:120px">Sirkulasi Udara 1</th>
-                                        <th style="width:120px">Sirkulasi Udara 2</th>
+                                        <th style="width:120px">RH Setting</th>
+                                        <th style="width:120px">RH Aktual</th>
+                                        <th style="width:120px">Sirkulasi Udara Setting</th>
+                                        <th style="width:120px">Sirkulasi Udara Aktual</th>
                                         <th style="width:120px">Suhu Produk Setting</th>
                                         <th style="width:120px">Suhu Produk Aktual</th>
                                         <th style="width:120px">Suhu Aktual Produk</th>
@@ -160,7 +172,7 @@
                                                 data-index="{{ $i }}"
                                                 data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}">
                                         </td>
-                                        @foreach(['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'air_circulation_1', 'air_circulation_2', 'product_temp_1', 'product_temp_2', 'actual_product_temp'] as $field)
+                                        @foreach(['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'rh_setting', 'rh_actual', 'air_circulation_1', 'air_circulation_2', 'product_temp_1', 'product_temp_2', 'actual_product_temp'] as $field)
                                         <td>
                                             @if(in_array($field, $step['fields']))
                                             <input type="number" step="any" class="form-control form-control-sm"
@@ -284,6 +296,11 @@
                             </table>
                         </div>
                     </div>
+                    <div class="col-md-12 mb-3 mt-4">
+                        <label>Catatan</label>
+                        <textarea name="notes" class="form-control" rows="4"
+                            placeholder="Masukkan catatan tambahan...">{{ $report->notes ?? '' }}</textarea>
+                    </div>  
                 </div>
 
             </div>{{-- end card-body --}}

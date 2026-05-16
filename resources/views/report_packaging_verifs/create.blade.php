@@ -34,6 +34,7 @@
                         <tr>
                             <th>Jam</th>
                             <th>Produk</th>
+                            <th>Gramase</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,10 +47,14 @@
                                 <select name="details[0][product_uuid]" class="form-control select2-product">
                                     @foreach($products as $product)
                                     <option value="{{ $product->uuid }}">
-                                        {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                        {{ $product->product_name }}
                                     </option>
                                     @endforeach
                                 </select>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
+                                    placeholder="Masukkan gramase" required>
                             </td>
                         </tr>
                     </tbody>
@@ -232,7 +237,7 @@
 </div>
 
 {{-- Isi Per-Pack --}}
-<div class="card mb-3">
+<!-- <div class="card mb-3">
     <div class="card-header p-2"><strong>Isi Per-Pack</strong></div>
     <div class="card-body p-2">
         <div class="row">
@@ -242,9 +247,25 @@
         </div>
         @endfor
     </div>
+</div> -->
+<div class="card mb-3">
+    <div class="card-header p-2 d-flex justify-content-between align-items-center">
+        <strong>Isi Per-Pack</strong>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-pack">
+            <i class="fas fa-plus"></i> Tambah Pack
+        </button>
+    </div>
+    <div class="card-body p-2">
+        <div class="row" id="content-per-pack-container">
+            {{-- Row pertama, tanpa tombol hapus --}}
+            <div class="col-md-2 mb-2 pack-item">
+                <label class="small">Aktual 1</label>
+                <input type="number" name="details[0][checklist][content_per_pack_json][]"
+                    class="form-control" placeholder="0">
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-
 {{-- Berat Produk Per Pack --}}
 <div class="card mb-3">
     <div class="card-header p-2"><strong>Berat Produk Per Pack</strong></div>
@@ -289,6 +310,9 @@
         </div>
     </div>
 </div>
+</div>
+
+
 
 @if ($errors->has('upload'))
 <div class="alert alert-danger mt-3">
@@ -527,6 +551,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 '\n\nSilakan hapus dan pilih ulang file.');
         }
     });
+
+    // ===== Isi Per-Pack dinamis (JSON) =====
+const packContainer = document.getElementById('content-per-pack-container');
+const btnAddPack    = document.getElementById('btn-add-pack');
+
+function getPackCount() {
+    return packContainer.querySelectorAll('.pack-item').length;
+}
+
+function updateLabels() {
+    packContainer.querySelectorAll('.pack-item').forEach(function(item, idx) {
+        item.querySelector('label').textContent = 'Aktual ' + (idx + 1);
+    });
+}
+
+btnAddPack.addEventListener('click', function () {
+    const index = getPackCount() + 1;
+
+    const col = document.createElement('div');
+    col.className = 'col-md-2 mb-2 pack-item';
+    col.innerHTML = `
+        <label class="small">Aktual ${index}</label>
+        <div class="input-group">
+            <input type="number"
+                name="details[0][checklist][content_per_pack_json][]"
+                class="form-control" placeholder="0">
+            <button type="button" class="btn btn-outline-danger btn-remove-pack" title="Hapus">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    packContainer.appendChild(col);
+});
+
+packContainer.addEventListener('click', function (e) {
+    const removeBtn = e.target.closest('.btn-remove-pack');
+    if (!removeBtn) return;
+
+    removeBtn.closest('.pack-item').remove();
+    updateLabels();
+});
 
 });
 </script>

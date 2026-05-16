@@ -20,9 +20,13 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\PasteurExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportPasteurController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportPasteur::class;
+
     public function index(Request $request)
     {
         $query = ReportPasteur::with([
@@ -106,7 +110,9 @@ class ReportPasteurController extends Controller
     public function create()
     {
         $areas = Area::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_pasteurs.create', compact('areas', 'products'));
     }
@@ -236,7 +242,9 @@ class ReportPasteurController extends Controller
     public function addDetail($reportUuid)
     {
         $report = ReportPasteur::where('uuid', $reportUuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_pasteurs.add_detail', compact('report', 'products'));
     }
@@ -390,7 +398,9 @@ class ReportPasteurController extends Controller
         ])->where('uuid', $uuid)->firstOrFail();
 
         $areas = Area::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         return view('report_pasteurs.edit', compact('report', 'areas', 'products'));
     }

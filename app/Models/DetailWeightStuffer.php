@@ -20,6 +20,7 @@ class DetailWeightStuffer extends Model implements Auditable
         'weight_standard',
         'long_standard',
         'machine',
+        'gramase'
     ];
 
     protected $auditEvents = [
@@ -54,5 +55,20 @@ class DetailWeightStuffer extends Model implements Auditable
     public function weights()
     {
          return $this->hasMany(WeightStufferMeasurement::class, 'stuffer_id');
+    }
+
+    public function vemag()
+    {
+        return $this->hasOne(VemagStuffer::class, 'detail_uuid', 'uuid');
+    }
+
+    public function vemag2()
+    {
+        return $this->hasOne(Vemag2Stuffer::class, 'detail_uuid', 'uuid');
+    }
+
+    public function handtmann()
+    {
+        return $this->hasOne(HandtmannStuffer::class, 'detail_uuid', 'uuid');
     }
 }

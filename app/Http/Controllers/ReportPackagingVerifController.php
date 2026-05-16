@@ -13,9 +13,14 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\PackagingVerifExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
+use App\Models\Product;
 
 class ReportPackagingVerifController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportPackagingVerif::class;
+
     public function index(Request $request)
     {
         $query = ReportPackagingVerif::with([
@@ -127,7 +132,9 @@ class ReportPackagingVerifController extends Controller
 
     public function create()
     {
-        $products = \App\Models\Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $areas = \App\Models\Area::all();
         $sections = \App\Models\Section::all();
 
@@ -202,6 +209,8 @@ class ReportPackagingVerifController extends Controller
                 'upload_qr' => $uploadQr,
                 'upload_ed' => $uploadEd,
                 'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
+                'time' => $detail['time'],
+                'gramase' => $detail['gramase'] ?? null,
             ]);
 
             $checklistData = [
@@ -254,12 +263,19 @@ class ReportPackagingVerifController extends Controller
             }
 
             // ✏ Loop content_per_pack & actual_weight
-            foreach (['content_per_pack', 'actual_weight'] as $field) {
-                for ($i = 1; $i <= 5; $i++) {
-                    $key = $field . '_' . $i;
-                    $checklistData[$key] = $detail['checklist'][$key] ?? null;
-                }
-            }
+            // foreach (['content_per_pack', 'actual_weight'] as $field) {
+            //     for ($i = 1; $i <= 5; $i++) {
+            //         $key = $field . '_' . $i;
+            //         $checklistData[$key] = $detail['checklist'][$key] ?? null;
+            //     }
+            // }
+            $contentPerPack = array_values(array_filter(
+                $detail['checklist']['content_per_pack_json'] ?? [],
+                fn($v) => $v !== null && $v !== ''
+            ));
+            $checklistData['content_per_pack_json'] = !empty($contentPerPack)
+                ? json_encode($contentPerPack)
+                : null;
 
             ChecklistPackagingDetail::create($checklistData);
         }
@@ -280,7 +296,9 @@ class ReportPackagingVerifController extends Controller
     public function addDetailForm($uuid)
     {
         $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
-        $products = \App\Models\Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_packaging_verifs.add_detail', compact('report', 'products'));
     }
@@ -339,6 +357,8 @@ class ReportPackagingVerifController extends Controller
                 'upload_qr' => $uploadQr,
                 'upload_ed' => $uploadEd,
                 'upload_md_multi' => $uploadMdMulti ? json_encode(array_values($uploadMdMulti)) : null,
+                'time' => $detail['time'],
+                'gramase' => $detail['gramase'] ?? null,
             ]);
 
             $checklistData = [
@@ -475,7 +495,9 @@ class ReportPackagingVerifController extends Controller
                     ->where('uuid', $uuid)
                     ->firstOrFail();
 
-        $products = \App\Models\Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         $areas = \App\Models\Area::all();
         $sections = \App\Models\Section::all();
 
@@ -548,6 +570,8 @@ class ReportPackagingVerifController extends Controller
                 'upload_qr' => $uploadQr,
                 'upload_ed' => $uploadEd,
                 'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
+                'time' => $detail['time'],
+                'gramase' => $detail['gramase'] ?? null,
 
             ]);
 
@@ -568,6 +592,15 @@ class ReportPackagingVerifController extends Controller
                 $checklistData['packaging_thermoformer_' . $i] = ($i == 1 && $packaging == 'Thermoformer') ? 'OK' : null;
                 $checklistData['packaging_manual_' . $i] = ($i == 1 && $packaging == 'Manual') ? 'OK' : null;
             }
+
+            // Tambahkan ini — handle content_per_pack_json
+            $contentPerPack = array_values(array_filter(
+                $checklistData['content_per_pack_json'] ?? [],
+                fn($v) => $v !== null && $v !== ''
+            ));
+            $checklistData['content_per_pack_json'] = !empty($contentPerPack)
+                ? json_encode($contentPerPack)
+                : null;
 
             ChecklistPackagingDetail::create($checklistData);
         }

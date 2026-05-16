@@ -12,9 +12,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\PremixExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportPremixController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportPremix::class;
 
     public function index(Request $request)
     {

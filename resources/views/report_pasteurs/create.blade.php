@@ -32,15 +32,15 @@
                                 <label>Produk</label>
                                 <select name="details[0][product_uuid]" class="form-control select2-product">
                                     @foreach($products as $product)
-                                    <option value="{{ $product->uuid }}">{{ $product->product_name }} -
-                                        {{ $product->nett_weight }} g</option>
+                                    <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label>Nomor Program</label>
-                                <input type="text" name="details[0][program_number]" class="form-control">
+                                <label>Gramase (gr)</label>
+                                <input type="number" name="details[0][for_packaging_gr]" class="form-control">
                             </div>
+                            
 
                         </div>
 
@@ -50,8 +50,8 @@
                                 <input type="text" name="details[0][product_code]" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label>Kemasan (gr)</label>
-                                <input type="number" name="details[0][for_packaging_gr]" class="form-control">
+                                <label>Nomor Program</label>
+                                <input type="text" name="details[0][program_number]" class="form-control">
                             </div>
                         </div>
 

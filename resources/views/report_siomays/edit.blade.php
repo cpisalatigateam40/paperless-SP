@@ -26,17 +26,26 @@
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Produk</label>
                         <select name="product_uuid" class="form-control select2-product" required>
                             <option value="">-- pilih produk --</option>
                             @foreach($products as $product)
                             <option value="{{ $product->uuid }}"
                                 {{ old('product_uuid', $report->product_uuid) == $product->uuid ? 'selected' : '' }}>
-                                {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                {{ $product->product_name }}
                             </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Gramase</label>
+                        <input type="number" 
+                            step="0.01" 
+                            name="gramase" 
+                            class="form-control"
+                            value="{{ $report->gramase }}"
+                            placeholder="Masukkan gramase">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Kode Produksi</label>

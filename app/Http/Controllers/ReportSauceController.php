@@ -18,9 +18,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\SauceExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportSauceController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportSauce::class;
 
     public function index(Request $request)
     {
@@ -123,7 +126,9 @@ class ReportSauceController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $rawMaterials = RawMaterial::all();
         $premixes = Premix::orderBy('name')->get(); // tambah
 
@@ -149,6 +154,7 @@ class ReportSauceController extends Controller
                 'end_time' => $request->end_time,
                 'sensory' => $request->sensory,
                 'created_by' => Auth::user()->name,
+                'gramase' => $request->gramase,
             ]);
 
             // 2. Simpan DETAIL proses + raw materials per detail
@@ -349,7 +355,9 @@ class ReportSauceController extends Controller
     public function edit($uuid)
     {
         $report = ReportSauce::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         $rawMaterials = RawMaterial::all();
         $premixes = Premix::orderBy('name')->get(); // tambah
 
@@ -371,6 +379,7 @@ class ReportSauceController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'sensory' => $request->sensory,
+                'gramase' => $request->gramase,
             ]);
 
             // ✅ Hapus detail lama (biar tidak dobel data nested)

@@ -9,17 +9,24 @@
         <div class="card-body">
             <form action="{{ route('report_metal_detectors.store_detail', $report->uuid) }}" method="POST">
                 @csrf
-                <div class="mb-3">
-                    <label>Produk</label>
-                    <select name="product_uuid" class="form-control select2-product" required>
-                        <option value="">-- Pilih Produk --</option>
-                        @foreach($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }} - {{ $product->nett_weight }}
-                            g
-                        </option>
-                        @endforeach
-                    </select>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Produk</label>
+                        <select name="product_uuid" class="form-control select2-product" required>
+                            <option value="">-- Pilih Produk --</option>
+                            @foreach($products as $product)
+                            <option value="{{ $product->uuid }}">{{ $product->product_name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Gramase</label>
+                        <input type="number" step="0.01" name="gramase" class="form-control"
+                            placeholder="Masukkan gramase" required>
+                    </div>
                 </div>
+                
                 <div class="mb-3">
                     <label>Jam</label>
                     <input type="time" name="hour" class="form-control"

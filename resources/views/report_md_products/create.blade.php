@@ -63,10 +63,15 @@
                         @foreach ($products as $product)
                         <option value="{{ $product->uuid }}" data-shelf-life="{{ $product->shelf_life }}"
                             data-created-at="{{ $product->created_at }}">
-                            {{ $product->product_name }} - {{ $product->nett_weight }} g
+                            {{ $product->product_name }}
                         </option>
                         @endforeach
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Gramase</label>
+                    <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
+                        placeholder="Masukkan gramase" required>
                 </div>
                 <!-- <div class="mb-3">
                     <label>Kode Produksi</label>
@@ -209,10 +214,15 @@ function addDetail() {
                     <option value="{{ $product->uuid }}"
                             data-shelf-life="{{ $product->shelf_life }}"
                             data-created-at="{{ $product->created_at }}">
-                        {{ $product->product_name }} - {{ $product->nett_weight }} g
+                        {{ $product->product_name }}
                     </option>
                 @endforeach
             </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Gramase</label>
+            <input type="number" step="0.01" name="details[${detailIndex}][gramase]" class="form-control"
+                placeholder="Masukkan gramase" required>
         </div>
         
         <div class="detail-row">

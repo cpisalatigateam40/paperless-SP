@@ -19,9 +19,13 @@ use App\Exports\ScaleExport;
 use App\Exports\ThermometerExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportScaleController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportScale::class;
+
     public function index(Request $request)
     {
         $reports = ReportScale::with([

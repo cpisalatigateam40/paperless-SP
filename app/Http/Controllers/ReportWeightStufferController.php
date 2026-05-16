@@ -8,6 +8,9 @@ use App\Models\ReportWeightStuffer;
 use App\Models\DetailWeightStuffer;
 use App\Models\TownsendStuffer;
 use App\Models\HitechStuffer;
+use App\Models\VemagStuffer;
+use App\Models\Vemag2Stuffer;
+use App\Models\HandtmannStuffer;
 use App\Models\CaseStuffer;
 use App\Models\WeightStuffer;
 use App\Models\Product;
@@ -19,14 +22,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\WeightStufferExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportWeightStufferController extends Controller
 {
-    // public function index()
-    // {
-    //     $reports = ReportWeightStuffer::with('details')->latest()->paginate(10);
-    //     return view('report_weight_stuffers.index', compact('reports'));
-    // }
+    use HasBulkApproval;
+    protected string $bulkModel = ReportWeightStuffer::class;
 
     public function index(Request $request)
     {
@@ -35,6 +36,9 @@ class ReportWeightStufferController extends Controller
             'details.product',
             'details.townsend',
             'details.hitech',
+            'details.vemag',
+            'details.vemag2',
+            'details.handtmann',
             'details.cases',
             'details.weights'
         ])->latest();
@@ -112,7 +116,9 @@ class ReportWeightStufferController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $standards = StandardStuffer::with('product')->get();
 
         return view('report_weight_stuffers.create', compact('products', 'standards'));
@@ -141,6 +147,7 @@ class ReportWeightStufferController extends Controller
                 'time' => $detail['time'],
                 'weight_standard' => $detail['weight_standard'] ?? null,
                 'long_standard' => $detail['long_standard'] ?? null,
+                'gramase' => $detail['gramase'] ?? null,
             ]);
 
             if ($detail['machine'] === 'townsend') {
@@ -155,6 +162,36 @@ class ReportWeightStufferController extends Controller
 
             if ($detail['machine'] === 'hitech') {
                 HitechStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'vemag') {
+                VemagStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'vemag2') {
+                Vemag2Stuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'handtmann') {
+                HandtmannStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
@@ -206,12 +243,13 @@ class ReportWeightStufferController extends Controller
     public function addDetailForm($uuid)
     {
         $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
         $standards = StandardStuffer::all();
 
         return view('report_weight_stuffers.add-detail', compact('report', 'products', 'standards'));
     }
-
 
     public function storeDetail(Request $request, $uuid)
     {
@@ -226,6 +264,7 @@ class ReportWeightStufferController extends Controller
                 'time' => $detail['time'],
                 'weight_standard' => $detail['weight_standard'] ?? null,
                 'long_standard' => $detail['long_standard'] ?? null,
+                'gramase' => $detail['gramase'] ?? null,
             ]);
 
             if ($detail['machine'] === 'townsend') {
@@ -240,6 +279,34 @@ class ReportWeightStufferController extends Controller
 
             if ($detail['machine'] === 'hitech') {
                 HitechStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'vemag') {
+                VemagStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'vemag2') {
+                Vemag2Stuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'handtmann') {
+                HandtmannStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
@@ -321,6 +388,9 @@ class ReportWeightStufferController extends Controller
             'details.product',
             'details.townsend',
             'details.hitech',
+            'details.vemag',
+            'details.vemag2',
+            'details.handtmann',
             'details.cases',
             'details.weights'
         ])->where('uuid', $uuid)->firstOrFail();
@@ -360,11 +430,16 @@ class ReportWeightStufferController extends Controller
                 'details.product',
                 'details.townsend',
                 'details.hitech',
+                'details.vemag',
+                'details.vemag2',
+                'details.handtmann',
                 'details.cases',
                 'details.weights',
             ])->firstOrFail();
 
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
         $standards = StandardStuffer::with('product')->get();
 
         return view('report_weight_stuffers.edit', compact('report', 'products', 'standards'));
@@ -384,6 +459,9 @@ class ReportWeightStufferController extends Controller
         foreach ($report->details as $oldDetail) {
             TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
             HitechStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+            VemagStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+            Vemag2Stuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+            HandtmannStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
             CaseStuffer::where('stuffer_id', $oldDetail->id)->delete();
             WeightStufferMeasurement::where('stuffer_id', $oldDetail->id)->delete();
             $oldDetail->delete();
@@ -399,6 +477,7 @@ class ReportWeightStufferController extends Controller
                 'time' => $detail['time'],
                 'weight_standard' => $detail['weight_standard'] ?? null,
                 'long_standard' => $detail['long_standard'] ?? null,
+                'gramase' => $detail['gramase'] ?? null,
             ]);
 
             if ($detail['machine'] === 'townsend') {
@@ -413,6 +492,36 @@ class ReportWeightStufferController extends Controller
 
             if ($detail['machine'] === 'hitech') {
                 HitechStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'vemag') {
+                VemagStuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'vemag2') {
+                Vemag2Stuffer::create([
+                    'detail_uuid' => $detailModel->uuid,
+                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                    'avg_weight' => $detail['avg_weight'] ?? null,
+                    'avg_long' => $detail['avg_long'] ?? null,
+                    'notes' => $detail['notes'] ?? null,
+                ]);
+            }
+
+            if ($detail['machine'] === 'handtmann') {
+                HandtmannStuffer::create([
                     'detail_uuid' => $detailModel->uuid,
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
@@ -472,6 +581,9 @@ class ReportWeightStufferController extends Controller
                 'details.product',
                 'details.townsend',
                 'details.hitech',
+                'details.vemag',
+                'details.vemag2',
+                'details.handtmann',
                 'details.cases',
                 'details.weights',
             ])

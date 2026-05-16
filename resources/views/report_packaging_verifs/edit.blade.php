@@ -33,6 +33,7 @@
                         <tr>
                             <th>Jam</th>
                             <th>Produk</th>
+                            <th>Gramase</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,10 +45,14 @@
                                     @foreach($products as $product)
                                     <option value="{{ $product->uuid }}"
                                         {{ $product->uuid == $detail->product_uuid ? 'selected' : '' }}>
-                                        {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                        {{ $product->product_name }}
                                     </option>
                                     @endforeach
                                 </select>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="details[{{ $i }}][gramase]" class="form-control"
+                                    placeholder="Masukkan gramase" value="{{ $detail->gramase }}" required>
                             </td>
                         </tr>
                     </tbody>
@@ -289,7 +294,7 @@
 </div>
 
 {{-- Isi Per Pack --}}
-<div class="card mb-3">
+<!-- <div class="card mb-3">
     <div class="card-header p-2"><strong>Isi Per Pack</strong></div>
     <div class="card-body p-2 row">
         @for($x=1; $x<=5; $x++) <div class="col-md-2 mb-2">
@@ -298,9 +303,58 @@
                 value="{{ $detail->checklist->{'content_per_pack_'.$x} ?? '' }}">
     </div>
     @endfor
-</div>
-</div>
+</div> -->
+{{-- Isi Per Pack --}}
+@php
+    $contentPerPack = is_array($detail->checklist?->content_per_pack_json)
+        ? $detail->checklist->content_per_pack_json
+        : json_decode($detail->checklist?->content_per_pack_json ?? '[]', true);
 
+    // Fallback ke kolom lama jika JSON kosong
+    if (empty($contentPerPack)) {
+        $contentPerPack = collect(range(1, 5))
+            ->map(fn($x) => $detail->checklist?->{'content_per_pack_' . $x})
+            ->filter(fn($v) => $v !== null && $v !== '')
+            ->values()
+            ->toArray();
+    }
+
+    // Minimal tampil 1 item kosong
+    if (empty($contentPerPack)) {
+        $contentPerPack = [''];
+    }
+@endphp
+
+<div class="card mb-3">
+    <div class="card-header p-2 d-flex justify-content-between align-items-center">
+        <strong>Isi Per-Pack</strong>
+        <button type="button" class="btn btn-sm btn-outline-primary btn-add-pack"
+            data-detail-index="{{ $i }}">
+            <i class="fas fa-plus"></i> Tambah Pack
+        </button>
+    </div>
+    <div class="card-body p-2">
+        <div class="row content-per-pack-container" data-detail-index="{{ $i }}">
+            @foreach($contentPerPack as $idx => $val)
+            <div class="col-md-2 mb-2 pack-item">
+                <label class="small">Aktual {{ $idx + 1 }}</label>
+                <div class="{{ $idx === 0 ? '' : 'input-group' }}">
+                    <input type="number"
+                        name="details[{{ $i }}][checklist][content_per_pack_json][]"
+                        class="form-control"
+                        value="{{ $val }}"
+                        placeholder="0">
+                    @if($idx > 0)
+                    <button type="button" class="btn btn-outline-danger btn-remove-pack" title="Hapus">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
 {{-- Berat Produk --}}
 <div class="card mb-3">
     <div class="card-header p-2"><strong>Berat Produk Per Pack</strong></div>
@@ -341,6 +395,9 @@
         </div>
     </div>
 </div>
+</div>
+
+
 @endforeach
 
 <button type="submit" class="btn btn-success">Update Report</button>
@@ -578,6 +635,47 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // ===== Isi Per-Pack dinamis (edit) =====
+document.querySelectorAll('.content-per-pack-container').forEach(function (container) {
+    const detailIndex = container.dataset.detailIndex;
+
+    function updateLabels() {
+        container.querySelectorAll('.pack-item').forEach(function (item, idx) {
+            item.querySelector('label').textContent = 'Aktual ' + (idx + 1);
+        });
+    }
+
+    // Tombol tambah
+    const btnAdd = document.querySelector(`.btn-add-pack[data-detail-index="${detailIndex}"]`);
+    if (btnAdd) {
+        btnAdd.addEventListener('click', function () {
+            const count = container.querySelectorAll('.pack-item').length + 1;
+            const col = document.createElement('div');
+            col.className = 'col-md-2 mb-2 pack-item';
+            col.innerHTML = `
+                <label class="small">Aktual ${count}</label>
+                <div class="input-group">
+                    <input type="number"
+                        name="details[${detailIndex}][checklist][content_per_pack_json][]"
+                        class="form-control" placeholder="0">
+                    <button type="button" class="btn btn-outline-danger btn-remove-pack" title="Hapus">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+    }
+
+    // Tombol hapus (delegasi)
+    container.addEventListener('click', function (e) {
+        const removeBtn = e.target.closest('.btn-remove-pack');
+        if (!removeBtn) return;
+        removeBtn.closest('.pack-item').remove();
+        updateLabels();
+    });
+});
 
 });
 </script>

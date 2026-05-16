@@ -76,7 +76,7 @@
                             @foreach($products as $product)
                             <option value="{{ $product->uuid }}"
                                 {{ $detail && $detail->product_uuid == $product->uuid ? 'selected' : '' }}>
-                                {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                {{ $product->product_name }}
                             </option>
                             @endforeach
                         </select>
@@ -342,6 +342,11 @@
                             </table>
                         </div>
                     </div>
+                    <div class="col-md-12 mb-3 mt-4">
+                        <label>Catatan</label>
+                        <textarea name="notes" class="form-control" rows="4"
+                            placeholder="Masukkan catatan tambahan...">{{ $report->notes ?? '' }}</textarea>
+                    </div>  
                 </div>
 
             </div>{{-- end card-body --}}

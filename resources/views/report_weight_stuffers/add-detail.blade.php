@@ -28,7 +28,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Nama Produk</label>
                             <select name="details[0][product_uuid]" class="form-control product-select select2-product"
                                 required>
@@ -41,16 +41,21 @@
                                     data-long-min="{{ $standard->long_min }}" data-long-max="{{ $standard->long_max }}"
                                     data-diameter="{{ $standard->diameter }}"
                                     data-weight-standard="{{ $standard->weight_max }}" @endif>
-                                    {{ $product->product_name }} - {{ $product->nett_weight }} g
+                                    {{ $product->product_name }}
                                 </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gramase</label>
+                            <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
+                                placeholder="Masukkan gramase" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label>Kode Produksi</label>
                             <input type="text" name="details[0][production_code]" class="form-control" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Waktu Proses</label>
                             <input type="time" name="details[0][time]" class="form-control" required>
                         </div>
@@ -58,19 +63,23 @@
 
                     {{-- Mesin & Input Detail --}}
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Mesin</label>
                             <select name="details[0][machine]" class="form-control" required>
                                 <option value="">-- Pilih Mesin --</option>
                                 <option value="townsend">Townsend</option>
                                 <option value="hitech">Hitech</option>
+
+                                <option value="vemag">Vemag</option>
+                                <option value="vemag2">Vemag 2</option>
+                                <option value="handtmann">Handtmann</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Kecepatan Stuffer (rpm)</label>
                             <input type="number" name="details[0][stuffer_speed]" class="form-control">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6 mb-3">
                             <label>Catatan</label>
                             <input type="text" name="details[0][notes]" class="form-control">
                         </div>

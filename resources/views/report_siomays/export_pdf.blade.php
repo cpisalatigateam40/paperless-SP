@@ -143,8 +143,10 @@
 
         <tr>
             <th class="text-start">Gramase</th>
-            <td colspan="15" class="text-start" style="text-align: start !important;">
-                {{ $report->product->nett_weight }} g</td>
+            <td colspan="16" class="text-start" style="text-align: start !important;">
+                {{ !empty($report->gramase) 
+                        ? $report->gramase 
+                        : ($report->product->nett_weight ?? '-') }} g</td>
         </tr>
 
         <tr>

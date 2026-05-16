@@ -16,11 +16,14 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\StorageRmCleanlinessExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class StorageRmCleanlinessController extends Controller
 {
 
     use HasRoles;
+    use HasBulkApproval;
+    protected string $bulkModel = ReportStorageRmCleanliness::class;
 
     public function index(Request $request)
     {

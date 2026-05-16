@@ -164,7 +164,9 @@
             <tr>
                 <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
+                <td>{{ !empty($detail->gramase) 
+                                                        ? $detail->gramase 
+                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
                 <td>{{ $detail->program_number }}</td>

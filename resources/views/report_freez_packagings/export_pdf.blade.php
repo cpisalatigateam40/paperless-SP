@@ -147,7 +147,11 @@
                     {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : '' }}
                 </td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td>{{ $detail->product->nett_weight ?? '-' }} g</td>
+                <td class="align-middle">
+                    {{ !empty($detail->gramase) 
+                        ? $detail->gramase 
+                        : ($detail->product->nett_weight ?? '-') }} g
+                </td>
                 <td>{{ $detail->production_code }}</td>
                 <td>{{ $detail->best_before }}</td>
                 <td>{{ $detail->corrective_action }}</td>

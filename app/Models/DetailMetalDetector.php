@@ -25,6 +25,7 @@ class DetailMetalDetector extends Model implements Auditable
         'corrective_action',
         'verif_after_correct',
         'notes',
+        'gramase'
     ];
 
     protected $casts = [

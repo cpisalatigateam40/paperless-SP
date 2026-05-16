@@ -18,9 +18,12 @@ use App\Imports\MetalDetectorImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MetalDetectorExport;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportMetalDetectorController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportMetalDetector::class;
 
     public function index(Request $request)
     {
@@ -92,13 +95,14 @@ class ReportMetalDetectorController extends Controller
         return view('report_metal_detectors.index', compact('reports'));
     }
 
-
     // Form create
     public function create()
     {
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_metal_detectors.create', compact('areas', 'sections', 'products'));
     }
@@ -147,6 +151,7 @@ class ReportMetalDetectorController extends Controller
                 'corrective_action' => $detail['corrective_action'],
                 'verif_after_correct' => $detail['verif_after_correct'],
                 'notes' => $detail['notes'] ?? null,
+                'gramase' => $detail['gramase'] ?? null,
             ]);
         }
 
@@ -166,7 +171,9 @@ class ReportMetalDetectorController extends Controller
     public function addDetail($report_uuid)
     {
         $report = ReportMetalDetector::where('uuid', $report_uuid)->with(['area', 'section'])->firstOrFail();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_metal_detectors.add_detail', compact('report', 'products'));
     }
@@ -203,6 +210,7 @@ class ReportMetalDetectorController extends Controller
             'corrective_action' => $request->corrective_action,
             'verif_after_correct' => $request->verif_after_correct,
             'notes' => $request->notes,
+            'gramase' => $request->gramase,
         ]);
 
         return redirect()->route('report_metal_detectors.index')->with('success', 'Detail berhasil ditambahkan!');
@@ -281,7 +289,9 @@ class ReportMetalDetectorController extends Controller
         $details = DetailMetalDetector::where('report_uuid', $report->uuid)->get();
         $areas = Area::all();
         $sections = Section::all();
-        $products = Product::all();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         return view('report_metal_detectors.edit', compact(
             'report',
@@ -330,6 +340,7 @@ class ReportMetalDetectorController extends Controller
                 'corrective_action' => $detail['corrective_action'],
                 'verif_after_correct' => $detail['verif_after_correct'],
                 'notes' => $detail['notes'] ?? null,
+                'gramase' => $detail['gramase'] ?? null,
             ]);
         }
 
@@ -389,6 +400,4 @@ class ReportMetalDetectorController extends Controller
     
         return Excel::download(new MetalDetectorExport($reports, $periodLabel), $filename);
     }
-
-
 }

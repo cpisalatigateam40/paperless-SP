@@ -52,7 +52,7 @@ function renderProductOptions(selectedUuid = '') {
             data-shelf-life="${p.shelf_life}"
             data-created-at="${p.created_at}"
             ${p.uuid === selectedUuid ? 'selected' : ''}>
-            ${p.product_name} - ${p.nett_weight} g
+            ${p.product_name}
         </option>`
     ).join('');
 }
@@ -71,13 +71,22 @@ function addDetailRow(detail = null) {
         <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">Hapus</button>
     </div>
 
-    <div class="row mb-3">
+    <div class="row">
         <div class="col-md-6 mb-3">
             <label>Produk</label>
             <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})">
                 <option value="">- Pilih Produk -</option>
                 ${renderProductOptions(detail?.product_uuid ?? '')}
             </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Gramase</label>
+            <input type="number" 
+                step="0.01" 
+                name="details[${index}][gramase]" 
+                class="form-control"
+                value="${detail?.gramase ?? ''}"
+                placeholder="Masukkan gramase">
         </div>
         <div class="col-md-6 mb-3">
             <label>Kode Produksi</label>
@@ -108,11 +117,7 @@ function addDetailRow(detail = null) {
     <div class="row mb-3">
         <div class="col-md-6">
             <label>Mesin IQF</label>
-            <select name="details[${index}][freezing][iqf_machine]" class="form-control">
-                <option value="">-- Pilih Mesin --</option>
-                <option value="IQF 1" ${detail?.freezing?.iqf_machine === 'IQF 1' ? 'selected' : ''}>IQF 1</option>
-                <option value="IQF 2" ${detail?.freezing?.iqf_machine === 'IQF 2' ? 'selected' : ''}>IQF 2</option>
-            </select>
+            <input type="text" name="details[${index}][freezing][iqf_machine]" class="form-control production-code" placeholder="Nama Mesin IQF" value="${detail?.freezing?.iqf_machine ?? ''}">
         </div>
     </div>
     <div class="row">

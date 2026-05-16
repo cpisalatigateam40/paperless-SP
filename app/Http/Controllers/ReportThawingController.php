@@ -14,9 +14,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Exports\ThawingExport;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Traits\HasBulkApproval;
 
 class ReportThawingController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportThawing::class;
+
     /**
      * Display a listing of the resource.
      */

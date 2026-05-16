@@ -72,7 +72,10 @@ class ForeignObjectExport implements WithEvents, WithTitle
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
                         $sheet->setCellValue("G{$row}", $report->section->section_name ?? '-');
-                        $sheet->setCellValue("H{$row}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "H{$row}",
+                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("I{$row}", $detail->production_code ?? '-');
                         $sheet->setCellValue("J{$row}", $detail->contaminant_type ?? '-');
                         $sheet->setCellValue("K{$row}", $detail->analysis_stage ?? '-');

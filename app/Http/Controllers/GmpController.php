@@ -22,10 +22,13 @@ use App\Exports\GmpEmployeeExport;
 use App\Exports\GmpSanitationExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class GmpController extends Controller
 {
     use HasRoles;
+    use HasBulkApproval;
+    protected string $bulkModel = ReportGmpEmployee::class;
 
     public function index(Request $request)
     {

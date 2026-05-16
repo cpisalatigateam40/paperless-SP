@@ -94,12 +94,15 @@ class ChecklistPackagingDetail extends Model implements Auditable
         'sampling_amount',
         'unit',
         'sampling_result',
-
-        
+        'content_per_pack_json'
     ];
 
     protected $auditEvents = [
         'updated',
+    ];
+
+    protected $casts = [
+        'content_per_pack_json' => 'array',
     ];
 
 

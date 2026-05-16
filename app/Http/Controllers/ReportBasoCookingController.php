@@ -16,9 +16,13 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\BasoCookingExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportBasoCookingController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportBasoCooking::class;
+
     public function index(Request $request)
     {
         $query = ReportBasoCooking::with([
@@ -115,7 +119,9 @@ class ReportBasoCookingController extends Controller
 
     public function create()
     {
-        $products = Product::orderBy('product_name')->get();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         return view('report_baso_cookings.create', compact('products'));
     }
@@ -165,6 +171,7 @@ class ReportBasoCookingController extends Controller
             'set_boiling_1' => $request->set_boiling_1,
             'set_boiling_2' => $request->set_boiling_2,
             'created_by' => Auth::user()->name ?? 'system',
+            'gramase' => $request->gramase,
         ]);
 
         // Simpan detail
@@ -445,7 +452,9 @@ class ReportBasoCookingController extends Controller
             ->where('uuid', $uuid)
             ->firstOrFail();
 
-        $products = Product::orderBy('product_name')->get();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
+        ->groupBy('product_name')
+        ->get();
 
         // ambil details dari report agar view menemukan $details
         $details = $report->details;
@@ -475,6 +484,7 @@ class ReportBasoCookingController extends Controller
                 'std_weight' => $request->std_weight,
                 'set_boiling_1' => $request->set_boiling_1,
                 'set_boiling_2' => $request->set_boiling_2,
+                'gramase' => $request->gramase,
             ]);
 
             // 2) Cache data 'akhir' & paraf lama sebelum hapus

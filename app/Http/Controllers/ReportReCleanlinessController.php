@@ -21,9 +21,13 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\ReCleanlinessExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportReCleanlinessController extends Controller
 {
+    use HasBulkApproval;
+    protected string $bulkModel = ReportReCleanliness::class;
+
     public function index(Request $request)
     {
         $reports = ReportReCleanliness::with([

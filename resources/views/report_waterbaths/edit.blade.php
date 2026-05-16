@@ -36,10 +36,19 @@
                                         @foreach($products as $p)
                                         <option value="{{ $p->uuid }}"
                                             {{ $d->product_uuid == $p->uuid ? 'selected' : '' }}>
-                                            {{ $p->product_name }} - {{ $p->nett_weight }} g
+                                            {{ $p->product_name }}
                                         </option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Gramase</label>
+                                    <input type="number" 
+                                        step="0.01" 
+                                        name="details[{{ $i }}][gramase]" 
+                                        class="form-control"
+                                        value="{{ $d->gramase }}"
+                                        placeholder="Masukkan gramase">
                                 </div>
                                 <div class="col-md-6">
                                     <label>Batch Code</label>

@@ -68,11 +68,15 @@
                         data-index="{{ $i }}">
                         <option value="">-- Pilih Produk --</option>
                         @foreach($products as $product)
-                        <option value="{{ $product->uuid }}">{{ $product->product_name }} - {{ $product->nett_weight }}
-                            g
+                        <option value="{{ $product->uuid }}">{{ $product->product_name }}
                         </option>
                         @endforeach
                     </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Gramase</label>
+                    <input type="number" step="0.01" name="details[{{ $i }}][gramase]" class="form-control"
+                        placeholder="Masukkan gramase" required>
                 </div>
                 <div class="col-md-6">
                     <label>Kode Produksi</label>
@@ -86,13 +90,14 @@
             </div> -->
 
             <div class="row g-3 card-body" style="margin-top: -2rem;">
-                <div class="col-md-6">
-                    <label>Jumlah Stik</label>
-                    <input type="number" name="details[{{ $i }}][stick_count]" class="form-control">
-                </div>
+                
                 <div class="col-md-6">
                     <label>Jumlah Trolley</label>
                     <input type="number" name="details[{{ $i }}][trolley_count]" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label>Jumlah Stik</label>
+                    <input type="number" name="details[{{ $i }}][stick_count]" class="form-control">
                 </div>
             </div>
 
@@ -113,35 +118,35 @@
             @php
             $steps = [
             ['name' => 'DRYINGI', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-            'room_temp_2']],
+            'room_temp_2', 'rh_setting', 'rh_actual']],
             ['name' => 'DRYINGII', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-            'room_temp_2']],
+            'room_temp_2', 'rh_setting', 'rh_actual']],
             ['name' => 'DRYINGIII', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-            'room_temp_2']],
+            'room_temp_2', 'rh_setting', 'rh_actual']],
             ['name' => 'DRYINGIV', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-            'room_temp_2']],
+            'room_temp_2', 'rh_setting', 'rh_actual']],
             ['name' => 'DRYINGV', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-            'room_temp_2']],
-            ['name' => 'PUT CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2']],
+            'room_temp_2', 'rh_setting', 'rh_actual']],
+            ['name' => 'PUT CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2', 'rh_setting', 'rh_actual']],
             ['name' => 'SMOKING', 'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-            'room_temp_2']],
+            'room_temp_2', 'rh_setting', 'rh_actual']],
             [
             'name' => 'COOKINGI',
             'fields' => ['time_minutes_1', 'time_minutes_2', 'air_circulation_1', 'air_circulation_2',
-            'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2']
+            'room_temp_1', 'room_temp_2', 'product_temp_1', 'product_temp_2', 'rh_setting', 'rh_actual']
             ],
             [
             'name' => 'COOKINGII',
             'fields' => ['time_minutes_1', 'time_minutes_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
-            'product_temp_2', 'actual_product_temp']
+            'product_temp_2', 'actual_product_temp', 'rh_setting', 'rh_actual']
             ],
             [
             'name' => 'DRYING',
             'fields' => ['time_minutes_1', 'time_minutes_2','air_circulation_1', 'air_circulation_2', 'room_temp_1', 'room_temp_2', 'product_temp_1',
-            'product_temp_2', 'actual_product_temp']
+            'product_temp_2', 'actual_product_temp', 'rh_setting', 'rh_actual']
             ],
-            ['name' => 'STEAM SUCTION', 'fields' => ['time_minutes_1', 'time_minutes_2']],
-            ['name' => 'REMOVE CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2']],
+            ['name' => 'STEAM SUCTION', 'fields' => ['time_minutes_1', 'time_minutes_2', 'rh_setting', 'rh_actual']],
+            ['name' => 'REMOVE CORE PROBE', 'fields' => ['time_minutes_1', 'time_minutes_2', 'rh_setting', 'rh_actual']],
             ];
             @endphp
 
@@ -157,8 +162,10 @@
                                     <th style="width:120px">Waktu Aktual</th>
                                     <th style="width:120px">Suhu Ruang Setting</th>
                                     <th style="width:120px">Suhu Ruang Aktual</th>
-                                    <th style="width:120px">Sirkulasi Udara 1</th>
-                                    <th style="width:120px">Sirkulasi Udara 2</th>
+                                    <th style="width:120px">RH Setting</th>
+                                    <th style="width:120px">RH Aktual</th>
+                                    <th style="width:120px">Sirkulasi Udara Setting</th>
+                                    <th style="width:120px">Sirkulasi Udara Aktual</th>
                                     <th style="width:120px">Suhu Produk Setting</th>
                                     <th style="width:120px">Suhu Produk Aktual</th>
                                     <th style="width:120px">Suhu Aktual Produk</th>
@@ -175,7 +182,7 @@
                                             data-step="{{ strtoupper(str_replace(' ', '', $step['name'])) }}">
                                     </td>
                                     @foreach(['time_minutes_1', 'time_minutes_2', 'room_temp_1',
-                                    'room_temp_2', 'air_circulation_1', 'air_circulation_2',
+                                    'room_temp_2',  'rh_setting', 'rh_actual', 'air_circulation_1', 'air_circulation_2',
                                     'product_temp_1', 'product_temp_2', 'actual_product_temp']
                                     as $field)
                                     <td>
@@ -425,6 +432,11 @@
                         </table>
                     </div>
                 </div>
+                <div class="col-md-12 mb-3 mt-4">
+                    <label>Catatan</label>
+                    <textarea name="notes" class="form-control" rows="4"
+                        placeholder="Masukkan catatan tambahan..."></textarea>
+                </div> 
             </div>
         </div>
 </div>

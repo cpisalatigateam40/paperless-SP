@@ -150,7 +150,10 @@ class BasoCookingExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$dataRow}", Carbon::parse($report->created_at)->format('H:i'));
                         $sheet->setCellValue("E{$dataRow}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$dataRow}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$dataRow}", $report->product->product_name ?? '-');
+                        $sheet->setCellValue(
+                            "G{$dataRow}",
+                            trim(($report->product->product_name ?? '-') . ' - ' . ($report->gramase ?? '-'))
+                        );
                         $sheet->setCellValue("H{$dataRow}", $detail->production_code ?? '-');
                         // Standar & Setting
                         $sheet->setCellValue("I{$dataRow}", $report->std_core_temp ?? '-');

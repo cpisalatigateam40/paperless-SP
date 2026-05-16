@@ -18,9 +18,13 @@ use App\Imports\RmArrivalImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\RmArrivalExport;
 use Carbon\Carbon;
+use App\Traits\HasBulkApproval;
 
 class ReportRmArrivalController extends Controller
 {
+
+    use HasBulkApproval;
+    protected string $bulkModel = ReportRmArrival::class;
 
     public function index(Request $request)
     {
@@ -474,5 +478,100 @@ class ReportRmArrivalController extends Controller
     
         return Excel::download(new RmArrivalExport($reports, $periodLabel), $filename);
     }
+
+    // public function bulkKnown(Request $request)
+    // {
+    //     $request->validate([
+    //         'filter_type' => 'required|in:month,range',
+    //         'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+    //         'date_from'   => 'required_if:filter_type,range|nullable|date',
+    //         'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+    //     ]);
+
+    //     $user  = Auth::user();
+    //     $query = ReportRmArrival::whereNull('known_by');
+
+    //     if ($request->filter_type === 'month') {
+    //         $query->whereYear('date', substr($request->month, 0, 4))
+    //             ->whereMonth('date', substr($request->month, 5, 2));
+    //     } else {
+    //         $query->whereBetween('date', [$request->date_from, $request->date_to]);
+    //     }
+
+    //     $count = $query->count();
+
+    //     if ($count === 0) {
+    //         return redirect()->back()->with('error', 'Tidak ada laporan yang belum diketahui pada periode tersebut.');
+    //     }
+
+    //     $query->update(['known_by' => $user->name]);
+
+    //     return redirect()->back()->with('success', "Berhasil mengetahui {$count} laporan.");
+    // }
+
+    // public function bulkApprove(Request $request)
+    // {
+    //     $request->validate([
+    //         'filter_type' => 'required|in:month,range',
+    //         'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+    //         'date_from'   => 'required_if:filter_type,range|nullable|date',
+    //         'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+    //     ]);
+
+    //     $user  = Auth::user();
+    //     $query = ReportRmArrival::whereNull('approved_by');
+
+    //     if ($request->filter_type === 'month') {
+    //         $query->whereYear('date', substr($request->month, 0, 4))
+    //             ->whereMonth('date', substr($request->month, 5, 2));
+    //     } else {
+    //         $query->whereBetween('date', [$request->date_from, $request->date_to]);
+    //     }
+
+    //     $count = $query->count();
+
+    //     if ($count === 0) {
+    //         return redirect()->back()->with('error', 'Tidak ada laporan yang belum disetujui pada periode tersebut.');
+    //     }
+
+    //     $query->update([
+    //         'approved_by' => $user->name,
+    //         'approved_at' => now(),
+    //     ]);
+
+    //     return redirect()->back()->with('success', "Berhasil menyetujui {$count} laporan.");
+    // }
+
+    // public function bulkKnownCount(Request $request)
+    // {
+    //     $query = ReportRmArrival::whereNull('known_by');
+
+    //     if ($request->filter_type === 'month' && $request->month) {
+    //         $query->whereYear('date', substr($request->month, 0, 4))
+    //             ->whereMonth('date', substr($request->month, 5, 2));
+    //     } elseif ($request->filter_type === 'range' && $request->date_from && $request->date_to) {
+    //         $query->whereBetween('date', [$request->date_from, $request->date_to]);
+    //     } else {
+    //         return response()->json(['count' => 0]);
+    //     }
+
+    //     return response()->json(['count' => $query->count()]);
+    // }
+
+    // public function bulkApproveCount(Request $request)
+    // {
+    //     $query = ReportRmArrival::whereNull('approved_by');
+
+    //     if ($request->filter_type === 'month' && $request->month) {
+    //         $query->whereYear('date', substr($request->month, 0, 4))
+    //             ->whereMonth('date', substr($request->month, 5, 2));
+    //     } elseif ($request->filter_type === 'range' && $request->date_from && $request->date_to) {
+    //         $query->whereBetween('date', [$request->date_from, $request->date_to]);
+    //     } else {
+    //         return response()->json(['count' => 0]);
+    //     }
+
+    //     return response()->json(['count' => $query->count()]);
+    // }
 
 }

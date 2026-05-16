@@ -138,7 +138,9 @@
             <tr>
                 <th style="width: 220px;">Keterangan</th>
                 @foreach($report->details as $detail)
-                <th>{{ $detail->product->product_name ?? '-' }} - {{ $detail->product->nett_weight ?? '-' }} g</th>
+                <th>{{ $detail->product->product_name ?? '-' }} - {{ !empty($detail->for_packaging_gr ) 
+                                                        ? $detail->for_packaging_gr  
+                                                        : ($detail->product->nett_weight ?? '-') }} g</th>
                 @endforeach
             </tr>
         </thead>
