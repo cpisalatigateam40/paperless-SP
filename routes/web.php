@@ -69,6 +69,7 @@ use App\Http\Controllers\ReportSiomayController;
 use App\Http\Controllers\ReportWaterbathController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ReportThawingController;
+use App\Http\Controllers\ReportStartupLabelController;
 
 
 Route::get('/', function () {
@@ -1298,6 +1299,20 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/check-vars', function () {
     dd(php_ini_loaded_file(), ini_get('max_input_vars'));
+
+    Route::prefix('report-startup-labels')
+    ->name('report_startup_labels.')
+    ->controller(ReportStartupLabelController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}', 'show')->name('show');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+    });
+    
 });
 
     });

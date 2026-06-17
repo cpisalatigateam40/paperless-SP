@@ -25,7 +25,8 @@ Request::is('report-retain-samples*') ||
 Request::is('report-product-verifs*') ||
 Request::is('report-tofu-verifs*') ||
 Request::is('report-prod-loss-vacums*') ||
-Request::is('report-packaging-verifs*');
+Request::is('report-packaging-verifs*') ||
+Request::is('report-startup-labels*'); 
 $isPasteurizing =
 Request::is('report-pasteurs*') ||
 Request::is('report-waterbaths*');
@@ -280,6 +281,11 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
                     href="{{ route('report_lab_samples.index') }}">
                     Verifikasi Pengambilan Sample
+                </a>
+
+                <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
+                    href="{{ route('report_startup_labels.index') }}">
+                    Pemeriksaan Labelisasi Startup
                 </a>
             </div>
         </div>
