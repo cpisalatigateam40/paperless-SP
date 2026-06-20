@@ -25,6 +25,8 @@ class DataFreezing extends Model implements Auditable
         'freezing_time_actual',
         'standard_temp',
         'iqf_machine',
+        'machine_type',
+        'notes'
     ];
 
     protected $auditEvents = [
@@ -40,5 +42,14 @@ class DataFreezing extends Model implements Auditable
     public function detail()
     {
         return $this->belongsTo(DetailFreezPackaging::class, 'detail_uuid', 'uuid');
+    }
+
+    public function actualTemps()
+    {
+        return $this->hasMany(
+            FreezingActualTemp::class,
+            'freezing_uuid',
+            'uuid'
+        );
     }
 }

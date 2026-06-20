@@ -1,7 +1,7 @@
 @php
 $isMasterData =
 Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
-'standard-stuffers*', 'maurer-standards*', 'fessman-standards*');
+'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*');
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -11,7 +11,8 @@ Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
 Request::is('report-siomays*') ||
 Request::is('report-thawings*') ||
-Request::is('report-process-productions*');
+Request::is('report-process-productions*') ||
+Request::is('report-mt-cleans*');
 $isCooking =
 Request::is('report-maurer-cookings*') ||
 Request::is('report-fessman-cookings*') ||
@@ -25,7 +26,8 @@ Request::is('report-retain-samples*') ||
 Request::is('report-product-verifs*') ||
 Request::is('report-tofu-verifs*') ||
 Request::is('report-prod-loss-vacums*') ||
-Request::is('report-packaging-verifs*');
+Request::is('report-packaging-verifs*') ||
+Request::is('report-startup-labels*');
 $isPasteurizing =
 Request::is('report-pasteurs*') ||
 Request::is('report-waterbaths*');
@@ -40,7 +42,8 @@ $isNonProses = Request::is([
 'report-chlorine-residues*',
 'report-fragile-item*',
 'report-scales*',
-'report-sharp-tools*'
+'report-sharp-tools*',
+'report-changeover-cleanings*'
 ]);
 $isKetidaksesuaian = Request::is([
 'report-production-nonconformities*',
@@ -126,6 +129,8 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('premixes.index') }}">Bahan penunjang & Premix</a>
                 <a class="collapse-item {{ Request::is('formulas*') ? 'active' : '' }}"
                     href="{{ route('formulas.index') }}">Formulasi</a>
+                <a class="collapse-item {{ Request::is('master-checklist-items*') ? 'active' : '' }}"
+                    href="{{ route('master_checklist_items.index') }}">Item Pergantian Produk</a>
             </div>
         </div>
     </li>
@@ -216,6 +221,10 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_thawings.index') }}">
                     Pemeriksaan Proses Thawing
                 </a>
+                <a class="collapse-item {{ Request::is('report-mt-cleans*') ? 'active' : '' }}"
+                    href="{{ route('report_mt_cleans.index') }}">
+                    Pemeriksaan Kebersihan Magnet Trap
+                </a>
             </div>
         </div>
     </li>
@@ -281,6 +290,11 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_lab_samples.index') }}">
                     Verifikasi Pengambilan Sample
                 </a>
+
+                <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
+                    href="{{ route('report_startup_labels.index') }}">
+                    Pemeriksaan Labelisasi Startup
+                </a>
             </div>
         </div>
     </li>
@@ -318,7 +332,7 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-freez-packagings*') ? 'active' : '' }}"
                     href="{{ route('report_freez_packagings.index') }}">
-                    Verifikasi Pembekuan IQF dan Pengemasan Karton Box
+                    Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk
                 </a>
             </div>
         </div>
@@ -362,6 +376,10 @@ $isKetidaksesuaian = Request::is([
                 <a class="collapse-item {{ Request::is('report-scales*') ? 'active' : '' }}"
                     href="{{ route('report-scales.index') }}">
                     Timbangan & Thermometer
+                </a>
+                <a class="collapse-item {{ Request::is('report-changeover-cleanings*') ? 'active' : '' }}"
+                    href="{{ route('report_changeover_cleanings.index') }}">
+                    Pemeriksaan Kebersihan Setelah Pergantian Produk
                 </a>
             </div>
         </div>

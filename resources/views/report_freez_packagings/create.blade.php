@@ -4,11 +4,11 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4 class="mb-4">Buat Laporan Verifikasi Pembekuan IQF & Pengemasan Karton Box</h4>
+            <h4 class="mb-4">Buat Laporan Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h4>
         </div>
 
         <div class="card-body">
-            <form action="{{ route('report_freez_packagings.store') }}" method="POST">
+            <form id="reportFreezPackagingForm" action="{{ route('report_freez_packagings.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="row mb-5">
@@ -27,6 +27,17 @@
 
                 <h5 class="mt-5">Detail Produk</h5>
                 <div id="detail-container"></div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-5">
+                        <label>Catatan Laporan</label>
+                        <textarea
+                            name="notes"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Masukkan catatan laporan..."></textarea>
+                    </div>
+                </div>
 
                 <button type="button" class="btn btn-outline-primary" onclick="addDetailRow()">+ Tambah Baris
                     Detail</button>
@@ -95,7 +106,22 @@ function addDetailRow() {
         </div>
     </div>
 
-    <div class="row mt-2">
+    <h6 class="mt-5 mb-3" style="font-weight: bold;">Pembekuan</h6>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Tipe Mesin</label>
+            <select name="details[${index}][freezing][machine_type]" class="form-control">
+                <option value="">Pilih Tipe Mesin</option>
+                <option value="IQF">IQF</option>
+                <option value="ABF">ABF</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label>Nama Mesin</label>
+            <input type="text" name="details[${index}][freezing][iqf_machine]" class="form-control production-code" placeholder="Nama Mesin">
+        </div>
+    </div>
+    <div class="row mt-2 mb-3">
         <div class="col-md-6">
             <label>Waktu Mulai</label>
             <input type="time" name="details[${index}][start_time]" class="form-control" value="${currentTime}">
@@ -105,102 +131,139 @@ function addDetailRow() {
             <input type="time" name="details[${index}][end_time]" class="form-control" value="${currentTime}">
         </div>
     </div>
-
-    <h6 class="mt-5 mb-3" style="font-weight: bold;">Pembekuan</h6>
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label>Mesin IQF</label>
-            <input type="text" name="details[${index}][freezing][iqf_machine]" class="form-control production-code" placeholder="Nama Mesin IQF">
-        </div>
-    </div>
     <div class="row">
         <div class="col-md-6">
-            <label>Suhu Akhir Produk (°C)</label>
-            <input type="number" step="0.0000001" name="details[${index}][freezing][end_product_temp]" class="form-control">
-        </div>
-        <div class="col-md-6">
-            <label>Standard Suhu (°C)</label>
+            <label>Standard Suhu Produk (°C)</label>
             <input type="number" step="0.0000001" 
                 name="details[${index}][freezing][standard_temp]" 
                 class="form-control"
                 value="-18">
         </div>
+        <div class="col-md-6">
+            <label>Suhu Aktual Produk (°C)</label>
+
+            <div class="actual-temp-wrapper">
+                <div class="input-group mb-2">
+                    <input type="number"
+                        step="0.0000001"
+                        name="details[${index}][freezing][actual_temps][]"
+                        class="form-control">
+
+                    <button type="button"
+                        class="btn btn-success add-temp">
+                        +
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-3">
         <div class="col-md-6">
-            <label>Suhu Room IQF (°C)</label>
+            <label>Suhu Room IQF/ABF (°C)</label>
             <input type="number" step="0.0000001" name="details[${index}][freezing][iqf_room_temp]" class="form-control">
         </div>
-        <div class="col-md-6">
+
+        <div class="col-md-6 mb-3">
+            <label>Catatan Pembekuan</label>
+            <textarea
+                name="details[${index}][freezing][notes]"
+                class="form-control"
+                rows="1"
+                placeholder="Masukkan catatan..."></textarea>
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <label>Dokumentasi Pembekuan</label>
+
+            <input
+                type="file"
+                name="details[${index}][documentation][]"
+                class="form-control"
+                accept="image/*"
+                capture="environment"
+                multiple>
+        </div>
+        
+        <div class="col-md-6 d-none">
             <label>Suhu Suction IQF (°C)</label>
             <input type="number" step="0.0000001" name="details[${index}][freezing][iqf_suction_temp]" class="form-control">
         </div>
     </div>
 
     <div class="row mt-3">
-        <div class="col-md-6">
+        <div class="col-md-6 d-none">
             <label>Durasi Display (menit)</label>
             <input type="number" name="details[${index}][freezing][freezing_time_display]" class="form-control">
         </div>
-        <div class="col-md-6">
+        
+        <div class="col-md-6 d-none">
             <label>Durasi Aktual (menit)</label>
             <input type="number" name="details[${index}][freezing][freezing_time_actual]" class="form-control">
         </div>
     </div>
 
-    <h6 class="mt-5 mb-3" style="font-weight: bold;">Kartoning</h6>
+    <h6 class="mt-5 mb-3" style="font-weight: bold;">Pengemasan Sekunder</h6>
     <div class="row">
         <div class="col-md-6">
-            <label class="form-label">Verifikasi Kondisi Karton</label>
+            <label class="form-label">Kondisi Kemasan Sekunder</label>
             <select name="details[${index}][kartoning][carton_condition]" class="form-control">
                 <option value="✓">✓</option>
                 <option value="x">x</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label>Label Kemasan Sekunder</label>
+            <select name="details[${index}][kartoning][label_condition]" class="form-control">
+                <option value="">Pilih</option>
+                <option value="OK">OK</option>
+                <option value="Tidak OK">Tidak OK</option>
             </select>
         </div>
     </div>
     
     <div class="row mt-3">
         <div class="col-md-6">
-            <label>Isi Bag</label>
+            <label>Isi Per Kemasan Sekunder</label>
             <input type="number" name="details[${index}][kartoning][content_bag]" class="form-control">
         </div>
-        <div class="col-md-6">
-            <label>Isi Binded</label>
-            <input type="number" name="details[${index}][kartoning][content_binded]" class="form-control">
-        </div>
-        <div class="col-md-6 mt-3">
-            <label>Isi Inner RTG</label>
+        <div class="col-md-6 mb-3">
+            <label>Isi Per Inner *RTG</label>
             <input type="number" name="details[${index}][kartoning][content_rtg]" class="form-control">
         </div>
+        <div class="col-md-6">
+            <label>Isi per binded *prod. binded</label>
+            <input type="number" name="details[${index}][kartoning][content_binded]" class="form-control">
+        </div>
+        
     </div>
     
     <div class="row mt-3">
         <div class="col-md-6">
-            <label>Berat Standar (kg)</label>
+            <label>Standar Berat Hasil Kartoning (kg)</label>
             <input type="text" name="details[${index}][kartoning][carton_weight_standard]" class="form-control" placeholder="contoh: 12-13">
         </div>
     </div>
     
     <div class="row kartoning-group mt-3" data-index="${index}">
         <div class="col-md-2">
-            <label>Berat Karton 1</label>
+            <label>Berat Aktual Hasil Karton 1</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_1]" class="form-control weight-input">
         </div>
         <div class="col-md-2">
-            <label>Berat Karton 2</label>
+            <label>Berat Aktual Hasil Karton 2</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_2]" class="form-control weight-input">
         </div>
         <div class="col-md-2">
-            <label>Berat Karton 3</label>
+            <label>Berat Aktual Hasil Karton 3</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_3]" class="form-control weight-input">
         </div>
         <div class="col-md-2">
-            <label>Berat Karton 4</label>
+            <label>Berat Aktual Hasil Karton 4</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_4]" class="form-control weight-input">
         </div>
         <div class="col-md-2">
-            <label>Berat Karton 5</label>
+            <label>Berat Aktual Hasil Karton 5</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_5]" class="form-control weight-input">
         </div>
         <div class="col-md-2">
@@ -209,14 +272,57 @@ function addDetailRow() {
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <label>Tindakan Koreksi</label>
-            <input type="text" name="details[${index}][corrective_action]" class="form-control">
+    <div class="row mt-3 mb-3">
+        <div class="col-md-6 mb-3">
+            <label>Catatan Pengemasan Sekunder</label>
+            <textarea
+                name="details[${index}][kartoning][notes]"
+                class="form-control"
+                rows="1"></textarea>
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <label>Dokumentasi Pengemasan Sekunder</label>
+
+            <input
+                type="file"
+                name="details[${index}][kartoning_documentation][]"
+                class="form-control"
+                accept="image/*"
+                capture="environment"
+                multiple>
+        </div>
+    </div>
+
+
+
+    <h6 class="mt-5 mb-3" style="font-weight: bold;">Status Produk</h6>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Status Release</label>
+            <select name="details[${index}][release_status]" class="form-control">
+                <option value="">Pilih Status</option>
+                <option value="Release">Release</option>
+                <option value="Hold">Hold</option>
+            </select>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Verifikasi Setelah Tindakan Koreksi</label>
+            <label>Tindakan Perbaikan</label>
+            <input type="text" name="details[${index}][corrective_action]" class="form-control">
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Catatan Status Produk</label>
+            <textarea
+                name="details[${index}][notes]"
+                class="form-control"
+                rows="1"></textarea>
+        </div>
+
+        <div class="col-md-6 d-none">
+            <label class="form-label">Verifikasi Setelah Tindakan Perbaikan</label>
             <select name="details[${index}][verif_after]" class="form-control">
                 <option value="✓">✓</option>
                 <option value="x">x</option>
@@ -360,5 +466,141 @@ document.addEventListener('input', function (e) {
     const result = calculateExpirationDate(batchCode, expirationMonths);
     bestBeforeInput.value = result ? result.expiration_date : '';
 });
+
+document.addEventListener('click', function(e) {
+
+    if (e.target.classList.contains('add-temp')) {
+
+        const wrapper = e.target.closest('.actual-temp-wrapper');
+        const inputName = wrapper.querySelector('input').name;
+
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2';
+
+        div.innerHTML = `
+            <input type="number"
+                step="0.0000001"
+                name="${inputName}"
+                class="form-control">
+
+            <button type="button"
+                class="btn btn-danger remove-temp">
+                -
+            </button>
+        `;
+
+        wrapper.appendChild(div);
+    }
+
+    if (e.target.classList.contains('remove-temp')) {
+        e.target.closest('.input-group').remove();
+    }
+});
+
+// ===== Compress & Validasi Upload File =====
+    const MAX_SIZE_MB = 2;
+    const MAX_FILES = 10;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+    const COMPRESS_QUALITY = 0.7; // 70% kualitas JPEG
+
+    // Fungsi compress 1 file gambar
+    function compressImage(file, quality) {
+        return new Promise((resolve, reject) => {
+            if (!file.type.startsWith('image/')) {
+                resolve(file);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Gagal membaca file: ' + file.name));
+
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Format gambar tidak didukung: ' + file.name));
+
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_DIMENSION = 1280;
+
+                    if (width > height) {
+                        if (width > MAX_DIMENSION) {
+                            height *= MAX_DIMENSION / width;
+                            width = MAX_DIMENSION;
+                        }
+                    } else {
+                        if (height > MAX_DIMENSION) {
+                            width *= MAX_DIMENSION / height;
+                            height = MAX_DIMENSION;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(function(blob) {
+                        if (!blob) {
+                            reject(new Error('Gagal mengompres: ' + file.name));
+                            return;
+                        }
+                        resolve(new File(
+                            [blob],
+                            file.name.replace(/\.[^.]+$/, '.jpg'),
+                            { type: 'image/jpeg' }
+                        ));
+                    }, 'image/jpeg', quality);
+                };
+
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+document.getElementById('reportFreezPackagingForm')
+.addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const form = this;
+
+    const fileInputs = form.querySelectorAll(
+        'input[type="file"]'
+    );
+
+    for (const input of fileInputs) {
+
+        if (!input.files || !input.files.length) {
+            continue;
+        }
+
+        const dataTransfer = new DataTransfer();
+
+        for (const file of input.files) {
+
+            let compressedFile;
+
+            try {
+                compressedFile = await compressImage(
+                    file,
+                    COMPRESS_QUALITY
+                );
+            } catch (err) {
+                compressedFile = file;
+            }
+
+            dataTransfer.items.add(compressedFile);
+        }
+
+        input.files = dataTransfer.files;
+    }
+
+    form.submit();
+});
+
 </script>
 @endsection

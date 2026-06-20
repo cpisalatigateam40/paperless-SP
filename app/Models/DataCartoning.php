@@ -30,6 +30,8 @@ class DataCartoning extends Model implements Auditable
         'avg_weight',
         'content_rtg',
         'carton_condition',
+        'label_condition',
+        'notes'
     ];
 
     protected $auditEvents = [

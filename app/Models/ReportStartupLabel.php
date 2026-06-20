@@ -2,18 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use App\Scopes\UserAreaScope;
-use OwenIt\Auditing\Contracts\Auditable;
 
-class ReportFreezPackaging extends Model implements Auditable
+class ReportStartupLabel extends Model
 {
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
 
-    protected $table = 'report_freez_packagings';
+    protected $table = 'report_startup_labels';
 
     protected $fillable = [
         'uuid',
@@ -24,27 +21,37 @@ class ReportFreezPackaging extends Model implements Auditable
         'known_by',
         'approved_by',
         'approved_at',
-        'notes'
     ];
 
-    protected $auditEvents = [
-        'updated',
+    protected $casts = [
+        'date' => 'date',
+        'approved_at' => 'datetime',
     ];
 
     protected static function boot()
     {
         parent::boot();
-        static::creating(fn($model) => $model->uuid = Str::uuid());
-        static::addGlobalScope(new UserAreaScope);
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
     }
 
+    /**
+     * Relasi ke Area
+     */
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 
+    /**
+     * Relasi ke detail (1 report banyak detail)
+     */
     public function details()
     {
-        return $this->hasMany(DetailFreezPackaging::class, 'report_uuid', 'uuid');
+        return $this->hasMany(DetailStartupLabel::class, 'report_uuid', 'uuid');
     }
 }

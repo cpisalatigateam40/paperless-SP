@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Laporan Verifikasi Pembekuan IQF & Pengemasan Karton Box</h4>
+            <h4>Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h4>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 
@@ -120,6 +120,7 @@
                             <th>Waktu</th>
                             <th>Area</th>
                             <th>Ketidaksesuaian</th>
+                            <th>Catatan</th>
                             <th>Dibuat Oleh</th>
                             <th>Aksi</th>
                         </tr>
@@ -139,7 +140,7 @@
                                 -
                                 @endif
                             </td>
-
+                            <td>{{ $report->notes }}</td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .2rem;">
                                 {{-- Toggle Detail --}}
@@ -247,31 +248,32 @@
                                         style="font-size: 13px;">
                                         <thead>
                                             <tr>
-                                                <th rowspan="2">Waktu Pemeriksaan</th>
                                                 <th rowspan="2">Nama Produk</th>
                                                 <th rowspan="2">Gramase</th>
                                                 <th rowspan="2">Kode Produksi</th>
                                                 <th rowspan="2">Best Before</th>
-                                                <th rowspan="2">Tindakan Koreksi</th>
-                                                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
+                                                <th rowspan="2">Release or Hold</th>
+                                                <th rowspan="2">Tindakan Perbaikan</th>
+                                                <th rowspan="2">Catatan Status Produk</th>
+                                                <th rowspan="2">Waktu Proses</th>
 
-                                                <th colspan="7">PEMBEKUAN</th>
-                                                <th colspan="12">KARTONING</th>
+                                                <th colspan="6">PEMBEKUAN</th>
+                                                <th colspan="14">KARTONING</th>
 
                                             </tr>
                                             <tr>
-                                                <th>Mesin IQF</th>
-                                                <th>Suhu Akhir</th>
+                                                <th>Mesin</th>
+                                                <th>Suhu Aktual Produk</th>
                                                 <th>Standar Suhu</th>
-                                                <th>Suhu IQF Room</th>
-                                                <th>Suhu IQF Suction</th>
-                                                <th>Lama Pembekuan Display</th>
-                                                <th>Lama Pembekuan Aktual</th>
+                                                <th>Suhu Room IQF/ABF</th>
+                                                <th>Dokumentasi</th>
+                                                <th>Catatan Pembekuan</th>
 
                                                 <th>Kondisi Karton</th>
-                                                <th>Isi Bag</th>
-                                                <th>Isi Binded</th>
-                                                <th>Isi RTG</th>
+                                                <th>Kondisi Label</th>
+                                                <th>Isi per Kemasan Sekunder</th>
+                                                <th>Isi per binded *prod. binded</th>
+                                                <th>Isi per Inner *RTG</th>
                                                 <th>Berat Standar (kg)</th>
                                                 <th>Berat Karton 1</th>
                                                 <th>Berat Karton 2</th>
@@ -279,16 +281,14 @@
                                                 <th>Berat Karton 4</th>
                                                 <th>Berat Karton 5</th>
                                                 <th>Rata-Rata Berat</th>
+                                                <th>Dokumentasi</th>
+                                                <th>Catatan Pengemasan Sekunder</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($report->details as $detail)
                                             <tr>
-                                                <td class="align-middle">
-                                                    {{ $detail->start_time ? \Carbon\Carbon::parse($detail->start_time)->format('H:i') : '-' }}
-                                                    -
-                                                    {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : '-' }}
-                                                </td>
+                                                
                                                 <td class="align-middle">{{ $detail->product->product_name ?? '-' }}
                                                 </td>
                                                 <td class="align-middle">
@@ -298,15 +298,28 @@
                                                 </td>
                                                 <td class="align-middle">{{ $detail->production_code ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->best_before ?? '-' }}</td>
+                                                <td class="align-middle">{{ $detail->release_status ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->corrective_action ?? '-' }}</td>
-                                                <td class="align-middle">{{ $detail->verif_after ?? '-' }}</td>
+                                                <td class="align-middle">{{ $detail->notes ?? '-' }}</td>
+                                                <td class="align-middle">
+                                                    {{ $detail->start_time ? \Carbon\Carbon::parse($detail->start_time)->format('H:i') : '-' }}
+                                                    -
+                                                    {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : '-' }}
+                                                </td>
 
                                                 {{-- Freezing --}}
                                                 <td class="align-middle">
-                                                    {{ $detail->freezing->iqf_machine ?? '-' }}
+                                                    {{ $detail->freezing->iqf_machine ?? '-' }} ({{ $detail->freezing->machine_type ?? '-' }})
                                                 </td>
                                                 <td class="align-middle">
-                                                    {{ $detail->freezing->end_product_temp ?? '-' }}
+                                                    @if($detail->freezing && $detail->freezing->actualTemps->count())
+                                                        @foreach($detail->freezing->actualTemps as $temp)
+                                                            {{ number_format($temp->actual_temp, 2) }}°C
+                                                            @if(!$loop->last)<br>@endif
+                                                        @endforeach
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
                                                 <td class="align-middle">
                                                     {{ $detail->freezing->standard_temp ?? '-' }}
@@ -314,16 +327,29 @@
                                                 <td class="align-middle">{{ $detail->freezing->iqf_room_temp ?? '-' }}
                                                 </td>
                                                 <td class="align-middle">
-                                                    {{ $detail->freezing->iqf_suction_temp ?? '-' }}
+                                                    @if($detail->documentations->count())
+                                                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                                                            @foreach($detail->documentations as $doc)
+                                                                <a href="{{ asset('storage/'.$doc->image) }}" target="_blank">
+                                                                    <img src="{{ asset('storage/'.$doc->image) }}"
+                                                                        alt="Dokumentasi"
+                                                                        style="width:50px;height:50px;object-fit:cover;border:1px solid #ddd;border-radius:4px;">
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
-                                                <td class="align-middle">
-                                                    {{ $detail->freezing->freezing_time_display ?? '-' }}</td>
-                                                <td class="align-middle">
-                                                    {{ $detail->freezing->freezing_time_actual ?? '-' }}</td>
+                                                <td class="align-middle">{{ $detail->freezing->notes ?? '-' }}
+                                                </td>
 
                                                 {{-- Kartoning --}}
                                                 <td class="align-middle">
                                                     {{ $detail->kartoning->carton_condition ?? '-' }}
+                                                </td>
+                                                <td class="align-middle">
+                                                    {{ $detail->kartoning->label_condition ?? '-' }}
                                                 </td>
                                                 <td class="align-middle">{{ $detail->kartoning->content_bag ?? '-' }}
                                                 </td>
@@ -339,6 +365,23 @@
                                                 <td class="align-middle">{{ $detail->kartoning->weight_4 ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->kartoning->weight_5 ?? '-' }}</td>
                                                 <td class="align-middle">{{ $detail->kartoning->avg_weight ?? '-' }}
+                                                </td>
+                                                <td class="align-middle">
+                                                    @if($detail->kartoningDocumentations->count())
+                                                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                                                            @foreach($detail->kartoningDocumentations as $doc)
+                                                                <a href="{{ asset('storage/'.$doc->image) }}" target="_blank">
+                                                                    <img src="{{ asset('storage/'.$doc->image) }}"
+                                                                        alt="Dokumentasi"
+                                                                        style="width:50px;height:50px;object-fit:cover;border:1px solid #ddd;border-radius:4px;">
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
+                                                <td class="align-middle">{{ $detail->kartoning->notes ?? '-' }}
                                                 </td>
 
 

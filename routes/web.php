@@ -69,6 +69,10 @@ use App\Http\Controllers\ReportSiomayController;
 use App\Http\Controllers\ReportWaterbathController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ReportThawingController;
+use App\Http\Controllers\ReportStartupLabelController;
+use App\Http\Controllers\ReportMtCleanController;
+use App\Http\Controllers\MasterChecklistItemController;
+use App\Http\Controllers\ReportChangeoverCleaningController;
 
 
 Route::get('/', function () {
@@ -173,6 +177,19 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/import', 'import')->name('import');
             Route::get('/template', 'downloadTemplate')->name('template');
             Route::post('/import', 'import')->name('import');
+        });
+
+    Route::prefix('master-checklist-items')
+        ->name('master_checklist_items.')
+        ->controller(MasterChecklistItemController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}', 'show')->name('show');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
         });
 
     // STORAGE RM ROUTES
@@ -1228,6 +1245,55 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-siomays/bulk-approve', [ReportSiomayController::class, 'bulkApprove'])->name('report-siomays.bulk-approve');
     Route::get('report-siomays/bulk-known-count', [ReportSiomayController::class, 'bulkKnownCount'])->name('report-siomays.bulk-known-count');
     Route::get('report-siomays/bulk-approve-count', [ReportSiomayController::class, 'bulkApproveCount'])->name('report-siomays.bulk-approve-count');
+    Route::post(
+    'report-startup-labels/export-excel',
+        [ReportStartupLabelController::class, 'exportExcel']
+    )->name('report_startup_labels.exportExcel');
+
+    Route::prefix('report-startup-labels')
+        ->name('report_startup_labels.')
+        ->controller(ReportStartupLabelController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}', 'show')->name('show');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+            Route::post('/{id}/approve', 'approve')->name('approve');
+            Route::post('/{id}/known', 'known')->name('known');
+        });
+    Route::post('report-startup-labels/bulk-known', [ReportStartupLabelController::class, 'bulkKnown'])->name('report-startup-labels.bulk-known');
+    Route::post('report-startup-labels/bulk-approve', [ReportStartupLabelController::class, 'bulkApprove'])->name('report-startup-labels.bulk-approve');
+    Route::get('report-startup-labels/bulk-known-count', [ReportStartupLabelController::class, 'bulkKnownCount'])->name('report-startup-labels.bulk-known-count');
+    Route::get('report-startup-labels/bulk-approve-count', [ReportStartupLabelController::class, 'bulkApproveCount'])->name('report-startup-labels.bulk-approve-count');
+
+    Route::prefix('report-mt-cleans')
+        ->name('report_mt_cleans.')
+        ->controller(ReportMtCleanController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}', 'show')->name('show');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+            Route::get('/{uuid}/export-pdf', 'exportPdf')
+                ->name('exportPdf');
+            Route::post('/{id}/approve', 'approve')
+                ->name('approve');
+            Route::post('/{id}/known', 'known')
+                ->name('known');
+            Route::post('/export-excel', 'exportExcel')
+                ->name('exportExcel');
+        });
+    Route::post('report-mt-cleans/bulk-known', [ReportMtCleanController::class, 'bulkKnown'])->name('report-mt-cleans.bulk-known');
+    Route::post('report-mt-cleans/bulk-approve', [ReportMtCleanController::class, 'bulkApprove'])->name('report-mt-cleans.bulk-approve');
+    Route::get('report-mt-cleans/bulk-known-count', [ReportMtCleanController::class, 'bulkKnownCount'])->name('report-mt-cleans.bulk-known-count');
+    Route::get('report-mt-cleans/bulk-approve-count', [ReportMtCleanController::class, 'bulkApproveCount'])->name('report-mt-cleans.bulk-approve-count');
 
     Route::prefix('report-waterbaths')
         ->name('report_waterbaths.')
@@ -1250,6 +1316,28 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-waterbaths/bulk-approve', [ReportWaterbathController::class, 'bulkApprove'])->name('report-waterbaths.bulk-approve');
     Route::get('report-waterbaths/bulk-known-count', [ReportWaterbathController::class, 'bulkKnownCount'])->name('report-waterbaths.bulk-known-count');
     Route::get('report-waterbaths/bulk-approve-count', [ReportWaterbathController::class, 'bulkApproveCount'])->name('report-waterbaths.bulk-approve-count');
+
+    Route::prefix('report-changeover-cleanings')
+    ->name('report_changeover_cleanings.')
+    ->controller(ReportChangeoverCleaningController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}', 'show')->name('show');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::post('/{id}/known', 'known')->name('known');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('exportPdf');
+        Route::post('/export-excel', 'exportExcel')
+                ->name('exportExcel');
+    });
+    Route::post('report-changeover-cleanings/bulk-known', [ReportChangeoverCleaningController::class, 'bulkKnown'])->name('report-changeover-cleanings.bulk-known');
+    Route::post('report-changeover-cleanings/bulk-approve', [ReportChangeoverCleaningController::class, 'bulkApprove'])->name('report-changeover-cleanings.bulk-approve');
+    Route::get('report-changeover-cleanings/bulk-known-count', [ReportChangeoverCleaningController::class, 'bulkKnownCount'])->name('report-changeover-cleanings.bulk-known-count');
+    Route::get('report-changeover-cleanings/bulk-approve-count', [ReportChangeoverCleaningController::class, 'bulkApproveCount'])->name('report-changeover-cleanings.bulk-approve-count');
 
     Route::prefix('report-thawings')
         ->name('report_thawings.')

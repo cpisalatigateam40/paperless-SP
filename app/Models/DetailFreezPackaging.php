@@ -24,7 +24,9 @@ class DetailFreezPackaging extends Model implements Auditable
         'best_before',
         'corrective_action',
         'verif_after',
-        'gramase'
+        'gramase',
+        'release_status',
+        'notes',
     ];
 
     protected $auditEvents = [
@@ -55,5 +57,23 @@ class DetailFreezPackaging extends Model implements Auditable
     public function kartoning()
     {
         return $this->hasOne(DataCartoning::class, 'detail_uuid', 'uuid');
+    }
+
+    public function documentations()
+    {
+        return $this->hasMany(
+            FreezingDocumentation::class,
+            'detail_uuid',
+            'uuid'
+        );
+    }
+
+    public function kartoningDocumentations()
+    {
+        return $this->hasMany(
+            KartoningDocumentation::class,
+            'detail_uuid',
+            'uuid'
+        );
     }
 }
