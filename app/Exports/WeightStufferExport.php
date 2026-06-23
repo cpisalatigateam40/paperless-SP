@@ -26,12 +26,12 @@ class WeightStufferExport implements WithEvents, WithTitle
                 $sheet = $event->sheet->getDelegate();
 
                 // ── Judul ──────────────────────────────────────────────────
-                $sheet->mergeCells('A1:R1');
+                $sheet->mergeCells('A1:X1');
                 $sheet->setCellValue('A1', 'LAPORAN PEMERIKSAAN WEIGHT STUFFER');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
-                $sheet->mergeCells('A2:R2');
+                $sheet->mergeCells('A2:X2');
                 $sheet->setCellValue('A2', 'Periode: ' . $this->periodLabel);
                 $sheet->getStyle('A2')->getFont()->setSize(10);
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
@@ -52,17 +52,47 @@ class WeightStufferExport implements WithEvents, WithTitle
                     'L' => 'Std. Berat/3pcs (g)',
                     'M' => 'Aktual Berat/3pcs (g)',
                     'N' => 'Rata-rata Berat/3pcs (g)',
-                    'O' => 'Std. Panjang/pcs (cm)',
-                    'P' => 'Aktual Panjang/pcs (cm)',
-                    'Q' => 'Rata-rata Panjang/pcs (cm)',
-                    'R' => 'Catatan',
+                    'O' => 'Status Berat',
+                    'P' => 'Koreksi Berat',
+                    'Q' => 'Ket. Berat',
+                    'R' => 'Std. Panjang/pcs (mm)',
+                    'S' => 'Aktual Panjang/pcs (mm)',
+                    'T' => 'Rata-rata Panjang/pcs (mm)',
+                    'U' => 'Status Panjang',
+                    'V' => 'Koreksi Panjang',
+                    'W' => 'Ket. Panjang',
+                    'X' => 'Std. Berat Fla (g)',
+                    'Y' => 'Aktual Berat Fla (g)',
+                    'Z' => 'Rata-rata Berat Fla (g)',
+                    'AA' => 'Status Fla',
+                    'AB' => 'Koreksi Fla',
+                    'AC' => 'Ket. Fla',
+                    'AD' => 'Catatan',
                 ];
+
+                // Update merge judul ke AD
+                $sheet->unmergeCells('A1:X1');
+                $sheet->mergeCells('A1:AD1');
+                $sheet->unmergeCells('A2:X2');
+                $sheet->mergeCells('A2:AD2');
 
                 foreach ($headers as $col => $label) {
                     $sheet->setCellValue("{$col}4", $label);
                     $sheet->getStyle("{$col}4")->getFont()->setBold(true);
                     $sheet->getStyle("{$col}4")->getAlignment()
                         ->setHorizontal('center')->setWrapText(true);
+                }
+
+                // Warna group header
+                $groups = [
+                    'L4:Q4' => 'D6E4F0', // berat
+                    'R4:W4' => 'D6F0D6', // panjang
+                    'X4:AC4' => 'F0F0D6', // fla
+                ];
+                foreach ($groups as $range => $color) {
+                    $sheet->getStyle($range)->getFill()
+                        ->setFillType('solid')
+                        ->getStartColor()->setRGB($color);
                 }
 
                 // ── Data (mulai row 5) ─────────────────────────────────────
@@ -75,43 +105,19 @@ class WeightStufferExport implements WithEvents, WithTitle
                     );
 
                     foreach ($report->details as $detail) {
-                        // Tentukan mesin & ambil data mesin
-                        $machine = null;
+                        $machine     = null;
                         $machineName = '-';
 
-                        if ($detail->townsend) {
-                            $machine = $detail->townsend;
-                            $machineName = 'Townsend';
-                        } elseif ($detail->hitech) {
-                            $machine = $detail->hitech;
-                            $machineName = 'Hitech';
-                        } elseif ($detail->vemag) {
-                            $machine = $detail->vemag;
-                            $machineName = 'Vemag';
-                        } elseif ($detail->vemag2) {
-                            $machine = $detail->vemag2;
-                            $machineName = 'Vemag 2';
-                        } elseif ($detail->handtmann) {
-                            $machine = $detail->handtmann;
-                            $machineName = 'Handtmann';
-                        }
+                        if ($detail->townsend)      { $machine = $detail->townsend;  $machineName = 'Townsend'; }
+                        elseif ($detail->hitech)    { $machine = $detail->hitech;    $machineName = 'Hitech'; }
+                        elseif ($detail->vemag)     { $machine = $detail->vemag;     $machineName = 'Vemag'; }
+                        elseif ($detail->vemag2)    { $machine = $detail->vemag2;    $machineName = 'Vemag 2'; }
+                        elseif ($detail->handtmann) { $machine = $detail->handtmann; $machineName = 'Handtmann'; }
 
-                        // Aktual berat: gabungkan semua WeightStufferMeasurement
-                        $actualWeights = $detail->weights
-                            ->pluck('actual_weight')
-                            ->filter()
-                            ->implode(', ');
-
-                        $actualLongs = $detail->weights
-                            ->pluck('actual_long')
-                            ->filter()
-                            ->implode(', ');
-
-                        // Diameter casing: dari cases->actual_case_2 (semua digabung)
-                        $caseDiameters = $detail->cases
-                            ->pluck('actual_case_2')
-                            ->filter()
-                            ->implode(', ');
+                        $actualWeights = $detail->weights->pluck('actual_weight')->filter()->implode(', ');
+                        $actualLongs   = $detail->weights->pluck('actual_long')->filter()->implode(', ');
+                        $actualFlas    = $detail->weights->pluck('actual_fla')->filter()->implode(', ');
+                        $caseDiameters = $detail->cases->pluck('actual_case_2')->filter()->implode(', ');
 
                         $sheet->setCellValue("A{$row}", $no);
                         $sheet->setCellValue("B{$row}", Carbon::parse($report->date)->format('d/m/Y'));
@@ -119,24 +125,41 @@ class WeightStufferExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $detail->time ?? '-');
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue(
-                            "G{$row}",
-                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
-                        );
+                        $sheet->setCellValue("G{$row}", trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-')));
                         $sheet->setCellValue("H{$row}", $detail->production_code ?? '-');
                         $sheet->setCellValue("I{$row}", $machineName);
                         $sheet->setCellValue("J{$row}", $machine?->stuffer_speed ?? '-');
                         $sheet->setCellValue("K{$row}", $caseDiameters ?: '-');
+
+                        // Berat
                         $sheet->setCellValue("L{$row}", $detail->weight_standard ?? '-');
                         $sheet->setCellValue("M{$row}", $actualWeights ?: '-');
                         $sheet->setCellValue("N{$row}", $machine?->avg_weight ?? '-');
-                        $sheet->setCellValue("O{$row}", $detail->long_standard ?? '-');
-                        $sheet->setCellValue("P{$row}", $actualLongs ?: '-');
-                        $sheet->setCellValue("Q{$row}", $machine?->avg_long ?? '-');
-                        $sheet->setCellValue("R{$row}", $machine?->notes ?? '-');
+                        $sheet->setCellValue("O{$row}", $detail->weight_status ?? '-');
+                        $sheet->setCellValue("P{$row}", $detail->weight_corrective_action ?? '-');
+                        $sheet->setCellValue("Q{$row}", $detail->weight_notes ?? '-');
 
-                        $sheet->getStyle("A{$row}:R{$row}")
-                            ->getAlignment()->setHorizontal('center');
+                        // Panjang
+                        $sheet->setCellValue("R{$row}", $detail->long_standard ?? '-');
+                        $sheet->setCellValue("S{$row}", $actualLongs ?: '-');
+                        $sheet->setCellValue("T{$row}", $machine?->avg_long ?? '-');
+                        $sheet->setCellValue("U{$row}", $detail->long_status ?? '-');
+                        $sheet->setCellValue("V{$row}", $detail->long_corrective_action ?? '-');
+                        $sheet->setCellValue("W{$row}", $detail->long_notes ?? '-');
+
+                        // Fla
+                        $sheet->setCellValue("X{$row}", $detail->fla_standard ?? '-');
+                        $sheet->setCellValue("Y{$row}", $actualFlas ?: '-');
+                        $sheet->setCellValue("Z{$row}", $machine?->avg_fla ?? '-');
+                        $sheet->setCellValue("AA{$row}", $detail->fla_status ?? '-');
+                        $sheet->setCellValue("AB{$row}", $detail->fla_corrective_action ?? '-');
+                        $sheet->setCellValue("AC{$row}", $detail->fla_notes ?? '-');
+
+                        // Catatan mesin
+                        $sheet->setCellValue("AD{$row}", $machine?->notes ?? '-');
+
+                        $sheet->getStyle("A{$row}:AD{$row}")
+                            ->getAlignment()->setHorizontal('center')->setWrapText(true);
 
                         $row++;
                         $no++;
@@ -144,7 +167,7 @@ class WeightStufferExport implements WithEvents, WithTitle
                 }
 
                 if ($no === 1) {
-                    $sheet->mergeCells('A5:R5');
+                    $sheet->mergeCells('A5:AD5');
                     $sheet->setCellValue('A5', 'Tidak ada data untuk periode yang dipilih.');
                     $sheet->getStyle('A5')->getFont()->setItalic(true);
                     $sheet->getStyle('A5')->getAlignment()->setHorizontal('center');
@@ -152,7 +175,7 @@ class WeightStufferExport implements WithEvents, WithTitle
                 }
 
                 // ── Border & auto width ────────────────────────────────────
-                $sheet->getStyle("A4:R" . ($row - 1))->getBorders()
+                $sheet->getStyle("A4:AD" . ($row - 1))->getBorders()
                     ->getAllBorders()->setBorderStyle('thin');
 
                 foreach (array_keys($headers) as $col) {

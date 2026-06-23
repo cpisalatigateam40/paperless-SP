@@ -1,314 +1,387 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Laporan Verifikasi Berat Stuffer</title>
+    <title>Verifikasi Proses Stuffing</title>
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
         font-size: 10px;
-        margin-top: 30px;
+        line-height: 1.25;
+        margin: 20px;
     }
-
-    table {
-        border-collapse: collapse;
+    h3 {
+        text-align: center;
+        margin: 2px 0 8px 0;
+        font-size: 12px;
+    }
+    .section-title {
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 4px;
+        color: #1a56a0;
+    }
+    table.info {
         width: 100%;
-        margin-bottom: 12px;
+        border-collapse: collapse;
     }
-
-    th,
-    td {
+    table.info td {
+        padding: 1px 2px;
+        vertical-align: top;
+        border: none;
+    }
+    table.data {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+    }
+    table.data th, table.data td {
         border: 1px solid #000;
-        padding: 2px 3px;
-        text-align: left;
+        padding: 2px 4px;
+        text-align: center;
         vertical-align: middle;
     }
-
-    th {
-        text-align: center;
+    table.data th {
         font-weight: bold;
+        background-color: #f0f0f0;
     }
-
-    .text-center {
-        text-align: center;
+    table.data td.text-left {
+        text-align: left;
     }
-
-    .signature-box {
-        height: 40px;
-        border-bottom: 1px solid #000;
-        margin-top: 20px;
-        width: 60%;
-    }
-
-    .no-border {
-        border: none !important;
-    }
-
-    .mb-2 {
-        margin-bottom: 1rem;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 2rem;
-    }
-
-    .underline {
-        text-decoration: underline;
-    }
-
     .header {
         position: fixed;
         top: -60px;
         left: 0;
         width: 100%;
-        border: none;
     }
-
     .header-table {
         width: 100%;
         border-collapse: collapse;
     }
-
+    .no-border {
+        border: none !important;
+    }
+    .page-break {
+        page-break-after: always;
+    }
     @page {
-        margin-top: 80px;
-    }
-
-    ul {
-        margin: unset;
-        padding: .2rem;
-    }
-
-    li {
-        list-style-type: none;
-        margin-left: -1rem;
+        margin-top: 75px;
+        margin-bottom: 45px;
+        margin-left: 35px;
+        margin-right: 35px;
     }
     </style>
 </head>
-
 <body>
-    {{-- header --}}
-    <div class="header">
-        <table class="header-table">
-            <tr>
-                <td class="no-border" style="width: 30%; vertical-align: middle;">
-                    <table style="border: none; border-collapse: collapse;">
-                        <tr>
-                            <td class="no-border" style="vertical-align: middle; width: 50px;">
-                                @php
+
+{{-- ===== HEADER FIXED ===== --}}
+<div class="header">
+    <table class="header-table">
+        <tr>
+            <td class="no-border" style="width:30%; vertical-align:middle;">
+                <table style="border:none; border-collapse:collapse;">
+                    <tr>
+                        <td class="no-border" style="width:50px; vertical-align:middle;">
+                            @php
                                 $path = public_path('storage/image/logo.png');
                                 if (file_exists($path)) {
-                                $type = pathinfo($path, PATHINFO_EXTENSION);
-                                $data = file_get_contents($path);
-                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    $type   = pathinfo($path, PATHINFO_EXTENSION);
+                                    $data   = file_get_contents($path);
+                                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
                                 }
-                                @endphp
-                                <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
-                            </td>
-                            <td class="no-border" style="vertical-align: middle; padding-left: 10px;">
-                                <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    CHAROEN<br>POKPHAND<br>INDONESIA PT.<br>Food Division
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <h3 class="mb-2 text-center">VERIFIKASI BERAT STUFFER</h3>
-
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td style="text-align: left; border: none;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
+                            @endphp
+                            <img src="{{ $base64 ?? '' }}" style="width:50px;">
+                        </td>
+                        <td class="no-border" style="padding-left:8px; vertical-align:middle;">
+                            <div style="font-size:9px; font-weight:bold; line-height:1.2;">
+                                PT. CHAROEN POKPHAND INDONESIA<br>
+                                FOOD DIVISION<br>
+                                SALATIGA - INDONESIA
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </td>
-            <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
+            <td class="no-border" style="text-align:right; vertical-align:middle; font-size:9px; font-weight:bold;">
+                QM P.2 / 02
             </td>
         </tr>
     </table>
+</div>
 
-    @php
-    $details = $report->details;
-    @endphp
-    <table class="table table-bordered table-sm text-center align-middle mb-4">
-        {{-- Heading baris nama produk --}}
+<h3>VERIFIKASI PROSES STUFFING</h3>
+
+@php $first = $report->details->first(); @endphp
+
+{{-- ===== A. INFORMASI PRODUK ===== --}}
+<div class="section-title">A. Informasi Produk</div>
+<table class="info" style="margin-bottom:10px;">
+    <tr>
+        <td width="130">Hari, Tanggal</td>
+        <td width="10">:</td>
+        <td>{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d F Y') }}</td>
+    </tr>
+    <tr>
+        <td>Shift</td>
+        <td>:</td>
+        <td>{{ $report->shift }}</td>
+    </tr>
+    <tr>
+        <td>Nama Produk</td>
+        <td>:</td>
+        <td>{{ $first?->product?->product_name ?? '-' }}</td>
+    </tr>
+    <tr>
+        <td>Kode Produk</td>
+        <td>:</td>
+        <td>{{ $first?->production_code ?? '-' }}</td>
+    </tr>
+    <tr>
+        <td>Gramasi</td>
+        <td>:</td>
+        <td>{{ $first?->gramase ?? '-' }} gr</td>
+    </tr>
+</table>
+
+{{-- ===== B. HASIL VERIFIKASI (per mesin) ===== --}}
+<div class="section-title">B. Hasil Verifikasi</div>
+
+@foreach($report->details as $detail)
+@php
+    $stuffer =
+        $detail->townsend ??
+        $detail->hitech   ??
+        $detail->vemag    ??
+        $detail->vemag2   ??
+        $detail->handtmann;
+
+    $machineLabel = match(true) {
+        $detail->townsend  != null => 'Townsend',
+        $detail->hitech    != null => 'Hitech',
+        $detail->vemag     != null => 'Vemag',
+        $detail->vemag2    != null => 'Vemag 2',
+        $detail->handtmann != null => 'Handtmann',
+        default                    => '-',
+    };
+
+    $weights = $detail->weights;
+    $maxCols = max(3, $weights->count()); // minimal tampilkan 3 kolom
+@endphp
+
+<table class="info" style="margin-bottom:4px;">
+    <tr>
+        <td width="130">Mesin</td>
+        <td width="10">:</td>
+        <td>{{ $machineLabel }}</td>
+    </tr>
+    <tr>
+        <td>Waktu Verifikasi</td>
+        <td>:</td>
+        <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }} WIB</td>
+    </tr>
+    <tr>
+        <td>Diameter casing</td>
+        <td>:</td>
+        <td>{{ $detail->cases->first()?->actual_case_2 ?? '-' }} mm</td>
+    </tr>
+</table>
+
+<table class="data">
+    <thead>
         <tr>
-            <th class="text-start">Nama Produk</th>
-            @foreach ($details as $d)
-            <th>{{ $d->product->product_name ?? '-' }}</th>
-            @endforeach
+            <th rowspan="2" style="width:5%">No</th>
+            <th rowspan="2" style="width:22%">Parameter Verifikasi</th>
+            <th rowspan="2" style="width:15%">Standar</th>
+            <th colspan="{{ $maxCols + 1 }}">Hasil Aktual</th>
+            <th rowspan="2" style="width:10%">Rata-rata aktual</th>
+            <th rowspan="2" style="width:10%">Status (OK/NG)</th>
+            <th rowspan="2" style="width:14%">Tindakan Koreksi</th>
+            <th rowspan="2" style="width:14%">Keterangan</th>
         </tr>
         <tr>
-            <th class="text-start">Gramase</th>
-            @foreach ($details as $d)
-            <th class="align-middle">
-                {{ !empty($d->gramase) 
-                    ? $d->gramase 
-                    : ($d->product->nett_weight ?? '-') }} g
-            </th>
-            @endforeach
+            @for($i = 1; $i <= $maxCols; $i++)
+                <th style="width:5%">{{ $i }}</th>
+            @endfor
+            <th style="width:5%">Etc</th>
         </tr>
+    </thead>
+    <tbody>
+        {{-- Baris 1: Berat per 3 pcs --}}
         <tr>
-            <th class="text-start">Kode Produksi</th>
-            @foreach ($details as $d)
-            <td>{{ $d->production_code }}</td>
-            @endforeach
-        </tr>
-        <tr>
-            <th class="text-start">Waktu Proses</th>
-            @foreach ($details as $d)
-            <td>{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
-            @endforeach
-        </tr>
-        <tr>
-            <th class="text-start">Mesin Stuffer</th>
-            @foreach ($details as $d)
-            @php
-                $machineName = '-';
-
-                if ($d->townsend) {
-                    $machineName = 'Townsend';
-                } elseif ($d->hitech) {
-                    $machineName = 'Hitech';
-                } elseif ($d->vemag) {
-                    $machineName = 'Vemag';
-                } elseif ($d->vemag2) {
-                    $machineName = 'Vemag 2';
-                } elseif ($d->handtmann) {
-                    $machineName = 'Handtmann';
-                }
-            @endphp
-
-            <td>{{ $machineName }}</td>
-            @endforeach
-        </tr>
-
-        @php
-        $labels = [
-        'Kecepatan Stuffer (rpm)' => 'speed',
-        'Ukuran Casing<br><small>(Aktual Diameter)</small>' => 'casing',
-        'Standar Berat (gr)' => 'standard',
-        'Berat Aktual (gr)' => 'actual_weight',
-        'Rata-rata Berat Aktual (gr)' => 'avg',
-        'Standar Panjang' => 'standard_long',
-        'Panjang Aktual' => 'actual_long',
-        'Rata-rata Panjang Aktual' => 'avg_long',
-        'Catatan' => 'notes',
-        ];
-        @endphp
-
-        @foreach ($labels as $label => $key)
-        <tr>
-            <td class="text-start">{!! $label !!}</td>
-            @foreach ($details as $d)
-            @php
-            // pilih mesin sesuai data yang ada
-            $stuffer =
-                $d->townsend ??
-                $d->hitech ??
-                $d->vemag ??
-                $d->vemag2 ??
-                $d->handtmann;
-            $case = $d->cases->first();
-            $weight = $d->weights->first();
-            @endphp
-
-            @switch($key)
-            @case('speed')
-            <td>{{ $stuffer?->stuffer_speed ?? '-' }}</td>
-            @break
-
-            @case('casing')
-            <td>{{ $case?->actual_case_2 ?? '-' }}</td>
-            @break
-
-            @case('standard')
-            <td>{{ $d->weight_standard ?? '-' }}</td>
-            @break
-
-            @case('actual_weight')
-            <td>
-                @if($d->weights->count() > 0)
-                {{ $d->weights->pluck('actual_weight')->filter()->implode(' / ') }}
-                @else
-                -
-                @endif
-            </td>
-            @break
-
-            @case('avg')
+            <td>1</td>
+            <td class="text-left">Berat per 3 pcs (gr)</td>
+            <td>{{ $detail->weight_standard ?? '-' }}</td>
+            @for($i = 0; $i < $maxCols; $i++)
+                <td>{{ $weights->get($i)?->actual_weight ?? '-' }}</td>
+            @endfor
+            <td>{{ $weights->count() > $maxCols ? '(…)' : '-' }}</td>
             <td>{{ $stuffer?->avg_weight ?? '-' }}</td>
-            @break
+            <td>{{ $detail->weight_status ?? '-' }}</td>
+            <td>{{ $detail->weight_corrective_action ?? '-' }}</td>
+            <td>{{ $detail->weight_notes ?? '-' }}</td>
+        </tr>
 
-            @case('standard_long')
-            <td>{{ $d->long_standard ?? '-' }}</td>
-            @break
-
-            @case('actual_long')
-            <td>
-                @if($d->weights->count() > 0)
-                {{ $d->weights->pluck('actual_long')->filter()->implode(' / ') }}
-                @else
-                -
-                @endif
-            </td>
-            @break
-
-            @case('avg_long')
+        {{-- Baris 2: Panjang per pcs --}}
+        <tr>
+            <td>2</td>
+            <td class="text-left">Panjang per pcs (mm)</td>
+            <td>{{ $detail->long_standard ?? '-' }}</td>
+            @for($i = 0; $i < $maxCols; $i++)
+                <td>{{ $weights->get($i)?->actual_long ?? '-' }}</td>
+            @endfor
+            <td>{{ $weights->count() > $maxCols ? '(…)' : '-' }}</td>
             <td>{{ $stuffer?->avg_long ?? '-' }}</td>
-            @break
-
-            @case('notes')
-            <td>{{ $stuffer?->notes ?? '-' }}</td>
-            @break
-            @endswitch
-            @endforeach
+            <td>{{ $detail->long_status ?? '-' }}</td>
+            <td>{{ $detail->long_corrective_action ?? '-' }}</td>
+            <td>{{ $detail->long_notes ?? '-' }}</td>
         </tr>
-        @endforeach
-    </table>
 
-    <table style="width: 100%; border: none; margin-top: 2rem;">
-        <tr style="border: none;">
-            <td style="text-align: center; border: none; width: 33%;">
-                Diperiksa oleh:<br><br>
-                <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->created_by }}</strong><br><br>
-                QC Inspector
-            </td>
-            <td style="text-align: center; border: none; width: 33%;">
-                Diketahui oleh:<br><br>
-                @if($report->known_by)
-                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->known_by }}</strong><br><br>
-                @else
-                <div style="height: 120px;"></div>
-                <strong>-</strong><br>
-                @endif
-                SPV/Foreman/Lady Produksi
-            </td>
-            <td style="text-align: center; border: none; width: 33%;">
-                Disetujui oleh:<br><br>
-                @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->approved_by }}</strong><br><br>
-                @else
-                <div style="height: 120px;"></div>
-                <strong>-</strong><br>
-                @endif
-                Supervisor QC
-            </td>
+        {{-- Baris 3: Berat Fla --}}
+        <tr>
+            <td>3</td>
+            <td class="text-left">Berat fla (gr)</td>
+            <td>{{ $detail->fla_standard ?? '-' }}</td>
+            @for($i = 0; $i < $maxCols; $i++)
+                <td>{{ $weights->get($i)?->actual_fla ?? '-' }}</td>
+            @endfor
+            <td>{{ $weights->count() > $maxCols ? '(…)' : '-' }}</td>
+            <td>{{ $stuffer?->avg_fla ?? '-' }}</td>
+            <td>{{ $detail->fla_status ?? '-' }}</td>
+            <td>{{ $detail->fla_corrective_action ?? '-' }}</td>
+            <td>{{ $detail->fla_notes ?? '-' }}</td>
         </tr>
-    </table>
+    </tbody>
+</table>
+
+@endforeach
+
+{{-- ===== C. CATATAN & DOKUMENTASI ===== --}}
+<div class="section-title">C. Catatan & Dokumentasi</div>
+
+@foreach($report->details as $detail)
+@php
+    $machine =
+        $detail->townsend ??
+        $detail->hitech ??
+        $detail->vemag ??
+        $detail->vemag2 ??
+        $detail->handtmann;
+
+    $machineLabel = match(true) {
+        $detail->townsend  != null => 'Townsend',
+        $detail->hitech    != null => 'Hitech',
+        $detail->vemag     != null => 'Vemag',
+        $detail->vemag2    != null => 'Vemag 2',
+        $detail->handtmann != null => 'Handtmann',
+        default => '-',
+    };
+@endphp
+
+{{-- OUTER TABLE (INI KUNCI UTAMA SIDE BY SIDE) --}}
+<table style="width:100%; border-collapse:collapse; margin-bottom:10px;">
+    <tr>
+
+        {{-- ================= LEFT SIDE (INFO) ================= --}}
+        <td style="width:35%; vertical-align:top; padding-right:10px;">
+
+            <table class="info" style="width:100%;">
+                <tr>
+                    <td width="80">Mesin</td>
+                    <td width="10">:</td>
+                    <td>{{ $machineLabel }}</td>
+                </tr>
+                <tr>
+                    <td>Catatan</td>
+                    <td>:</td>
+                    <td>{{ $machine?->notes ?? '-' }}</td>
+                </tr>
+            </table>
+
+        </td>
+
+        {{-- ================= RIGHT SIDE (IMAGES GRID) ================= --}}
+        <td style="width:65%; vertical-align:top;">
+
+            @if($detail->documentations && $detail->documentations->count())
+                @php
+                    $docs = $detail->documentations->values();
+                    $chunked = $docs->chunk(2);
+                @endphp
+
+                <table style="width:100%; border-collapse:collapse;">
+                    @foreach($chunked as $row)
+                        <tr>
+                            @foreach($row as $doc)
+                                <td style="width:50%; text-align:center; padding:4px; vertical-align:top;">
+                                    @if(!empty($doc->image))
+                                        @php
+                                            $path = storage_path('app/public/' . $doc->image);
+
+                                            $base64 = null;
+
+                                            if (file_exists($path)) {
+                                                $type = pathinfo($path, PATHINFO_EXTENSION);
+                                                $data = file_get_contents($path);
+                                                $base64 = 'data:image/'.$type.';base64,'.base64_encode($data);
+                                            }
+                                        @endphp
+
+                                        @if($base64)
+                                            <img src="{{ $base64 }}"
+                                                 style="width:100%; max-width:160px; border:1px solid #ccc;">
+                                        @endif
+                                    @endif
+                                </td>
+                            @endforeach
+
+                            {{-- kalau ganjil --}}
+                            @if($row->count() < 2)
+                                <td style="width:50%;"></td>
+                            @endif
+                        </tr>
+                    @endforeach
+                </table>
+            @endif
+
+        </td>
+    </tr>
+</table>
+
+<hr>
+@endforeach
+
+{{-- ===== TTD ===== --}}
+<table style="width:100%; border:none; margin-top:30px;">
+    <tr>
+        <td style="text-align:center; border:none; width:33%;">
+            Diperiksa oleh,<br><br>
+            <img src="{{ $createdQr }}" width="80" style="margin:8px 0;"><br>
+            <strong>{{ $report->created_by }}</strong><br>
+            QC Inspector
+        </td>
+        <td style="text-align:center; border:none; width:33%;">
+            Diketahui oleh,<br><br>
+            @if($report->known_by)
+                <img src="{{ $knownQr }}" width="80" style="margin:8px 0;"><br>
+                <strong>{{ $report->known_by }}</strong><br>
+            @else
+                <div style="height:100px;"></div>
+                <strong>Tanda Tangan &amp; Nama Terang</strong><br>
+            @endif
+            Foreman / SPV Produksi
+        </td>
+        <td style="text-align:center; border:none; width:33%;">
+            Disetujui oleh,<br><br>
+            @if($report->approved_by)
+                <img src="{{ $approvedQr }}" width="80" style="margin:8px 0;"><br>
+                <strong>{{ $report->approved_by }}</strong><br>
+            @else
+                <div style="height:100px;"></div>
+                <strong>Tanda Tangan &amp; Nama Terang</strong><br>
+            @endif
+            Supervisor QC
+        </td>
+    </tr>
+</table>
 
 </body>
-
 </html>

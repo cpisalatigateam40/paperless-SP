@@ -40,7 +40,8 @@ class ReportWeightStufferController extends Controller
             'details.vemag2',
             'details.handtmann',
             'details.cases',
-            'details.weights'
+            'details.weights',
+            'details.documentations',
         ])->latest();
 
         // 🔍 SEARCH
@@ -138,17 +139,44 @@ class ReportWeightStufferController extends Controller
             'created_by' => Auth::user()->name,
         ]);
 
-        foreach ($request->details as $detail) {
+        foreach ($request->details as $key => $detail) {
             $detailModel = DetailWeightStuffer::create([
                 'uuid' => Str::uuid(),
                 'report_uuid' => $report->uuid,
                 'product_uuid' => $detail['product_uuid'],
                 'production_code' => $detail['production_code'],
                 'time' => $detail['time'],
+                'machine'          => $detail['machine'] ?? null,
                 'weight_standard' => $detail['weight_standard'] ?? null,
                 'long_standard' => $detail['long_standard'] ?? null,
+                'fla_standard' => $detail['fla_standard'] ?? null,
                 'gramase' => $detail['gramase'] ?? null,
+                'weight_status' => $detail['weight_status'] ?? null,
+                'weight_corrective_action' => $detail['weight_corrective_action'] ?? null,
+                'weight_notes' => $detail['weight_notes'] ?? null,
+
+                'long_status' => $detail['long_status'] ?? null,
+                'long_corrective_action' => $detail['long_corrective_action'] ?? null,
+                'long_notes' => $detail['long_notes'] ?? null,
+
+                'fla_status' => $detail['fla_status'] ?? null,
+                'fla_corrective_action' => $detail['fla_corrective_action'] ?? null,
+                'fla_notes' => $detail['fla_notes'] ?? null,
             ]);
+
+            // Upload dokumentasi
+            if ($request->hasFile("details.{$key}.documentation")) {
+                foreach ($request->file("details.{$key}.documentation") as $image) {
+                    if (!$image->isValid()) continue;
+
+                    $path = $image->store('weight-stuffer-documentation', 'public');
+
+                    $detailModel->documentations()->create([
+                        'uuid' => Str::uuid(),
+                        'image' => $path,
+                    ]);
+                }
+            }
 
             if ($detail['machine'] === 'townsend') {
                 TownsendStuffer::create([
@@ -156,6 +184,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
                     'avg_long' => $detail['avg_long'] ?? null,
+                    'avg_fla' => $detail['avg_fla'] ?? null,
                     'notes' => $detail['notes'] ?? null,
                 ]);
             }
@@ -166,6 +195,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
                     'avg_long' => $detail['avg_long'] ?? null,
+                    'avg_fla' => $detail['avg_fla'] ?? null,
                     'notes' => $detail['notes'] ?? null,
                 ]);
             }
@@ -176,6 +206,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
                     'avg_long' => $detail['avg_long'] ?? null,
+                    'avg_fla' => $detail['avg_fla'] ?? null,
                     'notes' => $detail['notes'] ?? null,
                 ]);
             }
@@ -186,6 +217,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
                     'avg_long' => $detail['avg_long'] ?? null,
+                    'avg_fla' => $detail['avg_fla'] ?? null,
                     'notes' => $detail['notes'] ?? null,
                 ]);
             }
@@ -196,6 +228,7 @@ class ReportWeightStufferController extends Controller
                     'stuffer_speed' => $detail['stuffer_speed'] ?? null,
                     'avg_weight' => $detail['avg_weight'] ?? null,
                     'avg_long' => $detail['avg_long'] ?? null,
+                    'avg_fla' => $detail['avg_fla'] ?? null,
                     'notes' => $detail['notes'] ?? null,
                 ]);
             }
@@ -212,17 +245,30 @@ class ReportWeightStufferController extends Controller
 
             if (isset($detail['weights'])) {
                 foreach ($detail['weights'] as $weightSet) {
-                    // loop setiap pasangan weight/long
+
+                    // Cari index tertinggi dari semua tipe (weight, long, fla)
+                    $maxIndex = 0;
                     foreach ($weightSet as $key => $value) {
-                        // cek kalau key diawali actual_weight_x
-                        if (strpos($key, 'actual_weight_') === 0) {
-                            $index = str_replace('actual_weight_', '', $key);
-                            WeightStufferMeasurement::create([
-                                'stuffer_id' => $detailModel->id,
-                                'actual_weight' => $value ?? null,
-                                'actual_long' => $weightSet['actual_long_' . $index] ?? null,
-                            ]);
+                        if (preg_match('/^actual_(weight|long|fla)_(\d+)$/', $key, $m)) {
+                            $maxIndex = max($maxIndex, (int) $m[2]);
                         }
+                    }
+
+                    // Loop dari 1 sampai index tertinggi
+                    for ($i = 1; $i <= $maxIndex; $i++) {
+                        $hasAnyValue =
+                            isset($weightSet['actual_weight_' . $i]) ||
+                            isset($weightSet['actual_long_'   . $i]) ||
+                            isset($weightSet['actual_fla_'    . $i]);
+
+                        if (!$hasAnyValue) continue; // skip baris kosong total
+
+                        WeightStufferMeasurement::create([
+                            'stuffer_id'    => $detailModel->id,
+                            'actual_weight' => $weightSet['actual_weight_' . $i] ?? null,
+                            'actual_long'   => $weightSet['actual_long_'   . $i] ?? null,
+                            'actual_fla'    => $weightSet['actual_fla_'    . $i] ?? null,
+                        ]);
                     }
                 }
             }
@@ -392,7 +438,8 @@ class ReportWeightStufferController extends Controller
             'details.vemag2',
             'details.handtmann',
             'details.cases',
-            'details.weights'
+            'details.weights',
+            'details.documentations'
         ])->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
@@ -419,7 +466,7 @@ class ReportWeightStufferController extends Controller
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
-        ])->setPaper('A4', 'landscape');
+        ])->setPaper('F4', 'portrait');
         return $pdf->stream('laporan-verifikasi-berat-stuffer.pdf');
     }
 
@@ -435,6 +482,7 @@ class ReportWeightStufferController extends Controller
                 'details.handtmann',
                 'details.cases',
                 'details.weights',
+                'details.documentations',
             ])->firstOrFail();
 
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
@@ -442,20 +490,65 @@ class ReportWeightStufferController extends Controller
         ->get();
         $standards = StandardStuffer::with('product')->get();
 
-        return view('report_weight_stuffers.edit', compact('report', 'products', 'standards'));
+
+        // di controller edit()
+        $detailsJson = $report->details->map(function ($d) {
+            if ($d->townsend)      { $mt = 'townsend';  $md = $d->townsend; }
+            elseif ($d->hitech)    { $mt = 'hitech';    $md = $d->hitech; }
+            elseif ($d->vemag)     { $mt = 'vemag';     $md = $d->vemag; }
+            elseif ($d->vemag2)    { $mt = 'vemag2';    $md = $d->vemag2; }
+            elseif ($d->handtmann) { $mt = 'handtmann'; $md = $d->handtmann; }
+            else                   { $mt = '';           $md = null; }
+
+            return [
+                'machine'                  => $mt,
+                'time'                     => $d->time,
+                'cases_actual_case_2'      => $d->cases->first()->actual_case_2 ?? null,
+                'weight_standard'          => $d->weight_standard,
+                'long_standard'            => $d->long_standard,
+                'fla_standard'             => $d->fla_standard,
+                'weight_status'            => $d->weight_status,
+                'weight_corrective_action' => $d->weight_corrective_action,
+                'weight_notes'             => $d->weight_notes,
+                'long_status'              => $d->long_status,
+                'long_corrective_action'   => $d->long_corrective_action,
+                'long_notes'               => $d->long_notes,
+                'fla_status'               => $d->fla_status,
+                'fla_corrective_action'    => $d->fla_corrective_action,
+                'fla_notes'                => $d->fla_notes,
+                'stuffer_speed'            => $md->stuffer_speed ?? null,
+                'avg_weight'               => $md->avg_weight ?? null,
+                'avg_long'                 => $md->avg_long ?? null,
+                'avg_fla'                  => $md->avg_fla ?? null,
+                'notes'                    => $md->notes ?? null,
+                'weights'                  => $d->weights->map(fn($w) => [
+                    'actual_weight' => $w->actual_weight,
+                    'actual_long'   => $w->actual_long,
+                    'actual_fla'    => $w->actual_fla,
+                ])->values()->toArray(),
+                'documentations' => $d->documentations->map(function ($doc) {
+                    return [
+                        'uuid' => $doc->uuid,
+                        'image' => $doc->image,
+                        'url'   => asset('storage/' . $doc->image),
+                    ];
+                })->values()->toArray(),
+            ];
+        })->values()->toArray();
+
+
+        return view('report_weight_stuffers.edit', compact('report', 'products', 'standards', 'detailsJson'));
     }
 
     public function update(Request $request, $uuid)
     {
         $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
 
-        // Update header
         $report->update([
             'date'  => $request->date,
             'shift' => $request->shift,
         ]);
 
-        // Hapus detail lama agar bisa replace data baru
         foreach ($report->details as $oldDetail) {
             TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
             HitechStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
@@ -467,73 +560,51 @@ class ReportWeightStufferController extends Controller
             $oldDetail->delete();
         }
 
-        // Simpan detail baru dari form
         foreach ($request->details as $detail) {
             $detailModel = DetailWeightStuffer::create([
-                'uuid' => Str::uuid(),
-                'report_uuid' => $report->uuid,
-                'product_uuid' => $detail['product_uuid'],
-                'production_code' => $detail['production_code'],
-                'time' => $detail['time'],
-                'weight_standard' => $detail['weight_standard'] ?? null,
-                'long_standard' => $detail['long_standard'] ?? null,
-                'gramase' => $detail['gramase'] ?? null,
+                'uuid'                     => Str::uuid(),
+                'report_uuid'              => $report->uuid,
+                'product_uuid'             => $detail['product_uuid'],
+                'production_code'          => $detail['production_code'],
+                'time'                     => $detail['time'],
+                'machine'                  => $detail['machine'] ?? null,
+                'weight_standard'          => $detail['weight_standard'] ?? null,
+                'long_standard'            => $detail['long_standard'] ?? null,
+                'fla_standard'             => $detail['fla_standard'] ?? null,
+                'gramase'                  => $detail['gramase'] ?? null,
+                'weight_status'            => $detail['weight_status'] ?? null,
+                'weight_corrective_action' => $detail['weight_corrective_action'] ?? null,
+                'weight_notes'             => $detail['weight_notes'] ?? null,
+                'long_status'              => $detail['long_status'] ?? null,
+                'long_corrective_action'   => $detail['long_corrective_action'] ?? null,
+                'long_notes'               => $detail['long_notes'] ?? null,
+                'fla_status'               => $detail['fla_status'] ?? null,
+                'fla_corrective_action'    => $detail['fla_corrective_action'] ?? null,
+                'fla_notes'                => $detail['fla_notes'] ?? null,
             ]);
 
-            if ($detail['machine'] === 'townsend') {
-                TownsendStuffer::create([
-                    'detail_uuid' => $detailModel->uuid,
-                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                    'avg_weight' => $detail['avg_weight'] ?? null,
-                    'avg_long' => $detail['avg_long'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                ]);
-            }
+            $machineData = [
+                'detail_uuid'  => $detailModel->uuid,
+                'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+                'avg_weight'   => $detail['avg_weight'] ?? null,
+                'avg_long'     => $detail['avg_long'] ?? null,
+                'avg_fla'      => $detail['avg_fla'] ?? null,
+                'notes'        => $detail['notes'] ?? null,
+            ];
 
-            if ($detail['machine'] === 'hitech') {
-                HitechStuffer::create([
-                    'detail_uuid' => $detailModel->uuid,
-                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                    'avg_weight' => $detail['avg_weight'] ?? null,
-                    'avg_long' => $detail['avg_long'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                ]);
-            }
-
-            if ($detail['machine'] === 'vemag') {
-                VemagStuffer::create([
-                    'detail_uuid' => $detailModel->uuid,
-                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                    'avg_weight' => $detail['avg_weight'] ?? null,
-                    'avg_long' => $detail['avg_long'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                ]);
-            }
-
-            if ($detail['machine'] === 'vemag2') {
-                Vemag2Stuffer::create([
-                    'detail_uuid' => $detailModel->uuid,
-                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                    'avg_weight' => $detail['avg_weight'] ?? null,
-                    'avg_long' => $detail['avg_long'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                ]);
-            }
-
-            if ($detail['machine'] === 'handtmann') {
-                HandtmannStuffer::create([
-                    'detail_uuid' => $detailModel->uuid,
-                    'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                    'avg_weight' => $detail['avg_weight'] ?? null,
-                    'avg_long' => $detail['avg_long'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                ]);
-            }
+            match ($detail['machine'] ?? '') {
+                'townsend'  => TownsendStuffer::create($machineData),
+                'hitech'    => HitechStuffer::create($machineData),
+                'vemag'     => VemagStuffer::create($machineData),
+                'vemag2'    => Vemag2Stuffer::create($machineData),
+                'handtmann' => HandtmannStuffer::create($machineData),
+                default     => null,
+            };
 
             if (isset($detail['cases'])) {
                 foreach ($detail['cases'] as $case) {
                     CaseStuffer::create([
-                        'stuffer_id' => $detailModel->id,
+                        'stuffer_id'    => $detailModel->id,
                         'actual_case_2' => $case['actual_case_2'],
                     ]);
                 }
@@ -541,15 +612,27 @@ class ReportWeightStufferController extends Controller
 
             if (isset($detail['weights'])) {
                 foreach ($detail['weights'] as $weightSet) {
+                    $maxIndex = 0;
                     foreach ($weightSet as $key => $value) {
-                        if (strpos($key, 'actual_weight_') === 0) {
-                            $index = str_replace('actual_weight_', '', $key);
-                            WeightStufferMeasurement::create([
-                                'stuffer_id' => $detailModel->id,
-                                'actual_weight' => $value ?? null,
-                                'actual_long' => $weightSet['actual_long_' . $index] ?? null,
-                            ]);
+                        if (preg_match('/^actual_(weight|long|fla)_(\d+)$/', $key, $m)) {
+                            $maxIndex = max($maxIndex, (int) $m[2]);
                         }
+                    }
+
+                    for ($i = 1; $i <= $maxIndex; $i++) {
+                        $hasAnyValue =
+                            isset($weightSet['actual_weight_' . $i]) ||
+                            isset($weightSet['actual_long_'   . $i]) ||
+                            isset($weightSet['actual_fla_'    . $i]);
+
+                        if (!$hasAnyValue) continue;
+
+                        WeightStufferMeasurement::create([
+                            'stuffer_id'    => $detailModel->id,
+                            'actual_weight' => $weightSet['actual_weight_' . $i] ?? null,
+                            'actual_long'   => $weightSet['actual_long_'   . $i] ?? null,
+                            'actual_fla'    => $weightSet['actual_fla_'    . $i] ?? null,
+                        ]);
                     }
                 }
             }
@@ -557,6 +640,8 @@ class ReportWeightStufferController extends Controller
 
         return redirect()->route('report_weight_stuffers.index')->with('success', 'Laporan berhasil diperbarui.');
     }
+
+
 
     public function exportExcel(Request $request)
     {

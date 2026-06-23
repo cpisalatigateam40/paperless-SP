@@ -19,8 +19,20 @@ class DetailWeightStuffer extends Model implements Auditable
         'time',
         'weight_standard',
         'long_standard',
+        'fla_standard',
         'machine',
-        'gramase'
+        'gramase',
+        'weight_status',
+        'weight_corrective_action',
+        'weight_notes',
+
+        'long_status',
+        'long_corrective_action',
+        'long_notes',
+
+        'fla_status',
+        'fla_corrective_action',
+        'fla_notes',
     ];
 
     protected $auditEvents = [
@@ -70,5 +82,10 @@ class DetailWeightStuffer extends Model implements Auditable
     public function handtmann()
     {
         return $this->hasOne(HandtmannStuffer::class, 'detail_uuid', 'uuid');
+    }
+
+    public function documentations()
+    {
+        return $this->hasMany(WeightStufferDocumentation::class, 'detail_id');
     }
 }
