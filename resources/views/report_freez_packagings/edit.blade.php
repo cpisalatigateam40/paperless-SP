@@ -287,7 +287,6 @@ function addDetailRow(detail = null) {
                 name="details[${index}][documentation][]"
                 class="form-control"
                 accept="image/*"
-                capture="environment"
                 multiple>
 
             <div class="row mt-2">
@@ -390,7 +389,6 @@ function addDetailRow(detail = null) {
                 name="details[${index}][kartoning_documentation][]"
                 class="form-control"
                 accept="image/*"
-                capture="environment"
                 multiple>
 
             <div class="row mt-2">
