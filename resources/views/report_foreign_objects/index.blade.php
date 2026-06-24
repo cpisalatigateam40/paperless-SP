@@ -112,6 +112,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th class="align-middle">Tanggal</th>
                             <th class="align-middle">Shift</th>
                             <th class="align-middle">Waktu</th>
@@ -124,6 +125,7 @@
                     <tbody>
                         @foreach($reports as $report)
                         <tr>
+                            <td>{{ $reports->firstItem() + $loop->index }}</td>
                             <td>{{ $report->date->format('d-m-Y') }}</td>
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WeightStufferMeasurement extends Model
 {
-    protected $fillable = ['stuffer_id', 'actual_weight', 'actual_long'];
+    protected $fillable = ['stuffer_id', 'actual_weight', 'actual_long','actual_fla'];
 
     public function detail()
     {

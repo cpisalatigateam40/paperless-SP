@@ -15,6 +15,7 @@ class TownsendStuffer extends Model
         'trolley_total',
         'avg_weight',
         'avg_long',
+        'avg_fla',
         'notes'
     ];
 

@@ -59,32 +59,34 @@
                         </select>
                     </div>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label>Hasil Verifikasi MD Loma</label>
                     <select name="verif_loma" class="form-control" required>
                         <option value="√">√ </option>
                         <option value="x">x </option>
                     </select>
-                </div>
-                <div class="mb-3">
-                    <label>Keterangan</label>
-                    <textarea name="notes" class="form-control"></textarea>
-                </div>
+                </div> -->
+                
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <label>Ketidaksesuaian</label>
                         <input type="text" name="nonconformity" class="form-control">
+                    </div> -->
+                    <div class="col-md-4">
+                        <label>Status</label>
+                        <select name="verif_after_correct" class="form-control">
+                            <option value="√">√ </option>
+                            <option value="x">x </option>
+                        </select>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
                         <input type="text" name="corrective_action" class="form-control" >
                     </div>
+                    
                     <div class="col-md-4">
-                        <label>Verifikasi Setelah Tindakan Koreksi</label>
-                        <select name="verif_after_correct" class="form-control">
-                            <option value="√">√ </option>
-                            <option value="x">x </option>
-                        </select>
+                        <label>Keterangan</label>
+                        <textarea name="notes" class="form-control" rows="1"></textarea>
                     </div>
                 </div>
 

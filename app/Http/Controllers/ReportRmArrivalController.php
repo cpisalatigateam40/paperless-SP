@@ -153,6 +153,7 @@ class ReportRmArrivalController extends Controller
             // 'shift' => session('shift_number') . '-' . session('shift_group'),
             'shift' => $shift,
             'created_by' => Auth::user()->name,
+            'notes' => $request->notes,
         ]);
 
         foreach ($request->input('details', []) as $detail) {
@@ -180,6 +181,7 @@ class ReportRmArrivalController extends Controller
                 'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
+                'status' => $detail['status'] ?? null,
             ];
 
             if (($detail['material_type'] ?? 'raw') === 'raw') {
@@ -233,6 +235,7 @@ class ReportRmArrivalController extends Controller
             'details.*.contamination' => 'nullable|string',
             'details.*.problem' => 'nullable|string',
             'details.*.corrective_action' => 'nullable|string',
+            'details.*.status' => 'nullable|string',
         ]);
 
         foreach ($request->input('details', []) as $detail) {
@@ -260,6 +263,7 @@ class ReportRmArrivalController extends Controller
                 'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
+                'status' => $detail['status'] ?? null,
             ];
 
             if (($detail['material_type'] ?? 'raw') === 'raw') {
@@ -308,7 +312,7 @@ class ReportRmArrivalController extends Controller
     {
         $report = ReportRmArrival::with([
             'area',
-            'details.rawMaterial',
+            'details.rawMaterial', 'details.premix', 'section'
         ])->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
@@ -365,6 +369,7 @@ class ReportRmArrivalController extends Controller
             'date' => $request->date,
             'shift' => $request->shift,
             'updated_by' => Auth::user()->name,
+            'notes' => $request->notes,
         ]);
 
         // 3️⃣ Hapus semua detail lama
@@ -395,6 +400,7 @@ class ReportRmArrivalController extends Controller
                 'contamination' => $detail['contamination'],
                 'problem' => $detail['problem'] ?? null,
                 'corrective_action' => $detail['corrective_action'] ?? null,
+                'status' => $detail['status'] ?? null,
             ];
 
             /**

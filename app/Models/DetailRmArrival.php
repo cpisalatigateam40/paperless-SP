@@ -30,6 +30,7 @@ class DetailRmArrival extends Model implements Auditable
         'contamination',
         'problem',
         'corrective_action',
+        'status'
     ];
 
     protected $auditEvents = [

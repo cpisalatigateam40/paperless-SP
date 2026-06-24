@@ -45,7 +45,7 @@
                 <h5>Detail Pemeriksaan</h5>
                 <div id="detail-container">
                     @foreach($report->details as $i => $detail)
-                    <div class="detail-row mb-3 p-3 border rounded bg-light">
+                    <div class="detail-row p-3 border rounded bg-light" style="margin-bottom: 7rem;">
                         <div class="row align-items-end">
                             <div class="col-md-4">
                                 <label class="form-label">Bahan Baku</label>
@@ -246,22 +246,39 @@
                                     <option value="x" {{ $detail->contamination == 'x' ? 'selected' : '' }}>x</option>
                                 </select>
                             </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select name="details[{{ $i }}][status]" class="form-control">
+                                    <option value="OK" {{ $detail->status == 'OK' ? 'selected' : '' }}>OK</option>
+                                    <option value="Tidak OK" {{ $detail->status == 'Tidak OK' ? 'selected' : '' }}>Tidak OK</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Problem</label>
-                                <textarea name="details[{{ $i }}][problem]" class="form-control"
-                                    rows="2">{{ $detail->problem }}</textarea>
-                            </div>
                             <div class="col-md-6">
                                 <label class="form-label">Tindakan Koreksi</label>
                                 <textarea name="details[{{ $i }}][corrective_action]" class="form-control"
                                     rows="2">{{ $detail->corrective_action }}</textarea>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Catatan</label>
+                                <textarea name="details[{{ $i }}][problem]" class="form-control"
+                                    rows="2">{{ $detail->problem }}</textarea>
+                            </div>
                         </div>
                     </div>
+                    <hr>
                     @endforeach
+                </div>
+
+                <div class="form-group mt-5">
+                    <label>Notes</label>
+                    <textarea
+                        name="notes"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Masukkan catatan apabila diperlukan">{{ old('notes', $report->notes) }}</textarea>
                 </div>
 
                 <!-- <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">

@@ -200,23 +200,30 @@
                                     <option value="x">x</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Kontaminasi</label>
                                 <select name="details[0][contamination]" class="form-control">
                                     <option value="✓">✓</option>
                                     <option value="x">x</option>
                                 </select>
                             </div>
+                            <div class="col-md-4">
+                                <label>Status</label>
+                                <select name="details[0][status]" class="form-control">
+                                    <option value="OK">OK</option>
+                                    <option value="Tidak OK">Tidak OK</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <label class="form-label">Problem</label>
-                                <textarea name="details[0][problem]" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="col-md-6">
                                 <label class="form-label">Tindakan Koreksi</label>
                                 <textarea name="details[0][corrective_action]" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Catatan</label>
+                                <textarea name="details[0][problem]" class="form-control" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
@@ -419,15 +426,22 @@
                     <option value="x">x</option>
                 </select>
             </div>
+            <div class="col-md-4">
+                <label>Status</label>
+                <select name="details[__index__][status]" class="form-control">
+                    <option value="OK">OK</option>
+                    <option value="Tidak OK">Tidak OK</option>
+                </select>
+            </div>
         </div>
         <div class="row mt-3">
             <div class="col-md-6">
-                <label class="form-label">Problem</label>
-                <textarea name="details[__index__][problem]" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="col-md-6">
                 <label class="form-label">Tindakan Koreksi</label>
                 <textarea name="details[__index__][corrective_action]" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Catatan</label>
+                <textarea name="details[__index__][problem]" class="form-control" rows="2"></textarea>
             </div>
         </div>
     </div>

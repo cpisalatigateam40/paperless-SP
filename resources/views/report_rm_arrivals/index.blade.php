@@ -105,6 +105,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
                             <th>Waktu</th>
@@ -118,6 +119,7 @@
                     <tbody>
                         @forelse($reports as $report)
                         <tr>
+                            <td>{{ $reports->firstItem() + $loop->index }}</td>
                             <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
@@ -246,8 +248,9 @@
                                             <th rowspan="2" class="align-middle">Kondisi Kemasan</th>
                                             <th colspan="2" class="align-middle">Kondisi Bahan</th>
                                             <th rowspan="2" class="align-middle">Kontaminasi</th>
-                                            <th rowspan="2" class="align-middle">Problem</th>
+                                            <th rowspan="2" class="align-middle">Status</th>
                                             <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
+                                            <th rowspan="2" class="align-middle">Catatan</th>
                                         </tr>
                                         <tr class="text-center align-middle">
                                             <th class="align-middle">Suhu Bahan (°C)</th>
@@ -277,12 +280,14 @@
                                                 Warna: {{ $detail->sensory_color }}
                                             </td>
                                             <td class="text-center">{{ $detail->contamination }}</td>
-                                            <td>{{ $detail->problem ?? '-' }}</td>
+                                            <td class="text-center">{{ $detail->status }}</td>
                                             <td>{{ $detail->corrective_action ?? '-' }}</td>
+                                            <td>{{ $detail->problem ?? '-' }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
+                                <p class="mt-2">Catatan: {{ $report->notes }}</p>
                                 @can('create report')
                                 <div class="mb-2 d-flex justify-content-end mt-3">
                                     <a href="{{ route('report_rm_arrivals.add_detail', $report->uuid) }}"
