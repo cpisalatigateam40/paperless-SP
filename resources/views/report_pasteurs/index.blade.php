@@ -100,6 +100,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
                             <th>Waktu</th>
@@ -111,6 +112,7 @@
                     <tbody>
                         @forelse($reports as $report)
                         <tr>
+                            <td>{{ $reports->firstItem() + $loop->index }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>

@@ -20,13 +20,22 @@
                         <label>Shift</label>
                         <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
                     </div>
+                    <!-- <div class="col-md-6">
+                        <label>Section</label>
+                        <select name="section_uuid" class="form-control">
+                            <option value="">-- Pilih Section --</option>
+                            @foreach($sections as $section)
+                            <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
+                            @endforeach
+                        </select>
+                    </div> -->
                 </div>
                 
 
                 <hr>
                 <h5>Detail Pemeriksaan</h5>
                 <div id="details">
-                    <div class="card p-3 mb-3">
+                    <div class="card p-3 mb-5">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label>Produk</label>
@@ -76,35 +85,46 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label>Hasil Verifikasi MD Loma</label>
                             <select name="details[0][verif_loma]" class="form-control" required>
                                 <option value="√">√ </option>
                                 <option value="x">x </option>
                             </select>
-                        </div>
-                        <div class="mb-3">
-                            <label>Keterangan</label>
-                            <textarea name="details[0][notes]" class="form-control"></textarea>
-                        </div>
+                        </div> -->
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label>Ketidaksesuaian</label>
-                                <input type="text" name="details[0][nonconformity]" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label>Tindakan Koreksi</label>
-                                <input type="text" name="details[0][corrective_action]" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label>Verifikasi Setelah Tindakan Koreksi</label>
+                                <label>Status</label>
                                 <select name="details[0][verif_after_correct]" class="form-control">
                                     <option value="√">√ </option>
                                     <option value="x">x </option>
                                 </select>
                             </div>
+                            <!-- <div class="col-md-4">
+                                <label>Ketidaksesuaian</label>
+                                <input type="text" name="details[0][nonconformity]" class="form-control">
+                            </div> -->
+                            <div class="col-md-4">
+                                <label>Tindakan Koreksi</label>
+                                <input type="text" name="details[0][corrective_action]" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Keterangan</label>
+                                <textarea name="details[0][notes]" class="form-control" rows="1"></textarea>
+                            </div>
+                            
                         </div>
+                        
                     </div>
+                </div>
+
+                <div class="form-group mt-5 mb-5">
+                    <label>Notes</label>
+                    <textarea
+                        name="notes"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Masukkan catatan apabila diperlukan">{{ old('notes') }}</textarea>
                 </div>
                 <button type="button" class="btn btn-outline-secondary" onclick="addDetail()">+ Tambah
                     Detail</button>
@@ -170,32 +190,22 @@ function addDetail() {
                     </select>
                 </div>
             </div>
-            <div class="mb-3">
-                <label>Hasil Verifikasi MD Loma</label>
-                <select name="details[${detailIndex}][verif_loma]" class="form-control" required>
-                    <option value="√">√ </option>
-                    <option value="x">x </option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label>Keterangan</label>
-                <textarea name="details[${detailIndex}][notes]" class="form-control"></textarea>
-            </div>
+            
             <div class="row mb-3">
                 <div class="col-md-4">
-                    <label>Ketidaksesuaian</label>
-                    <input type="text" name="details[${detailIndex}][nonconformity]" class="form-control" required>
+                    <label>Status</label>
+                    <select name="details[${detailIndex}][verif_after_correct]" class="form-control" required>
+                        <option value="√">√ </option>
+                        <option value="x">x </option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label>Tindakan Koreksi</label>
                     <input type="text" name="details[${detailIndex}][corrective_action]" class="form-control" required>
                 </div>
                 <div class="col-md-4">
-                    <label>Verifikasi Setelah Tindakan Koreksi</label>
-                    <select name="details[${detailIndex}][verif_after_correct]" class="form-control" required>
-                        <option value="√">√ </option>
-                        <option value="x">x </option>
-                    </select>
+                    <label>Keterangan</label>
+                    <textarea name="details[${detailIndex}][notes]" class="form-control" rows="1"></textarea>
                 </div>
             </div>
             <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Hapus Detail</button>

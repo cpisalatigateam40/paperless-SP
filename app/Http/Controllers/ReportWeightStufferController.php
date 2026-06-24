@@ -16,6 +16,7 @@ use App\Models\WeightStuffer;
 use App\Models\Product;
 use App\Models\StandardStuffer;
 use App\Models\WeightStufferMeasurement;
+use App\Models\WeightStufferDocumentation;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -23,6 +24,7 @@ use App\Exports\WeightStufferExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
+use Illuminate\Support\Facades\Storage;
 
 class ReportWeightStufferController extends Controller
 {
@@ -540,14 +542,125 @@ class ReportWeightStufferController extends Controller
         return view('report_weight_stuffers.edit', compact('report', 'products', 'standards', 'detailsJson'));
     }
 
+    // public function update(Request $request, $uuid)
+    // {
+    //     $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
+
+    //     $report->update([
+    //         'date'  => $request->date,
+    //         'shift' => $request->shift,
+    //     ]);
+
+    //     foreach ($report->details as $oldDetail) {
+    //         TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+    //         HitechStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+    //         VemagStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+    //         Vemag2Stuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+    //         HandtmannStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
+    //         CaseStuffer::where('stuffer_id', $oldDetail->id)->delete();
+    //         WeightStufferMeasurement::where('stuffer_id', $oldDetail->id)->delete();
+    //         $oldDetail->delete();
+    //     }
+
+    //     foreach ($request->details as $detail) {
+    //         $detailModel = DetailWeightStuffer::create([
+    //             'uuid'                     => Str::uuid(),
+    //             'report_uuid'              => $report->uuid,
+    //             'product_uuid'             => $detail['product_uuid'],
+    //             'production_code'          => $detail['production_code'],
+    //             'time'                     => $detail['time'],
+    //             'machine'                  => $detail['machine'] ?? null,
+    //             'weight_standard'          => $detail['weight_standard'] ?? null,
+    //             'long_standard'            => $detail['long_standard'] ?? null,
+    //             'fla_standard'             => $detail['fla_standard'] ?? null,
+    //             'gramase'                  => $detail['gramase'] ?? null,
+    //             'weight_status'            => $detail['weight_status'] ?? null,
+    //             'weight_corrective_action' => $detail['weight_corrective_action'] ?? null,
+    //             'weight_notes'             => $detail['weight_notes'] ?? null,
+    //             'long_status'              => $detail['long_status'] ?? null,
+    //             'long_corrective_action'   => $detail['long_corrective_action'] ?? null,
+    //             'long_notes'               => $detail['long_notes'] ?? null,
+    //             'fla_status'               => $detail['fla_status'] ?? null,
+    //             'fla_corrective_action'    => $detail['fla_corrective_action'] ?? null,
+    //             'fla_notes'                => $detail['fla_notes'] ?? null,
+    //         ]);
+
+    //         $machineData = [
+    //             'detail_uuid'  => $detailModel->uuid,
+    //             'stuffer_speed' => $detail['stuffer_speed'] ?? null,
+    //             'avg_weight'   => $detail['avg_weight'] ?? null,
+    //             'avg_long'     => $detail['avg_long'] ?? null,
+    //             'avg_fla'      => $detail['avg_fla'] ?? null,
+    //             'notes'        => $detail['notes'] ?? null,
+    //         ];
+
+    //         match ($detail['machine'] ?? '') {
+    //             'townsend'  => TownsendStuffer::create($machineData),
+    //             'hitech'    => HitechStuffer::create($machineData),
+    //             'vemag'     => VemagStuffer::create($machineData),
+    //             'vemag2'    => Vemag2Stuffer::create($machineData),
+    //             'handtmann' => HandtmannStuffer::create($machineData),
+    //             default     => null,
+    //         };
+
+    //         if (isset($detail['cases'])) {
+    //             foreach ($detail['cases'] as $case) {
+    //                 CaseStuffer::create([
+    //                     'stuffer_id'    => $detailModel->id,
+    //                     'actual_case_2' => $case['actual_case_2'],
+    //                 ]);
+    //             }
+    //         }
+
+    //         if (isset($detail['weights'])) {
+    //             foreach ($detail['weights'] as $weightSet) {
+    //                 $maxIndex = 0;
+    //                 foreach ($weightSet as $key => $value) {
+    //                     if (preg_match('/^actual_(weight|long|fla)_(\d+)$/', $key, $m)) {
+    //                         $maxIndex = max($maxIndex, (int) $m[2]);
+    //                     }
+    //                 }
+
+    //                 for ($i = 1; $i <= $maxIndex; $i++) {
+    //                     $hasAnyValue =
+    //                         isset($weightSet['actual_weight_' . $i]) ||
+    //                         isset($weightSet['actual_long_'   . $i]) ||
+    //                         isset($weightSet['actual_fla_'    . $i]);
+
+    //                     if (!$hasAnyValue) continue;
+
+    //                     WeightStufferMeasurement::create([
+    //                         'stuffer_id'    => $detailModel->id,
+    //                         'actual_weight' => $weightSet['actual_weight_' . $i] ?? null,
+    //                         'actual_long'   => $weightSet['actual_long_'   . $i] ?? null,
+    //                         'actual_fla'    => $weightSet['actual_fla_'    . $i] ?? null,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return redirect()->route('report_weight_stuffers.index')->with('success', 'Laporan berhasil diperbarui.');
+    // }
+
+
     public function update(Request $request, $uuid)
     {
-        $report = ReportWeightStuffer::where('uuid', $uuid)->firstOrFail();
+        $report = ReportWeightStuffer::where('uuid', $uuid)
+            ->with(['details.documentations'])
+            ->firstOrFail();
 
         $report->update([
             'date'  => $request->date,
             'shift' => $request->shift,
         ]);
+
+        // Kumpulkan semua docs lama sebelum detail dihapus, indexed by old detail order
+        $oldDetailsDocs = $report->details->map(fn($d) => $d->documentations)->toArray();
+        $oldDetailsDocsKeyed = [];
+        foreach ($report->details as $i => $oldDetail) {
+            $oldDetailsDocsKeyed[$i] = $oldDetail->documentations;
+        }
 
         foreach ($report->details as $oldDetail) {
             TownsendStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
@@ -557,10 +670,13 @@ class ReportWeightStufferController extends Controller
             HandtmannStuffer::where('detail_uuid', $oldDetail->uuid)->delete();
             CaseStuffer::where('stuffer_id', $oldDetail->id)->delete();
             WeightStufferMeasurement::where('stuffer_id', $oldDetail->id)->delete();
+            // Lepas docs dari detail (set detail_id = null) agar tidak ikut terhapus
+            $oldDetail->documentations()->update(['detail_id' => null]); // placeholder
             $oldDetail->delete();
         }
 
-        foreach ($request->details as $detail) {
+        // Loop details - TANPA cleanup di dalam loop
+        foreach ($request->details as $key => $detail) {
             $detailModel = DetailWeightStuffer::create([
                 'uuid'                     => Str::uuid(),
                 'report_uuid'              => $report->uuid,
@@ -584,12 +700,12 @@ class ReportWeightStufferController extends Controller
             ]);
 
             $machineData = [
-                'detail_uuid'  => $detailModel->uuid,
+                'detail_uuid'   => $detailModel->uuid,
                 'stuffer_speed' => $detail['stuffer_speed'] ?? null,
-                'avg_weight'   => $detail['avg_weight'] ?? null,
-                'avg_long'     => $detail['avg_long'] ?? null,
-                'avg_fla'      => $detail['avg_fla'] ?? null,
-                'notes'        => $detail['notes'] ?? null,
+                'avg_weight'    => $detail['avg_weight'] ?? null,
+                'avg_long'      => $detail['avg_long'] ?? null,
+                'avg_fla'       => $detail['avg_fla'] ?? null,
+                'notes'         => $detail['notes'] ?? null,
             ];
 
             match ($detail['machine'] ?? '') {
@@ -613,20 +729,17 @@ class ReportWeightStufferController extends Controller
             if (isset($detail['weights'])) {
                 foreach ($detail['weights'] as $weightSet) {
                     $maxIndex = 0;
-                    foreach ($weightSet as $key => $value) {
-                        if (preg_match('/^actual_(weight|long|fla)_(\d+)$/', $key, $m)) {
+                    foreach ($weightSet as $k => $value) {
+                        if (preg_match('/^actual_(weight|long|fla)_(\d+)$/', $k, $m)) {
                             $maxIndex = max($maxIndex, (int) $m[2]);
                         }
                     }
-
                     for ($i = 1; $i <= $maxIndex; $i++) {
                         $hasAnyValue =
                             isset($weightSet['actual_weight_' . $i]) ||
                             isset($weightSet['actual_long_'   . $i]) ||
                             isset($weightSet['actual_fla_'    . $i]);
-
                         if (!$hasAnyValue) continue;
-
                         WeightStufferMeasurement::create([
                             'stuffer_id'    => $detailModel->id,
                             'actual_weight' => $weightSet['actual_weight_' . $i] ?? null,
@@ -636,12 +749,36 @@ class ReportWeightStufferController extends Controller
                     }
                 }
             }
+
+            // Re-attach docs lama yang di-keep
+            $keepUuids = $detail['keep_docs'] ?? [];
+            if (!empty($keepUuids)) {
+                WeightStufferDocumentation::whereIn('uuid', $keepUuids)
+                    ->update(['detail_id' => $detailModel->id]);
+            }
+
+            // Upload docs baru
+            if ($request->hasFile("details.{$key}.documentation")) {
+                foreach ($request->file("details.{$key}.documentation") as $image) {
+                    if (!$image->isValid()) continue;
+                    $path = $image->store('weight-stuffer-documentation', 'public');
+                    $detailModel->documentations()->create([
+                        'uuid'  => Str::uuid(),
+                        'image' => $path,
+                    ]);
+                }
+            }
         }
+
+        // Cleanup SETELAH semua detail selesai di-loop
+        // Docs yang masih null = tidak di-keep oleh siapapun = hapus
+        WeightStufferDocumentation::whereNull('detail_id')->each(function ($doc) {
+            Storage::disk('public')->delete($doc->image);
+            $doc->delete();
+        });
 
         return redirect()->route('report_weight_stuffers.index')->with('success', 'Laporan berhasil diperbarui.');
     }
-
-
 
     public function exportExcel(Request $request)
     {
@@ -684,5 +821,4 @@ class ReportWeightStufferController extends Controller
     
         return Excel::download(new WeightStufferExport($reports, $periodLabel), $filename);
     }
-
 }

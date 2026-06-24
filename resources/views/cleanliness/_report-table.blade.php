@@ -1,6 +1,7 @@
 <table class="table table-bordered">
     <thead>
         <tr>
+            <th>No.</th>
             <th>Tanggal</th>
             <th>Shift</th>
             <th>Waktu</th>
@@ -13,6 +14,7 @@
     <tbody>
         @forelse($filteredReports as $report)
         <tr>
+            <td>{{ $reports->firstItem() + $loop->index }}</td>
             <td>{{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}</td>
             <td>{{ $report->shift }}</td>
             <td>{{ $report->created_at->format('H:i') }}</td>

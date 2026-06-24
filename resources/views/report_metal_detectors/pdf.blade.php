@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Laporan Verifikasi Metal Detector Adonan</title>
+    <title>Verifikasi Metal Detector Adonan</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -21,13 +21,12 @@
     table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
-    th,
-    td {
+    th, td {
         border: 1px solid #000;
-        padding: 2px 3px;
+        padding: 2px 4px;
         text-align: left;
         vertical-align: middle;
     }
@@ -35,37 +34,24 @@
     th {
         text-align: center;
         font-weight: bold;
+        background-color: #f0f0f0;
     }
 
-    .text-center {
-        text-align: center;
+    .text-center { text-align: center; }
+    .text-left   { text-align: left; }
+    .no-border   { border: none !important; }
+
+    .section-title {
+        font-weight: bold;
+        margin-top: 10px;
+        margin-bottom: 4px;
+        font-size: 10px;
     }
 
-    .signature-box {
-        height: 40px;
-        border-bottom: 1px solid #000;
-        margin-top: 20px;
-        width: 60%;
-    }
-
-    .no-border {
-        border: none !important;
-    }
-
-    .mb-2 {
-        margin-bottom: 1rem;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 2rem;
-    }
-
-    .underline {
-        text-decoration: underline;
+    table.info td {
+        border: none;
+        padding: 1px 2px;
+        vertical-align: top;
     }
 
     .header {
@@ -81,151 +67,180 @@
         border-collapse: collapse;
     }
 
+    .row-ng td {
+        color: #c0392b;
+    }
+
     @page {
         margin-top: 80px;
+        margin-bottom: 45px;
+        margin-left: 35px;
+        margin-right: 35px;
         size: 210mm 330mm;
     }
     </style>
 </head>
 
 <body>
-    {{-- header --}}
+
+    {{-- ===== HEADER FIXED ===== --}}
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 30%; vertical-align: middle;">
+                <td class="no-border" style="width: 40%; vertical-align: middle;">
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
-                                $path = public_path('storage/image/logo.png');
-                                if (file_exists($path)) {
-                                $type = pathinfo($path, PATHINFO_EXTENSION);
-                                $data = file_get_contents($path);
-                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                }
+                                    $path = public_path('storage/image/logo.png');
+                                    if (file_exists($path)) {
+                                        $type   = pathinfo($path, PATHINFO_EXTENSION);
+                                        $data   = file_get_contents($path);
+                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    }
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
-                            <td class="no-border" style="vertical-align: middle; padding-left: 10px;">
+                            <td class="no-border" style="vertical-align: middle; padding-left: 8px;">
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    CHAROEN<br>POKPHAND<br>INDONESIA PT.<br>Food Division
+                                    PT. CHAROEN POKPHAND INDONESIA<br>
+                                    FOOD DIVISION<br>
+                                    SALATIGA - INDONESIA
                                 </div>
                             </td>
                         </tr>
                     </table>
                 </td>
+                <td class="no-border" style="text-align: right; vertical-align: middle; font-size: 9px; font-weight: bold;">
+                    QM P.? / ?
+                </td>
             </tr>
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">LAPORAN VERIFIKASI METAL DETECTOR ADONAN</h3>
+    {{-- ===== JUDUL ===== --}}
+    <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 12px;">
+        VERIFIKASI METAL DETECTOR ADONAN
+    </h3>
 
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td style="text-align: left; border: none;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
+    {{-- ===== A. INFORMASI PRODUK ===== --}}
+    <div class="section-title">A. Informasi Produk</div>
+    <table class="info" style="width: 100%; margin-bottom: 10px;">
+        <tr>
+            <td width="130">Hari, Tanggal</td>
+            <td width="10">:</td>
+            <td>{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d F Y') }}</td>
+        </tr>
+        <tr>
+            <td>Shift</td>
+            <td>:</td>
+            <td>{{ $report->shift }}</td>
         </tr>
     </table>
 
-    <table>
+    {{-- ===== B. HASIL VERIFIKASI ===== --}}
+    <div class="section-title">B. Hasil Verifikasi</div>
+
+    @php
+        $areaName = $report->section->section_name ?? '-';
+    @endphp
+
+    <table class="info" style="width: 100%; margin-bottom: 6px;">
+        <tr>
+            <td width="130">Area</td>
+            <td width="10">:</td>
+            <td>Meat Preparation</td>
+        </tr>
+    </table>
+
+    <table style="margin-bottom: 14px;">
         <thead>
             <tr>
-                <th rowspan="2">Jam</th>
-                <th rowspan="2">Produk</th>
-                <th rowspan="2">Gramase</th>
-                <th rowspan="2">Kode Produksi</th>
-                <th colspan="3">Spesimen</th>
-                <th rowspan="2">Hasil Verifikasi MD Loma</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Ketidaksesuaian</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
-            </tr>
-            <tr>
-                <th>Fe 1.5 mm</th>
-                <th>Non Fe 1.5 mm</th>
-                <th>SUS 316 2.5 mm</th>
+                <th>No</th>
+                <th>Waktu<br>Verifikasi</th>
+                <th>Nama Produk</th>
+                <th>Gramase (gr)</th>
+                <th>Kode Produksi</th>
+                <th>Specimen Fe<br>1.5 mm</th>
+                <th>Specimen<br>Non-Fe 2.0</th>
+                <th>Specimen<br>SUS 2.5</th>
+                <th>Status<br>(OK/NG)</th>
+                <th>Tindakan Koreksi</th>
+                <th>Keterangan</th>
             </tr>
         </thead>
-
         <tbody>
-            @forelse($report->details as $detail)
-            <tr>
-                <td>{{ $detail->hour }}</td>
-                <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td class="align-middle">
-                    {{ !empty($detail->gramase) 
-                        ? $detail->gramase 
-                        : ($detail->product->nett_weight ?? '-') }} g
+            @forelse($report->details as $i => $detail)
+            @php
+                $isNg = strtoupper($detail->verif_after_correct ?? '') === 'NG'
+                     || strtoupper($detail->result_fe ?? '') === 'NG'
+                     || strtoupper($detail->result_non_fe ?? '') === 'NG'
+                     || strtoupper($detail->result_sus316 ?? '') === 'NG';
+            @endphp
+            <tr class="{{ $isNg ? 'row-ng' : '' }}">
+                <td class="text-center">{{ $i + 1 }}</td>
+                <td class="text-center">{{ $detail->hour }}</td>
+                <td class="text-left">{{ $detail->product->product_name ?? '-' }}</td>
+                <td class="text-center">
+                    {{ !empty($detail->gramase)
+                        ? $detail->gramase
+                        : ($detail->product->nett_weight ?? '-') }}
                 </td>
-                <td>{{ $detail->production_code }}</td>
-                <td>{{ $detail->result_fe }}</td>
-                <td>{{ $detail->result_non_fe }}</td>
-                <td>{{ $detail->result_sus316 }}</td>
-                <td>{{ $detail->verif_loma }}</td>
-                <td>{{ $detail->notes }}</td>
-                <td>{{ $detail->nonconformity }}</td>
-                <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verif_after_correct }}</td>
+                <td class="text-center">{{ $detail->production_code ?? '-' }}</td>
+                <td class="text-center">{{ $detail->result_fe ?? '-' }}</td>
+                <td class="text-center">{{ $detail->result_non_fe ?? '-' }}</td>
+                <td class="text-center">{{ $detail->result_sus316 ?? '-' }}</td>
+                <td class="text-center">{{ $detail->verif_after_correct ?? '-' }}</td>
+                <td class="text-left">{{ $detail->corrective_action ?? '-' }}</td>
+                <td class="text-left">{{ $detail->notes ?? '-' }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="12">Tidak ada detail pemeriksaan</td>
+                <td colspan="11" class="text-center">Tidak ada data.</td>
             </tr>
             @endforelse
-            <tr>
-                <td colspan="12" style="text-align: right; border: none;">QM 10 / 00</td>
-            </tr>
         </tbody>
     </table>
 
-    <p style="margin-top: 10px;">
-        <strong>Keterangan:</strong><br>
-        √ : Terdeteksi metal detector<br>
-        x : Tidak terdeteksi metal detector
+    {{-- ===== C. CATATAN & DOKUMENTASI ===== --}}
+    <div class="section-title">C. Catatan &amp; Dokumentasi</div>
+    <p style="font-size: 10px; margin: 4px 0 16px 0; {{ ($report->notes ?? '') ? 'color: #c0392b;' : '' }}">
+        {{ $report->notes ?? '-' }}
     </p>
 
-    <br><br>
-    <table style="width: 100%; border: none; margin-top: 4rem;">
-        <tr style="border: none;">
+    {{-- ===== TTD ===== --}}
+    <table style="width: 100%; border: none; margin-top: 30px;">
+        <tr>
             <td style="text-align: center; border: none; width: 33%;">
-                Diperiksa oleh:<br><br>
-                <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->created_by }}</strong><br><br>
+                Diperiksa oleh,<br><br>
+                <img src="{{ $createdQr }}" width="80" style="margin: 8px 0;"><br>
+                <strong>{{ $report->created_by }}</strong><br>
                 QC Inspector
             </td>
             <td style="text-align: center; border: none; width: 33%;">
-                Diketahui oleh:<br><br>
+                Diketahui oleh,<br><br>
                 @if($report->known_by)
-                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->known_by }}</strong><br><br>
+                    <img src="{{ $knownQr }}" width="80" style="margin: 8px 0;"><br>
+                    <strong>{{ $report->known_by }}</strong><br>
                 @else
-                <div style="height: 120px;"></div>
-                <strong>-</strong><br>
+                    <div style="height: 100px;"></div>
+                    <strong>Tanda Tangan &amp; Nama Terang</strong><br>
                 @endif
-                SPV/Foreman/Lady Produksi
+                Foreman / SPV Produksi
             </td>
             <td style="text-align: center; border: none; width: 33%;">
-                Disetujui oleh:<br><br>
+                Disetujui oleh,<br><br>
                 @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->approved_by }}</strong><br><br>
+                    <img src="{{ $approvedQr }}" width="80" style="margin: 8px 0;"><br>
+                    <strong>{{ $report->approved_by }}</strong><br>
                 @else
-                <div style="height: 120px;"></div>
-                <strong>-</strong><br>
+                    <div style="height: 100px;"></div>
+                    <strong>Tanda Tangan &amp; Nama Terang</strong><br>
                 @endif
                 Supervisor QC
             </td>
         </tr>
     </table>
-</body>
 
+</body>
 </html>

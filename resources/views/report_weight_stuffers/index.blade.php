@@ -114,6 +114,7 @@
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
+                            <th>No.</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
                             <th>Nama Produk</th>
@@ -126,6 +127,7 @@
                     <tbody>
                         @forelse ($reports as $report)
                         <tr>
+                            <td>{{ $reports->firstItem() + $loop->index }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
                             <td>

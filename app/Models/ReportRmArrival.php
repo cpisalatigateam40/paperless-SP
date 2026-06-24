@@ -22,6 +22,7 @@ class ReportRmArrival extends Model implements Auditable
         'known_by',
         'approved_by',
         'approved_at',
+        'notes'
     ];
 
     protected $auditEvents = [

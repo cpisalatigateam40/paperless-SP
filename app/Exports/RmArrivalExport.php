@@ -26,12 +26,12 @@ class RmArrivalExport implements WithEvents, WithTitle
                 $sheet = $event->sheet->getDelegate();
 
                 // ── Judul ──────────────────────────────────────────────────
-                $sheet->mergeCells('A1:S1');
+                $sheet->mergeCells('A1:U1');
                 $sheet->setCellValue('A1', 'Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang (Chillroom & Seasoning)');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
-                $sheet->mergeCells('A2:S2');
+                $sheet->mergeCells('A2:U2');
                 $sheet->setCellValue('A2', 'Periode: ' . $this->periodLabel);
                 $sheet->getStyle('A2')->getFont()->setSize(10);
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
@@ -46,17 +46,19 @@ class RmArrivalExport implements WithEvents, WithTitle
                     'F' => 'Group',
                     'G' => 'Section',
                     'H' => 'Bahan',
-                    'I' => 'Kode prod.',
-                    'J' => 'Kondisi',
+                    'I' => 'Kode Prod.',
+                    'J' => 'Kondisi RM',
                     'K' => 'Supplier',
                     'L' => 'Kemasan',
-                    'M' => 'Kenampakan',
-                    'N' => 'Aroma',
-                    'O' => 'Warna',
-                    'P' => 'Kontaminasi',
-                    'Q' => 'Suhu (°C)',
-                    'R' => 'Problem',
-                    'S' => 'Tindakan koreksi',
+                    'M' => 'Suhu (°C)',
+                    'N' => 'Kenampakan',
+                    'O' => 'Aroma',
+                    'P' => 'Warna',
+                    'Q' => 'Sensorial Condition',
+                    'R' => 'Kontaminasi',
+                    'S' => 'Status (OK/NG)',
+                    'T' => 'Problem',
+                    'U' => 'Tindakan Koreksi',
                 ];
 
                 foreach ($headers as $col => $label) {
@@ -91,15 +93,17 @@ class RmArrivalExport implements WithEvents, WithTitle
                         $sheet->setCellValue("J{$row}", $detail->rm_condition ?? '-');
                         $sheet->setCellValue("K{$row}", $detail->supplier ?? '-');
                         $sheet->setCellValue("L{$row}", $detail->packaging_condition ?? '-');
-                        $sheet->setCellValue("M{$row}", $detail->sensory_appearance ?? '-');
-                        $sheet->setCellValue("N{$row}", $detail->sensory_aroma ?? '-');
-                        $sheet->setCellValue("O{$row}", $detail->sensory_color ?? '-');
-                        $sheet->setCellValue("P{$row}", $detail->contamination ?? '-');
-                        $sheet->setCellValue("Q{$row}", $detail->temperature ?? '-');
-                        $sheet->setCellValue("R{$row}", $detail->problem ?? '-');
-                        $sheet->setCellValue("S{$row}", $detail->corrective_action ?? '-');
+                        $sheet->setCellValue("M{$row}", $detail->temperature ?? '-');
+                        $sheet->setCellValue("N{$row}", $detail->sensory_appearance ?? '-');
+                        $sheet->setCellValue("O{$row}", $detail->sensory_aroma ?? '-');
+                        $sheet->setCellValue("P{$row}", $detail->sensory_color ?? '-');
+                        $sheet->setCellValue("Q{$row}", $detail->sensorial_condition ?? '-');
+                        $sheet->setCellValue("R{$row}", $detail->contamination ?? '-');
+                        $sheet->setCellValue("S{$row}", $detail->status ?? '-');
+                        $sheet->setCellValue("T{$row}", $detail->problem ?? '-');
+                        $sheet->setCellValue("U{$row}", $detail->corrective_action ?? '-');
 
-                        $sheet->getStyle("A{$row}:S{$row}")
+                        $sheet->getStyle("A{$row}:U{$row}")
                             ->getAlignment()->setHorizontal('center');
 
                         $row++;
@@ -108,7 +112,7 @@ class RmArrivalExport implements WithEvents, WithTitle
                 }
 
                 if ($no === 1) {
-                    $sheet->mergeCells('A5:S5');
+                    $sheet->mergeCells('A5:U5');
                     $sheet->setCellValue('A5', 'Tidak ada data untuk periode yang dipilih.');
                     $sheet->getStyle('A5')->getFont()->setItalic(true);
                     $sheet->getStyle('A5')->getAlignment()->setHorizontal('center');
@@ -116,7 +120,7 @@ class RmArrivalExport implements WithEvents, WithTitle
                 }
 
                 // ── Border tabel ───────────────────────────────────────────
-                $sheet->getStyle("A4:S" . ($row - 1))->getBorders()
+                $sheet->getStyle("A4:U" . ($row - 1))->getBorders()
                     ->getAllBorders()->setBorderStyle('thin');
 
                 // ── Auto width ─────────────────────────────────────────────

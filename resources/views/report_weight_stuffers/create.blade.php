@@ -129,7 +129,7 @@
                 </div>
                 <div class="col-md-4">
                     <label>Diameter Casing (mm)</label>
-                    <input type="number" name="details[__N__][cases][0][actual_case_2]" class="form-control">
+                    <input type="number" name="details[__N__][cases][0][actual_case_2]" class="form-control" placeholder="mis: 205">
                 </div>
             </div>
 
@@ -140,26 +140,26 @@
             <div class="row g-3 mb-2">
                 <div class="col-md-4">
                     <label>Standar Berat</label>
-                    <input type="text" name="details[__N__][weight_standard]" class="form-control" placeholder="mis: 204-209" required>
+                    <input type="text" name="details[__N__][weight_standard]" class="form-control" placeholder="mis: 204-209">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="fw-bold">Berat Aktual (gr)</label>
                 <div class="d-flex flex-wrap gap-2 weight-wrapper" id="weightWrapper-__N__" style="gap: .8rem;">
                     <div class="weight-item">
-                        <label style="font-size:12px">Berat 1</label>
+                        <label style="font-size:16px">Berat 1</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_weight_1]"
-                            class="form-control weight-input" style="width:100px">
+                            class="form-control weight-input" style="width:100px" placeholder="mis: 20">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Berat 2</label>
+                        <label style="font-size:16px">Berat 2</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_weight_2]"
-                            class="form-control weight-input" style="width:100px">
+                            class="form-control weight-input" style="width:100px" placeholder="mis: 20">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Berat 3</label>
+                        <label style="font-size:16px">Berat 3</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_weight_3]"
-                            class="form-control weight-input" style="width:100px">
+                            class="form-control weight-input" style="width:100px" placeholder="mis: 20">
                     </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-secondary mt-2 btn-add-weight" data-type="weight">
@@ -181,11 +181,11 @@
                 </div>
                 <div class="col-md-4">
                     <label>Tindakan Koreksi</label>
-                    <textarea name="details[__N__][weight_corrective_action]" class="form-control" rows="1"></textarea>
+                    <textarea name="details[__N__][weight_corrective_action]" class="form-control" rows="1" placeholder="masukkan tindakan koreksi"></textarea>
                 </div>
                 <div class="col-md-4">
                     <label>Keterangan</label>
-                    <textarea name="details[__N__][weight_notes]" class="form-control" rows="1"></textarea>
+                    <textarea name="details[__N__][weight_notes]" class="form-control" rows="1" placeholder="masukkan keterangan"></textarea>
                 </div>
             </div>
 
@@ -196,26 +196,26 @@
             <div class="row g-3 mb-2">
                 <div class="col-md-4">
                     <label>Standar Panjang</label>
-                    <input type="text" name="details[__N__][long_standard]" class="form-control" placeholder="mis: 120-130" required>
+                    <input type="text" name="details[__N__][long_standard]" class="form-control" placeholder="mis: 120-130">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="fw-bold">Panjang Aktual (mm)</label>
                 <div class="d-flex flex-wrap gap-2 long-wrapper" id="longWrapper-__N__" style="gap: .8rem;">
                     <div class="weight-item">
-                        <label style="font-size:12px">Panjang 1</label>
+                        <label style="font-size:16px">Panjang 1</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_long_1]"
-                            class="form-control long-input" style="width:100px">
+                            class="form-control long-input" style="width:100px" placeholder="mis: 20">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Panjang 2</label>
+                        <label style="font-size:16px">Panjang 2</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_long_2]"
-                            class="form-control long-input" style="width:100px">
+                            class="form-control long-input" style="width:100px" placeholder="mis: 20">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Panjang 3</label>
+                        <label style="font-size:16px">Panjang 3</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_long_3]"
-                            class="form-control long-input" style="width:100px">
+                            class="form-control long-input" style="width:100px" placeholder="mis: 20">
                     </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-secondary mt-2 btn-add-weight" data-type="long">
@@ -237,11 +237,11 @@
                 </div>
                 <div class="col-md-4">
                     <label>Tindakan Koreksi</label>
-                    <textarea name="details[__N__][long_corrective_action]" class="form-control" rows="1"></textarea>
+                    <textarea name="details[__N__][long_corrective_action]" class="form-control" rows="1" placeholder="masukkan tindakan koreksi"></textarea>
                 </div>
                 <div class="col-md-4">
                     <label>Keterangan</label>
-                    <textarea name="details[__N__][long_notes]" class="form-control" rows="1"></textarea>
+                    <textarea name="details[__N__][long_notes]" class="form-control" rows="1" placeholder="masukkan keterangan"></textarea>
                 </div>
             </div>
 
@@ -252,26 +252,26 @@
             <div class="row g-3 mb-2">
                 <div class="col-md-4">
                     <label>Standar Berat Fla</label>
-                    <input type="text" name="details[__N__][fla_standard]" class="form-control" placeholder="mis: 12-13" required>
+                    <input type="text" name="details[__N__][fla_standard]" class="form-control" placeholder="mis: 12-13">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="fw-bold">Berat Fla Aktual (gr)</label>
                 <div class="d-flex flex-wrap gap-2 fla-wrapper" id="flaWrapper-__N__" style="gap: .8rem;">
                     <div class="weight-item">
-                        <label style="font-size:12px">Fla 1</label>
+                        <label style="font-size:16px">Fla 1</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_fla_1]"
-                            class="form-control fla-input" style="width:100px">
+                            class="form-control fla-input" style="width:100px" placeholder="mis: 20">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Fla 2</label>
+                        <label style="font-size:16px">Fla 2</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_fla_2]"
-                            class="form-control fla-input" style="width:100px">
+                            class="form-control fla-input" style="width:100px" placeholder="mis: 20">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Fla 3</label>
+                        <label style="font-size:16px">Fla 3</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_fla_3]"
-                            class="form-control fla-input" style="width:100px">
+                            class="form-control fla-input" style="width:100px" placeholder="mis: 20">
                     </div>
                 </div>
                 <button type="button" class="btn btn-sm btn-secondary mt-2 btn-add-weight" data-type="fla">
@@ -293,11 +293,11 @@
                 </div>
                 <div class="col-md-4">
                     <label>Tindakan Koreksi</label>
-                    <textarea name="details[__N__][fla_corrective_action]" class="form-control" rows="1"></textarea>
+                    <textarea name="details[__N__][fla_corrective_action]" class="form-control" rows="1" placeholder="masukkan tindakan koreksi"></textarea>
                 </div>
                 <div class="col-md-4">
                     <label>Keterangan</label>
-                    <textarea name="details[__N__][fla_notes]" class="form-control" rows="1"></textarea>
+                    <textarea name="details[__N__][fla_notes]" class="form-control" rows="1" placeholder="masukkan keterangan"></textarea>
                 </div>
             </div>
 
@@ -314,7 +314,6 @@
                         name="details[__N__][documentation][]"
                         class="form-control"
                         accept="image/*"
-                        capture="environment"
                         multiple>
                 </div>
             </div>
@@ -425,7 +424,7 @@ function addActualInput(block, n, type) {
     const div = document.createElement('div');
     div.className = 'weight-item';
     div.innerHTML =
-        '<label style="font-size:12px">' + labelMap[type] + ' ' + count + '</label>' +
+        '<label style="font-size:16px">' + labelMap[type] + ' ' + count + '</label>' +
         '<input type="number" step="0.01" ' +
             'name="details[' + n + '][weights][0][actual_' + type + '_' + count + ']" ' +
             'class="form-control ' + type + '-input" style="width:100px">';

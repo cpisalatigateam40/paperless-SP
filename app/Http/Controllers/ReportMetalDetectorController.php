@@ -133,6 +133,7 @@ class ReportMetalDetectorController extends Controller
             'area_uuid' => Auth::user()->area_uuid,
             'section_uuid' => $request->section_uuid,
             'created_by' => Auth::user()->name,
+            'notes' => $request->notes,
         ]);
 
         // Buat detail
@@ -146,8 +147,8 @@ class ReportMetalDetectorController extends Controller
                 'result_fe' => $detail['result_fe'],
                 'result_non_fe' => $detail['result_non_fe'],
                 'result_sus316' => $detail['result_sus316'],
-                'verif_loma' => $detail['verif_loma'],
-                'nonconformity' => $detail['nonconformity'],
+                // 'verif_loma' => $detail['verif_loma'],
+                // 'nonconformity' => $detail['nonconformity'],
                 'corrective_action' => $detail['corrective_action'],
                 'verif_after_correct' => $detail['verif_after_correct'],
                 'notes' => $detail['notes'] ?? null,
@@ -188,8 +189,8 @@ class ReportMetalDetectorController extends Controller
             'result_non_fe' => 'required|in:√,x',
             'result_sus316' => 'required|in:√,x',
             'notes' => 'nullable',
-            'verif_loma' => 'nullable',
-            'nonconformity' => 'nullable',
+            // 'verif_loma' => 'nullable',
+            // 'nonconformity' => 'nullable',
             'corrective_action' => 'nullable',
             'verif_after_correct' => 'nullable',
         ]);
@@ -205,8 +206,8 @@ class ReportMetalDetectorController extends Controller
             'result_fe' => $request->result_fe,
             'result_non_fe' => $request->result_non_fe,
             'result_sus316' => $request->result_sus316,
-            'verif_loma' => $request->verif_loma,
-            'nonconformity' => $request->nonconformity,
+            // 'verif_loma' => $request->verif_loma,
+            // 'nonconformity' => $request->nonconformity,
             'corrective_action' => $request->corrective_action,
             'verif_after_correct' => $request->verif_after_correct,
             'notes' => $request->notes,
@@ -320,6 +321,7 @@ class ReportMetalDetectorController extends Controller
             'date' => $request->date,
             'shift' => $request->shift,
             'section_uuid' => $request->section_uuid,
+            'notes' => $request->notes,
         ]);
 
         // Hapus semua detail lama dan simpan ulang (praktis untuk form dinamis)
@@ -335,8 +337,8 @@ class ReportMetalDetectorController extends Controller
                 'result_fe' => $detail['result_fe'],
                 'result_non_fe' => $detail['result_non_fe'],
                 'result_sus316' => $detail['result_sus316'],
-                'verif_loma' => $detail['verif_loma'],
-                'nonconformity' => $detail['nonconformity'],
+                // 'verif_loma' => $detail['verif_loma'],
+                // 'nonconformity' => $detail['nonconformity'],
                 'corrective_action' => $detail['corrective_action'],
                 'verif_after_correct' => $detail['verif_after_correct'],
                 'notes' => $detail['notes'] ?? null,

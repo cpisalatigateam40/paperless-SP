@@ -132,6 +132,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>Tanggal</th>
                             <th>Shift</th>
                             <th>Waktu</th>
@@ -144,6 +145,7 @@
                     <tbody>
                         @foreach($reports as $report)
                         <tr>
+                            <td>{{ $reports->firstItem() + $loop->index }}</td>
                             <td>{{ $report->date }}</td>
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
@@ -265,11 +267,9 @@
                                                 <th>Fe 1.5 mm</th>
                                                 <th>Non Fe 1.5 mm</th>
                                                 <th>SUS 316 2.5 mm</th>
-                                                <th>Hasil Verifikasi MD Loma</th>
-                                                <th>Keterangan</th>
-                                                <th>Ketidaksesuaian</th>
+                                                <th>Status</th>
                                                 <th>Tindakan Koreksi</th>
-                                                <th>Verifikasi Setelah Tindakan Koreksi</th>
+                                                <th>Keterangan</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -286,11 +286,9 @@
                                                 <td>{{ $detail->result_fe }}</td>
                                                 <td>{{ $detail->result_non_fe }}</td>
                                                 <td>{{ $detail->result_sus316 }}</td>
-                                                <td>{{ $detail->verif_loma }}</td>
-                                                <td>{{ $detail->notes }}</td>
-                                                <td>{{ $detail->nonconformity }}</td>
-                                                <td>{{ $detail->corrective_action }}</td>
                                                 <td>{{ $detail->verif_after_correct }}</td>
+                                                <td>{{ $detail->corrective_action }}</td>
+                                                <td>{{ $detail->notes }}</td>
                                             </tr>
                                             @empty
                                             <tr>
@@ -299,6 +297,9 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+
+                                    <p class="mt-1">Catatan: {{ $report->notes }}</p>
+                                
 
                                     @can('create report')
                                     <div class="mt-2 d-flex justify-content-end">

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <form action="{{ route('report_weight_stuffers.update', $report->uuid) }}" method="POST" id="mainForm">
+    <form action="{{ route('report_weight_stuffers.update', $report->uuid) }}" method="POST" id="mainForm" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -148,24 +148,24 @@
             <div class="row g-3 mb-2">
                 <div class="col-md-4">
                     <label>Standar Berat</label>
-                    <input type="text" name="details[__N__][weight_standard]" class="form-control" placeholder="mis: 204-209" required>
+                    <input type="text" name="details[__N__][weight_standard]" class="form-control" placeholder="mis: 204-209">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="fw-bold">Berat Aktual (gr)</label>
                 <div class="d-flex flex-wrap gap-2 weight-wrapper" id="weightWrapper-__N__" style="gap:.8rem">
                     <div class="weight-item">
-                        <label style="font-size:12px">Berat 1</label>
+                        <label style="font-size:16px">Berat 1</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_weight_1]"
                             class="form-control weight-input" style="width:100px">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Berat 2</label>
+                        <label style="font-size:16px">Berat 2</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_weight_2]"
                             class="form-control weight-input" style="width:100px">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Berat 3</label>
+                        <label style="font-size:16px">Berat 3</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_weight_3]"
                             class="form-control weight-input" style="width:100px">
                     </div>
@@ -204,24 +204,24 @@
             <div class="row g-3 mb-2">
                 <div class="col-md-4">
                     <label>Standar Panjang</label>
-                    <input type="text" name="details[__N__][long_standard]" class="form-control" placeholder="mis: 120-130" required>
+                    <input type="text" name="details[__N__][long_standard]" class="form-control" placeholder="mis: 120-130">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="fw-bold">Panjang Aktual (mm)</label>
                 <div class="d-flex flex-wrap gap-2 long-wrapper" id="longWrapper-__N__" style="gap:.8rem">
                     <div class="weight-item">
-                        <label style="font-size:12px">Panjang 1</label>
+                        <label style="font-size:16px">Panjang 1</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_long_1]"
                             class="form-control long-input" style="width:100px">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Panjang 2</label>
+                        <label style="font-size:16px">Panjang 2</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_long_2]"
                             class="form-control long-input" style="width:100px">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Panjang 3</label>
+                        <label style="font-size:16px">Panjang 3</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_long_3]"
                             class="form-control long-input" style="width:100px">
                     </div>
@@ -260,24 +260,24 @@
             <div class="row g-3 mb-2">
                 <div class="col-md-4">
                     <label>Standar Berat Fla</label>
-                    <input type="text" name="details[__N__][fla_standard]" class="form-control" placeholder="mis: 12-13" required>
+                    <input type="text" name="details[__N__][fla_standard]" class="form-control" placeholder="mis: 12-13">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="fw-bold">Berat Fla Aktual (gr)</label>
                 <div class="d-flex flex-wrap gap-2 fla-wrapper" id="flaWrapper-__N__" style="gap:.8rem">
                     <div class="weight-item">
-                        <label style="font-size:12px">Fla 1</label>
+                        <label style="font-size:16px">Fla 1</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_fla_1]"
                             class="form-control fla-input" style="width:100px">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Fla 2</label>
+                        <label style="font-size:16px">Fla 2</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_fla_2]"
                             class="form-control fla-input" style="width:100px">
                     </div>
                     <div class="weight-item">
-                        <label style="font-size:12px">Fla 3</label>
+                        <label style="font-size:16px">Fla 3</label>
                         <input type="number" step="0.01" name="details[__N__][weights][0][actual_fla_3]"
                             class="form-control fla-input" style="width:100px">
                     </div>
@@ -316,6 +316,20 @@
                     <label>Catatan</label>
                     <input type="text" name="details[__N__][notes]" class="form-control">
                 </div>
+                <div class="col-md-6">
+                    <label>Upload Dokumentasi Baru</label>
+                    <input type="file"
+                        name="details[__N__][documentation][]"
+                        class="form-control doc-upload"
+                        accept="image/*"
+                        multiple>
+                </div>
+            </div>
+
+            {{-- Foto existing (di-render via JS dari existingDetails) --}}
+            <div class="existing-docs mt-3" style="display:none">
+                <label class="fw-semibold" style="font-size:13px">Dokumentasi Tersimpan</label>
+                <div class="d-flex flex-wrap gap-2 mt-1 doc-preview-wrapper"></div>
             </div>
 
         </div>{{-- /card-body --}}
@@ -369,140 +383,144 @@
     document.getElementById('headerGramase').addEventListener('input',  syncAllBlocks);
     document.getElementById('headerProdCode').addEventListener('input',  syncAllBlocks);
 
-    // ---------------------------------------------------------------
-    // Buat blok mesin dari template
-    // ---------------------------------------------------------------
-    function createBlock(n) {
-        const tpl  = document.getElementById('mesinTemplate').innerHTML;
-        const h    = getHeaderValues();
+function createBlock(n) {
+    const tpl = document.getElementById('mesinTemplate').innerHTML;
+    const h   = getHeaderValues();
 
-        const html = tpl
-            .replace(/__N__/g,         n)
-            .replace(/__DISPLAY_N__/g, n + 1);
+    const html = tpl
+        .replace(/__N__/g,         n)
+        .replace(/__DISPLAY_N__/g, n + 1);
 
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-        const block = wrapper.firstElementChild;
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    const block = wrapper.firstElementChild;
 
-        // Isi hidden & info display
-        block.querySelector('.copy-product-uuid').value    = h.product_uuid;
-        block.querySelector('.copy-gramase').value         = h.gramase;
-        block.querySelector('.copy-production-code').value = h.production_code;
+    block.querySelector('.copy-product-uuid').value    = h.product_uuid;
+    block.querySelector('.copy-gramase').value         = h.gramase;
+    block.querySelector('.copy-production-code').value = h.production_code;
 
-        block.querySelector('.info-product-name').textContent    = h.product_name    || '—';
-        block.querySelector('.info-gramase').textContent         = h.gramase         || '—';
-        block.querySelector('.info-production-code').textContent = h.production_code || '—';
+    block.querySelector('.info-product-name').textContent    = h.product_name    || '—';
+    block.querySelector('.info-gramase').textContent         = h.gramase         || '—';
+    block.querySelector('.info-production-code').textContent = h.production_code || '—';
 
-        // Label badge saat mesin dipilih
-        block.querySelector('.select-mesin').addEventListener('change', function () {
-            block.querySelector('.mesin-label').textContent = this.options[this.selectedIndex].text;
+    block.querySelector('.select-mesin').addEventListener('change', function () {
+        block.querySelector('.mesin-label').textContent = this.options[this.selectedIndex].text;
+    });
+
+    block.querySelector('.btn-remove-mesin').addEventListener('click', function () {
+        block.remove();
+        renumberBlocks();
+    });
+
+    block.querySelectorAll('.btn-add-weight').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            addActualInput(block, n, this.dataset.type);
         });
+    });
 
-        // Tombol hapus
-        block.querySelector('.btn-remove-mesin').addEventListener('click', function () {
-            block.remove();
-            renumberBlocks();
-        });
-
-        // Tombol tambah aktual
-        block.querySelectorAll('.btn-add-weight').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                addActualInput(block, n, this.dataset.type);
-            });
-        });
-
-        // Hitung rata-rata
-        block.addEventListener('input', function (e) {
-            if (e.target.matches('input[type="number"]:not([readonly])')) {
-                recalcAvg(block);
-            }
-        });
-
-        return block;
-    }
-
-    // ---------------------------------------------------------------
-    // Pre-populate blok dari data existing
-    // ---------------------------------------------------------------
-    function populateBlock(block, n, data) {
-        // Mesin
-        const selMesin = block.querySelector('.select-mesin');
-        if (data.machine) {
-            selMesin.value = data.machine;
-            block.querySelector('.mesin-label').textContent =
-                selMesin.options[selMesin.selectedIndex]?.text || data.machine;
-        }
-
-        // Waktu
-        const timeInput = block.querySelector(`[name="details[${n}][time]"]`);
-        if (timeInput && data.time) timeInput.value = data.time;
-
-        // Diameter casing
-        const caseInput = block.querySelector(`[name="details[${n}][cases][0][actual_case_2]"]`);
-        if (caseInput && data.cases_actual_case_2 != null) caseInput.value = data.cases_actual_case_2;
-
-        // Standar
-        setVal(block, `details[${n}][weight_standard]`, data.weight_standard);
-        setVal(block, `details[${n}][long_standard]`,   data.long_standard);
-        setVal(block, `details[${n}][fla_standard]`,    data.fla_standard);
-
-        // Status
-        setVal(block, `details[${n}][weight_status]`, data.weight_status);
-        setVal(block, `details[${n}][long_status]`,   data.long_status);
-        setVal(block, `details[${n}][fla_status]`,    data.fla_status);
-
-        // Corrective action & notes
-        setVal(block, `details[${n}][weight_corrective_action]`, data.weight_corrective_action);
-        setVal(block, `details[${n}][weight_notes]`,             data.weight_notes);
-        setVal(block, `details[${n}][long_corrective_action]`,   data.long_corrective_action);
-        setVal(block, `details[${n}][long_notes]`,               data.long_notes);
-        setVal(block, `details[${n}][fla_corrective_action]`,    data.fla_corrective_action);
-        setVal(block, `details[${n}][fla_notes]`,                data.fla_notes);
-
-        // Avg (dari machine data)
-        setVal(block, `details[${n}][avg_weight]`, data.avg_weight);
-        setVal(block, `details[${n}][avg_long]`,   data.avg_long);
-        setVal(block, `details[${n}][avg_fla]`,    data.avg_fla);
-
-        // Notes mesin
-        setVal(block, `details[${n}][notes]`, data.notes);
-
-        // Measurements (weight / long / fla)
-        if (data.weights && data.weights.length > 0) {
-            const types = [
-                { key: 'actual_weight', wrapperClass: '.weight-wrapper', inputClass: 'weight-input', label: 'Berat' },
-                { key: 'actual_long',   wrapperClass: '.long-wrapper',   inputClass: 'long-input',   label: 'Panjang' },
-                { key: 'actual_fla',    wrapperClass: '.fla-wrapper',    inputClass: 'fla-input',    label: 'Fla' },
-            ];
-
-            types.forEach(function (t) {
-                const wrapper     = block.querySelector(t.wrapperClass);
-                const existing    = wrapper.querySelectorAll('input');
-                const extraNeeded = data.weights.length - existing.length;
-
-                // Tambah input kalau data lebih banyak dari default 3
-                for (let ex = 0; ex < extraNeeded; ex++) {
-                    const idx = existing.length + ex + 1;
-                    const div = document.createElement('div');
-                    div.className = 'weight-item';
-                    div.innerHTML =
-                        '<label style="font-size:12px">' + t.label + ' ' + idx + '</label>' +
-                        '<input type="number" step="0.01" ' +
-                            'name="details[' + n + '][weights][0][' + t.key + '_' + idx + ']" ' +
-                            'class="form-control ' + t.inputClass + '" style="width:100px">';
-                    wrapper.appendChild(div);
-                }
-
-                // Isi nilai
-                wrapper.querySelectorAll('input').forEach(function (inp, idx) {
-                    const val = data.weights[idx] ? data.weights[idx][t.key] : null;
-                    if (val != null) inp.value = val;
-                });
-            });
-
+    block.addEventListener('input', function (e) {
+        if (e.target.matches('input[type="number"]:not([readonly])')) {
             recalcAvg(block);
         }
+    });
+
+    // TIDAK ada kode dokumentasi di sini
+    return block;
+}
+
+function populateBlock(block, n, data) {
+    const selMesin = block.querySelector('.select-mesin');
+    if (data.machine) {
+        selMesin.value = data.machine;
+        block.querySelector('.mesin-label').textContent =
+            selMesin.options[selMesin.selectedIndex]?.text || data.machine;
     }
+
+    const timeInput = block.querySelector(`[name="details[${n}][time]"]`);
+    if (timeInput && data.time) timeInput.value = data.time;
+
+    const caseInput = block.querySelector(`[name="details[${n}][cases][0][actual_case_2]"]`);
+    if (caseInput && data.cases_actual_case_2 != null) caseInput.value = data.cases_actual_case_2;
+
+    setVal(block, `details[${n}][weight_standard]`,          data.weight_standard);
+    setVal(block, `details[${n}][long_standard]`,            data.long_standard);
+    setVal(block, `details[${n}][fla_standard]`,             data.fla_standard);
+    setVal(block, `details[${n}][weight_status]`,            data.weight_status);
+    setVal(block, `details[${n}][long_status]`,              data.long_status);
+    setVal(block, `details[${n}][fla_status]`,               data.fla_status);
+    setVal(block, `details[${n}][weight_corrective_action]`, data.weight_corrective_action);
+    setVal(block, `details[${n}][weight_notes]`,             data.weight_notes);
+    setVal(block, `details[${n}][long_corrective_action]`,   data.long_corrective_action);
+    setVal(block, `details[${n}][long_notes]`,               data.long_notes);
+    setVal(block, `details[${n}][fla_corrective_action]`,    data.fla_corrective_action);
+    setVal(block, `details[${n}][fla_notes]`,                data.fla_notes);
+    setVal(block, `details[${n}][avg_weight]`,               data.avg_weight);
+    setVal(block, `details[${n}][avg_long]`,                 data.avg_long);
+    setVal(block, `details[${n}][avg_fla]`,                  data.avg_fla);
+    setVal(block, `details[${n}][notes]`,                    data.notes);
+
+    if (data.weights && data.weights.length > 0) {
+        const types = [
+            { key: 'actual_weight', wrapperClass: '.weight-wrapper', inputClass: 'weight-input', label: 'Berat' },
+            { key: 'actual_long',   wrapperClass: '.long-wrapper',   inputClass: 'long-input',   label: 'Panjang' },
+            { key: 'actual_fla',    wrapperClass: '.fla-wrapper',    inputClass: 'fla-input',    label: 'Fla' },
+        ];
+
+        types.forEach(function (t) {
+            const wrapper     = block.querySelector(t.wrapperClass);
+            const existing    = wrapper.querySelectorAll('input');
+            const extraNeeded = data.weights.length - existing.length;
+
+            for (let ex = 0; ex < extraNeeded; ex++) {
+                const idx = existing.length + ex + 1;
+                const div = document.createElement('div');
+                div.className = 'weight-item';
+                div.innerHTML =
+                    '<label style="font-size:16px">' + t.label + ' ' + idx + '</label>' +
+                    '<input type="number" step="0.01" ' +
+                        'name="details[' + n + '][weights][0][' + t.key + '_' + idx + ']" ' +
+                        'class="form-control ' + t.inputClass + '" style="width:100px">';
+                wrapper.appendChild(div);
+            }
+
+            wrapper.querySelectorAll('input').forEach(function (inp, idx) {
+                const val = data.weights[idx] ? data.weights[idx][t.key] : null;
+                if (val != null) inp.value = val;
+            });
+        });
+
+        recalcAvg(block);
+    }
+
+    // Render dokumentasi existing — DI SINI, bukan di createBlock
+    if (data.documentations && data.documentations.length > 0) {
+        const docsSection = block.querySelector('.existing-docs');
+        const docsWrapper = block.querySelector('.doc-preview-wrapper');
+        docsSection.style.display = '';
+
+        data.documentations.forEach(function (doc) {
+            const div = document.createElement('div');
+            div.className = 'position-relative';
+            div.style.cssText = 'display:inline-block';
+            div.innerHTML =
+                '<input type="hidden" name="details[' + n + '][keep_docs][]" value="' + doc.uuid + '" class="keep-doc-input">' +
+                '<a href="' + doc.url + '" target="_blank">' +
+                    '<img src="' + doc.url + '" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;">' +
+                '</a>' +
+                '<button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 btn-remove-doc" ' +
+                    'style="width:18px;height:18px;font-size:10px;line-height:1" title="Hapus">&times;</button>';
+
+            div.querySelector('.btn-remove-doc').addEventListener('click', function () {
+                div.remove();
+                if (docsWrapper.children.length === 0) {
+                    docsSection.style.display = 'none';
+                }
+            });
+
+            docsWrapper.appendChild(div);
+        });
+    }
+}
 
     function setVal(block, name, value) {
         if (value == null || value === '') return;
@@ -522,7 +540,7 @@
         const div = document.createElement('div');
         div.className = 'weight-item';
         div.innerHTML =
-            '<label style="font-size:12px">' + labelMap[type] + ' ' + count + '</label>' +
+            '<label style="font-size:16px">' + labelMap[type] + ' ' + count + '</label>' +
             '<input type="number" step="0.01" ' +
                 'name="details[' + n + '][weights][0][actual_' + type + '_' + count + ']" ' +
                 'class="form-control ' + type + '-input" style="width:100px">';
@@ -567,24 +585,67 @@
         document.getElementById('mesinContainer').appendChild(block);
     });
 
-    // ---------------------------------------------------------------
-    // Validasi submit
-    // ---------------------------------------------------------------
-    document.getElementById('mainForm').addEventListener('submit', function (e) {
-        if (document.querySelectorAll('.mesin-block').length === 0) {
-            e.preventDefault();
-            alert('Tambahkan minimal satu blok mesin sebelum menyimpan.');
-            return;
-        }
-        const productUuid = document.getElementById('headerProduct').value;
-        if (!productUuid) {
-            e.preventDefault();
-            alert('Pilih produk di Header Produk sebelum menyimpan.');
-            document.getElementById('headerProduct').focus();
-            return;
-        }
-        syncAllBlocks();
+// Compress & submit
+const COMPRESS_QUALITY = 0.7;
+
+function compressImage(file, quality) {
+    return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/')) { resolve(file); return; }
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Gagal membaca: ' + file.name));
+        reader.onload = function (e) {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Format tidak didukung: ' + file.name));
+            img.onload = function () {
+                let w = img.width, h = img.height;
+                const MAX_DIM = 1280;
+                if (w > h) { if (w > MAX_DIM) { h *= MAX_DIM / w; w = MAX_DIM; } }
+                else        { if (h > MAX_DIM) { w *= MAX_DIM / h; h = MAX_DIM; } }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                canvas.toBlob(function (blob) {
+                    if (!blob) { reject(new Error('Gagal compress: ' + file.name)); return; }
+                    resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+                }, 'image/jpeg', quality);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     });
+}
+
+// Ganti submit handler yang ada dengan ini
+document.getElementById('mainForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const form = this;
+
+    if (document.querySelectorAll('.mesin-block').length === 0) {
+        alert('Tambahkan minimal satu blok mesin sebelum menyimpan.');
+        return;
+    }
+    if (!document.getElementById('headerProduct').value) {
+        alert('Pilih produk di Header Produk sebelum menyimpan.');
+        document.getElementById('headerProduct').focus();
+        return;
+    }
+
+    syncAllBlocks();
+
+    for (const input of form.querySelectorAll('input[type="file"]')) {
+        if (!input.files || !input.files.length) continue;
+        const dt = new DataTransfer();
+        for (const file of input.files) {
+            let compressed;
+            try   { compressed = await compressImage(file, COMPRESS_QUALITY); }
+            catch { compressed = file; }
+            dt.items.add(compressed);
+        }
+        input.files = dt.files;
+    }
+
+    form.submit();
+});
 
     // ---------------------------------------------------------------
     // Init: render blok existing dari data server
