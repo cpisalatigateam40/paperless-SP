@@ -143,14 +143,14 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                @can('edit report')
+                                <!-- @can('edit report')
                                 <a href="{{ route('report_weight_stuffers.edit', $report->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Laporan">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @endcan
+                                @endcan -->
 
-                                <!-- @php
+                                @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
                                 @endphp
@@ -160,7 +160,7 @@
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                @endif -->
+                                @endif
 
                                 @can('delete report')
                                 <form action="{{ route('report_weight_stuffers.destroy', $report->uuid) }}"
@@ -223,16 +223,27 @@
                                 @endif
                                 @endcan
 
-                                {{-- Export PDF --}}
-                                <a href="{{ route('report_weight_stuffers.export-pdf', $report->uuid) }}"
-                                    target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak PDF">
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-secondary btn-pdf"
+                                    title="Cetak PDF"
+                                    data-report-uuid="{{ $report->uuid }}"
+                                    data-details="{{ $report->details->map(fn($d) => [
+                                        'uuid'             => $d->uuid,
+                                        'product'          => $d->product->product_name ?? '-',
+                                        'gramase'          => $d->gramase ?? ($d->product->nett_weight ?? '-'),
+                                        'production_code'  => $d->production_code ?? '-',
+                                        'time'             => \Carbon\Carbon::parse($d->time)->format('H:i'),
+                                        'machine'          => $d->machine ?? '-'
+                                    ])->toJson() }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalPilihProduk">
                                     <i class="fas fa-file-pdf"></i>
-                                </a>
+                                </button>
                             </td>
 
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="7" class="p-0">
+                            <td colspan="8" class="p-0">
                                 <div class="px-4 py-3" style="background:#f8f9fa">
 
                                     @php
@@ -240,254 +251,6 @@
                                         $isNewData = $details->whereNotNull('machine')->isNotEmpty();
                                     @endphp
 
-                                    @if ($isNewData)
-                                    {{-- ======================================================
-                                        TAMPILAN BARU — data punya kolom machine
-                                    ====================================================== --}}
-                                    @php $grouped = $details->groupBy('product_uuid'); @endphp
-
-                                    @forelse ($grouped as $productUuid => $machineDetails)
-                                        @php
-                                            $firstDetail = $machineDetails->first();
-                                            $productName = $firstDetail->product->product_name ?? '-';
-                                            $gramase     = !empty($firstDetail->gramase)
-                                                            ? $firstDetail->gramase
-                                                            : ($firstDetail->product->nett_weight ?? '-');
-                                            $prodCode    = $firstDetail->production_code ?? '-';
-                                        @endphp
-
-                                        <div class="mb-1 mt-2">
-                                            <span class="fw-bold" style="font-size:14px">{{ $productName }}</span>
-                                            <span class="text-muted mx-2">·</span>
-                                            <span class="text-muted" style="font-size:13px">Gramase: <strong>{{ $gramase }} g</strong></span>
-                                            <span class="text-muted mx-2">·</span>
-                                            <span class="text-muted" style="font-size:13px">Kode: <strong>{{ $prodCode }}</strong></span>
-                                        </div>
-
-                                        <div class="table-responsive mb-4">
-                                            <table class="table table-bordered table-sm align-middle mb-0" style="font-size:13px; min-width:700px">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th style="width:200px">Parameter</th>
-                                                        <th style="width:80px" class="text-center">Standar</th>
-                                                        @foreach ($machineDetails as $d)
-                                                            @php
-                                                                $machineName = match($d->machine) {
-                                                                    'townsend'  => 'Townsend',
-                                                                    'hitech'    => 'Hitech',
-                                                                    'vemag'     => 'Vemag',
-                                                                    'vemag2'    => 'Vemag 2',
-                                                                    'handtmann' => 'Handtmann',
-                                                                    default     => 'Mesin',
-                                                                };
-                                                            @endphp
-                                                            <th class="text-center">
-                                                                <div>{{ $machineName }}</div>
-                                                                <div class="text-muted fw-normal" style="font-size:11px">
-                                                                    {{ \Carbon\Carbon::parse($d->time)->format('H:i') }} WIB
-                                                                </div>
-                                                            </th>
-                                                        @endforeach
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="fw-semibold">Diameter Casing (mm)</td>
-                                                        <td class="text-center text-muted">-</td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->cases->first()?->actual_case_2 ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-
-                                                    <tr class="table-secondary">
-                                                        <td colspan="{{ $machineDetails->count() + 2 }}" class="fw-bold" style="font-size:12px">BERAT PER 3 PCS (gr)</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Standar Berat</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center text-muted">{{ $d->weight_standard ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Hasil Aktual</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">
-                                                                @forelse ($d->weights as $w)
-                                                                    <span class="badge bg-light text-dark border">{{ $w->actual_weight ?? '-' }}</span>
-                                                                @empty
-                                                                    <span class="text-muted">-</span>
-                                                                @endforelse
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Rata-rata</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            @php $stuffer = match($d->machine) { 'townsend' => $d->townsend, 'hitech' => $d->hitech, 'vemag' => $d->vemag, 'vemag2' => $d->vemag2, 'handtmann' => $d->handtmann, default => null }; @endphp
-                                                            <td class="text-center fw-semibold">{{ $stuffer?->avg_weight ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Status</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">
-                                                                @if ($d->weight_status)
-                                                                    <span class="badge bg-{{ $d->weight_status === 'OK' ? 'success' : 'danger' }}">{{ $d->weight_status }}</span>
-                                                                @else - @endif
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Tindakan Koreksi</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->weight_corrective_action ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Keterangan</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->weight_notes ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-
-                                                    <tr class="table-secondary">
-                                                        <td colspan="{{ $machineDetails->count() + 2 }}" class="fw-bold" style="font-size:12px">PANJANG PER PCS (mm)</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Standar Panjang</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center text-muted">{{ $d->long_standard ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Hasil Aktual</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">
-                                                                @forelse ($d->weights as $w)
-                                                                    <span class="badge bg-light text-dark border">{{ $w->actual_long ?? '-' }}</span>
-                                                                @empty
-                                                                    <span class="text-muted">-</span>
-                                                                @endforelse
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Rata-rata</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            @php $stuffer = match($d->machine) { 'townsend' => $d->townsend, 'hitech' => $d->hitech, 'vemag' => $d->vemag, 'vemag2' => $d->vemag2, 'handtmann' => $d->handtmann, default => null }; @endphp
-                                                            <td class="text-center fw-semibold">{{ $stuffer?->avg_long ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Status</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">
-                                                                @if ($d->long_status)
-                                                                    <span class="badge bg-{{ $d->long_status === 'OK' ? 'success' : 'danger' }}">{{ $d->long_status }}</span>
-                                                                @else - @endif
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Tindakan Koreksi</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->long_corrective_action ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Keterangan</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->long_notes ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-
-                                                    <tr class="table-secondary">
-                                                        <td colspan="{{ $machineDetails->count() + 2 }}" class="fw-bold" style="font-size:12px">BERAT FLA (gr)</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Standar Berat Fla</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center text-muted">{{ $d->fla_standard ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Hasil Aktual</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">
-                                                                @forelse ($d->weights as $w)
-                                                                    <span class="badge bg-light text-dark border">{{ $w->actual_fla ?? '-' }}</span>
-                                                                @empty
-                                                                    <span class="text-muted">-</span>
-                                                                @endforelse
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Rata-rata</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            @php $stuffer = match($d->machine) { 'townsend' => $d->townsend, 'hitech' => $d->hitech, 'vemag' => $d->vemag, 'vemag2' => $d->vemag2, 'handtmann' => $d->handtmann, default => null }; @endphp
-                                                            <td class="text-center fw-semibold">{{ $stuffer?->avg_fla ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Status</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">
-                                                                @if ($d->fla_status)
-                                                                    <span class="badge bg-{{ $d->fla_status === 'OK' ? 'success' : 'danger' }}">{{ $d->fla_status }}</span>
-                                                                @else - @endif
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Tindakan Koreksi</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->fla_corrective_action ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Keterangan</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            <td class="text-center">{{ $d->fla_notes ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-
-                                                    <tr class="table-light">
-                                                        <td class="fw-semibold">Catatan</td><td></td>
-                                                        @foreach ($machineDetails as $d)
-                                                            @php $stuffer = match($d->machine) { 'townsend' => $d->townsend, 'hitech' => $d->hitech, 'vemag' => $d->vemag, 'vemag2' => $d->vemag2, 'handtmann' => $d->handtmann, default => null }; @endphp
-                                                            <td class="text-center">{{ $stuffer?->notes ?? '-' }}</td>
-                                                        @endforeach
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        {{-- Dokumentasi --}}
-                                        @php
-                                            $allDocs = $machineDetails->flatMap(fn($d) => $d->documentations);
-                                        @endphp
-                                        @if($allDocs->isNotEmpty())
-                                            <div class="mb-3">
-                                                <div class="fw-semibold mb-2" style="font-size:13px">Dokumentasi</div>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    @foreach($allDocs as $doc)
-                                                        <a href="{{ Storage::url($doc->image) }}" target="_blank">
-                                                            <img src="{{ Storage::url($doc->image) }}"
-                                                                style="width:90px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #dee2e6;"
-                                                                alt="Dokumentasi">
-                                                        </a>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @endif
-                                    @empty
-                                        <p class="text-muted py-2 mb-0">Belum ada detail untuk laporan ini.</p>
-                                    @endforelse
-
-                                    @else
-                                    {{-- ======================================================
-                                        TAMPILAN LAMA — fallback untuk data tanpa kolom machine
-                                    ====================================================== --}}
                                     <div class="table-responsive mb-3">
                                         <table class="table table-bordered table-sm text-center align-middle mb-4">
                                             <tr>
@@ -590,17 +353,37 @@
                                             </tr>
                                             @endforeach
                                         </table>
-                                    </div>
-                                    @endif
 
-                                    <!-- @can('create report')
+                                        {{-- Dokumentasi per detail --}}
+                                        @foreach ($details as $d)
+                                            @if($d->documentations->isNotEmpty())
+                                            <div class="mb-3">
+                                                <p class="mb-1 fw-semibold" style="font-size:13px">
+                                                    Dokumentasi — {{ $d->product->product_name ?? '-' }}
+                                                    <span class="text-muted fw-normal">({{ \Carbon\Carbon::parse($d->time)->format('H:i') }})</span>
+                                                </p>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach($d->documentations as $doc)
+                                                    <a href="{{ Storage::url($doc->image) }}" target="_blank">
+                                                        <img src="{{ Storage::url($doc->image) }}"
+                                                            style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;"
+                                                            title="{{ $d->product->product_name ?? '-' }}">
+                                                    </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+
+                                    @can('create report')
                                         <div class="d-flex justify-content-end pb-2">
                                             <a href="{{ route('report_weight_stuffers.add-detail', $report->uuid) }}"
                                                 class="btn btn-secondary btn-sm">
                                                 + Tambah Detail
                                             </a>
                                         </div>
-                                    @endcan -->
+                                    @endcan
 
                                 </div>
                             </td>
@@ -611,6 +394,20 @@
                             <td colspan="6">Belum ada data laporan.</td>
                         </tr>
                         @endforelse
+                        {{-- Modal Pilih Produk untuk Export PDF --}}
+                        <div class="modal fade" id="modalPilihProduk" tabindex="-1" aria-labelledby="modalPilihProdukLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title fw-bold" id="modalPilihProdukLabel">Pilih Produk untuk Export PDF</h6>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body" id="modalProdukBody">
+                                        {{-- diisi JS --}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </tbody>
                 </table>
             </div>
@@ -633,4 +430,79 @@ $(document).ready(function() {
     }, 3000);
 });
 </script>
+
+<script>
+document.querySelectorAll('.btn-pdf').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const reportUuid = this.dataset.reportUuid;
+        const details    = JSON.parse(this.dataset.details);
+        const body       = document.getElementById('modalProdukBody');
+
+        if (details.length === 0) {
+            body.innerHTML = '<p class="text-muted">Tidak ada detail produk.</p>';
+            return;
+        }
+
+        // Group by product + gramase + production_code
+        const groups = {};
+        details.forEach(function(d) {
+            const key = d.product + '||' + d.gramase + '||' + d.production_code;
+            if (!groups[key]) {
+                groups[key] = {
+                    product         : d.product,
+                    gramase         : d.gramase,
+                    production_code : d.production_code,
+                    uuids           : [],
+                    machines        : [],
+                };
+            }
+            groups[key].uuids.push(d.uuid);
+            groups[key].machines.push(d.machine + ' (' + d.time + ')');
+        });
+
+        const urlAll = '/report-weight-stuffers/' + reportUuid + '/export-pdf/all';
+
+        let html = '';
+
+       
+
+        html += '<div class="list-group">';
+
+        Object.values(groups).forEach(function(g) {
+            // Jika 1 uuid langsung pakai uuid, jika >1 gabung dengan koma
+            const uuidParam = g.uuids.length === 1 ? g.uuids[0] : 'group:' + g.uuids.join(',');
+            const url       = '/report-weight-stuffers/' + reportUuid + '/export-pdf/' + encodeURIComponent(uuidParam);
+
+            html += `
+                <a href="${url}" target="_blank"
+                    class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-semibold mb-1">${g.product}</div>
+                            <table style="font-size:12px; color:#555; line-height:1.6;">
+                                <tr>
+                                    <td style="padding-right:8px;">Gramase</td>
+                                    <td>: ${g.gramase} gr</td>
+                                </tr>
+                                <tr>
+                                    <td>Kode Produksi</td>
+                                    <td>: ${g.production_code}</td>
+                                </tr>
+                                <tr>
+                                    <td>Mesin</td>
+                                    <td>: ${g.machines.join(', ')}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <i class="fas fa-file-pdf text-danger ms-3 mt-1"></i>
+                    </div>
+                </a>`;
+        });
+
+        html += '</div>';
+        body.innerHTML = html;
+    });
+});
+</script>
 @endsection
+

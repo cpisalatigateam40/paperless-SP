@@ -999,7 +999,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
-            Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+            Route::get('/{uuid}/export-pdf/{detail_uuid}', 'exportPdf')
+            ->name('export-pdf')
+            ->where('detail_uuid', '.*');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
         });
