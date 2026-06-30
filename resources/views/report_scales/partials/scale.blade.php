@@ -36,9 +36,9 @@
                         <option value="{{ $scale->uuid }}">{{ $scale->type }} - {{ $scale->code }}</option>
                         @endforeach
                     </select>
-                    <input type="hidden" name="data[0][time_1]" class="time1-input" value="08:00"
+                    <input type="hidden" name="data[0][time_1]" class="time1-input" value=""
                         {{ $isEdit ? 'disabled' : '' }}>
-                    <input type="hidden" name="data[0][time_2]" class="time2-input" value="14:00"
+                    <input type="hidden" name="data[0][time_2]" class="time2-input" value=""
                         {{ !$isEdit ? 'disabled' : '' }}>
                 </td>
 
@@ -116,5 +116,13 @@ document.getElementById('time1').addEventListener('input', function() {
 
 document.getElementById('time2').addEventListener('input', function() {
     document.querySelectorAll('.time2-input').forEach(input => input.value = this.value);
+});
+
+// ← TAMBAHKAN INI
+document.addEventListener('DOMContentLoaded', function () {
+    const time1Val = document.getElementById('time1').value;
+    const time2Val = document.getElementById('time2').value;
+    document.querySelectorAll('.time1-input').forEach(input => input.value = time1Val);
+    document.querySelectorAll('.time2-input').forEach(input => input.value = time2Val);
 });
 </script>

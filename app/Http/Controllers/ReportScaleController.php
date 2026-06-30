@@ -431,22 +431,26 @@ class ReportScaleController extends Controller
 
                     foreach ([1000, 5000, 10000] as $weight) {
                         // Pemeriksaan ke-1
-                        MeasurementScale::create([
-                            'uuid' => Str::uuid(),
-                            'detail_scale_uuid' => $detail->uuid,
-                            'inspection_time_index' => 1,
-                            'standard_weight' => $weight,
-                            'measured_value' => $row['p1_' . $weight],
-                        ]);
+                        if (isset($row['p1_' . $weight]) && $row['p1_' . $weight] !== '') {
+                            MeasurementScale::create([
+                                'uuid' => Str::uuid(),
+                                'detail_scale_uuid' => $detail->uuid,
+                                'inspection_time_index' => 1,
+                                'standard_weight' => $weight,
+                                'measured_value' => $row['p1_' . $weight],
+                            ]);
+                        }
 
                         // Pemeriksaan ke-2
-                        MeasurementScale::create([
-                            'uuid' => Str::uuid(),
-                            'detail_scale_uuid' => $detail->uuid,
-                            'inspection_time_index' => 2,
-                            'standard_weight' => $weight,
-                            'measured_value' => $row['p2_' . $weight],
-                        ]);
+                        if (isset($row['p2_' . $weight]) && $row['p2_' . $weight] !== '') {
+                            MeasurementScale::create([
+                                'uuid' => Str::uuid(),
+                                'detail_scale_uuid' => $detail->uuid,
+                                'inspection_time_index' => 2,
+                                'standard_weight' => $weight,
+                                'measured_value' => $row['p2_' . $weight],
+                            ]);
+                        }
                     }
                 }
             }
@@ -469,22 +473,26 @@ class ReportScaleController extends Controller
 
                     foreach ([0, 100] as $temp) {
                         // Pemeriksaan ke-1
-                        MeasurementThermometer::create([
-                            'uuid' => Str::uuid(),
-                            'detail_thermometer_uuid' => $detail->uuid,
-                            'inspection_time_index' => 1,
-                            'standard_temperature' => $temp,
-                            'measured_value' => $row['p1_' . $temp],
-                        ]);
+                        if (isset($row['p1_' . $temp]) && $row['p1_' . $temp] !== '') {
+                            MeasurementThermometer::create([
+                                'uuid' => Str::uuid(),
+                                'detail_thermometer_uuid' => $detail->uuid,
+                                'inspection_time_index' => 1,
+                                'standard_temperature' => $temp,
+                                'measured_value' => $row['p1_' . $temp],
+                            ]);
+                        }
 
                         // Pemeriksaan ke-2
-                        MeasurementThermometer::create([
-                            'uuid' => Str::uuid(),
-                            'detail_thermometer_uuid' => $detail->uuid,
-                            'inspection_time_index' => 2,
-                            'standard_temperature' => $temp,
-                            'measured_value' => $row['p2_' . $temp],
-                        ]);
+                        if (isset($row['p2_' . $temp]) && $row['p2_' . $temp] !== '') {
+                            MeasurementThermometer::create([
+                                'uuid' => Str::uuid(),
+                                'detail_thermometer_uuid' => $detail->uuid,
+                                'inspection_time_index' => 2,
+                                'standard_temperature' => $temp,
+                                'measured_value' => $row['p2_' . $temp],
+                            ]);
+                        }
                     }
                 }
             }

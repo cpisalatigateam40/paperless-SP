@@ -10,7 +10,7 @@
                 </th>
                 <th colspan="3">
                     Pemeriksaan Pukul:
-                    <input type="time" id="scale-time2" value="{{ $details->first()?->time_2 ? date('H:i', strtotime($details->first()->time_2)) : now()->format('H:i') }}" class="form-control form-control-sm mt-1">
+                    <input type="time" id="scale-time2" value="{{ now()->format('H:i') }}" class="form-control form-control-sm mt-1">
                 </th>
                 <th>Keterangan</th>
             </tr>
@@ -67,3 +67,14 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const time2Val = document.getElementById('scale-time2').value;
+    document.querySelectorAll('.time2-hidden').forEach(input => input.value = time2Val);
+});
+
+document.getElementById('scale-time2').addEventListener('input', function () {
+    document.querySelectorAll('.time2-hidden').forEach(input => input.value = this.value);
+});
+</script>

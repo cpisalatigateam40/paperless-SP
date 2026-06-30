@@ -10,7 +10,7 @@
                 </th>
                 <th colspan="2">
                     Pemeriksaan Pukul:
-                    <input type="time" id="thermo-time2" class="form-control form-control-sm mt-1" value="{{ date('H:i', strtotime($details->first()?->time_2 ?? now()->format('H:i'))) }}">
+                    <input type="time" id="thermo-time2" class="form-control form-control-sm mt-1" value="{{ now()->format('H:i') }}">
                 </th>
                 <th>Keterangan</th>
             </tr>
@@ -60,3 +60,15 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const time2Val = document.getElementById('thermo-time2').value;
+    document.querySelectorAll('.time2-hidden').forEach(input => input.value = time2Val);
+});
+
+document.getElementById('thermo-time2').addEventListener('input', function () {
+    document.querySelectorAll('.time2-hidden').forEach(input => input.value = this.value);
+});
+</script>
+

@@ -31,9 +31,9 @@
                         <option value="{{ $t->uuid }}">{{ $t->type }} - {{ $t->code }}</option>
                         @endforeach
                     </select>
-                    <input type="hidden" name="thermo_data[0][time_1]" class="thermo-time1" value="08:00"
+                    <input type="hidden" name="thermo_data[0][time_1]" class="thermo-time1" value=""
                         {{ $isEdit ? 'disabled' : '' }}>
-                    <input type="hidden" name="thermo_data[0][time_2]" class="thermo-time2" value="14:00"
+                    <input type="hidden" name="thermo_data[0][time_2]" class="thermo-time2" value=""
                         {{ !$isEdit ? 'disabled' : '' }}>
                 </td>
                 <td><input type="number" step="0.01" name="thermo_data[0][p1_0]" class="form-control"
@@ -99,5 +99,12 @@ document.getElementById('thermo_time1').addEventListener('input', function() {
 
 document.getElementById('thermo_time2').addEventListener('input', function() {
     document.querySelectorAll('.thermo-time2').forEach(input => input.value = this.value);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const time1Val = document.getElementById('thermo_time1').value;
+    const time2Val = document.getElementById('thermo_time2').value;
+    document.querySelectorAll('.thermo-time1').forEach(input => input.value = time1Val);
+    document.querySelectorAll('.thermo-time2').forEach(input => input.value = time2Val);
 });
 </script>
