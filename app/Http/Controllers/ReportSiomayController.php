@@ -18,11 +18,54 @@ use App\Exports\SiomayExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
+use App\Traits\HasBulkPdfExport;
 
 class ReportSiomayController extends Controller
 {
-    use HasBulkApproval;
+    use HasBulkApproval, HasBulkPdfExport;
     protected string $bulkModel = ReportSiomay::class;
+
+    protected function getBulkExportModelClass(): string
+    {
+        return ReportSiomay::class;
+    }
+
+    protected function getBulkExportView(): string
+    {
+        return 'report_siomays.export_pdf';
+    }
+
+    protected function getBulkExportEagerLoad(): array
+    {
+        return ['product',
+            'area',
+            'details.rawMaterials.rawMaterial',];
+    }
+
+    protected function getBulkExportExtraData($report): array
+    {
+        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQr = QrCode::format('png')->size(150)->generate($createdInfo);
+
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQr = QrCode::format('png')->size(150)->generate($approvedInfo);
+
+        $knownInfo = $report->known_by ? "Diketahui oleh: {$report->known_by}" : "Belum disetujui";
+        $knownQr = QrCode::format('png')->size(150)->generate($knownInfo);
+
+        return [
+            'createdQr'  => 'data:image/png;base64,' . base64_encode($createdQr),
+            'approvedQr' => 'data:image/png;base64,' . base64_encode($approvedQr),
+            'knownQr'    => 'data:image/png;base64,' . base64_encode($knownQr),
+        ];
+    }
+
+    protected function getBulkExportFileName(): string
+    {
+        return 'laporan_siomay';
+    }
 
     public function index(Request $request)
     {

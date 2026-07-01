@@ -13,11 +13,52 @@ use App\Exports\PremixExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
+use App\Traits\HasBulkPdfExport;
 
 class ReportPremixController extends Controller
 {
-    use HasBulkApproval;
+    use HasBulkApproval, HasBulkPdfExport;
     protected string $bulkModel = ReportPremix::class;
+
+    protected function getBulkExportModelClass(): string
+    {
+        return ReportPremix::class;
+    }
+
+    protected function getBulkExportView(): string
+    {
+        return 'report_premixes.pdf';
+    }
+
+    protected function getBulkExportEagerLoad(): array
+    {
+        return ['area', 'detailPremixes.premix'];
+    }
+
+    protected function getBulkExportExtraData($report): array
+    {
+        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQr = QrCode::format('png')->size(150)->generate($createdInfo);
+
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQr = QrCode::format('png')->size(150)->generate($approvedInfo);
+
+        $knownInfo = $report->known_by ? "Diketahui oleh: {$report->known_by}" : "Belum disetujui";
+        $knownQr = QrCode::format('png')->size(150)->generate($knownInfo);
+
+        return [
+            'createdQr'  => 'data:image/png;base64,' . base64_encode($createdQr),
+            'approvedQr' => 'data:image/png;base64,' . base64_encode($approvedQr),
+            'knownQr'    => 'data:image/png;base64,' . base64_encode($knownQr),
+        ];
+    }
+
+    protected function getBulkExportFileName(): string
+    {
+        return 'laporan_premix';
+    }
 
     public function index(Request $request)
     {

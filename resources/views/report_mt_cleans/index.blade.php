@@ -52,6 +52,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_mt_cleans.export_pdf_bulk')"
+                    title="MT Clean"
+                    modal-id="modalExportPdfMtClean"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

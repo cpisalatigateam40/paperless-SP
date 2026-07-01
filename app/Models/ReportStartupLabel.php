@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
 class ReportStartupLabel extends Model
 {
@@ -37,6 +38,8 @@ class ReportStartupLabel extends Model
                 $model->uuid = (string) Str::uuid();
             }
         });
+
+        static::addGlobalScope(new UserAreaScope);
     }
 
     /**

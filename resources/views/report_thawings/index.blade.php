@@ -43,6 +43,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_thawings.export_pdf_bulk')"
+                    title="Thawing"
+                    modal-id="modalExportPdfThawing"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

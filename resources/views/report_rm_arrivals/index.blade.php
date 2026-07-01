@@ -48,6 +48,13 @@
                     @endrole
                 </div>
 
+                {{-- Export PDF --}}
+                <x-export-pdf-modal
+                    :route="route('report_rm_arrivals.export_pdf_bulk')"
+                    title="RM Arrival"
+                    modal-id="modalExportPdfRmArrival"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

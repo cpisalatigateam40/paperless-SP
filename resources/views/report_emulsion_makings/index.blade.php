@@ -57,6 +57,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_emulsion_makings.export_pdf_bulk')"
+                    title="Emulsion Making"
+                    modal-id="modalExportPdfEmulsionMaking"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

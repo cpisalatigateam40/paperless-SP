@@ -91,10 +91,12 @@ class ReportChangeoverCleaningController extends Controller
      */
     public function create()
     {
-        $items = MasterChecklistItem::orderBy('category')->orderBy('name')->get();
-        $products = Product::selectRaw(
-                'MIN(uuid) as uuid, product_name'
-            )
+        $items = MasterChecklistItem::where('area_uuid', auth()->user()->area_uuid)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
             ->get();
 

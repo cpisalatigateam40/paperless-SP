@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Scopes\UserAreaScope;
 
 class ReportMtClean extends Model
 {
@@ -37,6 +38,8 @@ class ReportMtClean extends Model
                 $model->uuid = (string) Str::uuid();
             }
         });
+
+        static::addGlobalScope(new UserAreaScope);
     }
 
     public function area()
