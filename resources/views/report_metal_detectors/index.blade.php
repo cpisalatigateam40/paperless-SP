@@ -58,11 +58,11 @@
                     @endrole
                 </div>
 
-                <x-export-pdf-modal
+                <!-- <x-export-pdf-modal
                     :route="route('report_metal_detectors.export_pdf_bulk')"
                     title="Metal Detector"
                     modal-id="modalExportPdfMetalDetector"
-                />
+                /> -->
 
                 {{-- Modals --}}
                 @role('Produksi')

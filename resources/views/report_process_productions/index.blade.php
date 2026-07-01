@@ -58,11 +58,11 @@
                     @endrole
                 </div>
 
-                <x-export-pdf-modal
+                <!-- <x-export-pdf-modal
                     :route="route('report-process-productions.bulk-export-pdf')"
                     title="Process Production"
                     modal-id="modalExportPdfProcessProduction"
-                />
+                /> -->
 
                 {{-- Modals --}}
                 @role('Produksi')

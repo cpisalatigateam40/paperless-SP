@@ -58,11 +58,11 @@
                     @endrole
                 </div>
 
-                <x-export-pdf-modal
+                <!-- <x-export-pdf-modal
                     :route="route('report_siomays.export_pdf_bulk')"
                     title="Siomay"
                     modal-id="modalExportPdfSiomay"
-                />
+                /> -->
 
                 {{-- Modals --}}
                 @role('Produksi')
