@@ -57,6 +57,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_pasteurs.export_pdf_bulk')"
+                    title="Verifikasi Pasteurisasi"
+                    modal-id="modalExportPdfPasteur"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

@@ -59,6 +59,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_baso_cookings.export_pdf_bulk')"
+                    title="Verifikasi Pemasakan Baso"
+                    modal-id="modalExportPdfRmArrival"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

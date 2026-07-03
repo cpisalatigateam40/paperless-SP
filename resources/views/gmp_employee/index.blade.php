@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('gmp-employee.export_pdf_bulk')"
+                    title="GMP Employee"
+                    modal-id="modalExportPdfGmpEmployee"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

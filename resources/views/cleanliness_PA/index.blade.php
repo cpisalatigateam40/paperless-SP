@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('process-area-cleanliness.export_pdf_bulk')"
+                    title="Verifikasi Kebersihan Area Proses"
+                    modal-id="modalExportPdfProcessAreaCleanliness"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

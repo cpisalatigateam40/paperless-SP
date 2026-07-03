@@ -57,6 +57,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_packaging_verifs.export_pdf_bulk')"
+                    title="Verifikasi Pemeriksaan Kemasan Plastik"
+                    modal-id="modalExportPdfPackagingVerif"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

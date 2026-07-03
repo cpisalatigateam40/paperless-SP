@@ -59,6 +59,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report-fragile-item.export_pdf_bulk')"
+                    title="Verifikasi Barang Mudah Pecah"
+                    modal-id="modalExportPdfFragileItem"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

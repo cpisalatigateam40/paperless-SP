@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_lab_samples.export_pdf_bulk')"
+                    title="Lab Sample"
+                    modal-id="modalExportPdfLabSample"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

@@ -214,6 +214,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('storage-rm-cleanliness/bulk-approve', [StorageRmCleanlinessController::class, 'bulkApprove'])->name('storage-rm-cleanliness.bulk-approve');
     Route::get('storage-rm-cleanliness/bulk-known-count', [StorageRmCleanlinessController::class, 'bulkKnownCount'])->name('storage-rm-cleanliness.bulk-known-count');
     Route::get('storage-rm-cleanliness/bulk-approve-count', [StorageRmCleanlinessController::class, 'bulkApproveCount'])->name('storage-rm-cleanliness.bulk-approve-count');
+    Route::get('storage-rm-cleanliness/export-pdf-bulk', [StorageRmCleanlinessController::class, 'exportPdfBulk'])
+        ->name('storage-rm-cleanliness.export_pdf_bulk');
 
     // PROCESS AREA ROUTES
     Route::prefix('process-area-cleanliness')
@@ -237,6 +239,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('process-area-cleanliness/bulk-approve', [ProcessAreaCleanlinessController::class, 'bulkApprove'])->name('process-area-cleanliness.bulk-approve');
     Route::get('process-area-cleanliness/bulk-known-count', [ProcessAreaCleanlinessController::class, 'bulkKnownCount'])->name('process-area-cleanliness.bulk-known-count');
     Route::get('process-area-cleanliness/bulk-approve-count', [ProcessAreaCleanlinessController::class, 'bulkApproveCount'])->name('process-area-cleanliness.bulk-approve-count');
+    Route::get('process-area-cleanliness/export-pdf-bulk', [ProcessAreaCleanlinessController::class, 'exportPdfBulk'])
+        ->name('process-area-cleanliness.export_pdf_bulk');
 
     // GMP EMPLOYEE ROUTES
     Route::prefix('gmp-employee')
@@ -263,6 +267,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('gmp-employee/bulk-approve', [GmpController::class, 'bulkApprove'])->name('gmp-employee.bulk-approve');
     Route::get('gmp-employee/bulk-known-count', [GmpController::class, 'bulkKnownCount'])->name('gmp-employee.bulk-known-count');
     Route::get('gmp-employee/bulk-approve-count', [GmpController::class, 'bulkApproveCount'])->name('gmp-employee.bulk-approve-count');
+    Route::get('gmp-employee/export-pdf-bulk', [GmpController::class, 'exportPdfBulk'])
+        ->name('gmp-employee.export_pdf_bulk');
 
     // FRAGILE ITEM MD ROUTES
     Route::prefix('fragile-item')
@@ -301,6 +307,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-fragile-item/bulk-approve', [ReportFragileItemController::class, 'bulkApprove'])->name('report-fragile-item.bulk-approve');
     Route::get('report-fragile-item/bulk-known-count', [ReportFragileItemController::class, 'bulkKnownCount'])->name('report-fragile-item.bulk-known-count');
     Route::get('report-fragile-item/bulk-approve-count', [ReportFragileItemController::class, 'bulkApproveCount'])->name('report-fragile-item.bulk-approve-count');
+    Route::get('report-fragile-item/export-pdf-bulk', [ReportFragileItemController::class, 'exportPdfBulk'])
+        ->name('report-fragile-item.export_pdf_bulk');
 
     // QC EQUIPMENT ROUTES
     Route::prefix('qc-equipment')
@@ -367,6 +375,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-scales/bulk-approve', [ReportScaleController::class, 'bulkApprove'])->name('report-scales.bulk-approve');
     Route::get('report-scales/bulk-known-count', [ReportScaleController::class, 'bulkKnownCount'])->name('report-scales.bulk-known-count');
     Route::get('report-scales/bulk-approve-count', [ReportScaleController::class, 'bulkApproveCount'])->name('report-scales.bulk-approve-count');
+    Route::get('report-scales/export-pdf-bulk', [ReportScaleController::class, 'exportPdfBulk'])
+        ->name('report-scales.export_pdf_bulk');
 
     // THERMOMETER MD ROUTES
     Route::prefix('thermometers')
@@ -425,6 +435,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-re-cleanliness/bulk-approve', [ReportReCleanlinessController::class, 'bulkApprove'])->name('report-re-cleanliness.bulk-approve');
     Route::get('report-re-cleanliness/bulk-known-count', [ReportReCleanlinessController::class, 'bulkKnownCount'])->name('report-re-cleanliness.bulk-known-count');
     Route::get('report-re-cleanliness/bulk-approve-count', [ReportReCleanlinessController::class, 'bulkApproveCount'])->name('report-re-cleanliness.bulk-approve-count');
+    Route::get('report-re-cleanliness/export-pdf-bulk', [ReportReCleanlinessController::class, 'exportPdfBulk'])
+        ->name('report-re-cleanliness.export_pdf_bulk');
 
     // REPORT REPAIR CLEANLINESS ROUTES
     Route::prefix('repair-cleanliness')
@@ -574,6 +586,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-foreign-objects/bulk-approve', [ReportForeignObjectController::class, 'bulkApprove'])->name('report-foreign-objects.bulk-approve');
     Route::get('report-foreign-objects/bulk-known-count', [ReportForeignObjectController::class, 'bulkKnownCount'])->name('report-foreign-objects.bulk-known-count');
     Route::get('report-foreign-objects/bulk-approve-count', [ReportForeignObjectController::class, 'bulkApproveCount'])->name('report-foreign-objects.bulk-approve-count');
+    Route::get('report-foreign-objects/export-pdf-bulk', [ReportForeignObjectController::class, 'exportPdfBulk'])
+        ->name('report-foreign-objects.export_pdf_bulk');
 
     // REPORT MAGNET TRAP
     Route::prefix('report-magnet-traps')
@@ -661,6 +675,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-production-nonconformities/bulk-approve', [ReportProductionNonconformityController::class, 'bulkApprove'])->name('report-production-nonconformities.bulk-approve');
     Route::get('report-production-nonconformities/bulk-known-count', [ReportProductionNonconformityController::class, 'bulkKnownCount'])->name('report-production-nonconformities.bulk-known-count');
     Route::get('report-production-nonconformities/bulk-approve-count', [ReportProductionNonconformityController::class, 'bulkApproveCount'])->name('report-production-nonconformities.bulk-approve-count');
+    Route::get('report-production-nonconformities/export-pdf-bulk', [ReportProductionNonconformityController::class, 'exportPdfBulk'])
+        ->name('report-production-nonconformities.export_pdf_bulk');
 
     Route::prefix('report-chlorine-residues')
         ->name('report_chlorine_residues.')
@@ -711,6 +727,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-lab-samples/bulk-approve', [ReportLabSampleController::class, 'bulkApprove'])->name('report-lab-samples.bulk-approve');
     Route::get('report-lab-samples/bulk-known-count', [ReportLabSampleController::class, 'bulkKnownCount'])->name('report-lab-samples.bulk-known-count');
     Route::get('report-lab-samples/bulk-approve-count', [ReportLabSampleController::class, 'bulkApproveCount'])->name('report-lab-samples.bulk-approve-count');
+    Route::get('report-lab-samples/export-pdf-bulk', [ReportLabSampleController::class, 'exportPdfBulk'])
+    ->name('report_lab_samples.export_pdf_bulk');
 
     Route::prefix('report-returns')
         ->name('report_returns.')
@@ -821,6 +839,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-md-products/bulk-approve', [ReportMdProductController::class, 'bulkApprove'])->name('report-md-products.bulk-approve');
     Route::get('report-md-products/bulk-known-count', [ReportMdProductController::class, 'bulkKnownCount'])->name('report-md-products.bulk-known-count');
     Route::get('report-md-products/bulk-approve-count', [ReportMdProductController::class, 'bulkApproveCount'])->name('report-md-products.bulk-approve-count');
+    Route::get('report-md-products/export-pdf-bulk', [ReportMdProductController::class, 'exportPdfBulk'])
+    ->name('report_md_products.export_pdf_bulk');
 
     Route::prefix('report-retain-exterminations')
         ->name('report_retain_exterminations.')
@@ -855,6 +875,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-maurer-cookings/bulk-approve', [ReportMaurerCookingController::class, 'bulkApprove'])->name('report-maurer-cookings.bulk-approve');
     Route::get('report-maurer-cookings/bulk-known-count', [ReportMaurerCookingController::class, 'bulkKnownCount'])->name('report-maurer-cookings.bulk-known-count');
     Route::get('report-maurer-cookings/bulk-approve-count', [ReportMaurerCookingController::class, 'bulkApproveCount'])->name('report-maurer-cookings.bulk-approve-count');
+    Route::get('report-maurer-cookings/export-pdf-bulk', [ReportMaurerCookingController::class, 'exportPdfBulk'])
+    ->name('report_maurer_cookings.export_pdf_bulk');
 
     Route::prefix('report-stuffers')
         ->name('report_stuffers.')
@@ -889,6 +911,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-fessman-cookings/bulk-approve', [ReportFessmanCookingController::class, 'bulkApprove'])->name('report-fessman-cookings.bulk-approve');
     Route::get('report-fessman-cookings/bulk-known-count', [ReportFessmanCookingController::class, 'bulkKnownCount'])->name('report-fessman-cookings.bulk-known-count');
     Route::get('report-fessman-cookings/bulk-approve-count', [ReportFessmanCookingController::class, 'bulkApproveCount'])->name('report-fessman-cookings.bulk-approve-count');
+    Route::get('report-fessman-cookings/export-pdf-bulk', [ReportFessmanCookingController::class, 'exportPdfBulk'])
+    ->name('report_fessman_cookings.export_pdf_bulk');
 
     Route::prefix('report-freez-packagings')
         ->name('report_freez_packagings.')
@@ -912,6 +936,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-freez-packagings/bulk-approve', [ReportFreezPackagingController::class, 'bulkApprove'])->name('report-freez-packagings.bulk-approve');
     Route::get('report-freez-packagings/bulk-known-count', [ReportFreezPackagingController::class, 'bulkKnownCount'])->name('report-freez-packagings.bulk-known-count');
     Route::get('report-freez-packagings/bulk-approve-count', [ReportFreezPackagingController::class, 'bulkApproveCount'])->name('report-freez-packagings.bulk-approve-count');
+    Route::get('report-freez-packagings/export-pdf-bulk', [ReportFreezPackagingController::class, 'exportPdfBulk'])
+        ->name('report_freez_packagings.export_pdf_bulk');
 
     Route::prefix('report-checkweigher-boxes')
         ->name('report_checkweigher_boxes.')
@@ -976,6 +1002,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-tofu-verifs/bulk-approve', [ReportTofuVerifController::class, 'bulkApprove'])->name('report-tofu-verifs.bulk-approve');
     Route::get('report-tofu-verifs/bulk-known-count', [ReportTofuVerifController::class, 'bulkKnownCount'])->name('report-tofu-verifs.bulk-known-count');
     Route::get('report-tofu-verifs/bulk-approve-count', [ReportTofuVerifController::class, 'bulkApproveCount'])->name('report-tofu-verifs.bulk-approve-count');
+    Route::get('report-tofu-verifs/export-pdf-bulk', [ReportTofuVerifController::class, 'exportPdfBulk'])
+    ->name('report_tofu_verifs.export_pdf_bulk');
 
     Route::prefix('report-prod-loss-vacums')
         ->name('report_prod_loss_vacums.')
@@ -1015,6 +1043,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-weight-stuffers/bulk-approve', [ReportWeightStufferController::class, 'bulkApprove'])->name('report-weight-stuffers.bulk-approve');
     Route::get('report-weight-stuffers/bulk-known-count', [ReportWeightStufferController::class, 'bulkKnownCount'])->name('report-weight-stuffers.bulk-known-count');
     Route::get('report-weight-stuffers/bulk-approve-count', [ReportWeightStufferController::class, 'bulkApproveCount'])->name('report-weight-stuffers.bulk-approve-count');
+    Route::get('report-weight-stuffers/export-pdf-bulk', [ReportWeightStufferController::class, 'exportPdfBulk'])
+        ->name('report-weight-stuffers.export_pdf_bulk');
 
     Route::prefix('report-packaging-verifs')
         ->name('report_packaging_verifs.')
@@ -1037,6 +1067,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-packaging-verifs/bulk-approve', [ReportPackagingVerifController::class, 'bulkApprove'])->name('report-packaging-verifs.bulk-approve');
     Route::get('report-packaging-verifs/bulk-known-count', [ReportPackagingVerifController::class, 'bulkKnownCount'])->name('report-packaging-verifs.bulk-known-count');
     Route::get('report-packaging-verifs/bulk-approve-count', [ReportPackagingVerifController::class, 'bulkApproveCount'])->name('report-packaging-verifs.bulk-approve-count');
+    Route::get('report-packaging-verifs/export-pdf-bulk', [ReportPackagingVerifController::class, 'exportPdfBulk'])
+    ->name('report_packaging_verifs.export_pdf_bulk');
 
     Route::prefix('formulas')
         ->name('formulas.')
@@ -1168,6 +1200,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-baso-cookings/bulk-approve', [ReportBasoCookingController::class, 'bulkApprove'])->name('report-baso-cookings.bulk-approve');
     Route::get('report-baso-cookings/bulk-known-count', [ReportBasoCookingController::class, 'bulkKnownCount'])->name('report-baso-cookings.bulk-known-count');
     Route::get('report-baso-cookings/bulk-approve-count', [ReportBasoCookingController::class, 'bulkApproveCount'])->name('report-baso-cookings.bulk-approve-count');
+    Route::get('report-baso-cookings/export-pdf-bulk', [ReportBasoCookingController::class, 'exportPdfBulk'])
+    ->name('report_baso_cookings.export_pdf_bulk');
 
     Route::prefix('report-rtg-steamers')
         ->name('report_rtg_steamers.')
@@ -1190,6 +1224,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-rtg-steamers/bulk-approve', [ReportRtgSteamerController::class, 'bulkApprove'])->name('report-rtg-steamers.bulk-approve');
     Route::get('report-rtg-steamers/bulk-known-count', [ReportRtgSteamerController::class, 'bulkKnownCount'])->name('report-rtg-steamers.bulk-known-count');
     Route::get('report-rtg-steamers/bulk-approve-count', [ReportRtgSteamerController::class, 'bulkApproveCount'])->name('report-rtg-steamers.bulk-approve-count');
+    Route::get('report-rtg-steamers/export-pdf-bulk', [ReportRtgSteamerController::class, 'exportPdfBulk'])
+    ->name('report_rtg_steamers.export_pdf_bulk');
 
     Route::prefix('report-pasteurs')
         ->name('report_pasteurs.')
@@ -1212,6 +1248,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-pasteurs/bulk-approve', [ReportPasteurController::class, 'bulkApprove'])->name('report-pasteurs.bulk-approve');
     Route::get('report-pasteurs/bulk-known-count', [ReportPasteurController::class, 'bulkKnownCount'])->name('report-pasteurs.bulk-known-count');
     Route::get('report-pasteurs/bulk-approve-count', [ReportPasteurController::class, 'bulkApproveCount'])->name('report-pasteurs.bulk-approve-count');
+    Route::get('report-pasteurs/export-pdf-bulk', [ReportPasteurController::class, 'exportPdfBulk'])
+        ->name('report_pasteurs.export_pdf_bulk');
 
     Route::prefix('report-sauces')
         ->name('report_sauces.')
@@ -1234,6 +1272,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-sauces/bulk-approve', [ReportSauceController::class, 'bulkApprove'])->name('report-sauces.bulk-approve');
     Route::get('report-sauces/bulk-known-count', [ReportSauceController::class, 'bulkKnownCount'])->name('report-sauces.bulk-known-count');
     Route::get('report-sauces/bulk-approve-count', [ReportSauceController::class, 'bulkApproveCount'])->name('report-sauces.bulk-approve-count');
+    Route::get('report-sauces/export-pdf-bulk', [ReportSauceController::class, 'exportPdfBulk'])
+    ->name('report_sauces.export_pdf_bulk');
 
     Route::prefix('report-siomays')
         ->name('report_siomays.')
@@ -1256,6 +1296,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-siomays/bulk-approve', [ReportSiomayController::class, 'bulkApprove'])->name('report-siomays.bulk-approve');
     Route::get('report-siomays/bulk-known-count', [ReportSiomayController::class, 'bulkKnownCount'])->name('report-siomays.bulk-known-count');
     Route::get('report-siomays/bulk-approve-count', [ReportSiomayController::class, 'bulkApproveCount'])->name('report-siomays.bulk-approve-count');
+
+
+
     Route::post(
     'report-startup-labels/export-excel',
         [ReportStartupLabelController::class, 'exportExcel']
@@ -1264,6 +1307,8 @@ Route::middleware(['auth'])->group(function () {
     ->name('report_emulsion_makings.export_pdf_bulk');
     Route::get('report-siomays/export-pdf-bulk', [ReportSiomayController::class, 'exportPdfBulk'])
     ->name('report_siomays.export_pdf_bulk');
+    Route::get('report-startup-labels/export-pdf-bulk', [ReportStartupLabelController::class, 'exportPdfBulk'])
+        ->name('report_startup_labels.export_pdf_bulk');
 
     Route::prefix('report-startup-labels')
         ->name('report_startup_labels.')
@@ -1284,6 +1329,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-startup-labels/bulk-approve', [ReportStartupLabelController::class, 'bulkApprove'])->name('report-startup-labels.bulk-approve');
     Route::get('report-startup-labels/bulk-known-count', [ReportStartupLabelController::class, 'bulkKnownCount'])->name('report-startup-labels.bulk-known-count');
     Route::get('report-startup-labels/bulk-approve-count', [ReportStartupLabelController::class, 'bulkApproveCount'])->name('report-startup-labels.bulk-approve-count');
+    
 
     Route::get('report-mt-cleans/export-pdf-bulk', [ReportMtCleanController::class, 'exportPdfBulk'])
         ->name('report_mt_cleans.export_pdf_bulk');
@@ -1334,7 +1380,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-waterbaths/bulk-approve', [ReportWaterbathController::class, 'bulkApprove'])->name('report-waterbaths.bulk-approve');
     Route::get('report-waterbaths/bulk-known-count', [ReportWaterbathController::class, 'bulkKnownCount'])->name('report-waterbaths.bulk-known-count');
     Route::get('report-waterbaths/bulk-approve-count', [ReportWaterbathController::class, 'bulkApproveCount'])->name('report-waterbaths.bulk-approve-count');
+    Route::get('report-waterbaths/export-pdf-bulk', [ReportWaterbathController::class, 'exportPdfBulk'])
+        ->name('report_waterbaths.export_pdf_bulk');
 
+    Route::get('report-changeover-cleanings/export-pdf-bulk', [ReportChangeoverCleaningController::class, 'exportPdfBulk'])
+        ->name('report-changeover-cleanings.export_pdf_bulk');
     Route::prefix('report-changeover-cleanings')
     ->name('report_changeover_cleanings.')
     ->controller(ReportChangeoverCleaningController::class)
@@ -1356,6 +1406,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-changeover-cleanings/bulk-approve', [ReportChangeoverCleaningController::class, 'bulkApprove'])->name('report-changeover-cleanings.bulk-approve');
     Route::get('report-changeover-cleanings/bulk-known-count', [ReportChangeoverCleaningController::class, 'bulkKnownCount'])->name('report-changeover-cleanings.bulk-known-count');
     Route::get('report-changeover-cleanings/bulk-approve-count', [ReportChangeoverCleaningController::class, 'bulkApproveCount'])->name('report-changeover-cleanings.bulk-approve-count');
+    
 
     Route::prefix('report-thawings')
         ->name('report_thawings.')

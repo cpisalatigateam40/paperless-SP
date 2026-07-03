@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_tofu_verifs.export_pdf_bulk')"
+                    title="Verifikasi Produk Tofu"
+                    modal-id="modalExportPdfTofuVerif"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

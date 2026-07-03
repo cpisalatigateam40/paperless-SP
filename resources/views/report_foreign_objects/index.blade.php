@@ -57,6 +57,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report-foreign-objects.export_pdf_bulk')"
+                    title="Benda Asing"
+                    modal-id="modalExportPdfForeignObject"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

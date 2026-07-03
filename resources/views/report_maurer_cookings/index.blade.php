@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_maurer_cookings.export_pdf_bulk')"
+                    title="Maurer Cooking"
+                    modal-id="modalExportPdfMaurerCooking"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

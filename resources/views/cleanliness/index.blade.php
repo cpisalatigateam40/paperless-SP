@@ -61,6 +61,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('storage-rm-cleanliness.export_pdf_bulk')"
+                    title="Verifikasi Kebersihan Ruang Penyimpanan"
+                    modal-id="modalExportPdfCleanliness"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

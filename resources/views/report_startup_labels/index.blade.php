@@ -50,6 +50,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_startup_labels.export_pdf_bulk')"
+                    title="Startup Label"
+                    modal-id="modalExportPdfStartupLabel"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

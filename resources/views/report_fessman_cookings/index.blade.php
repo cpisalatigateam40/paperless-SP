@@ -57,6 +57,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_fessman_cookings.export_pdf_bulk')"
+                    title="Fessman Cooking"
+                    modal-id="modalExportPdfFessmanCooking"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

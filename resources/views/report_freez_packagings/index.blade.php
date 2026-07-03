@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h4>Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h4>
+            <h5>Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h5>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 
@@ -57,6 +57,12 @@
                     </button>
                     @endrole
                 </div>
+
+                <x-export-pdf-modal
+                    :route="route('report_freez_packagings.export_pdf_bulk')"
+                    title="Freez Packaging"
+                    modal-id="modalExportPdfFreezPackaging"
+                />
 
                 {{-- Modals --}}
                 @role('Produksi')

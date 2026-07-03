@@ -57,6 +57,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_sauces.export_pdf_bulk')"
+                    title="Sauce Reports"
+                    modal-id="modalExportPdfSauce"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

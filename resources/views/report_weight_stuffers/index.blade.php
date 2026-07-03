@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report-weight-stuffers.export_pdf_bulk')"
+                    title="Verifikasi Berat Stuffer"
+                    modal-id="modalExportPdfWeightStuffer"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

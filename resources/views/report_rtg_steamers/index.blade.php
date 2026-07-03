@@ -58,6 +58,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report_rtg_steamers.export_pdf_bulk')"
+                    title="RTG Steamer"
+                    modal-id="modalExportPdftgSteamer"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal

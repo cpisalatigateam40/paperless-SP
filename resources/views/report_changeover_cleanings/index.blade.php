@@ -51,6 +51,12 @@
                     @endrole
                 </div>
 
+                <x-export-pdf-modal
+                    :route="route('report-changeover-cleanings.export_pdf_bulk')"
+                    title="Kebersihan Setelah Pergantian Produk"
+                    modal-id="modalExportPdfChangeoverCleaning"
+                />
+
                 {{-- Modals --}}
                 @role('Produksi')
                 <x-bulk-approval-modal
