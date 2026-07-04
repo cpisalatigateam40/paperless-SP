@@ -20,7 +20,7 @@ use App\Exports\ThermometerExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
-use App\traits\HasBulkPdfExport;
+use App\Traits\HasBulkPdfExport;
 
 class ReportScaleController extends Controller
 {
