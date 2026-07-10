@@ -242,7 +242,7 @@
                             </tr>
 
                             <tr id="detail-{{ $report->id }}" class="d-none">
-                                <td colspan="6">
+                                <td colspan="7">
                                     <table class="table table-sm table-bordered mb-3 text-center">
                                         <thead>
                                             <tr>

@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MtCleanExport;
 use App\Traits\HasBulkPdfExport;
+use App\Models\DetailMtCleanPhoto;
+use Illuminate\Support\Facades\Storage;
 
 class ReportMtCleanController extends Controller
 {
@@ -72,7 +74,8 @@ class ReportMtCleanController extends Controller
     {
         $query = ReportMtClean::with([
             'area',
-            'details.product'
+            'details.product',
+            'details.photos'
         ])->latest('date');
 
         // SEARCH
@@ -140,67 +143,70 @@ class ReportMtCleanController extends Controller
         );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'date'                           => 'required|date',
-
-            'details'                        => 'required|array|min:1',
-            'details.*.product_uuid'         => 'required|exists:products,uuid',
-            'details.*.time'                 => 'nullable',
-            'details.*.mt_1'                 => 'nullable|string|max:255',
-            'details.*.mt_2'                 => 'nullable|string|max:255',
-            'details.*.finding_type'         => 'nullable|string|max:255',
-            'details.*.condition'            => 'nullable|string|max:255',
-            'details.*.note'                 => 'nullable|string',
-            'details.*.corrective_action'    => 'nullable|string',
+            'date'                         => 'required|date',
+            'details'                      => 'required|array|min:1',
+            'details.*.product_uuid'       => 'required|exists:products,uuid',
+            'details.*.time'               => 'nullable',
+            'details.*.mt_1'               => 'nullable|string|max:255',
+            'details.*.mt_2'               => 'nullable|string|max:255',
+            'details.*.condition'          => 'nullable|string|max:255',
+            'details.*.note'               => 'nullable|string',
+            'details.*.corrective_action'  => 'nullable|string',
+            'details.*.photos.*'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
             ? session('shift_number') . '-' . session('shift_group')
             : ($request->shift ?? 'NON-SHIFT');
 
-        DB::transaction(function () use ($request, $shift) {
+        $report = ReportMtClean::create([
+            'uuid'        => Str::uuid(),
+            'area_uuid'   => Auth::user()->area_uuid,
+            'date'        => $request->date,
+            'shift'       => $shift,
+            'created_by'  => Auth::user()->name,
+            'known_by'    => $request->known_by,
+            'approved_by' => $request->approved_by,
+        ]);
 
-            // Simpan header
-            $report = ReportMtClean::create([
-                'uuid'        => Str::uuid(),
-                'area_uuid'   => Auth::user()->area_uuid,
-                'date'        => $request->date,
-                'shift'       => $shift,
-                'created_by'  => Auth::user()->name,
-                'known_by'    => $request->known_by,
-                'approved_by' => $request->approved_by,
+        $detailsInput = $request->input('details', []);
+        $detailsFiles = $request->file('details', []);
+
+        foreach ($detailsInput as $i => $detail) {
+            $detailRecord = DetailMtClean::create([
+                'uuid'               => Str::uuid(),
+                'report_uuid'        => $report->uuid,
+                'product_uuid'       => $detail['product_uuid'],
+                'time'               => $detail['time'] ?? null,
+                'mt_1'               => $detail['mt_1'] ?? null,
+                'mt_2'               => $detail['mt_2'] ?? null,
+                'finding_type'       => null, // form baru gak pakai text lagi
+                'condition'          => $detail['condition'] ?? null,
+                'note'               => $detail['note'] ?? null,
+                'corrective_action'  => $detail['corrective_action'] ?? null,
             ]);
 
-            // Simpan detail
-            foreach ($request->details as $detail) {
+            if (!empty($detailsFiles[$i]['photos'])) {
+                foreach ($detailsFiles[$i]['photos'] as $photo) {
+                    if ($photo && $photo->isValid()) {
+                        $path = $photo->store('mt_clean_photos', 'public');
 
-                DetailMtClean::create([
-                    'uuid'               => Str::uuid(),
-                    'report_uuid'        => $report->uuid,
-
-                    'product_uuid'       => $detail['product_uuid'],
-                    'time'               => $detail['time'] ?? null,
-
-                    'mt_1'               => $detail['mt_1'] ?? null,
-                    'mt_2'               => $detail['mt_2'] ?? null,
-
-                    'finding_type'       => $detail['finding_type'] ?? null,
-                    'condition'          => $detail['condition'] ?? null,
-
-                    'note'               => $detail['note'] ?? null,
-                    'corrective_action'  => $detail['corrective_action'] ?? null,
-                ]);
+                        DetailMtCleanPhoto::create([
+                            'uuid'        => Str::uuid(),
+                            'detail_uuid' => $detailRecord->uuid,
+                            'file_path'   => $path,
+                        ]);
+                    }
+                }
             }
-        });
+        }
 
         return redirect()
             ->route('report_mt_cleans.index')
-            ->with('success', 'Laporan MT Clean berhasil disimpan.');
+            ->with('success', 'Laporan berhasil disimpan.');
     }
 
     /**
@@ -226,86 +232,117 @@ class ReportMtCleanController extends Controller
      */
     public function edit(string $uuid)
     {
-        $report = ReportMtClean::with('details')
+        $report = ReportMtClean::with('details.photos') // 👈 tambahkan
             ->where('uuid', $uuid)
             ->firstOrFail();
 
         $areas = Area::all();
-
-        $products = Product::selectRaw(
-                'MIN(uuid) as uuid, product_name'
-            )
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
             ->get();
 
-        return view(
-            'report_mt_cleans.form',
-            compact(
-                'report',
-                'areas',
-                'products'
-            )
-        );
+        return view('report_mt_cleans.form', compact('report', 'areas', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $uuid)
     {
-        $report = ReportMtClean::where('uuid', $uuid)
-            ->firstOrFail();
+        $report = ReportMtClean::where('uuid', $uuid)->firstOrFail();
 
         $validated = $request->validate([
-            'date'                           => 'required|date',
-            'shift'                          => 'nullable|string|max:255',
+            'date'                          => 'required|date',
+            'shift'                         => 'nullable|string|max:255',
 
-            'details'                        => 'required|array|min:1',
-            'details.*.product_uuid'         => 'required|exists:products,uuid',
-            'details.*.time'                 => 'nullable',
-            'details.*.mt_1'                 => 'nullable|string|max:255',
-            'details.*.mt_2'                 => 'nullable|string|max:255',
-            'details.*.finding_type'         => 'nullable|string|max:255',
-            'details.*.condition'            => 'nullable|string|max:255',
-            'details.*.note'                 => 'nullable|string',
-            'details.*.corrective_action'    => 'nullable|string',
+            'details'                       => 'required|array|min:1',
+            'details.*.uuid'                => 'nullable|string',
+            'details.*.product_uuid'        => 'required|exists:products,uuid',
+            'details.*.time'                => 'nullable',
+            'details.*.mt_1'                => 'nullable|string|max:255',
+            'details.*.mt_2'                => 'nullable|string|max:255',
+            'details.*.condition'           => 'nullable|string|max:255',
+            'details.*.note'                => 'nullable|string',
+            'details.*.corrective_action'   => 'nullable|string',
+            'details.*.photos.*'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'details.*.deleted_photos'      => 'nullable|array',
+            'details.*.deleted_photos.*'    => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($validated, $report) {
+        $detailsFiles = $request->file('details', []);
 
-            // Update header
+        DB::transaction(function () use ($validated, $report, $detailsFiles) {
+
             $report->update([
                 'date'  => $validated['date'],
                 'shift' => $validated['shift'] ?? $report->shift,
             ]);
 
-            // Hapus detail lama
-            $report->details()->delete();
+            $submittedUuids = [];
 
-            // Simpan ulang detail
-            foreach ($validated['details'] as $detail) {
+            foreach ($validated['details'] as $i => $detail) {
 
-                $report->details()->create([
-                    'uuid'               => Str::uuid(),
-
+                $fields = [
                     'product_uuid'       => $detail['product_uuid'],
                     'time'               => $detail['time'] ?? null,
-
                     'mt_1'               => $detail['mt_1'] ?? null,
                     'mt_2'               => $detail['mt_2'] ?? null,
-
-                    'finding_type'       => $detail['finding_type'] ?? null,
                     'condition'          => $detail['condition'] ?? null,
-
                     'note'               => $detail['note'] ?? null,
                     'corrective_action'  => $detail['corrective_action'] ?? null,
-                ]);
+                    // finding_type sengaja TIDAK disentuh di sini,
+                    // supaya data lama yang masih teks tetap utuh kalau row-nya dari data lama.
+                ];
+
+                $detailUuid = $detail['uuid'] ?? null;
+                $detailRecord = $detailUuid
+                    ? $report->details()->where('uuid', $detailUuid)->first()
+                    : null;
+
+                if ($detailRecord) {
+                    $detailRecord->update($fields);
+                } else {
+                    $fields['finding_type'] = null;
+                    $detailRecord = $report->details()->create($fields);
+                }
+
+                $submittedUuids[] = $detailRecord->uuid;
+
+                if (!empty($detail['deleted_photos'])) {
+                    $photosToDelete = DetailMtCleanPhoto::where('detail_uuid', $detailRecord->uuid)
+                        ->whereIn('uuid', $detail['deleted_photos'])
+                        ->get();
+
+                    foreach ($photosToDelete as $photo) {
+                        Storage::disk('public')->delete($photo->file_path);
+                        $photo->delete();
+                    }
+                }
+
+                if (!empty($detailsFiles[$i]['photos'])) {
+                    foreach ($detailsFiles[$i]['photos'] as $photo) {
+                        if ($photo && $photo->isValid()) {
+                            $path = $photo->store('mt_clean_photos', 'public');
+
+                            DetailMtCleanPhoto::create([
+                                'uuid'        => Str::uuid(),
+                                'detail_uuid' => $detailRecord->uuid,
+                                'file_path'   => $path,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            $oldDetails = $report->details()->whereNotIn('uuid', $submittedUuids)->get();
+            foreach ($oldDetails as $old) {
+                foreach ($old->photos as $photo) {
+                    Storage::disk('public')->delete($photo->file_path);
+                }
+                $old->delete();
             }
         });
 
         return redirect()
             ->route('report_mt_cleans.index')
-            ->with('success', 'Laporan MT Clean berhasil diperbarui.');
+            ->with('success', 'Laporan berhasil diperbarui.');
     }
 
     /**
@@ -313,19 +350,21 @@ class ReportMtCleanController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $report = ReportMtClean::where(
-            'uuid',
-            $uuid
-        )->firstOrFail();
+        $report = ReportMtClean::with('details.photos')
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        foreach ($report->details as $detail) {
+            foreach ($detail->photos as $photo) {
+                Storage::disk('public')->delete($photo->file_path);
+            }
+        }
 
         $report->delete();
 
         return redirect()
             ->route('report_mt_cleans.index')
-            ->with(
-                'success',
-                'Report MT Clean berhasil dihapus.'
-            );
+            ->with('success', 'Report berhasil dihapus.');
     }
 
     /**
@@ -335,7 +374,8 @@ class ReportMtCleanController extends Controller
     {
         $report = ReportMtClean::with([
             'area',
-            'details.product'
+            'details.product',
+            'details.photos'
         ])
         ->where('uuid', $uuid)
         ->firstOrFail();

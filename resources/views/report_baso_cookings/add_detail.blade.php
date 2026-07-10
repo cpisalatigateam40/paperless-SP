@@ -97,7 +97,7 @@
                     </div>
 
                     {{-- Parafer --}}
-                    <div class="row mb-3 mt-5">
+                    <!-- <div class="row mb-3 mt-5">
                         <div class="col-md-6">
                             <label class="form-label">Paraf QC</label>
                             <canvas id="qc-canvas-0" class="border" width="300" height="150"
@@ -112,7 +112,7 @@
                             <input type="hidden" name="details[0][prod_paraf]" id="prod_paraf_input_0">
                             <button type="button" class="btn btn-sm btn-secondary clear-signature">Hapus</button>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

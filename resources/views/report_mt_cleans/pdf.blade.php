@@ -239,15 +239,25 @@
                 </td>
 
                 <td>
-                    {{ $detail->finding_type ?? '-' }}
+                    @if ($detail->photos->isNotEmpty())
+                        @foreach ($detail->photos as $photo)
+                            @php $base64 = $photo->base64; @endphp
+                            @if ($base64)
+                                <img src="{{ $base64 }}"
+                                    style="width:50px;object-fit:cover;border:1px solid #ccc;margin:1px;">
+                            @endif
+                        @endforeach
+                    @else
+                        {{ $detail->finding_type ?? '-' }}
+                    @endif
                 </td>
 
-                <td class="text-center">
-                    {{ $detail->condition == 'Bersih' ? '✓' : '' }}
+                <td class="text-center" style="font-family: 'DejaVu Sans', sans-serif;">
+                    {{ $detail->condition == 'Bersih' ? 'Bersih' : '' }}
                 </td>
 
-                <td class="text-center">
-                    {{ $detail->condition == 'Tidak Bersih' ? '✓' : '' }}
+                <td class="text-center" style="font-family: 'DejaVu Sans', sans-serif;">
+                    {{ $detail->condition == 'Tidak Bersih' ? 'Tidak Bersih' : '' }}
                 </td>
 
                 <td>

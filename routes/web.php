@@ -1140,6 +1140,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-process-productions/bulk-known-count', [ReportProcessProdController::class, 'bulkKnownCount'])->name('report-process-productions.bulk-known-count');
     Route::get('report-process-productions/bulk-approve-count', [ReportProcessProdController::class, 'bulkApproveCount'])->name('report-process-productions.bulk-approve-count');
     Route::get('report-process-productions/export-pdf-bulk', [ReportProcessProdController::class, 'exportPdfBulk'])->name('report-process-productions.bulk-export-pdf');
+    Route::get('report_process_productions/prod-code-suggestions', [ReportProcessProdController::class, 'getProdCodeSuggestions'])
+    ->name('report_process_productions.getProdCodeSuggestions');
 
     Route::prefix('standard-stuffers')->name('standard-stuffers.')->controller(StandardStufferController::class)->group(function () {
         Route::get('/', 'index')->name('index');

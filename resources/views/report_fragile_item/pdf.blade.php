@@ -173,6 +173,42 @@
 
     <p>Ket : √ = Ok / Tidak Pecah X = Tidak Ok / Pecah.</p>
 
+    @if ($report->detailManuals->isNotEmpty())
+    <table>
+        <thead>
+            <tr>
+                <th colspan="9" style="text-align: left;">INPUT MANUAL BARANG</th>
+            </tr>
+            <tr>
+                <th>No</th>
+                <th>Area</th>
+                <th>Sub Area</th>
+                <th>Nama Barang</th>
+                <th>Jumlah</th>
+                <th>Kondisi</th>
+                <th>Nama Karyawan</th>
+                <th>Temuan Ketidaksesuaian</th>
+                <th>Tindakan Koreksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($report->detailManuals as $i => $manual)
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $manual->section->section_name ?? '-' }}</td>
+                <td>{{ $manual->sub_area ?? '-' }}</td>
+                <td>{{ $manual->item_name }}</td>
+                <td>{{ $manual->quantity }}</td>
+                <td>{{ $manual->condition ?? '-' }}</td>
+                <td>{{ $manual->employee_name ?? '-' }}</td>
+                <td>{{ $manual->issue_notes ?? '-' }}</td>
+                <td>{{ $manual->corrective_action ?? '-' }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">
             <td style="text-align: center; border: none; width: 33%;">

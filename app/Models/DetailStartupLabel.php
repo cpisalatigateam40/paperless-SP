@@ -54,4 +54,9 @@ class DetailStartupLabel extends Model
     {
         return $this->belongsTo(Product::class, 'product_uuid', 'uuid');
     }
+
+    public function photos()
+    {
+        return $this->hasMany(DetailStartupLabelPhoto::class, 'detail_uuid', 'uuid');
+    }
 }

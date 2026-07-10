@@ -119,7 +119,7 @@
         </tr>
 
         <tr class="collapse" id="detail-{{ $report->id }}">
-            <td colspan="7">
+            <td colspan="8">
                 <strong>Area:</strong> {{ $report->area->name ?? '-' }} <br>
 
                 @if($report->approved_by)

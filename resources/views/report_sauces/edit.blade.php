@@ -72,10 +72,18 @@
                             <input type="time" name="details[{{ $detailIndex }}][time]" class="form-control"
                                 value="{{ $detail->time }}">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Tahapan Proses</label>
                             <input type="text" name="details[{{ $detailIndex }}][process_step]" class="form-control"
                                 value="{{ $detail->process_step }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Nomor Mesin</label>
+                            <input type="text"
+                                name="details[{{ $detailIndex }}][no_mesin]"
+                                class="form-control"
+                                value="{{ $detail->no_mesin }}"
+                                placeholder="Masukkan nomor mesin">
                         </div>
                     </div>
 
@@ -157,6 +165,32 @@
                                 </option>
                             </select>
                         </div>
+
+                        
+                        <div class="col-md-12 mb-3 mt-3">
+                            <label class="form-label d-block">Mixing Paddle</label>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input"
+                                    type="radio"
+                                    name="details[{{ $detailIndex }}][mixing_paddle]"
+                                    id="mixingOn{{ $detailIndex }}"
+                                    value="on"
+                                    {{ $detail->mixing_paddle_on ? 'checked' : '' }}>
+                                <label class="form-check-label" for="mixingOn{{ $detailIndex }}">On</label>
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input"
+                                    type="radio"
+                                    name="details[{{ $detailIndex }}][mixing_paddle]"
+                                    id="mixingOff{{ $detailIndex }}"
+                                    value="off"
+                                    {{ $detail->mixing_paddle_off ? 'checked' : '' }}>
+                                <label class="form-check-label" for="mixingOff{{ $detailIndex }}">Off</label>
+                            </div>
+                        </div>
+                        
 
                         <div class="col-md-6 mb-3">
                             <label>Lama Proses (menit)</label>

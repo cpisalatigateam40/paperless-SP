@@ -98,6 +98,9 @@
                                     <option value="Frozen (Fr)"
                                         {{ $detail->rm_condition == 'Frozen (Fr)' ? 'selected' : '' }}>Frozen (Fr)
                                     </option>
+                                    <option value="Dry"
+                                        {{ $detail->rm_condition == 'Dry' ? 'selected' : '' }}>Dry
+                                    </option>
                                 </select>
                             </div>
 

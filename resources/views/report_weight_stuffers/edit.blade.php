@@ -71,10 +71,29 @@
                         <input type="time" name="details[{{ $idx }}][time]" class="form-control"
                             value="{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Diameter Casing (mm)</label>
                         <input type="number" name="details[{{ $idx }}][cases][0][actual_case_2]" class="form-control"
                             value="{{ $d->cases->first()?->actual_case_2 }}" placeholder="mis: 26">
+                    </div>
+                    @php
+                        $stufferSpeed = match($d->machine) {
+                            'townsend' => $d->townsend?->stuffer_speed,
+                            'hitech' => $d->hitech?->stuffer_speed,
+                            'vemag' => $d->vemag?->stuffer_speed,
+                            'vemag2' => $d->vemag2?->stuffer_speed,
+                            'handtmann' => $d->handtmann?->stuffer_speed,
+                            default => null,
+                        };
+                    @endphp
+                    <div class="col-md-6">
+                        <label>Stuffer Speed</label>
+                        <input type="number"
+                            step="0.01"
+                            name="details[{{ $idx }}][stuffer_speed]"
+                            class="form-control"
+                            value="{{ $stufferSpeed }}"
+                            placeholder="mis: 180">
                     </div>
                 </div>
             </div>

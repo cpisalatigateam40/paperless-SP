@@ -62,7 +62,7 @@
                     </div>
                 </div>
 
-                <div class="row mb-3 mt-5">
+                <!-- <div class="row mb-3 mt-5">
                     <div class="col-md-4">
                         <label class="form-label">Paraf QC</label>
                         <canvas id="qc-canvas" class="border" width="300" height="150"
@@ -86,7 +86,7 @@
                         <input type="hidden" name="engineering_paraf" id="engineering_paraf_input">
                         <button type="button" class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
                     </div>
-                </div>
+                </div> -->
 
 
 

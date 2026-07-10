@@ -108,6 +108,81 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                <div class="form-check mb-3 mt-3">
+                    <input type="checkbox" class="form-check-input" id="inputManualBarang">
+                    <label class="form-check-label" for="inputManualBarang">Input Manual Barang</label>
+                </div>
+
+                <div id="manualBarangSection" style="display:none;">
+                    <div id="manualItemsWrapper"></div>
+                    <button type="button" class="btn btn-secondary btn-sm" id="addManualItem">
+                        + Tambah Detail Manual Barang
+                    </button>
+                </div>
+
+                <template id="manualItemTemplate">
+                    <div class="manual-item-block border rounded p-3 mb-3 position-relative">
+                        <button type="button" class="btn btn-sm btn-danger remove-manual-item"
+                            style="position:absolute; top:10px; right:10px;">&times;</button>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Area Manual <span class="text-danger">*</span></label>
+                                <select name="manual_items[__INDEX__][section_uuid]" class="form-control">
+                                    <option value="">Pilih Area</option>
+                                    @foreach ($sections as $section)
+                                        <option value="{{ $section->uuid }}">{{ $section->section_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Sub Area Manual</label>
+                                <input type="text" name="manual_items[__INDEX__][sub_area]" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Nama Barang Manual <span class="text-danger">*</span></label>
+                                <input type="text" name="manual_items[__INDEX__][item_name]" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Jumlah Manual <span class="text-danger">*</span></label>
+                                <input type="number" name="manual_items[__INDEX__][quantity]" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Kondisi Manual <span class="text-danger">*</span></label>
+                                <select name="manual_items[__INDEX__][condition]" class="form-control">
+                                    <option value="">Pilih Kondisi</option>
+                                    <option value="baik">Baik</option>
+                                    <option value="rusak">Rusak</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Nama Karyawan</label>
+                                <input type="text" name="manual_items[__INDEX__][employee_name]" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Temuan Ketidaksesuaian Manual</label>
+                                <textarea name="manual_items[__INDEX__][issue_notes]" class="form-control"
+                                    placeholder="Masukkan temuan (opsional)"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Tindakan Koreksi Manual</label>
+                                <textarea name="manual_items[__INDEX__][corrective_action]" class="form-control"
+                                    placeholder="Masukkan tindakan (opsional)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
                 <button class="btn btn-primary" style="margin-top: 1rem;">Simpan Laporan</button>
             </form>
         </div>
@@ -148,6 +223,31 @@ document.addEventListener('DOMContentLoaded', function() {
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
     });
+});
+
+let manualIndex = 0;
+
+document.getElementById('inputManualBarang').addEventListener('change', function() {
+    document.getElementById('manualBarangSection').style.display = this.checked ? 'block' : 'none';
+    if (this.checked && document.querySelectorAll('#manualItemsWrapper .manual-item-block').length === 0) {
+        addManualItemBlock();
+    }
+});
+
+document.getElementById('addManualItem').addEventListener('click', addManualItemBlock);
+
+function addManualItemBlock() {
+    const html = document.getElementById('manualItemTemplate').innerHTML.replaceAll('__INDEX__', manualIndex);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    document.getElementById('manualItemsWrapper').appendChild(wrapper.firstElementChild);
+    manualIndex++;
+}
+
+document.getElementById('manualItemsWrapper').addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-manual-item')) {
+        e.target.closest('.manual-item-block').remove();
+    }
 });
 </script>
 @endsection

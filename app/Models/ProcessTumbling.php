@@ -17,7 +17,9 @@ class ProcessTumbling extends Model implements Auditable
     protected $fillable = [
         'uuid',
         'detail_uuid',
-        'tumbling_process'
+        'tumbling_process',
+        'process_duration',    
+        'final_temperature',   
     ];
 
     protected $auditEvents = [

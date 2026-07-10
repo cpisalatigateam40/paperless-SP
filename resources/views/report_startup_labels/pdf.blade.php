@@ -130,6 +130,7 @@
                 <th class="align-middle">Packaging (MC/PL)</th>
                 <th class="align-middle">Waktu</th>
                 <th class="align-middle">Kode Produksi</th>
+                <th class="align-middle">Foto</th>
                 <th class="align-middle">Best Before</th>
                 <th class="align-middle">Hasil</th>
                 <th class="align-middle">Tindakan Koreksi</th>
@@ -145,6 +146,17 @@
                     {{ $detail->time ? \Illuminate\Support\Str::substr($detail->time, 0, 5) : '-' }}
                 </td>
                 <td>{{ $detail->production_code ?? '-' }}</td>
+                <td class="align-middle text-center">
+                    @forelse ($detail->photos as $photo)
+                        @php $base64 = $photo->base64; @endphp
+                        @if ($base64)
+                            <img src="{{ $base64 }}"
+                                style="width:50px;height:50px;object-fit:cover;border:1px solid #ccc;margin:1px;">
+                        @endif
+                    @empty
+                        -
+                    @endforelse
+                </td>
                 <td>
                     {{ $detail->best_before ? \Carbon\Carbon::parse($detail->best_before)->format('d-m-Y') : '-' }}
                 </td>

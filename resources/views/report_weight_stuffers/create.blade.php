@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>Kode Produksi</label>
-                        <input type="text" name="details[0][production_code]" class="form-control" placeholder="mis: KP-2026-001" required>
+                        <input type="text" name="details[0][production_code]" class="form-control" placeholder="mis: QD14317" required>
                     </div>
                     <div class="col-md-6">
                         <label>Nama Mesin</label>
@@ -68,9 +68,17 @@
                         <input type="time" name="details[0][time]" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Diameter Casing (mm)</label>
                         <input type="number" name="details[0][cases][0][actual_case_2]" class="form-control" placeholder="mis: 26">
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label>Stuffer Speed</label>
+                        <input type="number"
+                            name="details[0][stuffer_speed]"
+                            class="form-control"
+                            placeholder="mis: 180">
                     </div>
                 </div>
             </div>

@@ -43,4 +43,9 @@ class ReportFragileItem extends Model implements Auditable
     {
         static::addGlobalScope(new UserAreaScope);
     }
+
+    public function detailManuals()
+    {
+        return $this->hasMany(DetailFragileItemManual::class, 'report_fragile_item_uuid', 'uuid');
+    }
 }

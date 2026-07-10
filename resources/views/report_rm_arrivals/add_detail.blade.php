@@ -48,6 +48,7 @@
                                     <option value="Fresh (F)">Fresh (F)</option>
                                     <option value="Thawing (Th)">Thawing (Th)</option>
                                     <option value="Frozen (Fr)">Frozen (Fr)</option>
+                                    <option value="Dry">Dry</option>
                                 </select>
                             </div>
                             @php
@@ -280,6 +281,7 @@
                     <option value="Fresh (F)">Fresh (F)</option>
                     <option value="Thawing (Th)">Thawing (Th)</option>
                     <option value="Frozen (Fr)">Frozen (Fr)</option>
+                    <option value="Dry">Dry</option>
                 </select>
             </div>
             @php

@@ -146,29 +146,10 @@
                                 </button>
 
                                 {{-- Update --}}
-                                <a href="{{ route('report-fragile-item.edit', $report->uuid) }}"
+                                <a href="{{ route('report-fragile-item.edit-next', $report->uuid) }}"
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-pen"></i>
                                 </a>
-
-                                <!-- @can('edit report')
-                                <a href="{{ route('report-fragile-item.edit-next', $report->uuid) }}"
-                                    class="btn btn-sm btn-danger" title="Edit Laporan">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @endcan -->
-
-                                <!-- @php
-                                    $user = auth()->user();
-                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
-                                @endphp
-
-                                @if($canEdit)
-                                    <a href="{{ route('report-fragile-item.edit', $report->uuid) }}"
-                                        class="btn btn-sm btn-warning" title="Edit Laporan">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                @endif -->
 
                                 @can('delete report')
                                 <form action="{{ route('report-fragile-item.destroy', $report->uuid) }}" method="POST"
@@ -278,6 +259,42 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+
+                                @if ($report->detailManuals->isNotEmpty())
+                                <div class="mt-3">
+                                    <strong>Input Manual Barang</strong>
+                                    <table class="table table-sm table-bordered mb-0 mt-1">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Area</th>
+                                                <th>Sub Area</th>
+                                                <th>Nama Barang</th>
+                                                <th>Jumlah</th>
+                                                <th>Kondisi</th>
+                                                <th>Nama Karyawan</th>
+                                                <th>Temuan Ketidaksesuaian</th>
+                                                <th>Tindakan Koreksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($report->detailManuals as $i => $manual)
+                                            <tr>
+                                                <td>{{ $i + 1 }}</td>
+                                                <td>{{ $manual->section->section_name ?? '-' }}</td>
+                                                <td>{{ $manual->sub_area ?? '-' }}</td>
+                                                <td>{{ $manual->item_name }}</td>
+                                                <td>{{ $manual->quantity }}</td>
+                                                <td>{{ $manual->condition ?? '-' }}</td>
+                                                <td>{{ $manual->employee_name ?? '-' }}</td>
+                                                <td>{{ $manual->issue_notes ?? '-' }}</td>
+                                                <td>{{ $manual->corrective_action ?? '-' }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @endif
                             </td>
                         </tr>
                         @empty

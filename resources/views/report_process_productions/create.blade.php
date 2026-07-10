@@ -66,9 +66,14 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Waktu Mixing (Menit)</label>
                         <input type="text" name="mixing_time" class="form-control">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Nama Mesin Mixer/Chopper</label>
+                        <input type="text" name="machine_name" class="form-control" placeholder="Nama Mesin Mixer/Chopper">
                     </div>
                 </div>
 
@@ -79,6 +84,8 @@
                 <div id="formulation-container">
                     {{-- Diisi otomatis via JS --}}
                 </div>
+
+                <datalist id="prod-code-list"></datalist>
 
                 <h5 class="mt-4 font-weight-bold">Penggunaan Rework</h5>
                 <div class=" row mt-4">
@@ -132,33 +139,40 @@
                     </div>
                 </div>
 
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label>Catatan After Rework</label>
+                        <textarea name="detail_notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+
                 <hr>
 
                 {{-- EMULSIFYING --}}
                 <h5 class="mt-4 font-weight-bold">Emulsifying</h5>
                 <div class="row mb-3">
                     <div class="col">
-                        <label>Suhu Standar Campuran</label>
+                        <label>Suhu Standar Campuran (°C)</label>
                         <input type="text" name="standard_mixture_temp" class="form-control" value="14 ± 2">
                     </div>
 
                     <div class="col">
-                        <label>Suhu Aktual 1</label>
+                        <label>Suhu Aktual 1 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_1" id="actual_mixture_temp_1"
                             class="form-control">
                     </div>
                     <div class="col">
-                        <label>Suhu Aktual 2</label>
+                        <label>Suhu Aktual 2 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_2" id="actual_mixture_temp_2"
                             class="form-control">
                     </div>
                     <div class="col">
-                        <label>Suhu Aktual 3</label>
+                        <label>Suhu Aktual 3 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_3" id="actual_mixture_temp_3"
                             class="form-control">
                     </div>
                     <div class="col">
-                        <label>Rata-rata Suhu</label>
+                        <label>Rata-rata Suhu (°C)</label>
                         <input type="text" name="average_mixture_temp" id="average_mixture_temp" class="form-control"
                             readonly>
                     </div>
@@ -204,10 +218,21 @@
 
                 {{-- TUMBLING --}}
                 <h5 class="mt-4 font-weight-bold">Tumbling</h5>
-                <div class="mb-3">
-                    <label>Proses Tumbling</label>
-                    <input type="text" name="tumbling_process" class="form-control">
+                <div class="row">
+                    <div class=" col-md-4 mb-3">
+                        <label>Proses Tumbling</label>
+                        <input type="text" name="tumbling_process" class="form-control">
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>Lama Proses (Menit)</label>
+                        <input type="number" step="1" name="process_duration" class="form-control" placeholder="mis: 3">
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>Suhu Akhir Tumbling (°C)</label>
+                        <input type="number" step="0.1" name="final_temperature" class="form-control" placeholder="mis: 12.5">
+                    </div>
                 </div>
+                
 
                 {{-- AGING --}}
                 <h5 class="mt-4 font-weight-bold">Aging</h5>
@@ -220,6 +245,13 @@
                         <label>Hasil Stuffing</label>
                         <input type="text" name="stuffing_result" class="form-control">
                     </div>
+                </div>
+
+                {{-- CATATAN REPORT --}}
+                <h5 class="mt-4 font-weight-bold">Catatan</h5>
+                <div class="mb-3">
+                    <label>Catatan Umum</label>
+                    <textarea name="report_notes" class="form-control" rows="3"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-success mt-3">Simpan Laporan</button>
@@ -237,11 +269,11 @@ function initActualWeightListeners() {
     weightInputs.forEach(input => {
         if (input.dataset.bound === "true") return;
 
-        const standard = parseFloat(input.dataset.standard);
+        const standard = input.dataset.standard;
         const sensorySelect = input.closest('.row').querySelector('.sensory-select');
 
         // Set nilai awal actual = standard
-        input.value = standard.toFixed(2);
+        input.value = standard;
 
         function updateSensoryBasedOnWeight() {
             const actual = parseFloat(input.value);
@@ -315,7 +347,8 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                 <div class="row">
                     <div class="col-md-3">
-                        <input type="number" step="0.01" 
+                        <input type="number"
+                            step="0.001"
                             name="actual_weight[${fm.uuid}]" 
                             class="form-control actual-weight" 
                             placeholder="Berat Aktual (kg)"
@@ -328,7 +361,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+                        <input type="text" name="prod_code[${fm.uuid}]" class="form-control" list="prod-code-list" placeholder="Kode Produksi">
                     </div>
                     <div class="col-md-3">
                         <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
@@ -351,7 +384,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                 <div class="row">
                     <div class="col-md-3">
-                        <input type="number" step="0.01" 
+                        <input type="number" step="0.001" 
                             name="actual_weight[${fm.uuid}]" 
                             class="form-control actual-weight" 
                             placeholder="Berat Aktual (kg)"
@@ -365,7 +398,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="prod_code[${fm.uuid}]" class="form-control" placeholder="Kode Produksi">
+                        <input type="text" name="prod_code[${fm.uuid}]" class="form-control" list="prod-code-list" placeholder="Kode Produksi">
                     </div>
                     <div class="col-md-3">
                         <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
@@ -398,6 +431,19 @@ function hitungRataRataSuhu() {
 
 ['actual_mixture_temp_1', 'actual_mixture_temp_2', 'actual_mixture_temp_3'].forEach(id => {
     document.getElementById(id).addEventListener('input', hitungRataRataSuhu);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    fetch(@json(route('report_process_productions.getProdCodeSuggestions')))
+        .then(res => res.json())
+        .then(codes => {
+            const datalist = document.getElementById('prod-code-list');
+            codes.forEach(code => {
+                const opt = document.createElement('option');
+                opt.value = code;
+                datalist.appendChild(opt);
+            });
+        });
 });
 </script>
 @endsection

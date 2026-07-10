@@ -149,9 +149,9 @@
                 <th class="align-middle">Tahapan</th>
                 <th class="align-middle">Analisis Asal Kontaminan</th>
                 <th class="align-middle">Keterangan</th>
-                <th class="align-middle">Paraf QC</th>
+                <!-- <th class="align-middle">Paraf QC</th>
                 <th class="align-middle">Paraf Produksi</th>
-                <th class="align-middle">Paraf Engineering</th>
+                <th class="align-middle">Paraf Engineering</th> -->
             </tr>
         </thead>
         <tbody>
@@ -185,7 +185,7 @@
                 <td>{{ $detail->analysis_stage }}</td>
                 <td>{{ $detail->contaminant_origin }}</td>
                 <td>{{ $detail->notes }}</td>
-                <td>
+                <!-- <td>
                     @php
                     $qcBase64 = null;
                     if ($detail->qc_paraf) {
@@ -237,12 +237,12 @@
                     @if($engBase64)
                     <img src="{{ $engBase64 }}" alt="Engineering" width="60">
                     @endif
-                </td>
+                </td> -->
 
             </tr>
             @endforeach
             <tr>
-                <td colspan="11" style="text-align: right; border: none;">QM 09 / 00</td>
+                <td colspan="9" style="text-align: right; border: none;">QM 09 / 00</td>
             </tr>
         </tbody>
     </table>

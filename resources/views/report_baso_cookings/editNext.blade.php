@@ -163,7 +163,7 @@
                     </div>
 
                     {{-- Paraf --}}
-                    <div class="row mb-2 mt-5">
+                    <!-- <div class="row mb-2 mt-5">
                         <div class="col-md-6">
                             <label class="form-label">Paraf QC</label>
                             @if($detail->qc_paraf)
@@ -186,7 +186,7 @@
                             <input type="hidden" name="details[{{ $i }}][prod_paraf]" id="prod_paraf_input_{{ $i }}">
                             <button type="button" class="btn btn-sm btn-secondary clear-signature">Hapus</button>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 @endforeach
             </div>

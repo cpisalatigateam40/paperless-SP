@@ -127,6 +127,40 @@ class FragileItemExport implements WithEvents, WithTitle
                     }
                 }
 
+                // ── Input Manual Barang ─────────────────────────────────────
+                foreach ($report->detailManuals as $manual) {
+                    [$shiftNum, $shiftGroup] = array_pad(
+                        explode('-', $report->shift ?? '', 2), 2, ''
+                    );
+
+                    $keterangan = collect([
+                        $manual->condition ? 'Kondisi: ' . $manual->condition : null,
+                        $manual->issue_notes ? 'Temuan: ' . $manual->issue_notes : null,
+                        $manual->corrective_action ? 'Tindakan: ' . $manual->corrective_action : null,
+                    ])->filter()->implode(' | ');
+
+                    $sheet->setCellValue("A{$row}", $no);
+                    $sheet->setCellValue("B{$row}", Carbon::parse($report->date)->format('d/m/Y'));
+                    $sheet->setCellValue("C{$row}", $shiftNum ?: ($report->shift ?? '-'));
+                    $sheet->setCellValue("D{$row}", Carbon::parse($report->created_at)->format('H:i'));
+                    $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
+                    $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
+                    $sheet->setCellValue("G{$row}", ($manual->section->section_name ?? '-') . ' (Manual)');
+                    $sheet->setCellValue("H{$row}", $manual->item_name . ($manual->sub_area ? " - {$manual->sub_area}" : ''));
+                    $sheet->setCellValue("I{$row}", $manual->employee_name ?? '-');
+                    $sheet->setCellValue("J{$row}", $manual->quantity ?? '-');
+                    $sheet->setCellValue("K{$row}", '-');
+                    $sheet->setCellValue("L{$row}", '-');
+                    $sheet->setCellValue("M{$row}", $keterangan ?: '-');
+
+                    $sheet->getStyle("G{$row}")->getFont()->setItalic(true);
+                    $sheet->getStyle("A{$row}:{$lastCol}{$row}")
+                        ->getAlignment()->setHorizontal('center');
+
+                    $row++;
+                    $no++;
+                }
+
                 if ($no === 1) {
                     $sheet->mergeCells("A5:{$lastCol}5");
                     $sheet->setCellValue('A5', 'Tidak ada data untuk periode yang dipilih.');

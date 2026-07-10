@@ -244,7 +244,7 @@
 
                         </tr>
                         <tr id="detail-{{ $report->id }}" class="d-none">
-                            <td colspan="6">
+                            <td colspan="7">
                                 {{-- TIMBANGAN --}}
                                 <h6 class="fw-bold mt-3">1. Pemeriksaan Timbangan</h6>
                                 <table class="table table-sm table-bordered">

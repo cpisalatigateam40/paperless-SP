@@ -327,7 +327,7 @@
         {{-- KIRI: Dokumentasi Pembekuan --}}
         <td style="border:none; width:50%; vertical-align:top; padding-right:10px;">
 
-            <strong>Dokumentasi Pembekuan</strong>
+            <strong>Dokumentasi Kemasan Primer</strong>
 
             @if($detail->documentations->count())
 

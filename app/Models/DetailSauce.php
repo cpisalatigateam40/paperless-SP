@@ -28,6 +28,7 @@ class DetailSauce extends Model implements Auditable
         'taste',
         'texture',
         'notes',
+        'no_mesin'
     ];
 
     protected $auditEvents = [

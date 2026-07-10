@@ -29,6 +29,8 @@ class DetailProcessProd extends Model implements Auditable
         'sensory_stiffness',
         'sensory_aroma',
         'gramase',
+        'notes',
+        'machine_name',
     ];
 
     protected $auditEvents = [

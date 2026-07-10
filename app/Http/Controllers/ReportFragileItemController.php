@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\ReportFragileItem;
 use App\Models\DetailFragileItem;
 use App\Models\FragileItem;
+use App\Models\DetailFragileItemManual;
+use App\Models\Section;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -66,7 +68,8 @@ class ReportFragileItemController extends Controller
     {
         $reports = ReportFragileItem::with([
                 'area',
-                'details.item'
+                'details.item',
+                'detailManuals.section'
             ])
 
             // 🔒 Area user (kalau bukan superadmin)
@@ -127,13 +130,17 @@ class ReportFragileItemController extends Controller
     public function create()
     {
         $fragileItems = FragileItem::orderBy('section_name')->get();
-        return view('report_fragile_item.create', compact('fragileItems'))->with('isEdit', false);
+        $sections = Section::orderBy('section_name')->get();
+
+        return view('report_fragile_item.create', compact('fragileItems', 'sections'))->with('isEdit', false);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'date' => 'required|date',
+            'manual_items.*.item_name' => 'nullable|string',
+            'manual_items.*.quantity' => 'nullable|integer',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
@@ -158,6 +165,25 @@ class ReportFragileItemController extends Controller
                 'time_start' => $data['time_start'] ?? '0',
                 'time_end' => $data['time_end'] ?? '0',
                 'notes' => $data['notes'] ?? '0',
+            ]);
+        }
+
+        foreach ($request->manual_items ?? [] as $manual) {
+            if (empty($manual['item_name'])) {
+                continue; // skip row kosong
+            }
+
+            DetailFragileItemManual::create([
+                'uuid' => Str::uuid(),
+                'report_fragile_item_uuid' => $report->uuid,
+                'section_uuid' => $manual['section_uuid'] ?? null,
+                'sub_area' => $manual['sub_area'] ?? null,
+                'item_name' => $manual['item_name'],
+                'quantity' => $manual['quantity'] ?? 0,
+                'condition' => $manual['condition'] ?? null,
+                'employee_name' => $manual['employee_name'] ?? null,
+                'issue_notes' => $manual['issue_notes'] ?? null,
+                'corrective_action' => $manual['corrective_action'] ?? null,
             ]);
         }
 
@@ -235,7 +261,7 @@ class ReportFragileItemController extends Controller
 
     public function exportPdf($uuid)
     {
-        $report = ReportFragileItem::with(['details.item'])->where('uuid', $uuid)->firstOrFail();
+        $report = ReportFragileItem::with(['details.item', 'detailManuals.section'])->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
         $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
@@ -268,16 +294,17 @@ class ReportFragileItemController extends Controller
 
     public function editNext($uuid)
     {
-        $report = ReportFragileItem::with('details')->where('uuid', $uuid)->firstOrFail();
+        $report = ReportFragileItem::with(['details', 'detailManuals.section'])->where('uuid', $uuid)->firstOrFail();
         $fragileItems = FragileItem::all();
+        $sections = Section::orderBy('section_name')->get();
 
         // isEdit = false agar form aktif untuk waktu akhir (time_end)
-        return view('report_fragile_item.editnext', compact('report', 'fragileItems'))->with('isEdit', true);
+        return view('report_fragile_item.editnext', compact('report', 'fragileItems', 'sections'))->with('isEdit', true);
     }
 
     public function updateNext(Request $request, $uuid)
     {
-        $report = ReportFragileItem::where('uuid', $uuid)->firstOrFail();
+        $report = ReportFragileItem::with('detailManuals')->where('uuid', $uuid)->firstOrFail();
 
         foreach ($request->items as $uuidItem => $data) {
             $detail = $report->details->where('fragile_item_uuid', $uuidItem)->first();
@@ -288,6 +315,45 @@ class ReportFragileItemController extends Controller
                     'time_end' => $data['time_end'] ?? 0,
                     'notes' => $data['notes'] ?? 0,
                 ]);
+            }
+        }
+
+        // Hapus manual item yang di-remove dari form
+        $deletedUuids = $request->deleted_manual_uuids ?? [];
+        if (!empty($deletedUuids)) {
+            DetailFragileItemManual::whereIn('uuid', $deletedUuids)
+                ->where('report_fragile_item_uuid', $report->uuid)
+                ->delete();
+        }
+
+        // Update existing / tambah manual item baru
+        foreach ($request->manual_items ?? [] as $manual) {
+            if (empty($manual['item_name'])) {
+                continue; // skip row kosong
+            }
+
+            $payload = [
+                'section_uuid' => $manual['section_uuid'] ?? null,
+                'sub_area' => $manual['sub_area'] ?? null,
+                'item_name' => $manual['item_name'],
+                'quantity' => $manual['quantity'] ?? 0,
+                'condition' => $manual['condition'] ?? null,
+                'employee_name' => $manual['employee_name'] ?? null,
+                'issue_notes' => $manual['issue_notes'] ?? null,
+                'corrective_action' => $manual['corrective_action'] ?? null,
+            ];
+
+            if (!empty($manual['uuid'])) {
+                // update existing
+                DetailFragileItemManual::where('uuid', $manual['uuid'])
+                    ->where('report_fragile_item_uuid', $report->uuid)
+                    ->update($payload);
+            } else {
+                // tambah baru
+                DetailFragileItemManual::create(array_merge($payload, [
+                    'uuid' => Str::uuid(),
+                    'report_fragile_item_uuid' => $report->uuid,
+                ]));
             }
         }
 
@@ -313,7 +379,7 @@ class ReportFragileItemController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportFragileItem::with(['details.item'])
+        $reports = ReportFragileItem::with(['details.item', 'detailManuals.section'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

@@ -214,7 +214,7 @@
                         </tr>
                         {{-- Detail Collapse --}}
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
                                         <thead class="text-center align-middle">

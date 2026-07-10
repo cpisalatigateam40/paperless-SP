@@ -57,4 +57,9 @@ class DetailMtClean extends Model
             'uuid'
         );
     }
+
+    public function photos()
+    {
+        return $this->hasMany(DetailMtCleanPhoto::class, 'detail_uuid', 'uuid');
+    }
 }

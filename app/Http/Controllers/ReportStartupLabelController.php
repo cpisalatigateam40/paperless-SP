@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\DetailStartupLabel;
 use App\Models\Product;
 use App\Models\ReportStartupLabel;
+use App\Models\DetailStartupLabelPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StartupLabelExport;
 use App\Traits\HasBulkPdfExport;
+use Illuminate\Support\Facades\Storage;
 
 class ReportStartupLabelController extends Controller
 {
@@ -70,7 +72,8 @@ class ReportStartupLabelController extends Controller
     {
         $query = ReportStartupLabel::with([
             'area',
-            'details.product'
+            'details.product',
+            'details.photos',
         ])->latest('date');
 
         // 🔍 SEARCH HEADER + DETAIL
@@ -145,14 +148,14 @@ class ReportStartupLabelController extends Controller
             'details.*.best_before'        => 'nullable|date',
             'details.*.result'             => 'nullable|string|max:255',
             'details.*.corrective_action'  => 'nullable|string',
-            'details.*.packaging'  => 'nullable|string',
+            'details.*.packaging'          => 'nullable|string',
+            'details.*.photos.*'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
             ? session('shift_number') . '-' . session('shift_group')
             : ($request->shift ?? 'NON-SHIFT');
 
-        // Simpan header laporan
         $report = ReportStartupLabel::create([
             'uuid'        => Str::uuid(),
             'area_uuid'   => Auth::user()->area_uuid,
@@ -163,11 +166,11 @@ class ReportStartupLabelController extends Controller
             'approved_by' => $request->approved_by,
         ]);
 
-        // dd($request->details);
+        $detailsInput = $request->input('details', []);
+        $detailsFiles = $request->file('details', []);
 
-        // Simpan setiap baris detail produk
-        foreach ($request->details as $detail) {
-            DetailStartupLabel::create([
+        foreach ($detailsInput as $i => $detail) {
+            $detailRecord = DetailStartupLabel::create([
                 'uuid'               => Str::uuid(),
                 'report_uuid'        => $report->uuid,
                 'product_uuid'       => $detail['product_uuid'],
@@ -176,8 +179,23 @@ class ReportStartupLabelController extends Controller
                 'best_before'        => $detail['best_before'] ?? null,
                 'result'             => $detail['result'] ?? null,
                 'corrective_action'  => $detail['corrective_action'] ?? null,
-                'packaging'  => $detail['packaging'] ?? null,
+                'packaging'          => $detail['packaging'] ?? null,
             ]);
+
+            // Simpan foto (jika ada)
+            if (!empty($detailsFiles[$i]['photos'])) {
+                foreach ($detailsFiles[$i]['photos'] as $photo) {
+                    if ($photo && $photo->isValid()) {
+                        $path = $photo->store('startup_label_photos', 'public');
+
+                        DetailStartupLabelPhoto::create([
+                            'uuid'        => Str::uuid(),
+                            'detail_uuid' => $detailRecord->uuid,
+                            'file_path'   => $path,
+                        ]);
+                    }
+                }
+            }
         }
 
         return redirect()
@@ -202,7 +220,7 @@ class ReportStartupLabelController extends Controller
      */
     public function edit(string $uuid)
     {
-        $report = ReportStartupLabel::with('details')
+        $report = ReportStartupLabel::with('details.photos')
             ->where('uuid', $uuid)
             ->firstOrFail();
 
@@ -214,45 +232,104 @@ class ReportStartupLabelController extends Controller
         return view('report_startup_labels.form', compact('report', 'areas', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $uuid)
     {
         $report = ReportStartupLabel::where('uuid', $uuid)->firstOrFail();
- 
+
         $validated = $request->validate([
-            'date'                         => 'required|date',
-            'shift'                        => 'nullable|string|max:255',
- 
-            'details'                      => 'required|array|min:1',
-            'details.*.product_uuid'       => 'required|exists:products,uuid',
-            'details.*.time'               => 'nullable',
-            'details.*.production_code'    => 'nullable|string|max:255',
-            'details.*.best_before'        => 'nullable|date',
-            'details.*.result'             => 'nullable|string|max:255',
-            'details.*.corrective_action'  => 'nullable|string',
-            'details.*.packaging'  => 'nullable|string',
+            'date'                          => 'required|date',
+            'shift'                         => 'nullable|string|max:255',
+
+            'details'                       => 'required|array|min:1',
+            'details.*.uuid'                => 'nullable|string',
+            'details.*.product_uuid'        => 'required|exists:products,uuid',
+            'details.*.time'                => 'nullable',
+            'details.*.production_code'     => 'nullable|string|max:255',
+            'details.*.best_before'         => 'nullable|date',
+            'details.*.result'              => 'nullable|string|max:255',
+            'details.*.corrective_action'   => 'nullable|string',
+            'details.*.packaging'           => 'nullable|string',
+            'details.*.photos.*'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'details.*.deleted_photos'      => 'nullable|array',
+            'details.*.deleted_photos.*'    => 'nullable|string',
         ]);
- 
-        DB::transaction(function () use ($validated, $report) {
-            // Hanya update tanggal & shift. area_uuid, created_by, known_by,
-            // approved_by, approved_at TIDAK disentuh karena form ini tidak
-            // mengirim input untuk field-field tersebut — kalau ikut di-update
-            // dengan null, nilainya akan hilang.
+
+        $detailsFiles = $request->file('details', []);
+
+        DB::transaction(function () use ($validated, $report, $detailsFiles) {
+
             $report->update([
                 'date'  => $validated['date'],
                 'shift' => $validated['shift'] ?? $report->shift,
             ]);
- 
-            // Cara simpel: hapus semua detail lama, lalu simpan ulang sesuai input
-            $report->details()->delete();
- 
-            foreach ($validated['details'] as $detail) {
-                $report->details()->create($detail);
+
+            $submittedUuids = [];
+
+            foreach ($validated['details'] as $i => $detail) {
+
+                $fields = [
+                    'product_uuid'       => $detail['product_uuid'],
+                    'time'               => $detail['time'] ?? null,
+                    'production_code'    => $detail['production_code'] ?? null,
+                    'best_before'        => $detail['best_before'] ?? null,
+                    'result'             => $detail['result'] ?? null,
+                    'corrective_action'  => $detail['corrective_action'] ?? null,
+                    'packaging'          => $detail['packaging'] ?? null,
+                ];
+
+                $detailUuid = $detail['uuid'] ?? null;
+                $detailRecord = $detailUuid
+                    ? $report->details()->where('uuid', $detailUuid)->first()
+                    : null;
+
+                if ($detailRecord) {
+                    // Row lama -> update, foto lama tetap aman
+                    $detailRecord->update($fields);
+                } else {
+                    // Row baru ditambahkan di form edit -> create
+                    $detailRecord = $report->details()->create($fields);
+                }
+
+                $submittedUuids[] = $detailRecord->uuid;
+
+                // Hapus foto lama yang ditandai user untuk dihapus
+                if (!empty($detail['deleted_photos'])) {
+                    $photosToDelete = DetailStartupLabelPhoto::where('detail_uuid', $detailRecord->uuid)
+                        ->whereIn('uuid', $detail['deleted_photos'])
+                        ->get();
+
+                    foreach ($photosToDelete as $photo) {
+                        Storage::disk('public')->delete($photo->file_path);
+                        $photo->delete();
+                    }
+                }
+
+                // Simpan foto baru yang diupload
+                if (!empty($detailsFiles[$i]['photos'])) {
+                    foreach ($detailsFiles[$i]['photos'] as $photo) {
+                        if ($photo && $photo->isValid()) {
+                            $path = $photo->store('startup_label_photos', 'public');
+
+                            DetailStartupLabelPhoto::create([
+                                'uuid'        => Str::uuid(),
+                                'detail_uuid' => $detailRecord->uuid,
+                                'file_path'   => $path,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Row yang dihapus user di form (tidak ada di submittedUuids) -> hapus beneran
+            $oldDetails = $report->details()->whereNotIn('uuid', $submittedUuids)->get();
+            foreach ($oldDetails as $old) {
+                foreach ($old->photos as $photo) {
+                    Storage::disk('public')->delete($photo->file_path);
+                }
+                $old->delete(); // foto ikut kehapus via FK cascade
             }
         });
- 
+
         return redirect()
             ->route('report_startup_labels.index')
             ->with('success', 'Laporan berhasil diperbarui.');
@@ -263,8 +340,18 @@ class ReportStartupLabelController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $report = ReportStartupLabel::where('uuid', $uuid)->firstOrFail();
-        $report->delete(); // detail ikut terhapus karena FK cascade
+        $report = ReportStartupLabel::with('details.photos')
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        // Hapus semua file foto fisik sebelum record-nya kehapus
+        foreach ($report->details as $detail) {
+            foreach ($detail->photos as $photo) {
+                Storage::disk('public')->delete($photo->file_path);
+            }
+        }
+
+        $report->delete(); // detail & photo record ikut terhapus karena FK cascade
 
         return redirect()
             ->route('report_startup_labels.index')
@@ -276,7 +363,7 @@ class ReportStartupLabelController extends Controller
      */
     public function exportPdf($uuid)
     {
-        $report = ReportStartupLabel::with(['area', 'details.product'])
+        $report = ReportStartupLabel::with(['area', 'details.product', 'details.photos'])
             ->where('uuid', $uuid)
             ->firstOrFail();
  
