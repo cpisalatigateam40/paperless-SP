@@ -21,7 +21,7 @@ class SauceExport implements WithEvents, WithTitle
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastCol = 'W';
+                $lastCol = 'X';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'LAPORAN PEMASAKAN PRODUK DI STEAM KETTLE (SAUCE)');
@@ -48,15 +48,16 @@ class SauceExport implements WithEvents, WithTitle
                     'L' => 'Berat',
                     'M' => 'Sensori RM',
                     'N' => 'Lama Proses',
-                    'O' => 'Mixing Paddle',
-                    'P' => 'Pressure',
-                    'Q' => 'Target Temp. (°C)',
-                    'R' => 'Aktual Temp. (°C)',
-                    'S' => 'Sensori Warna',
-                    'T' => 'Sensori Aroma',
-                    'U' => 'Sensori Rasa',
-                    'V' => 'Sensori Tekstur',
-                    'W' => 'Catatan',
+                    'O' => 'Nomor Mesin',
+                    'P' => 'Mixing Paddle',
+                    'Q' => 'Pressure',
+                    'R' => 'Target Temp. (°C)',
+                    'S' => 'Aktual Temp. (°C)',
+                    'T' => 'Sensori Warna',
+                    'U' => 'Sensori Aroma',
+                    'V' => 'Sensori Rasa',
+                    'W' => 'Sensori Tekstur',
+                    'X' => 'Catatan',
                 ];
 
                 foreach ($headers as $col => $label) {
@@ -114,15 +115,16 @@ class SauceExport implements WithEvents, WithTitle
                         $sheet->setCellValue("L{$row}", $beratList ?: '-');
                         $sheet->setCellValue("M{$row}", $sensoriRmList ?: '-');
                         $sheet->setCellValue("N{$row}", $detail->duration ?? '-');
-                        $sheet->setCellValue("O{$row}", $mixingPaddle);
-                        $sheet->setCellValue("P{$row}", $detail->pressure ?? '-');
-                        $sheet->setCellValue("Q{$row}", $detail->target_temperature ?? '-');
-                        $sheet->setCellValue("R{$row}", $detail->actual_temperature ?? '-');
-                        $sheet->setCellValue("S{$row}", $detail->color ?? '-');
-                        $sheet->setCellValue("T{$row}", $detail->aroma ?? '-');
-                        $sheet->setCellValue("U{$row}", $detail->taste ?? '-');
-                        $sheet->setCellValue("V{$row}", $detail->texture ?? '-');
-                        $sheet->setCellValue("W{$row}", $detail->notes ?? '-');
+                        $sheet->setCellValue("O{$row}", $detail->no_mesin ?? '-');
+                        $sheet->setCellValue("P{$row}", $mixingPaddle);
+                        $sheet->setCellValue("Q{$row}", $detail->pressure ?? '-');
+                        $sheet->setCellValue("R{$row}", $detail->target_temperature ?? '-');
+                        $sheet->setCellValue("S{$row}", $detail->actual_temperature ?? '-');
+                        $sheet->setCellValue("T{$row}", $detail->color ?? '-');
+                        $sheet->setCellValue("U{$row}", $detail->aroma ?? '-');
+                        $sheet->setCellValue("V{$row}", $detail->taste ?? '-');
+                        $sheet->setCellValue("W{$row}", $detail->texture ?? '-');
+                        $sheet->setCellValue("X{$row}", $detail->notes ?? '-');
 
                         $sheet->getStyle("A{$row}:{$lastCol}{$row}")
                             ->getAlignment()->setHorizontal('center');

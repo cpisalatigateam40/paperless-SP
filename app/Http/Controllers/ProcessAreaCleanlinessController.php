@@ -360,9 +360,9 @@ class ProcessAreaCleanlinessController extends Controller
             $report->update([
                 'shift' => $request->shift,
                 'section_name' => $request->section_name,
-                'known_by' => $request->known_by,
-                'approved_by' => $request->approved_by,
-                'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                // 'known_by' => $request->known_by,
+                // 'approved_by' => $request->approved_by,
+                // 'updated_at' => now()->setTimezone('Asia/Jakarta'),
             ]);
 
             // Hapus data lama dan simpan ulang (opsi paling aman untuk struktur nested)

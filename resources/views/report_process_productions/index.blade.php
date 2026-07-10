@@ -250,7 +250,7 @@
                             <td colspan="100%">
                                 <div class="mt-3">
                                     @foreach ($report->detail as $detail)
-                                    <table class="table table-bordered table-sm mb-5">
+                                    <table class="table table-bordered table-sm mb-2">
                                         {{-- HEADER PRODUK --}}
                                         <tr>
                                             <th colspan="2">NAMA PRODUK</th>
@@ -270,7 +270,12 @@
                                             <td colspan="4">{{ $detail->formula->formula_name ?? '-' }}</td>
                                         </tr>
                                         <tr>
-                                            <th colspan="6">WAKTU MIXING: {{ $detail->mixing_time ?? '-' }}</th>
+                                            <th colspan="2">WAKTU MIXING</th>
+                                            <td colspan="4">{{ $detail->mixing_time ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">NAMA MESIN MIXER/CHOPPER</th>
+                                            <td colspan="4">{{ $detail->machine_name ?? '-' }}</td>
                                         </tr>
 
                                         {{-- A. BAHAN BAKU --}}
@@ -352,6 +357,10 @@
                                             <th colspan="2">Sensori Aroma</th>
                                             <td colspan="4">{{ $detail->sensory_aroma ?? '-' }}</td>
                                         </tr>
+                                        <tr>
+                                            <th colspan="2">Catatan After Rework</th>
+                                            <td colspan="4">{{ $detail->notes ?? '-' }}</td>
+                                        </tr>
 
                                         {{-- EMULSIFYING --}}
                                         <tr class="table-secondary fw-bold">
@@ -405,6 +414,14 @@
                                             <th colspan="2">Proses Tumbling</th>
                                             <td colspan="4">{{ $detail->tumbling->tumbling_process ?? '-' }}</td>
                                         </tr>
+                                        <tr>
+                                            <th colspan="2">Lama Proses (Menit)</th>
+                                            <td colspan="4">{{ $detail->tumbling->process_duration ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">Suhu Akhir Tumbling (°C)</th>
+                                            <td colspan="4">{{ $detail->tumbling->final_temperature ?? '-' }}</td>
+                                        </tr>
 
                                         {{-- AGING --}}
                                         <tr class="table-secondary fw-bold">
@@ -419,6 +436,8 @@
                                             <td colspan="4">{{ $detail->aging->stuffing_result ?? '-' }}</td>
                                         </tr>
                                     </table>
+
+                                    <p>Catatan: {{ $report->notes ?? '-' }}</p>
                                     <hr> <br><br>
                                     @endforeach
 

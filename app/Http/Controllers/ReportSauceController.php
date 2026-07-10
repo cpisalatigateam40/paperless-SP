@@ -220,6 +220,7 @@ class ReportSauceController extends Controller
                         'notes' => $detail['notes'] ?? null,
                         'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
                         'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
+                        'no_mesin' => $detail['no_mesin'] ?? null,
                     ]);
 
                     // simpan raw materials untuk detail ini
@@ -356,6 +357,7 @@ class ReportSauceController extends Controller
         $detail->pressure = $detailData['pressure'] ?? null;
         $detail->target_temperature = $detailData['target_temperature'] ?? null;
         $detail->actual_temperature = $detailData['actual_temperature'] ?? null;
+        $detail->no_mesin = $detailData['no_mesin'] ?? null;
 
         // Mixing paddle (radio on/off)
         if (isset($detailData['mixing_paddle'])) {
@@ -451,6 +453,7 @@ class ReportSauceController extends Controller
                         'notes' => $detail['notes'] ?? null,
                         'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
                         'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
+                        'no_mesin' => $detail['no_mesin'] ?? null,
                     ]);
 
                     if (isset($detail['raw_materials'])) {

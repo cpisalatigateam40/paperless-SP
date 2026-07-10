@@ -245,7 +245,7 @@
                         </tr>
 
                         <tr id="detail-{{ $report->id }}" class="d-none">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="table-responsive">
                                     <table class="table table-bordered small">
 

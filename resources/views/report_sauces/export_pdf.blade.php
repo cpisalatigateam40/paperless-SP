@@ -162,6 +162,15 @@
                 {{ $report->end_time }}</td>
         </tr>
 
+        <tr>
+            <th class="text-center">Nomor Mesin</th>
+            <td colspan="15" class="text-left">
+                @foreach($report->details as $detail)
+                    {{ $detail->no_mesin }}@if(!$loop->last), @endif
+                @endforeach
+            </td>
+        </tr>
+
         {{-- Header Kolom Utama --}}
         <tr>
             <th rowspan="2">Pukul</th>

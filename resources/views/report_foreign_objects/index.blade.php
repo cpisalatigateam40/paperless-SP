@@ -236,7 +236,7 @@
                         </tr>
 
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered mb-0">
                                         <thead>
@@ -250,9 +250,9 @@
                                                 <th class="align-middle">Tahapan Analisis</th>
                                                 <th class="align-middle">Asal Kontaminan</th>
                                                 <th class="align-middle">Keterangan</th>
-                                                <th class="align-middle">Paraf QC</th>
+                                                <!-- <th class="align-middle">Paraf QC</th>
                                                 <th class="align-middle">Paraf Produksi</th>
-                                                <th class="align-middle">Paraf Engineering</th>
+                                                <th class="align-middle">Paraf Engineering</th> -->
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -279,7 +279,7 @@
                                                 <td>{{ $detail->notes }}</td>
 
                                                 {{-- Tambahan kolom paraf --}}
-                                                <td>
+                                                <!-- <td>
                                                     @if($detail->qc_paraf)
                                                     <img src="{{ asset('storage/' . $detail->qc_paraf) }}" alt="QC"
                                                         width="60">
@@ -296,7 +296,7 @@
                                                     <img src="{{ asset('storage/' . $detail->engineering_paraf) }}"
                                                         alt="Engineering" width="60">
                                                     @endif
-                                                </td>
+                                                </td> -->
                                             </tr>
                                             @empty
                                             <tr>

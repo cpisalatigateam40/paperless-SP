@@ -263,6 +263,7 @@ class ReportProcessProdController extends Controller
             'date' => $request->date,
             'shift' => $shift,
             'created_by' => Auth::user()->name,
+            'notes' => $request->report_notes,
         ]);
 
         // Simpan Detail Process
@@ -281,6 +282,8 @@ class ReportProcessProdController extends Controller
             'sensory_stiffness' => $request->sensory_stiffness,
             'sensory_aroma' => $request->sensory_aroma,
             'gramase' => $request->gramase,
+            'notes' => $request->detail_notes,
+            'machine_name' => $request->machine_name,
         ]);
 
         // Simpan Item Formulasi
@@ -322,6 +325,8 @@ class ReportProcessProdController extends Controller
             'uuid' => Str::uuid(),
             'detail_uuid' => $detail->uuid,
             'tumbling_process' => $request->tumbling_process,
+            'process_duration' => $request->process_duration,
+            'final_temperature' => $request->final_temperature,
         ]);
 
         // Simpan Aging
@@ -432,6 +437,8 @@ class ReportProcessProdController extends Controller
             'uuid' => Str::uuid(),
             'detail_uuid' => $detail->uuid,
             'tumbling_process' => $request->tumbling_process,
+            'process_duration' => $request->process_duration,
+            'final_temperature' => $request->final_temperature,
         ]);
 
         ProcessAging::create([
@@ -553,6 +560,7 @@ class ReportProcessProdController extends Controller
             'section_uuid' => $request->section_uuid,
             'date' => $request->date,
             'shift' => $request->shift,
+            'notes' => $request->report_notes,
         ]);
 
         $detail = $report->detail->first();
@@ -568,6 +576,8 @@ class ReportProcessProdController extends Controller
                 'sensory_homogenity' => $request->sensory_homogenity,
                 'sensory_stiffness' => $request->sensory_stiffness,
                 'sensory_aroma' => $request->sensory_aroma,
+                'notes' => $request->detail_notes,
+                'machine_name' => $request->machine_name,
             ]);
 
             // Update Item Formulasi
@@ -617,6 +627,8 @@ class ReportProcessProdController extends Controller
             if ($detail->tumbling) {
                 $detail->tumbling->update([
                     'tumbling_process' => $request->tumbling_process,
+                    'process_duration' => $request->process_duration,
+                    'final_temperature' => $request->final_temperature,
                 ]);
             }
 
@@ -684,6 +696,21 @@ class ReportProcessProdController extends Controller
             . $dateTo->format('Ymd') . '.xlsx';
     
         return Excel::download(new ProcessProdExport($reports, $periodLabel), $filename);
+    }
+
+    public function getProdCodeSuggestions()
+    {
+        $codes = \App\Models\ItemDetailProd::whereNotNull('prod_code')
+            ->where('prod_code', '!=', '')
+            ->whereHas('detail.report', function ($q) {
+                $q->where('area_uuid', auth()->user()->area_uuid);
+            })
+            ->distinct()
+            ->orderBy('prod_code')
+            ->limit(200)
+            ->pluck('prod_code');
+
+        return response()->json($codes);
     }
 
 

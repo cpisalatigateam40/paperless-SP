@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Models\Product;
 use App\Traits\HasBulkPdfExport;
+use Illuminate\Support\Facades\Storage;
 
 class ReportPackagingVerifController extends Controller
 {
@@ -257,7 +258,6 @@ class ReportPackagingVerifController extends Controller
             $checklistData = [
                 'uuid' => Str::uuid(),
                 'detail_uuid' => $detailModel->uuid,
-                'standard_weight' => $detail['checklist']['standard_weight'],
                 'standard_long_pcs' => $detail['checklist']['standard_long_pcs'],
                 'actual_long_pcs_1' => $detail['checklist']['actual_long_pcs_1'],
                 'actual_long_pcs_2' => $detail['checklist']['actual_long_pcs_2'],
@@ -273,7 +273,19 @@ class ReportPackagingVerifController extends Controller
                 'actual_weight_pcs_4' => $detail['checklist']['actual_weight_pcs_4'],
                 'actual_weight_pcs_5' => $detail['checklist']['actual_weight_pcs_5'],
                 'avg_weight_pcs' => $detail['checklist']['avg_weight_pcs'],
+
+
+
+                'standard_weight' => $detail['checklist']['standard_weight'],
+                'actual_weight_1' => $detail['checklist']['actual_weight_1'] ?? null,
+                'actual_weight_2' => $detail['checklist']['actual_weight_2'] ?? null,
+                'actual_weight_3' => $detail['checklist']['actual_weight_3'] ?? null,
+                'actual_weight_4' => $detail['checklist']['actual_weight_4'] ?? null,
+                'actual_weight_5' => $detail['checklist']['actual_weight_5'] ?? null,
                 'avg_weight' => $detail['checklist']['avg_weight'],
+
+
+
                 'verif_md' => $detail['checklist']['verif_md'],
                 'notes' => $detail['checklist']['notes'],
                 'sampling_amount' => $detail['checklist']['sampling_amount'],
@@ -325,9 +337,49 @@ class ReportPackagingVerifController extends Controller
     }
 
 
+    // public function destroy($uuid)
+    // {
+    //     $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
+    //     $report->delete();
+
+    //     return redirect()->route('report_packaging_verifs.index')
+    //         ->with('success', 'Report berhasil dihapus.');
+    // }
     public function destroy($uuid)
     {
-        $report = ReportPackagingVerif::where('uuid', $uuid)->firstOrFail();
+        $report = ReportPackagingVerif::with('details')->where('uuid', $uuid)->firstOrFail();
+
+        foreach ($report->details as $detail) {
+
+            // Hapus upload MD
+            if ($detail->upload_md && Storage::disk('public')->exists($detail->upload_md)) {
+                Storage::disk('public')->delete($detail->upload_md);
+            }
+
+            // Hapus upload QR
+            if ($detail->upload_qr && Storage::disk('public')->exists($detail->upload_qr)) {
+                Storage::disk('public')->delete($detail->upload_qr);
+            }
+
+            // Hapus upload ED
+            if ($detail->upload_ed && Storage::disk('public')->exists($detail->upload_ed)) {
+                Storage::disk('public')->delete($detail->upload_ed);
+            }
+
+            // Hapus upload MD Multi
+            if ($detail->upload_md_multi) {
+                $files = json_decode($detail->upload_md_multi, true);
+
+                if (is_array($files)) {
+                    foreach ($files as $file) {
+                        if ($file && Storage::disk('public')->exists($file)) {
+                            Storage::disk('public')->delete($file);
+                        }
+                    }
+                }
+            }
+        }
+
         $report->delete();
 
         return redirect()->route('report_packaging_verifs.index')
@@ -405,7 +457,6 @@ class ReportPackagingVerifController extends Controller
             $checklistData = [
                 'uuid' => Str::uuid(),
                 'detail_uuid' => $detailModel->uuid,
-                'standard_weight' => $detail['checklist']['standard_weight'],
                 'standard_long_pcs' => $detail['checklist']['standard_long_pcs'],
                 'actual_long_pcs_1' => $detail['checklist']['actual_long_pcs_1'],
                 'actual_long_pcs_2' => $detail['checklist']['actual_long_pcs_2'],
@@ -421,6 +472,13 @@ class ReportPackagingVerifController extends Controller
                 'actual_weight_pcs_4' => $detail['checklist']['actual_weight_pcs_4'],
                 'actual_weight_pcs_5' => $detail['checklist']['actual_weight_pcs_5'],
                 'avg_weight_pcs' => $detail['checklist']['avg_weight_pcs'],
+
+                'standard_weight' => $detail['checklist']['standard_weight'],
+                'actual_weight_1' => $detail['checklist']['actual_weight_1'] ?? null,
+                'actual_weight_2' => $detail['checklist']['actual_weight_2'] ?? null,
+                'actual_weight_3' => $detail['checklist']['actual_weight_3'] ?? null,
+                'actual_weight_4' => $detail['checklist']['actual_weight_4'] ?? null,
+                'actual_weight_5' => $detail['checklist']['actual_weight_5'] ?? null,
                 'avg_weight' => $detail['checklist']['avg_weight'],
                 'verif_md' => $detail['checklist']['verif_md'],
                 'notes' => $detail['checklist']['notes'],

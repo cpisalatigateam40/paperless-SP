@@ -239,7 +239,7 @@
                             </td>
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="12">
+                            <td colspan="13">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm text-center align-middle">
                                         <thead class="table-secondary">
@@ -255,7 +255,7 @@
 
                                                 <th colspan="5" rowspan="2">Uji Sensori</th>
                                                 <th rowspan="2">Berat Akhir (gr)</th>
-                                                <th colspan="2" rowspan="2">Paraf</th>
+                                                <!-- <th colspan="2" rowspan="2">Paraf</th> -->
                                             </tr>
                                             <tr>
                                                 {{-- Suhu Baso --}}
@@ -301,7 +301,7 @@
 
                                                 {{-- Berat akhir & paraf --}}
                                                 <td rowspan="2">{{ $detail->final_weight }}</td>
-                                                <td rowspan="2">
+                                                <!-- <td rowspan="2">
                                                     @if ($detail->qc_paraf)
                                                     <img src="{{ asset('storage/'.$detail->qc_paraf) }}" width="60">
                                                     @endif
@@ -310,7 +310,7 @@
                                                     @if ($detail->prod_paraf)
                                                     <img src="{{ asset('storage/'.$detail->prod_paraf) }}" width="60">
                                                     @endif
-                                                </td>
+                                                </td> -->
                                             </tr>
 
                                             {{-- Baris 2 (akhir) --}}

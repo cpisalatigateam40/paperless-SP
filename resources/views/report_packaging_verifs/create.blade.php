@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const MAX_SIZE_MB = 2;
     const MAX_FILES = 10;
     const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-    const COMPRESS_QUALITY = 0.7; // 70% kualitas JPEG
+    const COMPRESS_QUALITY = 0.5; // 45% kualitas JPEG
 
     // Fungsi compress 1 file gambar
     function compressImage(file, quality) {
@@ -407,10 +407,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
 
-                    // Resize jika dimensi > 1920px
+                    // Resize jika dimensi > 1280px
                     let width = img.width;
                     let height = img.height;
-                    const MAX_DIMENSION = 1920;
+                    const MAX_DIMENSION = 1024;
                     if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
                         if (width > height) {
                             height = Math.round((height * MAX_DIMENSION) / width);

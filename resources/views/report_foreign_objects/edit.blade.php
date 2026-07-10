@@ -89,7 +89,7 @@
                             </div>
 
                             {{-- Tanda tangan --}}
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <label class="form-label">Paraf QC</label>
                                 <canvas id="qc-canvas-{{ $i }}" class="border" width="300" height="150" data-input="qc_paraf_input_{{ $i }}"></canvas>
                                 <input type="hidden" name="details[{{ $i }}][qc_paraf]" id="qc_paraf_input_{{ $i }}" value="{{ $detail->qc_paraf }}">
@@ -117,7 +117,7 @@
                                     <small><a href="{{ asset('storage/'.$detail->engineering_paraf) }}" target="_blank">Lihat</a></small>
                                 @endif
                                 <button type="button" class="btn btn-sm btn-secondary mt-1 clear-signature">Hapus</button>
-                            </div>
+                            </div> -->
 
                         </div>
                     @endforeach

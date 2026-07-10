@@ -248,7 +248,7 @@
 
                         {{-- Baris detail (ruangan & equipment) --}}
                         <tr id="detail-{{ $report->uuid }}" style="display: none;">
-                            <td colspan="6">
+                            <td colspan="7">
                                 {{-- Detail Ruangan --}}
                                 <h6 style="font-weight: bold;">Pemeriksaan Ruangan</h6>
                                 <table class="table table-bordered table-sm mb-4 align-middle">

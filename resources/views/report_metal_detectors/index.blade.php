@@ -261,7 +261,7 @@
                         </tr>
 
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered mb-0">
                                         <thead>

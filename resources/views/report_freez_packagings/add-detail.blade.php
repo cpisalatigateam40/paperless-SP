@@ -145,7 +145,7 @@ function addDetailRow() {
         </div>
 
         <div class="col-md-12 mb-3">
-            <label>Dokumentasi Pembekuan</label>
+            <label>Dokumentasi Kemasan Primer</label>
 
             <input
                 type="file"

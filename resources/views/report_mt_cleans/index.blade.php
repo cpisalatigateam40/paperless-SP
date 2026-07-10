@@ -304,7 +304,21 @@
 
                                             <td>{{ $detail->mt_2 ?? '-' }}</td>
 
-                                            <td>{{ $detail->finding_type ?? '-' }}</td>
+                                            <td class="align-middle text-center">
+                                                @if ($detail->photos->isNotEmpty())
+                                                    @foreach ($detail->photos as $photo)
+                                                        <a href="{{ Storage::url($photo->file_path) }}" target="_blank" class="d-inline-block me-1 mb-1">
+                                                            <img src="{{ Storage::url($photo->file_path) }}"
+                                                                class="img-thumbnail"
+                                                                style="width:50px;height:50px;object-fit:cover;"
+                                                                alt="Foto"
+                                                                loading="lazy">
+                                                        </a>
+                                                    @endforeach
+                                                @else
+                                                    {{ $detail->finding_type ?? '-' }}
+                                                @endif
+                                            </td>
 
                                             <td>{{ $detail->condition ?? '-' }}</td>
 

@@ -183,6 +183,11 @@
         <td>:</td>
         <td>{{ $detail->cases->first()?->actual_case_2 ?? '-' }} mm</td>
     </tr>
+    <tr>
+        <td>Stuffer Speed</td>
+        <td>:</td>
+        <td>{{ $stuffer?->stuffer_speed ?? '-' }}</td>
+    </tr>
 </table>
 
 <table class="data">

@@ -18,9 +18,13 @@
                         <input type="time" name="details[0][time]" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Tahapan Proses</label>
                         <input type="text" name="details[0][process_step]" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Nomor Mesin</label>
+                        <input type="text" name="details[0][no_mesin]" class="form-control">
                     </div>
                 </div>
 

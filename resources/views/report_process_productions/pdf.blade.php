@@ -163,7 +163,12 @@
             <td colspan="4">{{ $detail->formula->formula_name ?? '-' }}</td>
         </tr>
         <tr>
-            <th colspan="6">WAKTU MIXING: {{ $detail->mixing_time ?? '-' }}</th>
+            <th colspan="2">WAKTU MIXING</th>
+            <td colspan="4">{{ $detail->mixing_time ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th colspan="2">NAMA MESIN MIXER/CHOPPER</th>
+            <td colspan="4">{{ $detail->machine_name ?? '-' }}</td>
         </tr>
 
         {{-- A. BAHAN BAKU --}}
@@ -239,6 +244,10 @@
             <th colspan="2">Sensori Aroma</th>
             <td colspan="4">{{ $detail->sensory_aroma ?? '-' }}</td>
         </tr>
+        <tr>
+            <th colspan="2">Catatan After Rework</th>
+            <td colspan="4">{{ $detail->notes ?? '-' }}</td>
+        </tr>
 
         {{-- EMULSIFYING --}}
         <tr class="table-secondary">
@@ -290,6 +299,14 @@
             <th colspan="2">Proses Tumbling</th>
             <td colspan="4">{{ $detail->tumbling->tumbling_process ?? '-' }}</td>
         </tr>
+        <tr>
+            <th colspan="2">Lama Proses (Menit)</th>
+            <td colspan="4">{{ $detail->tumbling->process_duration ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th colspan="2">Suhu Akhir Tumbling (°C)</th>
+            <td colspan="4">{{ $detail->tumbling->final_temperature ?? '-' }}</td>
+        </tr>
 
         {{-- AGING --}}
         <tr class="table-secondary">
@@ -309,6 +326,7 @@
     </table>
     @endforeach
 
+    <p>Catatan: {{ $report->notes ?? '-' }}</p>
     <p>Keterangan: &#10003; = OK, &#10007; = Tidak OK</p>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">

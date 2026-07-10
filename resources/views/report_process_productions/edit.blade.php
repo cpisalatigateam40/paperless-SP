@@ -78,10 +78,16 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <label>Waktu Mixing</label>
                         <input type="text" name="mixing_time" class="form-control"
                             value="{{ old('mixing_time', $detail->mixing_time) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Nama Mesin Mixer/Chopper</label>
+                        <input type="text" name="machine_name" class="form-control" placeholder="Nama Mesin Mixer/Chopper"
+                            value="{{ old('machine_name', $detail->machine_name) }}">
                     </div>
                 </div>
 
@@ -99,7 +105,7 @@
                     <input type="hidden" name="formulation_uuids[]" value="{{ $item->formulation_uuid }}">
                     <div class="row">
                         <div class="col-md-3">
-                            <input type="number" step="0.01" name="actual_weight[{{ $item->formulation_uuid }}]"
+                            <input type="number" step="0.001" name="actual_weight[{{ $item->formulation_uuid }}]"
                                 class="form-control"
                                 value="{{ old('actual_weight.'.$item->formulation_uuid, $item->actual_weight) }}"
                                 placeholder="Berat Aktual (gr)">
@@ -134,7 +140,7 @@
                 <div class="row mt-4">
                     <div class="mb-3 col-md-3">
                         <label>Rework (kg)</label>
-                        <input type="number" step="0.01" name="rework_kg" class="form-control"
+                        <input type="number" step="0.001" name="rework_kg" class="form-control"
                             value="{{ old('rework_kg', $detail->rework_kg) }}">
                     </div>
                     <div class="col-md-3 mb-3">
@@ -200,36 +206,43 @@
                     </div>
                 </div>
 
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label>Catatan After Rework</label>
+                        <textarea name="detail_notes" class="form-control" rows="2">{{ old('detail_notes', $detail->notes) }}</textarea>
+                    </div>
+                </div>
+
                 <hr>
 
                 {{-- EMULSIFYING --}}
                 <h5 class="mt-4 font-weight-bold">Emulsifying</h5>
                 <div class="row mb-3">
                     <div class="col">
-                        <label>Suhu Standar Campuran</label>
+                        <label>Suhu Standar Campuran (°C)</label>
                         <input type="text" name="standard_mixture_temp" class="form-control"
                             value="{{ old('standard_mixture_temp', $detail->emulsifying->standard_mixture_temp) }}">
                     </div>
                     <div class="col">
-                        <label>Suhu Aktual 1</label>
+                        <label>Suhu Aktual 1 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_1" id="actual_mixture_temp_1"
                             class="form-control"
                             value="{{ old('actual_mixture_temp_1', $detail->emulsifying->actual_mixture_temp_1) }}">
                     </div>
                     <div class="col">
-                        <label>Suhu Aktual 2</label>
+                        <label>Suhu Aktual 2 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_2" id="actual_mixture_temp_2"
                             class="form-control"
                             value="{{ old('actual_mixture_temp_2', $detail->emulsifying->actual_mixture_temp_2) }}">
                     </div>
                     <div class="col">
-                        <label>Suhu Aktual 3</label>
+                        <label>Suhu Aktual 3 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_3" id="actual_mixture_temp_3"
                             class="form-control"
                             value="{{ old('actual_mixture_temp_3', $detail->emulsifying->actual_mixture_temp_3) }}">
                     </div>
                     <div class="col">
-                        <label>Rata-rata Suhu</label>
+                        <label>Rata-rata Suhu (°C)</label>
                         <input type="text" name="average_mixture_temp" id="average_mixture_temp" class="form-control"
                             value="{{ old('average_mixture_temp', $detail->emulsifying->average_mixture_temp) }}"
                             readonly>
@@ -289,11 +302,24 @@
 
                 {{-- TUMBLING --}}
                 <h5 class="mt-4 font-weight-bold">Tumbling</h5>
-                <div class="mb-3">
-                    <label>Proses Tumbling</label>
-                    <input type="text" name="tumbling_process" class="form-control"
-                        value="{{ old('tumbling_process', $detail->tumbling->tumbling_process) }}">
+                <div class="row">
+                    <div class="mb-3 col-md-4">
+                        <label>Proses Tumbling</label>
+                        <input type="text" name="tumbling_process" class="form-control"
+                            value="{{ old('tumbling_process', $detail->tumbling->tumbling_process) }}">
+                    </div>
+                     <div class="mb-3 col-md-4">
+                        <label>Lama Proses (Menit)</label>
+                        <input type="number" step="1" name="process_duration" class="form-control" placeholder="mis: 3"
+                            value="{{ old('process_duration', $detail->tumbling->process_duration) }}">
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>Suhu Akhir Tumbling (°C)</label>
+                        <input type="number" step="0.1" name="final_temperature" class="form-control" placeholder="mis: 12.5"
+                            value="{{ old('final_temperature', $detail->tumbling->final_temperature) }}">
+                    </div>
                 </div>
+                
 
                 {{-- AGING --}}
                 <h5 class="mt-4 font-weight-bold">Aging</h5>
@@ -308,6 +334,12 @@
                         <input type="text" name="stuffing_result" class="form-control"
                             value="{{ old('stuffing_result', $detail->aging->stuffing_result) }}">
                     </div>
+                </div>
+
+                <h5 class="mt-4 font-weight-bold">Catatan</h5>
+                <div class="mb-3">
+                    <label>Catatan Umum</label>
+                    <textarea name="report_notes" class="form-control" rows="3">{{ old('report_notes', $report->notes) }}</textarea>
                 </div>
 
                 <button type="submit" class="btn btn-success mt-3">Update Laporan</button>

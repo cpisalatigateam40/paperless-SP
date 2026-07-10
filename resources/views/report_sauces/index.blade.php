@@ -251,6 +251,14 @@
                                                 {{ $r->start_time }} -
                                                 {{ $r->end_time }}</td>
                                         </tr>
+                                        <tr>
+                                            <th class="text-center">Nomor Mesin</th>
+                                            <td colspan="16" class="text-left">
+                                                @foreach($r->details as $detail)
+                                                    {{ $detail->no_mesin }}@if(!$loop->last), @endif
+                                                @endforeach
+                                            </td>
+                                        </tr>
 
                                         {{-- Header Kolom Utama --}}
                                         <tr>

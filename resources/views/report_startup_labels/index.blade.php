@@ -223,6 +223,7 @@
                                             <th class="align-middle">Packaging (MC/PL)</th>
                                             <th class="align-middle">Waktu</th>
                                             <th class="align-middle">Kode Produksi</th>
+                                            <th class="align-middle">Foto</th>
                                             <th class="align-middle">Best Before</th>
                                             <th class="align-middle">Hasil</th>
                                             <th class="align-middle">Tindakan Koreksi</th>
@@ -237,6 +238,19 @@
                                                 {{ $detail->time ? \Illuminate\Support\Str::substr($detail->time, 0, 5) : '-' }}
                                             </td>
                                             <td class="align-middle">{{ $detail->production_code ?? '-' }}</td>
+                                            <td class="align-middle text-center">
+                                                @forelse ($detail->photos as $photo)
+                                                    <a href="{{ Storage::url($photo->file_path) }}" target="_blank" class="d-inline-block me-1 mb-1">
+                                                        <img src="{{ Storage::url($photo->file_path) }}"
+                                                            class="img-thumbnail"
+                                                            style="width:50px;height:50px;object-fit:cover;"
+                                                            alt="Foto"
+                                                            loading="lazy">
+                                                    </a>
+                                                @empty
+                                                    -
+                                                @endforelse
+                                            </td>
                                             <td class="align-middle">
                                                 {{ $detail->best_before ? $detail->best_before->format('d-m-Y') : '-' }}
                                             </td>
