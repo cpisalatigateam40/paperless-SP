@@ -258,4 +258,22 @@ class Area extends Model
     {
         return $this->hasMany(ReportThawing::class, 'area_uuid', 'uuid');
     }
+
+    public function smokeHouseReports()
+    {
+        return $this->hasMany(
+            ReportSmokeHouse::class,
+            'area_uuid',
+            'uuid'
+        );
+    }
+
+    public function smokeHouseMasters()
+    {
+        return $this->hasMany(
+            MasterSmokeHouse::class,
+            'area_uuid',
+            'uuid'
+        );
+    }
 }

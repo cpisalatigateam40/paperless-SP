@@ -95,7 +95,6 @@
                             <div style="font-size:9px; font-weight:bold; line-height:1.2;">
                                 PT. CHAROEN POKPHAND INDONESIA<br>
                                 FOOD DIVISION<br>
-                                SALATIGA - INDONESIA
                             </div>
                         </td>
                     </tr>

@@ -73,6 +73,8 @@ use App\Http\Controllers\ReportStartupLabelController;
 use App\Http\Controllers\ReportMtCleanController;
 use App\Http\Controllers\MasterChecklistItemController;
 use App\Http\Controllers\ReportChangeoverCleaningController;
+use App\Http\Controllers\MasterSmokeHouseController;
+use App\Http\Controllers\ReportSmokeHouseController;
 
 
 Route::get('/', function () {
@@ -190,6 +192,21 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
+        });
+
+    Route::prefix('master-smoke-houses')
+        ->name('master-smoke-houses.')
+        ->controller(MasterSmokeHouseController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit', 'edit')->name('edit');
+            Route::put('/{uuid}', 'update')->name('update');
+            Route::delete('/{uuid}', 'destroy')->name('destroy');
+
+            // untuk ajax tambah detail berdasarkan produk jika nanti diperlukan
+            Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
         });
 
     // STORAGE RM ROUTES
@@ -952,6 +969,33 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::get('/{uuid}/export', 'exportPdf')->name('export');
         });
+
+    Route::prefix('report-smoke-houses')
+    ->name('report-smoke-houses.')
+    ->controller(ReportSmokeHouseController::class)
+    ->group(function () {
+
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::post('/{id}/known', 'known')->name('known');
+        Route::post('/export', 'exportExcel')->name('export');
+
+        Route::get('/master/machines/{product_uuid}', 'getMachines')->name('machines');
+        Route::get('/master/{master_uuid}/steps', 'getMasterSteps')->name('master-steps');
+        Route::get('/master/{master_uuid}/step/{process_name}', 'getMasterStep')->name('master-step');
+    });
+    Route::post('report-smoke-houses/bulk-known', [ReportSmokeHouseController::class, 'bulkKnown'])->name('report-smoke-houses.bulk-known');
+    Route::post('report-smoke-houses/bulk-approve', [ReportSmokeHouseController::class, 'bulkApprove'])->name('report-smoke-houses.bulk-approve');
+    Route::get('report-smoke-houses/bulk-known-count', [ReportSmokeHouseController::class, 'bulkKnownCount'])->name('report-smoke-houses.bulk-known-count');
+    Route::get('report-smoke-houses/bulk-approve-count', [ReportSmokeHouseController::class, 'bulkApproveCount'])->name('report-smoke-houses.bulk-approve-count');
+    Route::get('report-smoke-houses/export-pdf-bulk', [ReportSmokeHouseController::class, 'exportPdfBulk'])
+        ->name('report-smoke-houses.export-pdf-bulk');
 
     Route::prefix('report-retain-samples')
         ->name('report_retain_samples.')

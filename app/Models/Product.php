@@ -156,6 +156,24 @@ class Product extends Model
         return $this->hasMany(ReportRtgSteamer::class, 'product_uuid', 'uuid');
     }
 
+    public function smokeHouseMasters()
+    {
+        return $this->hasMany(
+            MasterSmokeHouse::class,
+            'product_uuid',
+            'uuid'
+        );
+    }
+
+    public function smokeHouseDetails()
+    {
+        return $this->hasMany(
+            DetailSmokeHouse::class,
+            'product_uuid',
+            'uuid'
+        );
+    }
+
 
 
 

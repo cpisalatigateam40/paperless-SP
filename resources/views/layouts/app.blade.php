@@ -68,7 +68,8 @@
 
     #content-wrapper {
         width: 100%;
-        min-width: 0; /* penting agar tidak overflow di mobile */
+        min-width: 0;
+        /* penting agar tidak overflow di mobile */
     }
 
 
@@ -173,7 +174,9 @@
             width: 100%;
         }
 
-        .form-select, .form-control, .select2-selection {
+        .form-select,
+        .form-control,
+        .select2-selection {
             margin-bottom: .5rem;
         }
 
@@ -212,7 +215,7 @@
         }
 
         /* tombol download melebar */
-        .d-flex.align-items-center.flex-wrap > a.btn {
+        .d-flex.align-items-center.flex-wrap>a.btn {
             width: 100%;
         }
 
@@ -221,10 +224,9 @@
             width: 100%;
         }
     }
-
     </style>
 
-    
+
 
     @yield('style')
 </head>
@@ -292,43 +294,46 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    
+    document.addEventListener('DOMContentLoaded', function() {
+
         // ── Toggle range / month untuk setiap modal export ───────────────────────
-        document.querySelectorAll('.export-filter-type').forEach(function (radio) {
-            radio.addEventListener('change', function () {
+        document.querySelectorAll('.export-filter-type').forEach(function(radio) {
+            radio.addEventListener('change', function() {
                 // Ambil modalId dari nama class section yang ada di modal yang sama
-                const form    = this.closest('form')
+                const form = this.closest('form')
                 const modalId = form.dataset.modalId
                 const isRange = this.value === 'range'
-    
+
                 form.querySelector('.export-section-range_' + modalId)
                     .classList.toggle('d-none', !isRange)
                 form.querySelector('.export-section-month_' + modalId)
                     .classList.toggle('d-none', isRange)
             })
         })
-    
+
         // ── Loading state saat submit ─────────────────────────────────────────────
-        document.querySelectorAll('[id^="formExport_"]').forEach(function (form) {
-            form.addEventListener('submit', function () {
+        document.querySelectorAll('[id^="formExport_"]').forEach(function(form) {
+            form.addEventListener('submit', function() {
                 const modalId = form.dataset.modalId
-                const btn     = document.getElementById('btnExport_' + modalId)
-    
-                btn.disabled  = true
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...'
-    
-                setTimeout(function () {
-                    btn.disabled  = false
-                    btn.innerHTML = '<i class="fas fa-file-excel me-1"></i> Download Excel'
+                const btn = document.getElementById('btnExport_' + modalId)
+
+                btn.disabled = true
+                btn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...'
+
+                setTimeout(function() {
+                    btn.disabled = false
+                    btn.innerHTML =
+                        '<i class="fas fa-file-excel me-1"></i> Download Excel'
                 }, 5000)
             })
         })
-    
+
     })
     </script>
 
     @yield('script')
+    @stack('scripts')
 </body>
 
 </html>
