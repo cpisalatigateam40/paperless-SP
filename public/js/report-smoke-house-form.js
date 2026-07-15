@@ -4,6 +4,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const routeMachines = $container.data('route-machines'); // .../__PRODUCT__
     const routeSteps = $container.data('route-steps');       // .../__MASTER__
 
+    // ============ HELPER: format min-max jadi range, atau angka tunggal kalau salah satu kosong ============
+    function formatRange(min, max) {
+        const hasMin = min !== null && min !== undefined && min !== '';
+        const hasMax = max !== null && max !== undefined && max !== '';
+
+        if (hasMin && hasMax) return `${min}-${max}`;
+        if (hasMin) return `${min}`;
+        if (hasMax) return `${max}`;
+        return '';
+    }
+
     // ============ INIT existing blocks (edit mode) ============
     $container.find('.detail-item').each(function () {
         bindDetailEvents($(this));
@@ -50,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             $machine.prop('disabled', true).html('<option value="">Memuat...</option>');
             $stepBody.html('<tr><td colspan="10" class="text-center text-muted">Pilih product & machine</td></tr>');
-            $showeringBody.html('<tr><td colspan="8" class="text-center text-muted">Pilih product & machine</td></tr>');
+            $showeringBody.html('<tr><td colspan="9" class="text-center text-muted">Pilih product & machine</td></tr>');
             $masterUuidInput.val('');
 
             if (!productUuid) {
@@ -78,19 +89,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!masterUuid) {
                 $stepBody.html('<tr><td colspan="10" class="text-center text-muted">Machine tidak terhubung ke master</td></tr>');
-                $showeringBody.html('<tr><td colspan="8" class="text-center text-muted">Machine tidak terhubung ke master</td></tr>');
+                $showeringBody.html('<tr><td colspan="9" class="text-center text-muted">Machine tidak terhubung ke master</td></tr>');
                 return;
             }
 
             $stepBody.html('<tr><td colspan="10" class="text-center text-muted">Memuat parameter...</td></tr>');
-            $showeringBody.html('<tr><td colspan="8" class="text-center text-muted">Memuat parameter...</td></tr>');
+            $showeringBody.html('<tr><td colspan="9" class="text-center text-muted">Memuat parameter...</td></tr>');
 
             $.get(routeSteps.replace('__MASTER__', masterUuid), function (steps) {
                 $detail.data('master-steps', steps); // cache untuk rework
                 renderSteps($stepBody, $showeringBody, detailIndex, steps, SHOWERING_PROCESS);
             }).fail(function () {
                 $stepBody.html('<tr><td colspan="10" class="text-center text-danger">Gagal memuat parameter master</td></tr>');
-                $showeringBody.html('<tr><td colspan="8" class="text-center text-danger">Gagal memuat parameter master</td></tr>');
+                $showeringBody.html('<tr><td colspan="9" class="text-center text-danger">Gagal memuat parameter master</td></tr>');
             });
         });
 
@@ -124,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderSteps($tbody, $showeringTbody, detailIndex, steps, showeringProcess) {
         if (!steps.length) {
             $tbody.html('<tr><td colspan="10" class="text-center text-muted">Master belum punya step</td></tr>');
-            $showeringTbody.html('<tr><td colspan="8" class="text-center text-muted">Master belum punya step</td></tr>');
+            $showeringTbody.html('<tr><td colspan="9" class="text-center text-muted">Master belum punya step</td></tr>');
             return;
         }
 
@@ -132,9 +143,9 @@ document.addEventListener('DOMContentLoaded', function () {
         let showeringRows = '';
 
         steps.forEach(function (step, i) {
-            const settingTemp = (step.temperature_min || step.temperature_max)
-                ? `${step.temperature_min ?? ''}-${step.temperature_max ?? ''}`
-                : '';
+            const settingTemp = formatRange(step.temperature_min, step.temperature_max);
+            const settingTime = formatRange(step.time_minutes, step.time_minutes_max);
+            const settingCt = formatRange(step.core_temperature, step.core_temperature_max);
 
             const isShowering = step.process_name === showeringProcess;
 
@@ -148,11 +159,11 @@ document.addEventListener('DOMContentLoaded', function () {
             </td>
             <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_temp]" value="${settingTemp}"></td>
             <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_temp]" placeholder="Mis: 12.5"></td>
-            <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_time]" value="${step.time_minutes ?? ''}"></td>
+            <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_time]" value="${settingTime}"></td>
             <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_time]" placeholder="Mis: 10"></td>
             <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_rh]" value="${step.rh ?? ''}"></td>
             <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_rh]" placeholder="Mis: 60"></td>
-            <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_ct]" value="${step.core_temperature ?? ''}"></td>
+            <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_ct]" value="${settingCt}"></td>
             <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_ct]" placeholder="Mis: 75"></td>
         </tr>`;
             } else {
@@ -168,18 +179,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     </td>
                     <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_temp]" value="${settingTemp}"></td>
                     <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_temp]" placeholder="Mis: 12.5"></td>
-                    <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_time]" value="${step.time_minutes ?? ''}"></td>
+                    <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_time]" value="${settingTime}"></td>
                     <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_time]" placeholder="Mis: 10"></td>
                     <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_rh]" value="${step.rh ?? ''}"></td>
                     <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_rh]" placeholder="Mis: 60"></td>
-                    <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_ct]" value="${step.core_temperature ?? ''}"></td>
+                    <td><input class="form-control" readonly name="details[${detailIndex}][steps][${i}][setting_ct]" value="${settingCt}"></td>
                     <td><input class="form-control" name="details[${detailIndex}][steps][${i}][actual_ct]" placeholder="Mis: 75"></td>
                 </tr>`;
             }
         });
 
         $tbody.html(cookingRows || '<tr><td colspan="10" class="text-center text-muted">Tidak ada step cooking</td></tr>');
-        $showeringTbody.html(showeringRows || '<tr><td colspan="8" class="text-center text-muted">Tidak ada step showering</td></tr>');
+        $showeringTbody.html(showeringRows || '<tr><td colspan="9" class="text-center text-muted">Tidak ada step showering</td></tr>');
     }
 
     // ============ BIND REWORK EVENTS ============
@@ -214,13 +225,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const match = masterSteps.find(s => s.process_name === processName);
 
             if (match) {
-                const settingTemp = (match.temperature_min || match.temperature_max)
-                    ? `${match.temperature_min ?? ''}-${match.temperature_max ?? ''}`
-                    : '';
+                const settingTemp = formatRange(match.temperature_min, match.temperature_max);
+                const settingTime = formatRange(match.time_minutes, match.time_minutes_max);
+                const settingCt = formatRange(match.core_temperature, match.core_temperature_max);
+
                 $stepRow.find('.setting-temp').val(settingTemp);
-                $stepRow.find('.setting-time').val(match.time_minutes ?? '');
+                $stepRow.find('.setting-time').val(settingTime);
                 $stepRow.find('.setting-rh').val(match.rh ?? '');
-                $stepRow.find('.setting-ct').val(match.core_temperature ?? '');
+                $stepRow.find('.setting-ct').val(settingCt);
             } else {
                 $stepRow.find('.setting-temp, .setting-time, .setting-rh, .setting-ct').val('');
             }

@@ -20,8 +20,10 @@ class MasterSmokeHouseStep extends Model implements Auditable
         'temperature_min',
         'temperature_max',
         'time_minutes',
+        'time_minutes_max',
         'rh',
         'core_temperature',
+        'core_temperature_max',
     ];
 
     protected $auditEvents = [

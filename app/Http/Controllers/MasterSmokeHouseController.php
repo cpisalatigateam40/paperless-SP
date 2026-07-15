@@ -54,8 +54,10 @@ class MasterSmokeHouseController extends Controller
             'steps.*.temperature_min' => 'nullable|numeric',
             'steps.*.temperature_max' => 'nullable|numeric',
             'steps.*.time_minutes' => 'nullable|integer',
+            'steps.*.time_minutes_max' => 'nullable|integer',
             'steps.*.rh' => 'nullable|numeric',
             'steps.*.core_temperature' => 'nullable|numeric',
+            'steps.*.core_temperature_max' => 'nullable|numeric',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -76,8 +78,10 @@ class MasterSmokeHouseController extends Controller
                     'temperature_min' => $step['temperature_min'] ?: null,
                     'temperature_max' => $step['temperature_max'] ?: null,
                     'time_minutes' => $step['time_minutes'] ?: null,
+                    'time_minutes_max' => $step['time_minutes_max'] ?: null,
                     'rh' => $step['rh'] ?: null,
                     'core_temperature' => $step['core_temperature'] ?: null,
+                    'core_temperature_max' => $step['core_temperature_max'] ?: null,
                 ]);
             }
         });
@@ -122,8 +126,10 @@ class MasterSmokeHouseController extends Controller
             'steps.*.temperature_min' => 'nullable|numeric',
             'steps.*.temperature_max' => 'nullable|numeric',
             'steps.*.time_minutes' => 'nullable|integer',
+            'steps.*.time_minutes_max' => 'nullable|integer',
             'steps.*.rh' => 'nullable|numeric',
             'steps.*.core_temperature' => 'nullable|numeric',
+            'steps.*.core_temperature_max' => 'nullable|numeric',
         ]);
 
         DB::transaction(function () use ($request, $uuid) {
@@ -153,8 +159,10 @@ class MasterSmokeHouseController extends Controller
                     'temperature_min' => $step['temperature_min'] ?: null,
                     'temperature_max' => $step['temperature_max'] ?: null,
                     'time_minutes' => $step['time_minutes'] ?: null,
+                    'time_minutes_max' => $step['time_minutes_max'] ?: null,
                     'rh' => $step['rh'] ?: null,
                     'core_temperature' => $step['core_temperature'] ?: null,
+                    'core_temperature_max' => $step['core_temperature_max'] ?: null,
                 ]);
             }
         });
@@ -177,8 +185,4 @@ class MasterSmokeHouseController extends Controller
             ->with('success', 'Master Smoke House berhasil dihapus.');
     }
 
-    public function addDetail($product_uuid)
-    {
-
-    }
 }

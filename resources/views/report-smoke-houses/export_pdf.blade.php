@@ -133,6 +133,32 @@
     </div>
 
     @php
+    function isActualOutOfRange($setting, $actual)
+    {
+        if ($setting === null || trim($setting) === '' || $actual === null || trim((string) $actual) === '') {
+            return false;
+        }
+
+        if (strpos($setting, '-') === false) {
+            return false; // bukan range, skip highlight
+        }
+
+        [$min, $max] = array_pad(array_map('trim', explode('-', $setting, 2)), 2, null);
+
+        if (!is_numeric($min) || !is_numeric($max) || !is_numeric($actual)) {
+            return false;
+        }
+
+        return ((float) $actual < (float) $min) || ((float) $actual > (float) $max);
+    }
+
+    function actualStyle($setting, $actual)
+    {
+        return isActualOutOfRange($setting, $actual) ? 'color:#c00; font-weight:bold;' : '';
+    }
+    @endphp
+
+    @php
     $SHOWERING_PROCESS = 'Showering & Cooling Down';
     @endphp
 
@@ -226,13 +252,13 @@
             <tr>
                 <td>{{ $step->process_name }}</td>
                 <td>{{ $step->setting_temp }}</td>
-                <td>{{ $step->actual_temp }}</td>
+                <td style="{{ actualStyle($step->setting_temp, $step->actual_temp) }}">{{ $step->actual_temp }}</td>
                 <td>{{ $step->setting_time }}</td>
-                <td>{{ $step->actual_time }}</td>
+                <td style="{{ actualStyle($step->setting_time, $step->actual_time) }}">{{ $step->actual_time }}</td>
                 <td>{{ $step->setting_rh }}</td>
                 <td>{{ $step->actual_rh }}</td>
                 <td>{{ $step->setting_ct }}</td>
-                <td>{{ $step->actual_ct }}</td>
+                <td style="{{ actualStyle($step->setting_ct, $step->actual_ct) }}">{{ $step->actual_ct }}</td>
             </tr>
             @empty
             <tr>
@@ -286,13 +312,13 @@
             <tr>
                 <td>{{ $step->process_name }}</td>
                 <td>{{ $step->setting_temp }}</td>
-                <td>{{ $step->actual_temp }}</td>
+                <td style="{{ actualStyle($step->setting_temp, $step->actual_temp) }}">{{ $step->actual_temp }}</td>
                 <td>{{ $step->setting_time }}</td>
-                <td>{{ $step->actual_time }}</td>
+                <td style="{{ actualStyle($step->setting_time, $step->actual_time) }}">{{ $step->actual_time }}</td>
                 <td>{{ $step->setting_rh }}</td>
                 <td>{{ $step->actual_rh }}</td>
                 <td>{{ $step->setting_ct }}</td>
-                <td>{{ $step->actual_ct }}</td>
+                <td style="{{ actualStyle($step->setting_ct, $step->actual_ct) }}">{{ $step->actual_ct }}</td>
             </tr>
             @empty
             <tr>
@@ -358,13 +384,13 @@
             <tr>
                 <td>{{ $step->process_name }}</td>
                 <td>{{ $step->setting_temp }}</td>
-                <td>{{ $step->actual_temp }}</td>
+                <td style="{{ actualStyle($step->setting_temp, $step->actual_temp) }}">{{ $step->actual_temp }}</td>
                 <td>{{ $step->setting_time }}</td>
-                <td>{{ $step->actual_time }}</td>
+                <td style="{{ actualStyle($step->setting_time, $step->actual_time) }}">{{ $step->actual_time }}</td>
                 <td>{{ $step->setting_rh }}</td>
                 <td>{{ $step->actual_rh }}</td>
                 <td>{{ $step->setting_ct }}</td>
-                <td>{{ $step->actual_ct }}</td>
+                <td style="{{ actualStyle($step->setting_ct, $step->actual_ct) }}">{{ $step->actual_ct }}</td>
             </tr>
             @empty
             <tr>

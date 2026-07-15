@@ -96,13 +96,13 @@
 
                                             <th>Process</th>
 
-                                            <th>Temp</th>
+                                            <th>Temperature (°C)</th>
 
-                                            <th>Time</th>
+                                            <th>Time (menit)</th>
 
-                                            <th>RH</th>
+                                            <th>RH (%)</th>
 
-                                            <th>CT</th>
+                                            <th>CT (°C)</th>
 
                                         </tr>
 
@@ -140,7 +140,7 @@
 
                                             <td class="text-center">
 
-                                                {{ $step->time_minutes ?? '-' }}
+                                                {{ $step->time_minutes ?? '-' }} - {{ $step->time_minutes_max ?? '-' }}
 
                                             </td>
 
@@ -152,7 +152,7 @@
 
                                             <td class="text-center">
 
-                                                {{ $step->core_temperature ?? '-' }}
+                                                {{ $step->core_temperature ?? '-' }} - {{ $step->core_temperature_max ?? '-' }}
 
                                             </td>
 

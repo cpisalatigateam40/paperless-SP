@@ -55,6 +55,18 @@
 
         <hr>
 
+        <div class="alert alert-info d-flex align-items-start" role="alert">
+            <i class="bx bx-info-circle me-2 mt-1"></i>
+            <div>
+                <strong>Catatan pengisian parameter:</strong>
+                <ul class="mb-0 mt-1">
+                    <li>Kolom <strong>Min</strong> dan <strong>Max</strong> dipakai untuk parameter yang punya rentang nilai (misal suhu 55–60°C).</li>
+                    <li>Kalau nilainya <strong>tidak berupa range</strong> (cuma satu angka pasti), isi kolom <strong>Min</strong> saja dan biarkan <strong>Max</strong> kosong.</li>
+                    <li>Kolom yang dikosongi otomatis tidak ditampilkan sebagai range di form laporan.</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mb-3">
 
             <h5 class="mb-0">
@@ -111,11 +123,13 @@
 
                         <th>Temperature Max (°C)</th>
 
-                        <th>Time (Minute)</th>
+                        <th>Time Min (Minute)</th>
+                        <th>Time Max (Minute)</th>
 
                         <th>RH (%)</th>
 
-                        <th>CT (°C)</th>
+                        <th>CT Min (°C)</th>
+                        <th>CT Max (°C)</th>
 
                         <th width="70">Action</th>
 
@@ -200,6 +214,17 @@
 
                                 <input
                                     type="number"
+                                    class="form-control"
+                                    name="steps[{{ $i }}][time_minutes_max]"
+                                    value="{{ $step['time_minutes_max'] }}"
+                                    placeholder="mis: 15">
+
+                            </td>
+
+                            <td>
+
+                                <input
+                                    type="number"
                                     step="0.01"
                                     class="form-control"
                                     name="steps[{{ $i }}][rh]"
@@ -216,7 +241,19 @@
                                     class="form-control"
                                     name="steps[{{ $i }}][core_temperature]"
                                     value="{{ $step['core_temperature'] }}"
-                                    placeholder="mis: 12.5">
+                                    placeholder="mis: 12">
+
+                            </td>
+
+                            <td>
+
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    name="steps[{{ $i }}][core_temperature_max]"
+                                    value="{{ $step['core_temperature_max'] }}"
+                                    placeholder="mis: 15">
 
                             </td>
 
@@ -307,34 +344,47 @@ document.getElementById('btn-add').addEventListener('click', function(){
             <input type="number"
                 step="0.01"
                 class="form-control"
-                name="steps[${index}][temperature_min]">
+                name="steps[${index}][temperature_min]" placeholder="mis: 12">
         </td>
 
         <td>
             <input type="number"
                 step="0.01"
                 class="form-control"
-                name="steps[${index}][temperature_max]">
+                name="steps[${index}][temperature_max]" placeholder="mis: 15">
         </td>
 
         <td>
             <input type="number"
                 class="form-control"
-                name="steps[${index}][time_minutes]">
+                name="steps[${index}][time_minutes]" placeholder="mis: 6">
+        </td>
+
+        <td>
+            <input type="number"
+                class="form-control"
+                name="steps[${index}][time_minutes_max]" placeholder="mis: 12">
         </td>
 
         <td>
             <input type="number"
                 step="0.01"
                 class="form-control"
-                name="steps[${index}][rh]">
+                name="steps[${index}][rh]" placeholder="mis: 12">
         </td>
 
         <td>
             <input type="number"
                 step="0.01"
                 class="form-control"
-                name="steps[${index}][core_temperature]">
+                name="steps[${index}][core_temperature]" placeholder="mis: 12">
+        </td>
+
+        <td>
+            <input type="number"
+                step="0.01"
+                class="form-control"
+                name="steps[${index}][core_temperature_max]" placeholder="mis: 15">
         </td>
 
         <td class="text-center">
