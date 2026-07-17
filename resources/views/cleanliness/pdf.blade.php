@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Form PDF - Kebersihan Area Penyimpanan Bahan</title>
+    <title>Verifikasi Kondisi Ruang Penyimpanan Bahan</title>
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
@@ -14,11 +14,10 @@
     table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: 12px;
+        margin-bottom: 6px;
     }
 
-    th,
-    td {
+    th, td {
         border: 1px solid #000;
         padding: 2px 3px;
         text-align: left;
@@ -30,35 +29,27 @@
         font-weight: bold;
     }
 
-    .text-center {
-        text-align: center;
+    .text-center { text-align: center; }
+    .no-border { border: none !important; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
+    .fw-bold { font-weight: bold; }
+
+    .section-title {
+        font-weight: bold;
+        margin-bottom: 4px;
     }
 
-    .signature-box {
-        height: 40px;
-        border-bottom: 1px solid #000;
-        margin-top: 20px;
-        width: 60%;
+    .info-table td {
+        border: none;
+        padding: 1px 0;
     }
 
-    .no-border {
-        border: none !important;
-    }
-
-    .mb-2 {
-        margin-bottom: 1rem;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 2rem;
-    }
-
-    .underline {
-        text-decoration: underline;
+    .notes-text {
+        font-size: 9px;
+        font-style: italic;
+        margin-top: -2px;
+        margin-bottom: 10px;
     }
 
     .header {
@@ -79,24 +70,10 @@
         size: 210mm 330mm;
     }
 
-    ul {
-        margin: unset;
-        padding: .5rem;
-    }
-
-    li {
-        list-style-type: none;
-    }
-
-    tr,
-    td,
-    th {
-        page-break-inside: avoid;
-    }
-
-    thead {
-        display: table-header-group;
-    }
+    ul { margin: unset; padding: .5rem; }
+    li { list-style-type: none; }
+    tr, td, th { page-break-inside: avoid; }
+    thead { display: table-header-group; }
     </style>
 </head>
 
@@ -106,110 +83,145 @@
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 30%; vertical-align: middle;">
+                <td class="no-border" style="width: 60%; vertical-align: middle;">
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
                                 $path = public_path('storage/image/logo.png');
                                 if(file_exists($path)) {
-                                $type = pathinfo($path, PATHINFO_EXTENSION);
-                                $data = file_get_contents($path);
-                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    $type = pathinfo($path, PATHINFO_EXTENSION);
+                                    $data = file_get_contents($path);
+                                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
                                 }
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
                             <td class="no-border" style="vertical-align: middle; padding-left: 10px;">
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    CHAROEN<br>POKPHAND<br>INDONESIA PT.<br>Food Division
+                                    PT. CHAROEN POKPHAND INDONESIA<br>
+                                    FOOD DIVISION<br>
                                 </div>
                             </td>
                         </tr>
                     </table>
                 </td>
+                <td class="no-border" style="width: 40%; text-align: right; vertical-align: middle; font-size: 9px;">
+                    QM P.x / 0x
+                </td>
             </tr>
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">KONDISI RUANG PENYIMPANAN BAHAN BAKU DAN PENUNJANG</h3>
+    <h3 class="mb-2 text-center">VERIFIKASI KONDISI RUANG PENYIMPANAN BAHAN BAKU DAN BAHAN PENUNJANG</h3>
 
-    <table style="width: 100%; border: none;">
+    {{-- ===== A. INFORMASI PRODUK ===== --}}
+    <div class="section-title">A. Informasi Produk</div>
+    <table class="info-table mb-3" style="width: 60%;">
+        <tr>
+            <td width="120">Hari, Tanggal</td>
+            <td width="15">:</td>
+            <td>{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d F Y') }}</td>
+        </tr>
+        <tr>
+            <td>Shift</td>
+            <td>:</td>
+            <td>{{ $report->shift }}</td>
+        </tr>
+        <tr>
+            <td>Area</td>
+            <td>:</td>
+            <td>{{ $report->room_name }}</td>
+        </tr>
+    </table>
+
+    {{-- ===== B. HASIL VERIFIKASI ===== --}}
+    <div class="section-title">B. Hasil Verifikasi</div>
+
+    @php
+        $roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+        $isChillroom = strtolower($report->room_name) === 'chillroom';
+        $itemLabelMap = [
+            'Suhu ruang (℃) / RH (%)' => 'Suhu Ruang (°C)',
+        ];
+    @endphp
+
+    @foreach($report->details as $dIndex => $detail)
+
+    <table style="width: 100%; border: none; margin-bottom: 2px;">
         <tr style="border: none;">
-            <td style="text-align: left; border: none;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
+            <td class="no-border fw-bold" style="width: 30%;">
+                {{ $roman[$dIndex] ?? ($dIndex + 1) }}. Waktu Pemeriksaan
             </td>
-            <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->room_name }}</span>
-            </td>
+            <td class="no-border">: {{ $detail->inspection_hour }} WIB</td>
         </tr>
     </table>
 
     <table>
         <thead>
             <tr>
-                <th>Jam</th>
-                <th>No</th>
-                <th>Item</th>
-                <th>Kondisi</th>
-                <th>Keterangan</th>
-                <th>Tindakan Koreksi</th>
-                <th>Verifikasi Setelah Dilakukan Tindakan Koreksi</th>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Item</th>
+                <th rowspan="2">Kondisi</th>
+                <th rowspan="2">Catatan</th>
+                <th rowspan="2">Tindakan<br>Koreksi</th>
+                <th rowspan="2">Hasil<br>Verifikasi</th>
+                <th colspan="3">
+                    Koreksi Lanjutan
+                    <div style="font-size: 8px; font-weight: normal; font-style: italic;">
+                        (Jika hasil verifikasi sebelumnya tidak ok, maka akan muncul ini)
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>Catatan</th>
+                <th>Tindakan<br>Koreksi</th>
+                <th>Hasil<br>Verifika</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($report->details as $detail)
-                @foreach($detail->items as $i => $item)
-                    @php
-                        $isChillroom = strtolower($report->room_name) === 'chillroom';
-                        $isItem4 = $item->item === 'Suhu ruang (℃) / RH (%)';
-                    @endphp
+            @php $no = 1; @endphp
+            @foreach($detail->items as $item)
+                @php
+                    $notes = json_decode($item->notes, true);
+                    $notesText = is_array($notes) ? implode(', ', $notes) : ($item->notes ?? '-');
+                    $firstFollowup = $item->followups->first();
+                @endphp
+                <tr>
+                    <td class="text-center">{{ $no++ }}</td>
+                    <td>{{ $itemLabelMap[$item->item] ?? $item->item }}</td>
+                    <td class="text-center">{{ $item->condition }}</td>
+                    <td>{{ $notesText }}</td>
+                    <td>{{ $item->corrective_action ?? '-' }}</td>
+                    <td class="text-center">{{ $item->verification ? 'OK' : 'Tidak OK' }}</td>
+                    <td>{{ $firstFollowup->notes ?? '-' }}</td>
+                    <td>{{ $firstFollowup->corrective_action ?? '-' }}</td>
+                    <td class="text-center">
+                        {{ $firstFollowup ? ($firstFollowup->verification ? 'OK' : 'Tidak OK') : '-' }}
+                    </td>
+                </tr>
 
-                    @if(!($isChillroom && $isItem4))
-                    <tr>
-                        <td>{{ $detail->inspection_hour }}</td>
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $item->item }}</td>
-                        <td class="text-center">{{ $item->condition }}</td>
-                        <td>
-                            @php $notes = json_decode($item->notes, true); @endphp
-                            @if(is_array($notes))
-                                {{ implode(', ', $notes) }}
-                            @else
-                                {{ $item->notes ?? '-' }}
-                            @endif
-                        </td>
-                        <td>{{ $item->corrective_action ?? '-' }}</td>
-                        <td>
-                            <ul>
-                                <li><strong>Utama:</strong> {{ $item->verification ? 'OK' : 'Tidak OK' }}</li>
-                                @foreach($item->followups as $index => $followup)
-                                    <li><strong>Lanjutan #{{ $index+1 }}:</strong> {{ $followup->verification ? 'OK' : 'Tidak OK' }}</li>
-                                @endforeach
-                            </ul>
-                        </td>
-                    </tr>
-                    @endif
-
+                @foreach($item->followups->skip(1) as $fIndex => $followup)
+                <tr>
+                    <td class="text-center"></td>
+                    <td colspan="5" style="font-style: italic;">
+                        Lanjutan #{{ $fIndex + 2 }} untuk item "{{ $item->item }}"
+                    </td>
+                    <td>{{ $followup->notes ?? '-' }}</td>
+                    <td>{{ $followup->corrective_action ?? '-' }}</td>
+                    <td class="text-center">{{ $followup->verification ? 'OK' : 'Tidak OK' }}</td>
+                </tr>
                 @endforeach
             @endforeach
-            <tr>
-                <td colspan="7" class="no-border" style="text-align: right;">QM 12 / 01</td>
-            </tr>
         </tbody>
-
-
     </table>
 
-    <br><br>
+    @endforeach
 
-    <table style="width: 100%; border: none; margin-top: 4rem;">
+    <br>
+
+    {{-- ===== TANDA TANGAN ===== --}}
+    <table style="width: 100%; border: none; margin-top: 2rem;">
         <tr style="border: none;">
             <td style="text-align: center; border: none; width: 33%;">
                 Diperiksa oleh:<br><br>

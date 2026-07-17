@@ -184,10 +184,10 @@
             <th>Suhu (℃)</th>
         </tr>
         @php $i = 1; @endphp
-        @foreach ($detail->items->filter(fn($item) => $item->formulation?->raw_material_uuid) as $item)
+        @foreach ($detail->items->where('material_type', 'raw_material') as $item)
         <tr>
             <td>{{ $i++ }}</td>
-            <td>{{ $item->formulation->rawMaterial->material_name ?? '-' }}</td>
+            <td>{{ $item->material_name ?? '-' }}</td>
             <td>{{ $item->actual_weight }}</td>
             <td>{{ $item->sensory }}</td>
             <td>{{ $item->prod_code }}</td>
@@ -208,10 +208,10 @@
             <th>Suhu (℃)</th>
         </tr>
         @php $j = 1; @endphp
-        @foreach ($detail->items->filter(fn($item) => $item->formulation?->premix_uuid) as $item)
+        @foreach ($detail->items->where('material_type', 'premix') as $item)
         <tr>
             <td>{{ $j++ }}</td>
-            <td>{{ $item->formulation->premix->name ?? '-' }}</td>
+            <td>{{ $item->material_name ?? '-' }}</td>
             <td>{{ $item->actual_weight }}</td>
             <td>{{ $item->sensory }}</td>
             <td>{{ $item->prod_code }}</td>

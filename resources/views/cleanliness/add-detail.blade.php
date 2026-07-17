@@ -39,7 +39,7 @@
                                     <td>
                                         <input type="hidden" name="details[__index__][items][{{ $i }}][item]"
                                             value="{{ $i == 0 ? 'Kondisi dan penempatan barang' : ($i == 1 ? 'Pelabelan' : ($i == 2 ? 'Kebersihan Ruangan' : 'Suhu ruang (℃) / RH (%)')) }}">
-                                        {{ $i == 0 ? 'Kondisi dan penempatan barang' : ($i == 1 ? 'Pelabelan' : ($i == 2 ? 'Kebersihan Ruangan' : 'Suhu ruang (℃) / RH (%)')) }}
+                                        {{ $i == 0 ? 'Kondisi dan penempatan barang' : ($i == 1 ? 'Pelabelan' : ($i == 2 ? 'Kebersihan Ruangan' : 'Suhu ruang (℃)')) }}
                                     </td>
                                     <td>
                                         @if ($i == 3)
@@ -47,9 +47,7 @@
                                             <input type="number" step="0.1"
                                                 name="details[__index__][items][3][temperature]" placeholder="℃"
                                                 class="form-control">
-                                            <input type="number" step="0.1"
-                                                name="details[__index__][items][3][humidity]" placeholder="RH%"
-                                                class="form-control">
+                                            
                                         </div>
                                         @else
                                         <select name="details[__index__][items][{{ $i }}][condition]"

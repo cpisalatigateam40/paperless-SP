@@ -154,6 +154,12 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $itemLabelMap = [
+                                    'Suhu ruang (℃) / RH (%)' => 'Suhu Ruang (°C)',
+                                ];
+                            @endphp
+
                             @foreach($detail->items as $i => $item)
 
                             {{-- Hide Item Index 3 (Item 4) ketika Chillroom --}}
@@ -163,7 +169,7 @@
 
                             <tr>
                                 <td class="align-middle">{{ $i + 1 }}</td>
-                                <td class="align-middle">{{ $item->item }}</td>
+                                <td class="align-middle">{{ $itemLabelMap[$item->item] ?? $item->item }}</td>
                                 <td class="align-middle">{{ $item->condition }}</td>
                                 <td class="align-middle">
                                     @php

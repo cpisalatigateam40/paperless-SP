@@ -74,7 +74,7 @@ class ReportStartupLabelController extends Controller
             'area',
             'details.product',
             'details.photos',
-        ])->latest('date');
+        ])->latest();
 
         // 🔍 SEARCH HEADER + DETAIL
         if ($request->filled('search')) {

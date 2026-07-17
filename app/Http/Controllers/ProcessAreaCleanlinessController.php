@@ -164,7 +164,7 @@ class ProcessAreaCleanlinessController extends Controller
             $report = ReportProcessAreaCleanliness::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
-                'date' => now()->toDateString(),
+                'date' => $request->date,
                 'shift' => $shift,
                 'section_name' => $request->section_name,
                 'created_by' => Auth::user()->name,
@@ -311,33 +311,29 @@ class ProcessAreaCleanlinessController extends Controller
 
     public function exportPdf($uuid)
     {
-        $report = ReportProcessAreaCleanliness::with('area', 'details.items.followups')->where('uuid', $uuid)->firstOrFail();
+        $report = ReportProcessAreaCleanliness::with('area', 'details.items.followups')
+            ->where('uuid', $uuid)
+            ->firstOrFail();
 
-        // Generate QR untuk created_by
-        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
-        $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
-        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+        $createdInfo = "Diperiksa oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQrBase64 = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($createdInfo));
 
-        // Generate QR untuk approved_by
         $approvedInfo = $report->approved_by
-            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . optional($report->approved_at)->format('Y-m-d H:i')
             : "Belum disetujui";
-        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
-        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($approvedInfo));
 
-        // Generate QR untuk known_by
         $knownInfo = $report->known_by
             ? "Diketahui oleh: {$report->known_by}"
-            : "Belum disetujui";
-        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
-        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+            : "Belum diketahui";
+        $knownQrBase64 = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($knownInfo));
 
         $pdf = Pdf::loadView('cleanliness_PA.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
-        ]);
+        ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');
     }
@@ -360,6 +356,7 @@ class ProcessAreaCleanlinessController extends Controller
             $report->update([
                 'shift' => $request->shift,
                 'section_name' => $request->section_name,
+                'date' => $request->date,
                 // 'known_by' => $request->known_by,
                 // 'approved_by' => $request->approved_by,
                 // 'updated_at' => now()->setTimezone('Asia/Jakarta'),

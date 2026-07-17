@@ -75,6 +75,8 @@ use App\Http\Controllers\MasterChecklistItemController;
 use App\Http\Controllers\ReportChangeoverCleaningController;
 use App\Http\Controllers\MasterSmokeHouseController;
 use App\Http\Controllers\ReportSmokeHouseController;
+use App\Http\Controllers\SteamerStandardController;
+use App\Http\Controllers\ReportSteamerCookingController;
 
 
 Route::get('/', function () {
@@ -122,6 +124,10 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
         });
+
+    Route::resource('steamer-standards', SteamerStandardController::class)
+        ->parameters(['steamer-standards' => 'steamer_standard:uuid'])
+        ->except(['show']);
 
     // ROLE ROUTES
     Route::prefix('roles')
@@ -504,6 +510,32 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
             Route::post('/{id}/known', 'known')->name('known');
         });
+
+    Route::post('report_steamer_cookings/bulk-known', [ReportSteamerCookingController::class, 'bulkKnown'])->name('report_steamer_cookings.bulk-known');
+    Route::post('report_steamer_cookings/bulk-approve', [ReportSteamerCookingController::class, 'bulkApprove'])->name('report_steamer_cookings.bulk-approve');
+    Route::get('report_steamer_cookings/bulk-known-count', [ReportSteamerCookingController::class, 'bulkKnownCount'])->name('report_steamer_cookings.bulk-known-count');
+    Route::get('report_steamer_cookings/bulk-approve-count', [ReportSteamerCookingController::class, 'bulkApproveCount'])->name('report_steamer_cookings.bulk-approve-count');
+    Route::get('report_steamer_cookings/export-pdf-bulk', [ReportSteamerCookingController::class, 'exportPdfBulk'])
+    ->name('report_steamer_cookings.export-pdf-bulk');
+
+    Route::resource('report_steamer_cookings', ReportSteamerCookingController::class)
+        ->parameters(['report_steamer_cookings' => 'report_steamer_cooking:uuid'])
+        ->except(['show']);
+
+    // AJAX ambil standar steamer berdasarkan produk yang dipilih
+    Route::get('/report-steamer-cookings/standard/{product_uuid}', [ReportSteamerCookingController::class, 'getStandard'])
+        ->name('report_steamer_cookings.standard');
+    Route::get('report_steamer_cookings/{uuid}/export-pdf', [ReportSteamerCookingController::class, 'exportPdf'])
+    ->name('report_steamer_cookings.export_pdf');
+
+    Route::post('report_steamer_cookings/{uuid}/known', [ReportSteamerCookingController::class, 'known'])
+    ->name('report_steamer_cookings.known');
+    Route::post('report_steamer_cookings/{uuid}/approve', [ReportSteamerCookingController::class, 'approve'])
+    ->name('report_steamer_cookings.approve');
+    Route::post('report_steamer_cookings/export/excel', [ReportSteamerCookingController::class, 'exportExcel'])
+    ->name('report_steamer_cookings.export_excel');
+
+    
 
     // REPORT SOLVENT
     Route::prefix('report-solvents')

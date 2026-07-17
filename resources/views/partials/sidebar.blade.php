@@ -1,7 +1,8 @@
 @php
 $isMasterData =
 Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
-'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*');
+'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*',
+'steamer-standards*');
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -19,7 +20,8 @@ Request::is('report-maurer-cookings*') ||
 Request::is('report-fessman-cookings*') ||
 Request::is('report-baso-cookings*') ||
 Request::is('report-rtg-steamers*') ||
-Request::is('report-sauces*');
+Request::is('report-sauces*') ||
+Request::is('report_steamer_cookings*');
 $isPacking =
 Request::is('report-lab-samples*') ||
 Request::is('report-md-products*') ||
@@ -134,6 +136,8 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('master_checklist_items.index') }}">Item Pergantian Produk</a>
                 <a class="collapse-item {{ Request::is('master-smoke-houses*') ? 'active' : '' }}"
                     href="{{ route('master-smoke-houses.index') }}">Master Cooking Smoke Houses</a>
+                <a class="collapse-item {{ Request::is('steamer-standards*') ? 'active' : '' }}"
+                    href="{{ route('steamer-standards.index') }}">Master Steamer</a>
             </div>
         </div>
     </li>
@@ -253,9 +257,13 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report_fessman_cookings.index') }}">
                     Fessman
                 </a> -->
-                <a class="collapse-item {{ Request::is('report-rtg-steamers*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-rtg-steamers*') ? 'active' : '' }}"
                     href="{{ route('report_rtg_steamers.index') }}">
                     Pemeriksaan Pemasakan Dengan Steamer
+                </a> -->
+                <a class="collapse-item {{ Request::is('report_steamer_cookings*') ? 'active' : '' }}"
+                    href="{{ route('report_steamer_cookings.index') }}">
+                    Verifikasi Proses Pemasakan di Steamer
                 </a>
                 <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
                     href="{{ route('report_baso_cookings.index') }}">
