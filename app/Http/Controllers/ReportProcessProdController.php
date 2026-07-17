@@ -86,8 +86,7 @@ class ReportProcessProdController extends Controller
             'detail.product',
             'detail.reworkProduct',
             'detail.formula',
-            'detail.items.formulation.rawMaterial',
-            'detail.items.formulation.premix',
+            'detail.items',
             'detail.emulsifying',
             'detail.sensoric',
             'detail.tumbling',
@@ -286,12 +285,22 @@ class ReportProcessProdController extends Controller
             'machine_name' => $request->machine_name,
         ]);
 
+        $formulations = Formulation::with(['rawMaterial', 'premix'])
+        ->whereIn('uuid', $request->formulation_uuids ?? [])
+        ->get()
+        ->keyBy('uuid');
+
         // Simpan Item Formulasi
         foreach ($request->formulation_uuids ?? [] as $uuid) {
+            $formulation = $formulations->get($uuid);
             ItemDetailProd::create([
                 'uuid' => Str::uuid(),
                 'detail_uuid' => $detail->uuid,
                 'formulation_uuid' => $uuid,
+                'material_name' => $formulation?->raw_material_uuid
+                    ? $formulation->rawMaterial?->material_name
+                    : $formulation?->premix?->name,
+                'material_type' => $formulation?->raw_material_uuid ? 'raw_material' : 'premix',
                 'actual_weight' => $request->actual_weight[$uuid] ?? null,
                 'sensory' => $request->sensory[$uuid] ?? null,
                 'prod_code' => $request->prod_code[$uuid] ?? null,
@@ -487,8 +496,7 @@ class ReportProcessProdController extends Controller
         $report = ReportProcessProd::with([
             'detail.product',
             'detail.formula',
-            'detail.items.formulation.rawMaterial',
-            'detail.items.formulation.premix',
+            'detail.items',
             'detail.emulsifying',
             'detail.sensoric',
             'detail.tumbling',
@@ -530,8 +538,7 @@ class ReportProcessProdController extends Controller
             'detail',
             'detail.product',
             'detail.formula',
-            'detail.items.formulation.rawMaterial',
-            'detail.items.formulation.premix',
+            'detail.items',
             'detail.sensoric',
             'detail.emulsifying',
             'detail.tumbling',
@@ -580,14 +587,26 @@ class ReportProcessProdController extends Controller
                 'machine_name' => $request->machine_name,
             ]);
 
-            // Update Item Formulasi
+            $formulations = Formulation::with(['rawMaterial', 'premix'])
+                ->whereIn('uuid', $request->formulation_uuids ?? [])
+                ->get()
+                ->keyBy('uuid');
+
             foreach ($request->formulation_uuids ?? [] as $uuidFm) {
+                $formulation = $formulations->get($uuidFm);
+                $materialName = $formulation?->raw_material_uuid
+                    ? $formulation->rawMaterial?->material_name
+                    : $formulation?->premix?->name;
+                $materialType = $formulation?->raw_material_uuid ? 'raw_material' : 'premix';
+
                 $item = $detail->items->where('formulation_uuid', $uuidFm)->first();
                 if ($item) {
                     $item->update([
                         'actual_weight' => $request->actual_weight[$uuidFm] ?? null,
                         'sensory' => $request->sensory[$uuidFm] ?? null,
                         'temperature' => $request->temperature[$uuidFm] ?? null,
+                        'material_name' => $materialName,
+                        'material_type' => $materialType,
                     ]);
                 } else {
                     ItemDetailProd::create([
@@ -598,6 +617,8 @@ class ReportProcessProdController extends Controller
                         'sensory' => $request->sensory[$uuidFm] ?? null,
                         'prod_code' => $request->prod_code[$uuidFm] ?? null,
                         'temperature' => $request->temperature[$uuidFm] ?? null,
+                        'material_name' => $materialName,
+                        'material_type' => $materialType,
                     ]);
                 }
             }

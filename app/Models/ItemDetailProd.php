@@ -21,7 +21,9 @@ class ItemDetailProd extends Model implements Auditable
         'actual_weight',
         'sensory',
         'prod_code',
-        'temperature'
+        'temperature',
+        'material_name',
+        'material_type'
     ];
 
     protected $auditEvents = [

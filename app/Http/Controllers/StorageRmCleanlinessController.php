@@ -160,7 +160,7 @@ class StorageRmCleanlinessController extends Controller
             $report = ReportStorageRmCleanliness::create([
                 'uuid' => Str::uuid(),
                 'area_uuid' => Auth::user()->area_uuid,
-                'date' => now()->toDateString(),
+                'date' => $request->date,
                 'shift' => $shift,
                 'room_name' => $request->room_name,
                 'created_by' => Auth::user()->name,
@@ -182,7 +182,11 @@ class StorageRmCleanlinessController extends Controller
                     $itemName = $itemInput['item'];
 
                     if ($itemName === 'Suhu ruang (℃) / RH (%)') {
-                        $condition = 'Suhu: ' . $itemInput['temperature'] . ' °C, RH: ' . $itemInput['humidity'] . ' %';
+                        $condition = 'Suhu: ' . $itemInput['temperature'] . ' °C';
+
+                        if (!empty($itemInput['humidity'])) {
+                            $condition .= ', RH: ' . $itemInput['humidity'] . ' %';
+                        }
                     } else {
                         $condition = $itemInput['condition'];
                     }
@@ -279,7 +283,7 @@ class StorageRmCleanlinessController extends Controller
                     $itemName = $itemInput['item'];
 
                     $condition = $itemName === 'Suhu ruang (℃) / RH (%)'
-                        ? 'Suhu: ' . $itemInput['temperature'] . ' °C, RH: ' . $itemInput['humidity'] . ' %'
+                        ? 'Suhu: ' . $itemInput['temperature'] . ' °C'
                         : $itemInput['condition'];
 
                     // Simpan item inspeksi
@@ -319,35 +323,35 @@ class StorageRmCleanlinessController extends Controller
 
     public function exportPdf($uuid)
     {
-        $report = ReportStorageRmCleanliness::with('area', 'details.items')->where('uuid', $uuid)->firstOrFail();
+        $report = ReportStorageRmCleanliness::with([
+            'area',
+            'details.items.followups',
+        ])->where('uuid', $uuid)->firstOrFail();
 
-        // Generate QR untuk created_by
-        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdInfo = "Diperiksa oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
         $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
-        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+        $createdQr = 'data:image/png;base64,' . base64_encode($createdQrImage);
 
-        // Generate QR untuk approved_by
-        $approvedInfo = $report->approved_by
-            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
-            : "Belum disetujui";
-        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
-        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
-
-        // Generate QR untuk known_by
         $knownInfo = $report->known_by
             ? "Diketahui oleh: {$report->known_by}"
-            : "Belum disetujui";
+            : "Belum diketahui";
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
-        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+        $knownQr = 'data:image/png;base64,' . base64_encode($knownQrImage);
+
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . optional($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
+        $approvedQr = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
         $pdf = Pdf::loadView('cleanliness.pdf', [
             'report' => $report,
-            'createdQr' => $createdQrBase64,
-            'approvedQr' => $approvedQrBase64,
-            'knownQr' => $knownQrBase64,
-        ]);
+            'createdQr' => $createdQr,
+            'knownQr' => $knownQr,
+            'approvedQr' => $approvedQr,
+        ])->setPaper('a4', 'portrait');
 
-        return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');
+        return $pdf->stream('cleanliness_' . $report->uuid . '.pdf');
     }
 
     public function edit($uuid)
@@ -366,6 +370,7 @@ class StorageRmCleanlinessController extends Controller
             $report = ReportStorageRmCleanliness::where('uuid', $uuid)->firstOrFail();
 
             $report->update([
+                'date' => $request->date,
                 'shift' => $request->shift,
                 'room_name' => $request->room_name,
                 'known_by' => $request->known_by,
@@ -391,8 +396,9 @@ class StorageRmCleanlinessController extends Controller
 
                 foreach ($detailInput['items'] as $itemInput) {
                     $itemName = $itemInput['item'];
+
                     if ($itemName === 'Suhu ruang (℃) / RH (%)') {
-                        $condition = 'Suhu: ' . $itemInput['temperature'] . ' °C, RH: ' . $itemInput['humidity'] . ' %';
+                        $condition = 'Suhu: ' . $itemInput['temperature'] . ' °C';
                     } else {
                         $condition = $itemInput['condition'];
                     }

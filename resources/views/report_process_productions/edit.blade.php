@@ -99,7 +99,7 @@
                 <h5 class="mt-4 font-weight-bold">Item Formulasi</h5>
                 @foreach($detail->items as $item)
                 <div class="border p-2 mb-2">
-                    <p><strong>{{ $item->formulation?->rawMaterial?->material_name ?? $item->formulation?->premix?->name ?? '-' }}</strong>
+                    <p><strong>{{ $item->material_name ?? $item->formulation?->rawMaterial?->material_name ?? $item->formulation?->premix?->name ?? '-' }}</strong>
                     </p>
                     <p class="text-muted mb-2">Standard: <strong>{{ $item->formulation?->weight }} gr</strong></p>
                     <input type="hidden" name="formulation_uuids[]" value="{{ $item->formulation_uuid }}">

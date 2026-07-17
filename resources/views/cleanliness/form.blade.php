@@ -320,16 +320,13 @@
                                     <td>
                                         <input type="hidden" name="details[__index__][items][3][item]"
                                             value="Suhu ruang (℃) / RH (%)">
-                                        Suhu ruang (℃) / RH (%)
+                                        Suhu ruang (℃)
                                     </td>
 
                                     <td>
                                         <div class="d-flex gap-1" style="gap: 1rem;">
                                             <input type="number" step="0.1"
                                                 name="details[__index__][items][3][temperature]" placeholder="℃"
-                                                class="form-control">
-                                            <input type="number" step="0.1"
-                                                name="details[__index__][items][3][humidity]" placeholder="RH%"
                                                 class="form-control">
                                         </div>
                                     </td>
