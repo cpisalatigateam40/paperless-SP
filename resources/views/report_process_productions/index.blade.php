@@ -291,10 +291,12 @@
                                             <th>Suhu (℃)</th>
                                         </tr>
                                         @php $i = 1; @endphp
-                                        @foreach ($detail->items->where('material_type', 'raw_material') as $item)
+                                        @foreach ($detail->items->filter(fn($item) => $item->material_type
+                                        ? $item->material_type === 'raw_material'
+                                        : $item->formulation?->raw_material_uuid) as $item)
                                         <tr>
                                             <td>{{ $i++ }}</td>
-                                            <td>{{ $item->material_name ?? '-' }}</td>
+                                            <td>{{ $item->material_name ?? $item->formulation?->rawMaterial?->material_name ?? '-' }}</td>
                                             <td>{{ $item->actual_weight }}</td>
                                             <td>{{ $item->sensory }}</td>
                                             <td>{{ $item->prod_code }}</td>
@@ -315,10 +317,12 @@
                                             <th>Suhu (℃)</th>
                                         </tr>
                                         @php $j = 1; @endphp
-                                        @foreach ($detail->items->where('material_type', 'premix') as $item)
+                                        @foreach ($detail->items->filter(fn($item) => $item->material_type
+                                        ? $item->material_type === 'premix'
+                                        : ($item->formulation && !$item->formulation->raw_material_uuid)) as $item)
                                         <tr>
                                             <td>{{ $j++ }}</td>
-                                            <td>{{ $item->material_name ?? '-' }}</td>
+                                            <td>{{ $item->material_name ?? $item->formulation?->premix?->name ?? '-' }}</td>
                                             <td>{{ $item->actual_weight }}</td>
                                             <td>{{ $item->sensory }}</td>
                                             <td>{{ $item->prod_code }}</td>
