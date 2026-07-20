@@ -242,7 +242,7 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="9" style="text-align: right; border: none;">QM 09 / 00</td>
+                <td colspan="9" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
             </tr>
         </tbody>
     </table>

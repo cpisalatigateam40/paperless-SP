@@ -319,11 +319,14 @@ class ReportWaterbathController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_waterbaths');
+
         $pdf = Pdf::loadView('report_waterbaths.export_pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])
             ->setPaper('a4', 'landscape');
 

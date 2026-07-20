@@ -336,12 +336,15 @@ class ReportChangeoverCleaningController extends Controller
             : "Belum diperiksa";
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_changeover_cleanings');
  
         $pdf = Pdf::loadView('report_changeover_cleanings.pdf', [
             'report'     => $report,
             'createdQr'  => $createdQrBase64,
             'knownQr'    => $knownQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('F4', 'landscape');
  
         return $pdf->stream('laporan_kebersihan_pergantian_produk_' . $report->date->format('Ymd') . '.pdf');

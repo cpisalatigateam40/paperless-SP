@@ -596,11 +596,14 @@ public function exportPdf($uuid, $detail_uuid)
     $knownQrImage  = QrCode::format('png')->size(150)->generate($knownInfo);
     $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+    $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_weight_stuffers');
+
     $pdf = Pdf::loadView('report_weight_stuffers.pdf', [
         'report'     => $report,
         'createdQr'  => $createdQrBase64,
         'approvedQr' => $approvedQrBase64,
         'knownQr'    => $knownQrBase64,
+        'formNumber' => $formNumber,
     ])->setPaper('F4', 'portrait');
 
     $filename = 'laporan-stuffer-' . Str::slug($report->details->first()->product->product_name ?? 'produk') . '.pdf';

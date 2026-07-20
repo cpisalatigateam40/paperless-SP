@@ -347,11 +347,14 @@ public function index(Request $request)
             : "Belum diketahui";
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($knownInfo));
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'process_area_cleanliness');
+
         $pdf = Pdf::loadView('cleanliness_PA.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Laporan-Kebersihan-' . $report->date . '.pdf');

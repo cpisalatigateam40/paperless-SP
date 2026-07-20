@@ -327,6 +327,8 @@ class ReportTofuVerifController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_tofu_verifs');
+
         $pdf = Pdf::loadView('report_tofu_verifs.export', [
             'report' => $report,
             'weightGroups' => $weightGroups,
@@ -334,6 +336,7 @@ class ReportTofuVerifController extends Controller
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('Laporan Verifikasi Tofu - ' . $report->date . '.pdf');

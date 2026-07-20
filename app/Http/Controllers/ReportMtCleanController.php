@@ -436,6 +436,8 @@ class ReportMtCleanController extends Controller
             'data:image/png;base64,'
             . base64_encode($approvedQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_mt_cleans');
+
         $pdf = Pdf::loadView(
             'report_mt_cleans.pdf',
             [
@@ -443,6 +445,7 @@ class ReportMtCleanController extends Controller
                 'createdQr' => $createdQrBase64,
                 'knownQr' => $knownQrBase64,
                 'approvedQr' => $approvedQrBase64,
+                'formNumber' => $formNumber,
             ]
         )->setPaper('a4', 'portrait');
 

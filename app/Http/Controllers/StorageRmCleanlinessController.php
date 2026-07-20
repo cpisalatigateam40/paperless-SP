@@ -360,11 +360,14 @@ public function index(Request $request)
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQr = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'storage_rm_cleanliness');
+
         $pdf = Pdf::loadView('cleanliness.pdf', [
             'report' => $report,
             'createdQr' => $createdQr,
             'knownQr' => $knownQr,
             'approvedQr' => $approvedQr,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('cleanliness_' . $report->uuid . '.pdf');

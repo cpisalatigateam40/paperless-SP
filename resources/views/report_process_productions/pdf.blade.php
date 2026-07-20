@@ -325,7 +325,7 @@
             <td colspan="4">{{ $detail->aging->stuffing_result ?? '-' }}</td>
         </tr>
         <tr>
-            <td colspan="6" style="text-align: right; border: none;">QM 08 / 02</td>
+            <td colspan="6" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
         </tr>
     </table>
     @endforeach

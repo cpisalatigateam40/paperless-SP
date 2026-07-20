@@ -107,7 +107,7 @@
                     </table>
                 </td>
                 <td class="no-border" style="width: 40%; text-align: right; vertical-align: middle; font-size: 9px;">
-                    QM P.x / 0x
+                    {{ $formNumber ?? '-' }}
                 </td>
             </tr>
         </table>

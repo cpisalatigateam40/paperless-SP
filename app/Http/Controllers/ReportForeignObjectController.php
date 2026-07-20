@@ -418,11 +418,14 @@ public function index(Request $request)
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_foreign_objects');
+
         $pdf = Pdf::loadView('report_foreign_objects.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Laporan_Kontaminasi_' . $report->date->format('Ymd') . '.pdf');

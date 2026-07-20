@@ -436,6 +436,8 @@ class ReportPasteurController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_pasteurs');
+
 
         // Kirim data ke view PDF
         $pdf = Pdf::loadView('report_pasteurs.pdf', [
@@ -443,6 +445,7 @@ class ReportPasteurController extends Controller
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'landscape');
 
         // Download PDF

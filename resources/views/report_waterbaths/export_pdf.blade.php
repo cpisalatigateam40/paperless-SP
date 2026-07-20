@@ -229,6 +229,8 @@
                 <td>{{ $report->details[$i]->note ?? '-' }}</td>
                 </tr>
                 @endfor
+
+                <td colspan="9" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
         </tbody>
     </table>
 

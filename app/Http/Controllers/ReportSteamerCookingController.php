@@ -385,12 +385,15 @@ public function exportPdf($uuid)
         : "Belum disetujui";
     $approvedQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($approvedInfo));
 
+    $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_steamer_cookings');
+
     $pdf = Pdf::loadView('report_steamer_cookings.export_pdf', [
         'report' => $report,
         'standard' => $standard,
         'createdQr' => $createdQr,
         'knownQr' => $knownQr,
         'approvedQr' => $approvedQr,
+        'formNumber' => $formNumber,
     ])->setPaper('a4', 'portrait');
 
     return $pdf->stream('report_steamer_cooking_' . $report->uuid . '.pdf');

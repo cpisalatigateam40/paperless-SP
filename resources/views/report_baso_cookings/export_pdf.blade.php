@@ -247,6 +247,7 @@
                 <td>{{ $akhir?->avg_baso_temp }}</td>
             </tr>
             @endforeach
+            <td colspan="18" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
         </tbody>
     </table>
 

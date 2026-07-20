@@ -272,6 +272,8 @@
 
             @endforeach
 
+            <td colspan="10" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+
         </tbody>
 
     </table>

@@ -164,6 +164,8 @@
                 <td>{{ $detail->corrective_action ?? '-' }}</td>
             </tr>
             @endforeach
+
+            <td colspan="9" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
         </tbody>
     </table>
 

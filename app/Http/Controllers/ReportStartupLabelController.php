@@ -401,12 +401,15 @@ class ReportStartupLabelController extends Controller
             : "Belum disetujui";
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_startup_labels');
  
         $pdf = Pdf::loadView('report_startup_labels.pdf', [
             'report'     => $report,
             'createdQr'  => $createdQrBase64,
             'knownQr'    => $knownQrBase64,
             'approvedQr' => $approvedQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'portrait');
  
         return $pdf->stream('laporan_startup_label_' . $report->date->format('Ymd') . '.pdf');

@@ -564,11 +564,14 @@ class ReportSmokeHouseController extends Controller
             : "Belum disetujui";
         $approvedQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($approvedInfo));
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_smoke_houses');
+
         $pdf = Pdf::loadView('report-smoke-houses.export_pdf', [
             'report' => $report,
             'createdQr' => $createdQr,
             'knownQr' => $knownQr,
             'approvedQr' => $approvedQr,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('report_smoke_house_' . $report->uuid . '.pdf');

@@ -172,7 +172,7 @@
             @endforeach
 
             <tr>
-                <td colspan="7" style="text-align: right; border: none;">QM 13 / 01</td>
+                <td colspan="7" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
             </tr>
         </tbody>
     </table>

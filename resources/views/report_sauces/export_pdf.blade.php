@@ -239,6 +239,7 @@
             <td>{{ $d->notes }}</td>
         </tr>
         @endforeach
+        <td colspan="16" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
     </table>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">

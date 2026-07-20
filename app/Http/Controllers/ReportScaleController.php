@@ -440,11 +440,14 @@ public function index(Request $request)
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_scales');
+
         $pdf = PDF::loadView('report_scales.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ]);
         return $pdf->stream('Laporan-Timbangan-Thermometer-' . $report->date . '.pdf');
     }

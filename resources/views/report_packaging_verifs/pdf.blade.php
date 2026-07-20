@@ -355,7 +355,7 @@
             @endforeach
 
             <tr>
-                <td colspan="26" class="text-end" style="border: none;">QM 05 / 01</td>
+                <td colspan="26" class="text-end" style="border: none;">{{ $formNumber ?? '-' }}</td>
             </tr>
 
     </table>

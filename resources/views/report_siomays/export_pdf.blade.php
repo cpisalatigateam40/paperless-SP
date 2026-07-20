@@ -137,7 +137,7 @@
         {{-- Header Informasi --}}
         <tr>
             <th class="text-start">Nama Produk</th>
-            <td colspan="15" class="text-start" style="text-align: start !important;">
+            <td colspan="16" class="text-start" style="text-align: start !important;">
                 {{ $report->product->product_name }}</td>
         </tr>
 
@@ -151,13 +151,13 @@
 
         <tr>
             <th class="text-start">Kode Produksi</th>
-            <td colspan="15" class="text-start" style="text-align: start !important;">
+            <td colspan="16" class="text-start" style="text-align: start !important;">
                 {{ $report->production_code }}</td>
         </tr>
 
         <tr>
             <th class="text-start">Waktu (Start - Stop)</th>
-            <td colspan="15" class="text-start" style="text-align: start !important;">
+            <td colspan="16" class="text-start" style="text-align: start !important;">
                 {{ $report->start_time }} -
                 {{ $report->end_time }}</td>
         </tr>
@@ -225,6 +225,8 @@
             <td>{{ $d->notes }}</td>
         </tr>
         @endforeach
+
+        <td colspan="16" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
     </table>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">

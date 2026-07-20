@@ -353,11 +353,14 @@ class ReportMdProductController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_md_products');
+
         $pdf = PDF::loadView('report_md_products.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ]);
         return $pdf->stream('Report-Metal-Detector-' . $report->date . '.pdf');
     }
