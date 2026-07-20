@@ -7,6 +7,7 @@ use App\Models\DetailSiomay;
 use App\Models\RmSiomay;
 use App\Models\Product;
 use App\Models\RawMaterial;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -74,6 +75,13 @@ class ReportSiomayController extends Controller
             'area',
             'details.rawMaterials.rawMaterial',
         ])->latest();
+
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
         // 🔍 SEARCH
         if ($request->filled('search')) {
@@ -162,7 +170,16 @@ class ReportSiomayController extends Controller
             return $report;
         });
 
-        return view('report_siomays.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_siomays.index', compact('reports', 'areas'));
     }
 
     public function create()

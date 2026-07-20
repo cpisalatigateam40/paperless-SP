@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ReportProductionNonconformity;
 use App\Models\DetailProductionNonconformity;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -62,56 +63,73 @@ class ReportProductionNonconformityController extends Controller
         return 'laporan_production_nonconformity';
     }
 
-    public function index(Request $request)
-    {
-        $reports = ReportProductionNonconformity::with([
-                'area',
-                'details'
-            ])
+public function index(Request $request)
+{
+    $query = ReportProductionNonconformity::with([
+        'area',
+        'details'
+    ]);
 
-            // 🔍 FILTER TANGGAL
-            ->when($request->date, function ($q) use ($request) {
-                $q->whereDate('date', $request->date);
-            })
-
-            // 🔍 GLOBAL SEARCH
-            ->when($request->search, function ($q) use ($request) {
-                $search = $request->search;
-
-                $q->where(function ($qq) use ($search) {
-
-                    // ===== HEADER REPORT =====
-                    $qq->where('date', 'like', "%{$search}%")
-                    ->orWhere('shift', 'like', "%{$search}%")
-                    ->orWhere('created_by', 'like', "%{$search}%")
-                    ->orWhere('known_by', 'like', "%{$search}%")
-                    ->orWhere('approved_by', 'like', "%{$search}%");
-
-                    // ===== AREA =====
-                    $qq->orWhereHas('area', function ($a) use ($search) {
-                        $a->where('name', 'like', "%{$search}%");
-                    });
-
-                    // ===== DETAIL NONCONFORMITY =====
-                    $qq->orWhereHas('details', function ($d) use ($search) {
-                        $d->where('occurrence_time', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhere('quantity', 'like', "%{$search}%")
-                        ->orWhere('unit', 'like', "%{$search}%")
-                        ->orWhere('hazard_category', 'like', "%{$search}%")
-                        ->orWhere('disposition', 'like', "%{$search}%")
-                        ->orWhere('remark', 'like', "%{$search}%")
-                        ->orWhere('evidence', 'like', "%{$search}%");
-                    });
-                });
-            })
-
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view('report_production_nonconformities.index', compact('reports'));
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $query->where('area_uuid', $request->area);
     }
+
+    // 🔍 FILTER TANGGAL
+    $query->when($request->date, function ($q) use ($request) {
+        $q->whereDate('date', $request->date);
+    });
+
+    // 🔍 GLOBAL SEARCH
+    $query->when($request->search, function ($q) use ($request) {
+
+        $search = $request->search;
+
+        $q->where(function ($qq) use ($search) {
+
+            // ===== HEADER REPORT =====
+            $qq->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+            // ===== AREA =====
+            $qq->orWhereHas('area', function ($a) use ($search) {
+                $a->where('name', 'like', "%{$search}%");
+            });
+
+            // ===== DETAIL NONCONFORMITY =====
+            $qq->orWhereHas('details', function ($d) use ($search) {
+
+                $d->where('occurrence_time', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('quantity', 'like', "%{$search}%")
+                    ->orWhere('unit', 'like', "%{$search}%")
+                    ->orWhere('hazard_category', 'like', "%{$search}%")
+                    ->orWhere('disposition', 'like', "%{$search}%")
+                    ->orWhere('remark', 'like', "%{$search}%")
+                    ->orWhere('evidence', 'like', "%{$search}%");
+
+            });
+
+        });
+
+    });
+
+    $reports = $query->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('report_production_nonconformities.index', compact('reports', 'areas'));
+}
 
 
     public function create()

@@ -80,6 +80,14 @@ class ReportRmArrivalController extends Controller
             });
         }
 
+        // FILTER AREA (hanya admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 SEARCH GLOBAL (HEADER + DETAIL + RELASI)
         if ($request->filled('search')) {
             $search = $request->search;
@@ -163,12 +171,28 @@ class ReportRmArrivalController extends Controller
             return $report;
         });
 
-        $sections = \App\Models\Section::where('area_uuid', auth()->user()->area_uuid)
-        ->whereIn('section_name', ['Seasoning', 'Chillroom'])
-        ->orderBy('section_name')
-        ->get();
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
 
-        return view('report_rm_arrivals.index', compact('reports', 'sections'));
+            $sections = \App\Models\Section::when($request->filled('area'), function ($q) use ($request) {
+                    $q->where('area_uuid', $request->area);
+                })
+                ->whereIn('section_name', ['Seasoning', 'Chillroom'])
+                ->orderBy('section_name')
+                ->get();
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $sections = \App\Models\Section::where('area_uuid', auth()->user()->area_uuid)
+                ->whereIn('section_name', ['Seasoning', 'Chillroom'])
+                ->orderBy('section_name')
+                ->get();
+
+            $areas = collect();
+        }
+
+        return view('report_rm_arrivals.index', compact('reports', 'sections','areas'));
     }
 
     public function create()
@@ -376,11 +400,14 @@ class ReportRmArrivalController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_rm_arrivals');
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('report_rm_arrivals.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('A4', 'landscape');
 
         return $pdf->stream('laporan_rm_arrival_' . $report->date . '.pdf');

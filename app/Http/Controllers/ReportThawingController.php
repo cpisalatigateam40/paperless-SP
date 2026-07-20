@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use App\Models\ReportThawing;
 use App\Models\DetailThawing;
 use App\Models\RawMaterial;
+use App\Models\Area;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -69,52 +70,67 @@ class ReportThawingController extends Controller
     {
         $search = $request->search;
 
-        $reports = ReportThawing::with(['area','details.rawMaterial'])
-            ->when($search, function ($query) use ($search) {
+        $query = ReportThawing::with(['area', 'details.rawMaterial']);
 
-                $query->where(function ($q) use ($search) {
+        // Filter area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
-                    // kolom report
-                    $q->where('date', 'like', "%$search%")
-                    ->orWhere('shift', 'like', "%$search%")
-                    ->orWhere('created_by', 'like', "%$search%")
-                    ->orWhere('known_by', 'like', "%$search%")
-                    ->orWhere('approved_by', 'like', "%$search%");
+        // Search
+        $query->when($search, function ($query) use ($search) {
 
-                    // relasi area
-                    $q->orWhereHas('area', function ($area) use ($search) {
-                        $area->where('name', 'like', "%$search%");
-                    });
+            $query->where(function ($q) use ($search) {
 
-                    // relasi detail thawing
-                    $q->orWhereHas('details', function ($detail) use ($search) {
+                // Header
+                $q->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
 
-                        $detail->where('start_thawing_time', 'like', "%$search%")
-                            ->orWhere('end_thawing_time', 'like', "%$search%")
-                            ->orWhere('package_condition', 'like', "%$search%")
-                            ->orWhere('production_code', 'like', "%$search%")
-                            ->orWhere('qty', 'like', "%$search%")
-                            ->orWhere('room_condition', 'like', "%$search%")
-                            ->orWhere('inspection_time', 'like', "%$search%")
-                            ->orWhere('room_temp', 'like', "%$search%")
-                            ->orWhere('water_temp', 'like', "%$search%")
-                            ->orWhere('product_temp', 'like', "%$search%")
-                            ->orWhere('product_condition', 'like', "%$search%");
-                    });
-
-                    // relasi raw material
-                    $q->orWhereHas('details.rawMaterial', function ($rm) use ($search) {
-                        $rm->where('material_name', 'like', "%$search%");
-                    });
-
+                // Area
+                $q->orWhereHas('area', function ($area) use ($search) {
+                    $area->where('name', 'like', "%{$search}%");
                 });
 
-            })
-            ->latest()
+                // Detail
+                $q->orWhereHas('details', function ($detail) use ($search) {
+
+                    $detail->where('start_thawing_time', 'like', "%{$search}%")
+                        ->orWhere('end_thawing_time', 'like', "%{$search}%")
+                        ->orWhere('package_condition', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%")
+                        ->orWhere('qty', 'like', "%{$search}%")
+                        ->orWhere('room_condition', 'like', "%{$search}%")
+                        ->orWhere('inspection_time', 'like', "%{$search}%")
+                        ->orWhere('room_temp', 'like', "%{$search}%")
+                        ->orWhere('water_temp', 'like', "%{$search}%")
+                        ->orWhere('product_temp', 'like', "%{$search}%")
+                        ->orWhere('product_condition', 'like', "%{$search}%");
+                });
+
+                // Raw Material
+                $q->orWhereHas('details.rawMaterial', function ($rm) use ($search) {
+                    $rm->where('material_name', 'like', "%{$search}%");
+                });
+
+            });
+
+        });
+
+        $reports = $query->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('report_thawings.index', compact('reports'));
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('report_thawings.index', compact('reports', 'areas'));
     }
 
     /**

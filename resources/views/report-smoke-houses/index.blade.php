@@ -21,7 +21,29 @@
                 Report Smoke House
             </h5>
 
+            
+
             <div class="d-flex" style="gap: .4rem;">
+                @hasanyrole('admin|superadmin')
+                <form method="GET" action="{{ route('report-smoke-houses.index') }}">
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <select name="area"
+                            class="form-select form-control form-control"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Area</option>
+
+                        @foreach($areas as $area)
+                            <option value="{{ $area->uuid }}"
+                                {{ request('area') == $area->uuid ? 'selected' : '' }}>
+                                {{ $area->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                @endhasanyrole
+
                 <button type="button"
                     class="btn btn-outline-secondary"
                     data-bs-toggle="modal"

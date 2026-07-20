@@ -8,6 +8,26 @@
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 
+                @hasanyrole('admin|superadmin')
+                <form method="GET" action="{{ route('report_tofu_verifs.index') }}">
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <select name="area"
+                            class="form-select form-control form-control"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Area</option>
+
+                        @foreach($areas as $area)
+                            <option value="{{ $area->uuid }}"
+                                {{ request('area') == $area->uuid ? 'selected' : '' }}>
+                                {{ $area->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                @endhasanyrole
+
                 {{-- 🔍 SEARCH --}}
                 <form method="GET"
                     action="{{ route('report_tofu_verifs.index') }}"

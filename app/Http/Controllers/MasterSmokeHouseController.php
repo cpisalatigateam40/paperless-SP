@@ -12,17 +12,32 @@ use Illuminate\Support\Facades\Auth;
 
 class MasterSmokeHouseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $masters = MasterSmokeHouse::with([
+        $query = MasterSmokeHouse::with([
             'area',
             'product',
             'steps'
-        ])
-        ->latest()
-        ->paginate(10);
+        ]);
 
-        return view('master-smoke-houses.index', compact('masters'));
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
+        $masters = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('master-smoke-houses.index', compact('masters', 'areas'));
     }
 
     public function create()

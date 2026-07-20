@@ -69,6 +69,13 @@ class ReportLabSampleController extends Controller
         $query = ReportLabSample::with(['area', 'details.product'])
             ->latest();
 
+            if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 GLOBAL SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
@@ -110,7 +117,16 @@ class ReportLabSampleController extends Controller
 
         $reports = $query->paginate(10)->withQueryString();
 
-        return view('report_lab_samples.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_lab_samples.index', compact('reports', 'areas'));
     }
 
     // Form create

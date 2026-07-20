@@ -71,6 +71,13 @@ class ReportMetalDetectorController extends Controller
         $query = ReportMetalDetector::with(['area', 'section', 'details.product'])
             ->latest();
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
@@ -133,7 +140,16 @@ class ReportMetalDetectorController extends Controller
             return $report;
         });
 
-        return view('report_metal_detectors.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_metal_detectors.index', compact('reports', 'areas'));
     }
 
     // Form create
@@ -314,11 +330,14 @@ class ReportMetalDetectorController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_metal_detectors');
+
         $pdf = Pdf::loadView('report_metal_detectors.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])
             ->setPaper('A4', 'portrait');
 

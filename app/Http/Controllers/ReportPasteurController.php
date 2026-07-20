@@ -82,6 +82,13 @@ class ReportPasteurController extends Controller
             'area'
         ])->latest();
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 GLOBAL SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
@@ -146,7 +153,16 @@ class ReportPasteurController extends Controller
 
         $reports = $query->paginate(10)->withQueryString();
 
-        return view('report_pasteurs.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_pasteurs.index', compact('reports', 'areas'));
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\SteamerCookingDetail;
 use App\Models\SteamerCookingCoreTemp;
 use App\Models\SteamerStandard;
 use App\Models\Product;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -73,13 +74,29 @@ class ReportSteamerCookingController extends Controller
         $query = ReportSteamerCooking::with(['product', 'area', 'batches.details.coreTemps'])
             ->withCount('batches');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('date')) {
             $query->whereDate('date', $request->date);
         }
 
         $reports = $query->latest()->paginate(20);
 
-        return view('report_steamer_cookings.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_steamer_cookings.index', compact('reports', 'areas'));
     }
 
     public function create()

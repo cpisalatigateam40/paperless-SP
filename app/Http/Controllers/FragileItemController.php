@@ -18,6 +18,13 @@ class FragileItemController extends Controller
         $query = FragileItem::with('area')
             ->orderBy('item_name', 'asc');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -30,7 +37,16 @@ class FragileItemController extends Controller
 
         $fragileItems = $query->paginate(10)->withQueryString();
 
-        return view('fragile_item.index', compact('fragileItems'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('fragile_item.index', compact('fragileItems', 'areas'));
     }
 
     public function create()

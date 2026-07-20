@@ -76,6 +76,13 @@ class ReportStartupLabelController extends Controller
             'details.photos',
         ])->latest();
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 SEARCH HEADER + DETAIL
         if ($request->filled('search')) {
             $search = $request->search;
@@ -115,9 +122,18 @@ class ReportStartupLabelController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
         return view(
             'report_startup_labels.index',
-            compact('reports')
+            compact('reports', 'areas')
         );
     }
 

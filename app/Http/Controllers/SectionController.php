@@ -8,11 +8,28 @@ use App\Models\Area;
 
 class SectionController extends Controller
 {
-    public function index()
-    {
-        $sections = Section::with('area')->orderBy('section_name', 'asc')->paginate(10);
-        return view('section.section', compact('sections'));
+public function index(Request $request)
+{
+    $query = Section::with('area');
+
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $query->where('area_uuid', $request->area);
     }
+
+    $sections = $query->orderBy('section_name', 'asc')
+        ->paginate(10)
+        ->withQueryString();
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('section.section', compact('sections', 'areas'));
+}
 
     public function create()
     {

@@ -7,6 +7,7 @@ use App\Models\Formulation;
 use App\Models\Product;
 use App\Models\RawMaterial;
 use App\Models\Premix;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -17,28 +18,48 @@ use Illuminate\Support\Facades\DB;
 
 class FormulaController extends Controller
 {
-    public function index(Request $request)
-    {
-        $areaUuid = Auth::user()->area_uuid;
-        $search   = $request->search; // ⬅️ FIX DI SINI
+public function index(Request $request)
+{
+    $search = $request->search;
 
-        $formulas = Formula::with(['product', 'area'])
-            ->where('area_uuid', $areaUuid)
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('formula_name', 'like', "%{$search}%")
+    $query = Formula::with(['product', 'area']);
+
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin'])
+    ) {
+        if ($request->filled('area')) {
+            $query->where('area_uuid', $request->area);
+        }
+    } else {
+        // User selain admin mengikuti area miliknya
+        $query->where('area_uuid', auth()->user()->area_uuid);
+    }
+
+    $formulas = $query
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('formula_name', 'like', "%{$search}%")
                     ->orWhere('product_name', 'like', "%{$search}%")
                     ->orWhereHas('product', function ($p) use ($search) {
                         $p->where('product_name', 'like', "%{$search}%");
                     });
-                });
-            })
-            ->orderBy('product_name', 'asc')
-            ->paginate(10)
-            ->withQueryString();
+            });
+        })
+        ->orderBy('product_name', 'asc')
+        ->paginate(10)
+        ->withQueryString();
 
-        return view('formulas.index', compact('formulas', 'search'));
-    }
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('formulas.index', compact(
+        'formulas',
+        'search',
+        'areas'
+    ));
+}
 
 
     public function create()

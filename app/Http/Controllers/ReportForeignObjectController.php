@@ -65,75 +65,92 @@ class ReportForeignObjectController extends Controller
         return 'laporan_foreign_objects';
     }
 
-    public function index(Request $request)
-    {
-        $reports = ReportForeignObject::with([
-                'area',
-                'section',
-                'details.product',
-            ])
+public function index(Request $request)
+{
+    $query = ReportForeignObject::with([
+        'area',
+        'section',
+        'details.product',
+    ]);
 
-            // 🔍 FILTER TANGGAL
-            ->when($request->date, function ($q) use ($request) {
-                $q->whereDate('date', $request->date);
-            })
-
-            // 🔍 FILTER SHIFT
-            ->when($request->shift, function ($q) use ($request) {
-                $q->where('shift', $request->shift);
-            })
-
-            // 🔍 GLOBAL SEARCH (HEADER + RELASI + DETAIL)
-            ->when($request->search, function ($q) use ($request) {
-                $search = $request->search;
-
-                $q->where(function ($qq) use ($search) {
-
-                    // ===== HEADER REPORT =====
-                    $qq->where('created_by', 'like', "%{$search}%")
-                    ->orWhere('known_by', 'like', "%{$search}%")
-                    ->orWhere('approved_by', 'like', "%{$search}%")
-                    ->orWhere('shift', 'like', "%{$search}%")
-                    ->orWhere('date', 'like', "%{$search}%");
-
-                    // ===== AREA =====
-                    $qq->orWhereHas('area', function ($a) use ($search) {
-                        $a->where('name', 'like', "%{$search}%");
-                    });
-
-                    // ===== SECTION =====
-                    $qq->orWhereHas('section', function ($s) use ($search) {
-                        $s->where('section_name', 'like', "%{$search}%");
-                    });
-
-                    // ===== DETAIL FOREIGN OBJECT =====
-                    $qq->orWhereHas('details', function ($d) use ($search) {
-                        $d->where('time', 'like', "%{$search}%")
-                        ->orWhere('production_code', 'like', "%{$search}%")
-                        ->orWhere('contaminant_type', 'like', "%{$search}%")
-                        ->orWhere('analysis_stage', 'like', "%{$search}%")
-                        ->orWhere('contaminant_origin', 'like', "%{$search}%")
-                        ->orWhere('notes', 'like', "%{$search}%")
-                        ->orWhere('evidence', 'like', "%{$search}%")
-                        ->orWhere('qc_paraf', 'like', "%{$search}%")
-                        ->orWhere('production_paraf', 'like', "%{$search}%")
-                        ->orWhere('engineering_paraf', 'like', "%{$search}%");
-                    });
-
-                    // ===== PRODUK =====
-                    $qq->orWhereHas('details.product', function ($p) use ($search) {
-                        $p->where('product_name', 'like', "%{$search}%")
-                        ->orWhere('production_code', 'like', "%{$search}%");
-                    });
-                });
-            })
-
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view('report_foreign_objects.index', compact('reports'));
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $query->where('area_uuid', $request->area);
     }
+
+    // 🔍 FILTER TANGGAL
+    $query->when($request->date, function ($q) use ($request) {
+        $q->whereDate('date', $request->date);
+    });
+
+    // 🔍 FILTER SHIFT
+    $query->when($request->shift, function ($q) use ($request) {
+        $q->where('shift', $request->shift);
+    });
+
+    // 🔍 GLOBAL SEARCH (HEADER + RELASI + DETAIL)
+    $query->when($request->search, function ($q) use ($request) {
+
+        $search = $request->search;
+
+        $q->where(function ($qq) use ($search) {
+
+            // ===== HEADER REPORT =====
+            $qq->where('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('date', 'like', "%{$search}%");
+
+            // ===== AREA =====
+            $qq->orWhereHas('area', function ($a) use ($search) {
+                $a->where('name', 'like', "%{$search}%");
+            });
+
+            // ===== SECTION =====
+            $qq->orWhereHas('section', function ($s) use ($search) {
+                $s->where('section_name', 'like', "%{$search}%");
+            });
+
+            // ===== DETAIL FOREIGN OBJECT =====
+            $qq->orWhereHas('details', function ($d) use ($search) {
+
+                $d->where('time', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%")
+                    ->orWhere('contaminant_type', 'like', "%{$search}%")
+                    ->orWhere('analysis_stage', 'like', "%{$search}%")
+                    ->orWhere('contaminant_origin', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
+                    ->orWhere('evidence', 'like', "%{$search}%")
+                    ->orWhere('qc_paraf', 'like', "%{$search}%")
+                    ->orWhere('production_paraf', 'like', "%{$search}%")
+                    ->orWhere('engineering_paraf', 'like', "%{$search}%");
+
+            });
+
+            // ===== PRODUK =====
+            $qq->orWhereHas('details.product', function ($p) use ($search) {
+                $p->where('product_name', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%");
+            });
+
+        });
+
+    });
+
+    $reports = $query->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('report_foreign_objects.index', compact('reports', 'areas'));
+}
 
 
     public function create()

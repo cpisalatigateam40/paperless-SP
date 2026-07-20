@@ -2,7 +2,7 @@
 $isMasterData =
 Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
 'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*',
-'steamer-standards*');
+'steamer-standards*', 'form-numbers*');
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -108,10 +108,6 @@ $isKetidaksesuaian = Request::is([
         <div id="collapseTwo" class="collapse {{ $isMasterData ? 'show' : '' }}" aria-labelledby="headingTwo"
             data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
-                <!-- @can('user view')
-                <a class="collapse-item {{ Request::is('users*') ? 'active' : '' }}"
-                    href="{{ route('users.index') }}">User</a>
-                @endcan -->
                 <a class="collapse-item {{ Request::is('area*') ? 'active' : '' }}"
                     href="{{ route('areas.index') }}">Area</a>
                 <a class="collapse-item {{ Request::is('section*') ? 'active' : '' }}"
@@ -138,6 +134,8 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('master-smoke-houses.index') }}">Master Cooking Smoke Houses</a>
                 <a class="collapse-item {{ Request::is('steamer-standards*') ? 'active' : '' }}"
                     href="{{ route('steamer-standards.index') }}">Master Steamer</a>
+                <a class="collapse-item {{ Request::is('form-numbers*') ? 'active' : '' }}"
+                    href="{{ route('form-numbers.index') }}">Nomor Form</a>
             </div>
         </div>
     </li>
@@ -249,18 +247,6 @@ $isKetidaksesuaian = Request::is([
                     href="{{ route('report-smoke-houses.index') }}">
                     Cooking Smoke House
                 </a>
-                <!-- <a class="collapse-item {{ Request::is('report-maurer-cookings*') ? 'active' : '' }}"
-                    href="{{ route('report_maurer_cookings.index') }}">
-                    Maurer
-                </a>
-                <a class="collapse-item {{ Request::is('report-fessman-cookings*') ? 'active' : '' }}"
-                    href="{{ route('report_fessman_cookings.index') }}">
-                    Fessman
-                </a> -->
-                <!-- <a class="collapse-item {{ Request::is('report-rtg-steamers*') ? 'active' : '' }}"
-                    href="{{ route('report_rtg_steamers.index') }}">
-                    Pemeriksaan Pemasakan Dengan Steamer
-                </a> -->
                 <a class="collapse-item {{ Request::is('report_steamer_cookings*') ? 'active' : '' }}"
                     href="{{ route('report_steamer_cookings.index') }}">
                     Verifikasi Proses Pemasakan di Steamer

@@ -9,31 +9,22 @@ use Illuminate\Support\Facades\Auth;
 
 class UserAreaScope implements Scope
 {
-    // public function apply(Builder $builder, Model $model)
-    // {
-    //     // Pastikan user sudah login
-    //     if (Auth::check()) {
-    //         $user = Auth::user();
-
-    //         // Bypass scope jika user punya role 'admin'
-    //         // if ($user->hasRole('admin')) {
-    //         //     return;
-    //         // }
-
-    //         // Jika user punya area_uuid, filter query
-    //         if ($user->area_uuid) {
-    //             $builder->where('area_uuid', $user->area_uuid);
-    //         }
-    //     }
-    // }
     public function apply(Builder $builder, Model $model)
     {
-        if (Auth::check()) {
-            $user = Auth::user();
+        if (!Auth::check()) {
+            return;
+        }
 
-            if ($user->area_uuid) {
-                $builder->where('area_uuid', $user->area_uuid);
-            }
+        $user = Auth::user();
+
+        // Admin & Superadmin dapat melihat semua area
+        if ($user->hasAnyRole(['admin', 'superadmin'])) {
+            return;
+        }
+
+        // User lain hanya melihat area miliknya
+        if (!empty($user->area_uuid)) {
+            $builder->where('area_uuid', $user->area_uuid);
         }
     }
 }

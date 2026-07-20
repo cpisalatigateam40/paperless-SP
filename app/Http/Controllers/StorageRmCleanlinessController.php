@@ -8,6 +8,7 @@ use App\Models\ReportStorageRmCleanliness;
 use App\Models\DetailStorageRmCleanliness;
 use App\Models\ItemStorageRmCleanliness;
 use App\Models\FollowupCleanlinessStorage;
+use App\Models\Area;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
@@ -66,82 +67,97 @@ class StorageRmCleanlinessController extends Controller
         return 'laporan_storage_rm_cleanliness';
     }
 
-    public function index(Request $request)
-    {
-        $search = $request->search;
+public function index(Request $request)
+{
+    $search = $request->search;
 
-        $reports = ReportStorageRmCleanliness::with([
-                'details.items.followups',
-                'area'
-            ])
-            ->when(!Auth::user()->hasRole('Superadmin'), function ($query) {
-                $query->where('area_uuid', Auth::user()->area_uuid);
-            })
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
+    $query = ReportStorageRmCleanliness::with([
+        'details.items.followups',
+        'area'
+    ]);
 
-                    /* ================= HEADER ================= */
-                    $q->where('date', 'like', "%{$search}%")
-                    ->orWhere('shift', 'like', "%{$search}%")
-                    ->orWhere('room_name', 'like', "%{$search}%")
-                    ->orWhere('created_by', 'like', "%{$search}%")
-                    ->orWhere('known_by', 'like', "%{$search}%")
-                    ->orWhere('approved_by', 'like', "%{$search}%");
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $query->where('area_uuid', $request->area);
+    }
 
-                    /* ================= AREA ================= */
-                    $q->orWhereHas('area', function ($qa) use ($search) {
-                        $qa->where('name', 'like', "%{$search}%");
+    $query->when($search, function ($query) use ($search) {
+        $query->where(function ($q) use ($search) {
+
+            /* ================= HEADER ================= */
+            $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('room_name', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+            /* ================= AREA ================= */
+            $q->orWhereHas('area', function ($qa) use ($search) {
+                $qa->where('name', 'like', "%{$search}%");
+            });
+
+            /* ================= DETAIL ================= */
+            $q->orWhereHas('details', function ($qd) use ($search) {
+
+                $qd->where('inspection_hour', 'like', "%{$search}%")
+
+                    /* ================= ITEM ================= */
+                    ->orWhereHas('items', function ($qi) use ($search) {
+
+                        $qi->where('item', 'like', "%{$search}%")
+                            ->orWhere('condition', 'like', "%{$search}%")
+                            ->orWhere('notes', 'like', "%{$search}%")
+                            ->orWhere('corrective_action', 'like', "%{$search}%")
+                            ->orWhere('verification', 'like', "%{$search}%")
+
+                            /* ============== FOLLOW UP ============== */
+                            ->orWhereHas('followups', function ($qf) use ($search) {
+                                $qf->where('notes', 'like', "%{$search}%")
+                                    ->orWhere('corrective_action', 'like', "%{$search}%")
+                                    ->orWhere('verification', 'like', "%{$search}%");
+                            });
                     });
 
-                    /* ================= DETAIL ================= */
-                    $q->orWhereHas('details', function ($qd) use ($search) {
-                        $qd->where('inspection_hour', 'like', "%{$search}%")
+            });
+        });
+    });
 
-                        /* ================= ITEM ================= */
-                        ->orWhereHas('items', function ($qi) use ($search) {
-                            $qi->where('item', 'like', "%{$search}%")
-                                ->orWhere('condition', 'like', "%{$search}%")
-                                ->orWhere('notes', 'like', "%{$search}%")
-                                ->orWhere('corrective_action', 'like', "%{$search}%")
-                                ->orWhere('verification', 'like', "%{$search}%")
+    $reports = $query->latest()
+        ->paginate(20)
+        ->withQueryString();
 
-                                /* ============== FOLLOW UP ============== */
-                                ->orWhereHas('followups', function ($qf) use ($search) {
-                                    $qf->where('notes', 'like', "%{$search}%")
-                                        ->orWhere('corrective_action', 'like', "%{$search}%")
-                                        ->orWhere('verification', 'like', "%{$search}%");
-                                });
-                        });
-                    });
-                });
-            })
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+    /* ================= HITUNG KETIDAKSESUAIAN ================= */
+    foreach ($reports as $report) {
+        $count = 0;
 
-        /* ================= HITUNG KETIDAKSESUAIAN ================= */
-        foreach ($reports as $report) {
-            $count = 0;
+        foreach ($report->details as $detail) {
+            foreach ($detail->items as $item) {
 
-            foreach ($report->details as $detail) {
-                foreach ($detail->items as $item) {
-                    if ($item->verification == 0) {
+                if ($item->verification == 0) {
+                    $count++;
+                }
+
+                foreach ($item->followups as $followup) {
+                    if ($followup->verification == 0) {
                         $count++;
-                    }
-
-                    foreach ($item->followups as $followup) {
-                        if ($followup->verification == 0) {
-                            $count++;
-                        }
                     }
                 }
             }
-
-            $report->ketidaksesuaian = $count;
         }
 
-        return view('cleanliness.index', compact('reports'));
+        $report->ketidaksesuaian = $count;
     }
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('cleanliness.index', compact('reports', 'areas'));
+}
 
     public function create()
     {

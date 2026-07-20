@@ -77,6 +77,7 @@ use App\Http\Controllers\MasterSmokeHouseController;
 use App\Http\Controllers\ReportSmokeHouseController;
 use App\Http\Controllers\SteamerStandardController;
 use App\Http\Controllers\ReportSteamerCookingController;
+use App\Http\Controllers\FormNumberController;
 
 
 Route::get('/', function () {
@@ -111,6 +112,10 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{uuid}', 'update')->name('update');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
         });
+
+    Route::resource('form-numbers', FormNumberController::class)
+    ->except(['show'])
+    ->middleware('permission:view master data');
 
     // USER ROUTES
     Route::prefix('area')

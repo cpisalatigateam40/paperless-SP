@@ -5,7 +5,31 @@
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center mb-3">
             <h4>Master Standar Steamer</h4>
-            <a href="{{ route('steamer-standards.create') }}" class="btn btn-primary">+ Tambah Standar</a>
+
+            <div class="d-flex">
+                @hasanyrole('admin|superadmin')
+                <form method="GET" action="{{ route('steamer-standards.index') }}" class="mr-3">
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <select name="area"
+                            class="form-select form-control form-control"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Area</option>
+
+                        @foreach($areas as $area)
+                            <option value="{{ $area->uuid }}"
+                                {{ request('area') == $area->uuid ? 'selected' : '' }}>
+                                {{ $area->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                @endhasanyrole
+
+                <a href="{{ route('steamer-standards.create') }}" class="btn btn-primary">+ Tambah Standar</a>
+            </div>
+            
         </div>
 
         @if (session('success'))

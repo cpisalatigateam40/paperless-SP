@@ -94,6 +94,13 @@ class ReportProcessProdController extends Controller
             'detail.aging'
         ])->latest();
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
@@ -233,7 +240,16 @@ class ReportProcessProdController extends Controller
             return $report;
         });
 
-        return view('report_process_productions.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_process_productions.index', compact('reports', 'areas'));
     }
 
     public function create()

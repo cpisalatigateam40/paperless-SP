@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DetailChangeoverCleaning;
 use App\Models\MasterChecklistItem;
 use App\Models\Product;
+use App\Models\Area;
 use App\Models\ReportChangeoverCleaning;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,6 +76,13 @@ class ReportChangeoverCleaningController extends Controller
             'details.item',
         ])->latest('date');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // SEARCH ALL KOLOM
         if ($request->filled('search')) {
 
@@ -121,9 +129,18 @@ class ReportChangeoverCleaningController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
         return view(
             'report_changeover_cleanings.index',
-            compact('reports')
+            compact('reports', 'areas')
         );
     }
 

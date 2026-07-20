@@ -11,18 +11,35 @@ class MasterChecklistItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        $items = MasterChecklistItem::with('area')
-            ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->orderBy('category')
-            ->orderBy('name')
-            ->paginate(20);
+public function index(Request $request)
+{
+    $query = MasterChecklistItem::with('area');
 
-        return view('master_checklist_items.index', compact('items'));
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $query->where('area_uuid', $request->area);
     }
+
+    // Search
+    $query->when($request->search, function ($q, $search) {
+        $q->where('name', 'like', "%{$search}%");
+    });
+
+    $items = $query
+        ->orderBy('category')
+        ->orderBy('name')
+        ->paginate(20)
+        ->withQueryString();
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('master_checklist_items.index', compact('items', 'areas'));
+}
 
     /**
      * Show the form for creating a new resource.

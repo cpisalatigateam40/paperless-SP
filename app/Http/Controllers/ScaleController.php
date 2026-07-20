@@ -18,6 +18,13 @@ class ScaleController extends Controller
         $query = Scale::with('area')
             ->orderBy('brand', 'asc');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -31,7 +38,16 @@ class ScaleController extends Controller
 
         $scales = $query->paginate(10)->withQueryString();
 
-        return view('scales.index', compact('scales'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('scales.index', compact('scales', 'areas'));
     }
 
     public function create()

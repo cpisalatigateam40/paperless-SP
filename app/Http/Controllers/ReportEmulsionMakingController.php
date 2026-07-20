@@ -8,6 +8,7 @@ use App\Models\ReportEmulsionMaking;
 use App\Models\HeaderEmulsionMaking;
 use App\Models\DetailEmulsionMaking;
 use App\Models\AgingEmulsionMaking;
+use App\Models\Area;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -72,6 +73,14 @@ class ReportEmulsionMakingController extends Controller
             'header.details.premix',
             'header.agings'
         ])->latest();
+
+        // FILTER AREA (hanya admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
         // 🔍 SEARCH GLOBAL
         if ($request->filled('search')) {
@@ -147,7 +156,16 @@ class ReportEmulsionMakingController extends Controller
 
         $rawMaterials = \App\Models\RawMaterial::all();
 
-        return view('report_emulsion_makings.index', compact('reports', 'rawMaterials'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_emulsion_makings.index', compact('reports', 'rawMaterials', 'areas'));
     }
 
     public function create()
@@ -377,11 +395,14 @@ class ReportEmulsionMakingController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_emulsion_makings');
+
         $pdf = Pdf::loadView('report_emulsion_makings.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
 
         ])
             ->setPaper('a4', 'landscape'); // landscape biar muat

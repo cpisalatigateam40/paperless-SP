@@ -74,9 +74,9 @@ class ReportSmokeHouseController extends Controller
         return 'laporan_smoke_house';
     }
     
-    public function index()
+    public function index(Request $request)
     {
-        $reports = ReportSmokeHouse::with([
+        $query = ReportSmokeHouse::with([
             'area',
             'creator',
             'details' => function ($q) {
@@ -87,11 +87,25 @@ class ReportSmokeHouseController extends Controller
                     'sensories',
                 ]);
             }
-        ])
-        ->latest()
-        ->paginate(10);
+        ]);
 
-        return view('report-smoke-houses.index', compact('reports'));
+        // Filter area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
+        $reports = $query->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('report-smoke-houses.index', compact('reports', 'areas'));
     }
 
     public function create()

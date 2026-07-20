@@ -19,38 +19,68 @@ use App\Imports\EquipmentImport;
 
 class RoomEquipmentController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search = $request->search;
+public function index(Request $request)
+{
+    $search = $request->search;
 
-        // Rooms + Elements
-        $rooms = Room::with('elements')
-            ->when($search, function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhereHas('elements', function ($e) use ($search) {
-                    $e->where('element_name', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name', 'asc')
-            ->get();
+    // ==========================
+    // ROOM
+    // ==========================
+    $roomQuery = Room::with('elements');
 
-        // Equipments + Parts
-        $equipments = Equipment::with('parts')
-            ->when($search, function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhereHas('parts', function ($p) use ($search) {
-                    $p->where('part_name', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name', 'asc')
-            ->get();
-
-        return view('room_equipment.master_data', [
-            'areas' => Area::all(),
-            'rooms' => $rooms,
-            'equipments' => $equipments,
-        ]);
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $roomQuery->where('area_uuid', $request->area);
     }
+
+    $rooms = $roomQuery
+        ->when($search, function ($q) use ($search) {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('elements', function ($e) use ($search) {
+                        $e->where('element_name', 'like', "%{$search}%");
+                    });
+            });
+        })
+        ->orderBy('name', 'asc')
+        ->get();
+
+    // ==========================
+    // EQUIPMENT
+    // ==========================
+    $equipmentQuery = Equipment::with('parts');
+
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $equipmentQuery->where('area_uuid', $request->area);
+    }
+
+    $equipments = $equipmentQuery
+        ->when($search, function ($q) use ($search) {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('parts', function ($p) use ($search) {
+                        $p->where('part_name', 'like', "%{$search}%");
+                    });
+            });
+        })
+        ->orderBy('name', 'asc')
+        ->get();
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('room_equipment.master_data', compact(
+        'areas',
+        'rooms',
+        'equipments'
+    ));
+}
 
     // ---------- ROOM ----------
     public function storeRoom(Request $request)

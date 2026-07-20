@@ -11,6 +11,7 @@ use App\Models\HitechStuffer;
 use App\Models\VemagStuffer;
 use App\Models\Vemag2Stuffer;
 use App\Models\HandtmannStuffer;
+use App\Models\Area;
 use App\Models\CaseStuffer;
 use App\Models\WeightStuffer;
 use App\Models\Product;
@@ -95,6 +96,13 @@ class ReportWeightStufferController extends Controller
             'details.documentations',
         ])->latest();
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
@@ -163,7 +171,16 @@ class ReportWeightStufferController extends Controller
 
         $reports = $query->paginate(10)->withQueryString();
 
-        return view('report_weight_stuffers.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_weight_stuffers.index', compact('reports', 'areas'));
     }
 
     public function create()

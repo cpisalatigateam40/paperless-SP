@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SteamerStandard;
 use App\Models\Product;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -14,13 +15,29 @@ class SteamerStandardController extends Controller
     {
         $query = SteamerStandard::with(['product', 'area']);
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('product_uuid')) {
             $query->where('product_uuid', $request->product_uuid);
         }
 
         $steamerStandards = $query->latest()->paginate(20);
 
-        return view('steamer_standards.index', compact('steamerStandards'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('steamer_standards.index', compact('steamerStandards', 'areas'));
     }
 
     public function create()

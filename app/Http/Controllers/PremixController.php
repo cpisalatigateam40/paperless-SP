@@ -19,6 +19,13 @@ class PremixController extends Controller
         $query = Premix::with('area')
             ->orderBy('name', 'asc');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -31,7 +38,16 @@ class PremixController extends Controller
 
         $premixes = $query->paginate(10)->withQueryString();
 
-        return view('premixes.index', compact('premixes'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('premixes.index', compact('premixes', 'areas'));
     }
 
     public function create()

@@ -73,25 +73,30 @@ class GmpController extends Controller
         return 'laporan_gmp_employee';
     }
 
-    public function index(Request $request)
-    {
-        $reports = ReportGmpEmployee::with([
-            'area',
-            'details.followups',
-            'sanitationCheck.sanitationArea.followups'
-        ])
-        ->when(!Auth::user()->hasRole('Superadmin'), function ($q) {
-            $q->where('area_uuid', Auth::user()->area_uuid);
-        })
+public function index(Request $request)
+{
+    $query = ReportGmpEmployee::with([
+        'area',
+        'details.followups',
+        'sanitationCheck.sanitationArea.followups'
+    ]);
 
-        // 🔍 FILTER GLOBAL
-        ->when(
-            $request->filled('date') ||
-            $request->filled('shift') ||
-            $request->filled('keyword') ||
-            $request->filled('sanitation_area') ||
-            $request->boolean('only_nc'),
-            function ($q) use ($request) {
+    // Filter Area (khusus admin & superadmin)
+    if (
+        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+        $request->filled('area')
+    ) {
+        $query->where('area_uuid', $request->area);
+    }
+
+    // 🔍 FILTER GLOBAL
+    $query->when(
+        $request->filled('date') ||
+        $request->filled('shift') ||
+        $request->filled('keyword') ||
+        $request->filled('sanitation_area') ||
+        $request->boolean('only_nc'),
+        function ($q) use ($request) {
 
             $q->where(function ($qq) use ($request) {
 
@@ -109,8 +114,8 @@ class GmpController extends Controller
                 if ($request->filled('keyword')) {
                     $qq->orWhereHas('details', function ($d) use ($request) {
                         $d->where('employee_name', 'like', "%{$request->keyword}%")
-                        ->orWhere('section_name', 'like', "%{$request->keyword}%")
-                        ->orWhere('notes', 'like', "%{$request->keyword}%");
+                            ->orWhere('section_name', 'like', "%{$request->keyword}%")
+                            ->orWhere('notes', 'like', "%{$request->keyword}%");
                     });
                 }
 
@@ -123,43 +128,58 @@ class GmpController extends Controller
 
                 // ❌ hanya NC
                 if ($request->boolean('only_nc')) {
-                    $qq->orWhereHas('details', fn ($d) => $d->where('verification', 0))
-                    ->orWhereHas('details.followups', fn ($f) => $f->where('verification', 0))
-                    ->orWhereHas('sanitationCheck.sanitationArea', fn ($s) => $s->where('verification', 0))
-                    ->orWhereHas('sanitationCheck.sanitationArea.followups', fn ($f) => $f->where('verification', 0));
+                    $qq->orWhereHas('details', fn($d) => $d->where('verification', 0))
+                        ->orWhereHas('details.followups', fn($f) => $f->where('verification', 0))
+                        ->orWhereHas('sanitationCheck.sanitationArea', fn($s) => $s->where('verification', 0))
+                        ->orWhereHas('sanitationCheck.sanitationArea.followups', fn($f) => $f->where('verification', 0));
                 }
             });
-        })
+        }
+    );
 
-        ->latest()
+    $reports = $query->latest()
         ->paginate(10)
         ->withQueryString();
 
-        // 🔢 hitung ketidaksesuaian (AMAN)
-        foreach ($reports as $report) {
-            $count = 0;
+    // 🔢 Hitung ketidaksesuaian
+    foreach ($reports as $report) {
+        $count = 0;
 
-            foreach ($report->details as $d) {
-                if ($d->verification == 0) $count++;
-                foreach ($d->followups as $f) {
-                    if ($f->verification == 0) $count++;
-                }
+        foreach ($report->details as $detail) {
+            if ($detail->verification == 0) {
+                $count++;
             }
 
-            if ($report->sanitationCheck) {
-                foreach ($report->sanitationCheck->sanitationArea as $a) {
-                    if ($a->verification == 0) $count++;
-                    foreach ($a->followups as $f) {
-                        if ($f->verification == 0) $count++;
+            foreach ($detail->followups as $followup) {
+                if ($followup->verification == 0) {
+                    $count++;
+                }
+            }
+        }
+
+        if ($report->sanitationCheck) {
+            foreach ($report->sanitationCheck->sanitationArea as $area) {
+                if ($area->verification == 0) {
+                    $count++;
+                }
+
+                foreach ($area->followups as $followup) {
+                    if ($followup->verification == 0) {
+                        $count++;
                     }
                 }
             }
-
-            $report->ketidaksesuaian = $count;
         }
 
-        return view('gmp_employee.index', compact('reports'));
+        $report->ketidaksesuaian = $count;
     }
+
+    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Area::orderBy('name')->get()
+        : collect();
+
+    return view('gmp_employee.index', compact('reports', 'areas'));
+}
 
     public function create()
     {

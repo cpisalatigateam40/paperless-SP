@@ -9,6 +9,25 @@
             </h5>
 
             <div class="d-flex flex-wrap align-items-center gap-2">
+                @hasanyrole('admin|superadmin')
+                <form method="GET" action="{{ route('report_rm_arrivals.index') }}">
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <select name="area"
+                            class="form-select form-control-sm form-control"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Area</option>
+
+                        @foreach($areas as $area)
+                            <option value="{{ $area->uuid }}"
+                                {{ request('area') == $area->uuid ? 'selected' : '' }}>
+                                {{ $area->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                @endhasanyrole
                 {{-- FILTER SECTION --}}
                 <form method="GET" action="{{ route('report_rm_arrivals.index') }}">
                     <select name="section" class="form-select form-control-sm form-control" onchange="this.form.submit()">

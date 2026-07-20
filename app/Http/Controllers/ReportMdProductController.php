@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ReportMdProduct;
 use App\Models\DetailMdProduct;
 use App\Models\PositionMdProduct;
+use App\Models\Area;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -82,6 +83,13 @@ class ReportMdProductController extends Controller
             'details.positions'
         ])->latest();
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔹 FILTER BY PROCESS TYPE (TAB)
         if ($activeTab) {
             $query->whereHas('details', function ($d) use ($activeTab) {
@@ -155,7 +163,16 @@ class ReportMdProductController extends Controller
             $report->ketidaksesuaian = $totalNonConform;
         }
 
-        return view('report_md_products.index', compact('reports', 'processTypes', 'activeTab'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_md_products.index', compact('reports', 'processTypes', 'activeTab', 'areas'));
     }
 
     public function create()

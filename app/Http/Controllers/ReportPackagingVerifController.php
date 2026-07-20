@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ReportPackagingVerif;
 use App\Models\DetailPackagingVerif;
+use App\Models\Area;
 use App\Models\ChecklistPackagingDetail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -71,6 +72,13 @@ class ReportPackagingVerifController extends Controller
             'details.product',
             'details.checklist'
         ])->latest();
+
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
         // 🔍 SEARCH GLOBAL
         if ($request->filled('search')) {
@@ -169,7 +177,16 @@ class ReportPackagingVerifController extends Controller
             $report->ketidaksesuaian = $totalNonConform;
         }
 
-        return view('report_packaging_verifs.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_packaging_verifs.index', compact('reports', 'areas'));
     }
 
     public function create()

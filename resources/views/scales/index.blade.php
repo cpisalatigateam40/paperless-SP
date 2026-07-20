@@ -7,6 +7,26 @@
             <h5>Daftar Timbangan</h5>
 
             <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
+                @hasanyrole('admin|superadmin')
+                <form method="GET" action="{{ route('scales.index') }}" class="mr-3">
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <select name="area"
+                            class="form-select form-control-sm form-control"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Area</option>
+
+                        @foreach($areas as $area)
+                            <option value="{{ $area->uuid }}"
+                                {{ request('area') == $area->uuid ? 'selected' : '' }}>
+                                {{ $area->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+                @endhasanyrole
+
                 <form action="{{ route('scales.index') }}" method="GET">
                     <div class="row g-2 align-items-center">
                         <div class="col-auto p-0">

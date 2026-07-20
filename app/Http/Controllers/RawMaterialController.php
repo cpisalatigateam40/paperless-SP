@@ -19,6 +19,13 @@ class RawMaterialController extends Controller
         $query = RawMaterial::with('area')
             ->orderBy('material_name', 'asc');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -30,7 +37,16 @@ class RawMaterialController extends Controller
 
         $rawMaterials = $query->paginate(10)->withQueryString();
 
-        return view('raw_material.index', compact('rawMaterials'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('raw_material.index', compact('rawMaterials', 'areas'));
     }
 
     public function create()

@@ -18,6 +18,13 @@ class ProductController extends Controller
         $query = Product::with('area')
             ->orderBy('product_name', 'asc');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -29,7 +36,16 @@ class ProductController extends Controller
 
         $products = $query->paginate(10)->withQueryString();
 
-        return view('products.index', compact('products'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('products.index', compact('products', 'areas'));
     }
 
 

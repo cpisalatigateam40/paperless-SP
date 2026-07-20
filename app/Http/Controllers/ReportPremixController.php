@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ReportPremix;
 use App\Models\DetailPremix;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -65,6 +66,14 @@ class ReportPremixController extends Controller
         $query = ReportPremix::with(['area', 'detailPremixes.premix'])
             ->latest();
 
+        // FILTER AREA (hanya admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // 🔍 SEARCH (HEADER + DETAIL PREMIX)
         if ($request->filled('search')) {
             $search = $request->search;
@@ -108,7 +117,16 @@ class ReportPremixController extends Controller
             return $report;
         });
 
-        return view('report_premixes.index', compact('reports'));
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
+        return view('report_premixes.index', compact('reports', 'areas'));
     }
 
 
@@ -239,11 +257,14 @@ class ReportPremixController extends Controller
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_premixes');
+
         $pdf = Pdf::loadView('report_premixes.pdf', [
             'report' => $report,
             'createdQr' => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'formNumber' => $formNumber,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('laporan_pemeriksaan_premix_' . $report->date->format('Ymd') . '.pdf');

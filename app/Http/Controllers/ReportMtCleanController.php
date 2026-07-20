@@ -78,6 +78,13 @@ class ReportMtCleanController extends Controller
             'details.photos'
         ])->latest('date');
 
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
         // SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
@@ -118,9 +125,18 @@ class ReportMtCleanController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+            if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+
+            $areas = Area::orderBy('name')->get();
+
+        } else {
+
+            $areas = collect();
+        }
+
         return view(
             'report_mt_cleans.index',
-            compact('reports')
+            compact('reports', 'areas')
         );
     }
 
