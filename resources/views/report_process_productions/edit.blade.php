@@ -105,7 +105,7 @@
                     <input type="hidden" name="formulation_uuids[]" value="{{ $item->formulation_uuid }}">
                     <div class="row">
                         <div class="col-md-3">
-                            <input type="number" step="0.001" name="actual_weight[{{ $item->formulation_uuid }}]"
+                            <input type="number" step="0.00001" name="actual_weight[{{ $item->formulation_uuid }}]"
                                 class="form-control"
                                 value="{{ old('actual_weight.'.$item->formulation_uuid, $item->actual_weight) }}"
                                 placeholder="Berat Aktual (gr)">

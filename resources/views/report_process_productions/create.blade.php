@@ -348,7 +348,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 <div class="row">
                     <div class="col-md-3">
                         <input type="number"
-                            step="0.001"
+                            step="0.00001"
                             name="actual_weight[${fm.uuid}]" 
                             class="form-control actual-weight" 
                             placeholder="Berat Aktual (kg)"
@@ -384,7 +384,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                 <div class="row">
                     <div class="col-md-3">
-                        <input type="number" step="0.001" 
+                        <input type="number" step="0.00001" 
                             name="actual_weight[${fm.uuid}]" 
                             class="form-control actual-weight" 
                             placeholder="Berat Aktual (kg)"

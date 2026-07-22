@@ -54,7 +54,7 @@
                         </div>
 
                         {{-- Temperatures --}}
-                        <h6 class="mt-3">Suhu Baso</h6>
+                        <h6 class="mt-3">Pemeriksaan Suhu Baso (waktu proses & suhu)</h6>
                         <div class="temperatures-wrapper">
                             <div class="temperature-item row mb-2">
                                 <!-- <div class="col-md-2">

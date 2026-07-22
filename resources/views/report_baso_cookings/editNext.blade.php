@@ -121,7 +121,7 @@
                         </div>
 
                         {{-- Suhu Baso --}}
-                        <h6 class="mt-3">Suhu Baso</h6>
+                        <h6 class="mt-3">Pemeriksaan Suhu Baso (waktu proses & suhu)</h6>
                         <div class="temperatures-wrapper">
                             @foreach($detail->temperatures as $j => $temp)
                             <div class="temperature-item row mb-2">

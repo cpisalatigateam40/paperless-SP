@@ -205,7 +205,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                             <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <input type="number" step="0.01" name="actual_weight[${fm.uuid}]" class="form-control" placeholder="Berat Aktual (gr)">
+                                    <input type="number" step="0.00001" name="actual_weight[${fm.uuid}]" class="form-control" placeholder="Berat Aktual (gr)">
                                 </div>
                                 <div class="col-md-4">
                                     <select name="sensory[${fm.uuid}]" class="form-control">
@@ -234,7 +234,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                             <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <input type="number" step="0.01" name="actual_weight[${fm.uuid}]" class="form-control" placeholder="Berat Aktual (gr)">
+                                    <input type="number" step="0.00001" name="actual_weight[${fm.uuid}]" class="form-control" placeholder="Berat Aktual (gr)">
                                 </div>
                                 <div class="col-md-4">
                                     <select name="sensory[${fm.uuid}]" class="form-control">
