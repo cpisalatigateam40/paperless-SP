@@ -65,6 +65,14 @@
                                 <option value="Tidak OK">Tidak OK</option>
                             </select>
                         </div>
+                        <div class="col-md-4 mt-2">
+                            <label class="form-label">Tindakan Koreksi</label>
+                            <input type="text" name="details[0][raw_materials][0][corrective_action]" class="form-control">
+                        </div>
+                        <div class="col-md-4 mt-2">
+                            <label class="form-label">Keterangan</label>
+                            <input type="text" name="details[0][raw_materials][0][keterangan]" class="form-control">
+                        </div>
                     </div>
                 </div>
 
@@ -73,6 +81,13 @@
 
 
                 <div class="row mb-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Kenampakan</label>
+                        <select name="details[0][appearance]" class="form-control" required>
+                            <option value="OK">OK</option>
+                            <option value="Tidak OK">Tidak OK</option>
+                        </select>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Warna</label>
                         <select name="details[0][color]" class="form-control" required>
@@ -140,6 +155,20 @@
                 </div>
 
                 <div class="row mb-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status Produk</label>
+                        <select name="details[0][product_status]" class="form-control" required>
+                            <option value="Release">Release</option>
+                            <option value="Reject">Reject</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tindakan Perbaikan</label>
+                        <input type="text" name="details[0][corrective_action]" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-2">
                     <div class="col-md-6">
                         <label class="form-label">Catatan</label>
                         <input type="text" name="details[0][notes]" class="form-control">
@@ -147,8 +176,8 @@
                 </div>
 
                 <div class="mt-3">
-                    <button type="submit" class="btn btn-success">Simpan Detail</button>
-                    <a href="{{ route('report_sauces.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
             </form>
         </div>
@@ -198,6 +227,12 @@ function addRawMaterial() {
                     <button type="button" class="btn btn-danger btn-sm"
                             onclick="this.closest('.raw-material-item').remove()">✕</button>
                 </div>
+            </div>
+            <div class="col-md-4 mt-2">
+                <input type="text" name="details[0][raw_materials][${rmIndex}][corrective_action]" class="form-control" placeholder="Tindakan Koreksi">
+            </div>
+            <div class="col-md-4 mt-2">
+                <input type="text" name="details[0][raw_materials][${rmIndex}][keterangan]" class="form-control" placeholder="Keterangan">
             </div>
         </div>`;
     wrapper.insertAdjacentHTML('beforeend', html);

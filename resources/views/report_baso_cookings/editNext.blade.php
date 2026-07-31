@@ -193,7 +193,7 @@
         </div>
 
         <div class="card-footer text-end">
-            <a href="{{ route('report_baso_cookings.index') }}" class="btn btn-secondary">Batal</a>
+            <a href="{{ route('report_baso_cookings.index') }}" class="btn btn-secondary">Kembali</a>
             <button type="submit" class="btn btn-success">Update</button>
         </div>
 </div>

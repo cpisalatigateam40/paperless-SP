@@ -400,8 +400,8 @@
 
 @endforeach
 
+<a href="{{ route('report_packaging_verifs.index') }}" class="btn btn-secondary">Kembali</a>
 <button type="submit" class="btn btn-success">Update Report</button>
-<a href="{{ route('report_packaging_verifs.index') }}" class="btn btn-secondary">Batal</a>
 </form>
 </div>
 </div>

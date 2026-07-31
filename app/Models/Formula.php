@@ -18,7 +18,31 @@ class Formula extends Model
         'product_uuid',
         'product_name',
         'formula_name',
+        'category'
     ];
+
+    const CATEGORY_PRODUK = 'produk';
+    const CATEGORY_SAUS_FLA_KULIT = 'saus_fla_kulit';
+
+    public static function categories(): array
+    {
+        return [
+            self::CATEGORY_PRODUK => 'Formulasi Produk',
+            self::CATEGORY_SAUS_FLA_KULIT => 'Formulasi Produk Saus, Fla, Kulit Siomay & Gyoza',
+        ];
+    }
+
+    // null atau 'produk' dianggap satu kategori yang sama (formulasi produk existing)
+    public function scopeCategory($query, $category)
+    {
+        if (empty($category) || $category === self::CATEGORY_PRODUK) {
+            return $query->where(function ($q) {
+                $q->whereNull('category')->orWhere('category', self::CATEGORY_PRODUK);
+            });
+        }
+
+        return $query->where('category', $category);
+    }
 
     public function product()
     {

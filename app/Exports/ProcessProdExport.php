@@ -24,14 +24,14 @@ class ProcessProdExport implements WithEvents, WithTitle
 
                 // Layout:
                 // A-H    : Info (termasuk Catatan Report)
-                // I-T    : Detail Produk (10 kolom + Catatan Detail + Nama Mesin)
-                // U-Y    : Item Formulasi (Nama Bahan, Kode Prod, Aktual, Sensori, Suhu)
-                // Z-AD   : Emulsifying (5 kolom)
-                // AE-AH  : Sensoric (4 kolom)
-                // AI-AK  : Tumbling (Proses, Lama Proses, Suhu Akhir)
-                // AL-AM  : Aging
+                // I-V    : Detail Produk (12 kolom + Hasil Penggilingan + Hasil Pencampuran)
+                // W-AB   : Item Formulasi (Nama Bahan, Kode Prod, Aktual, Sensori, Suhu, Keterangan)
+                // AC-AG  : Emulsifying (5 kolom)
+                // AH-AK  : Sensoric (4 kolom)
+                // AL-AN  : Tumbling (Proses, Lama Proses, Suhu Akhir)
+                // AO-AP  : Aging
 
-                $lastCol = 'AM';
+                $lastCol = 'AP';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI PROSES PRODUKSI');
@@ -47,14 +47,14 @@ class ProcessProdExport implements WithEvents, WithTitle
                 foreach (['A','B','C','D','E','F','G','H'] as $col) {
                     $sheet->mergeCells("{$col}4:{$col}5");
                 }
-                $sheet->mergeCells('I4:T4');  $sheet->setCellValue('I4', 'Detail Produk');
-                $sheet->mergeCells('U4:Y4');  $sheet->setCellValue('U4', 'Item Formulasi');
-                $sheet->mergeCells('Z4:AD4'); $sheet->setCellValue('Z4', 'Emulsifying');
-                $sheet->mergeCells('AE4:AH4'); $sheet->setCellValue('AE4', 'Sensoric');
-                $sheet->mergeCells('AI4:AK4'); $sheet->setCellValue('AI4', 'Tumbling');
-                $sheet->mergeCells('AL4:AM4'); $sheet->setCellValue('AL4', 'Aging');
+                $sheet->mergeCells('I4:V4');   $sheet->setCellValue('I4', 'Detail Produk');
+                $sheet->mergeCells('W4:AB4');  $sheet->setCellValue('W4', 'Item Formulasi');
+                $sheet->mergeCells('AC4:AG4'); $sheet->setCellValue('AC4', 'Emulsifying');
+                $sheet->mergeCells('AH4:AK4'); $sheet->setCellValue('AH4', 'Sensoric');
+                $sheet->mergeCells('AL4:AN4'); $sheet->setCellValue('AL4', 'Tumbling');
+                $sheet->mergeCells('AO4:AP4'); $sheet->setCellValue('AO4', 'Aging');
 
-                foreach (['I4','U4','Z4','AE4','AI4'] as $cell) {
+                foreach (['I4','W4','AC4','AH4','AL4','AO4'] as $cell) {
                     $sheet->getStyle($cell)->getFont()->setBold(true);
                     $sheet->getStyle($cell)->getAlignment()
                         ->setHorizontal('center')->setVertical('center');
@@ -87,30 +87,33 @@ class ProcessProdExport implements WithEvents, WithTitle
                     'R' => "Sensori\nHomo / Kekentalan / Aroma",
                     'S' => 'Catatan After Rework',
                     'T' => 'Nama Mesin',
+                    'U' => 'Hasil Penggilingan',
+                    'V' => 'Hasil Pencampuran',
                     // Item Formulasi
-                    'U' => 'Nama Bahan',
-                    'V' => 'Kode Produksi',
-                    'W' => 'Aktual (kg)',
-                    'X' => 'Sensori',
-                    'Y' => 'Suhu (°C)',
+                    'W' => 'Nama Bahan',
+                    'X' => 'Kode Produksi',
+                    'Y' => 'Aktual (kg)',
+                    'Z' => 'Sensori',
+                    'AA' => 'Suhu (°C)',
+                    'AB' => 'Keterangan',
                     // Emulsifying
-                    'Z' => "Std Suhu\nCampuran",
-                    'AA' => "Aktual 1 (°C)",
-                    'AB' => "Aktual 2 (°C)",
-                    'AC' => "Aktual 3 (°C)",
-                    'AD' => "Rata-rata (°C)",
+                    'AC' => "Std Suhu\nCampuran",
+                    'AD' => "Aktual 1 (°C)",
+                    'AE' => "Aktual 2 (°C)",
+                    'AF' => "Aktual 3 (°C)",
+                    'AG' => "Rata-rata (°C)",
                     // Sensoric
-                    'AE' => 'Homogenitas',
-                    'AF' => 'Kekentalan',
-                    'AG' => 'Aroma',
-                    'AH' => 'Benda Asing',
+                    'AH' => 'Homogenitas',
+                    'AI' => 'Kekentalan',
+                    'AJ' => 'Aroma',
+                    'AK' => 'Benda Asing',
                     // Tumbling
-                    'AI' => 'Proses Tumbling',
-                    'AJ' => 'Lama Proses (Menit)',
-                    'AK' => 'Suhu Akhir (°C)',
+                    'AL' => 'Proses Tumbling',
+                    'AM' => 'Lama Proses (Menit)',
+                    'AN' => 'Suhu Akhir (°C)',
                     // Aging
-                    'AL' => 'Aging Process',
-                    'AM' => 'Hasil Stuffing',
+                    'AO' => 'Aging Process',
+                    'AP' => 'Hasil Stuffing',
                 ];
 
                 foreach ($sub as $col => $label) {
@@ -129,12 +132,12 @@ class ProcessProdExport implements WithEvents, WithTitle
 
                 // Kolom yang di-merge vertikal (tidak direpeat per item)
                 $mergedCols = [
-                    'A','B','C','D','E','F','G','H',                     // Info + Catatan Report
-                    'I','J','K','L','M','N','O','P','Q','R','S','T',     // Detail Produk + Catatan Detail + Nama Mesin
-                    'Z','AA','AB','AC','AD',                             // Emulsifying
-                    'AE','AF','AG','AH',                                 // Sensoric
-                    'AI','AJ','AK',                                      // Tumbling
-                    'AL','AM',                                           // Aging
+                    'A','B','C','D','E','F','G','H',                             // Info + Catatan Report
+                    'I','J','K','L','M','N','O','P','Q','R','S','T','U','V',     // Detail Produk + Hasil Penggilingan/Pencampuran
+                    'AC','AD','AE','AF','AG',                                    // Emulsifying
+                    'AH','AI','AJ','AK',                                         // Sensoric
+                    'AL','AM','AN',                                              // Tumbling
+                    'AO','AP',                                                   // Aging
                 ];
 
                 foreach ($this->reports as $report) {
@@ -188,24 +191,26 @@ class ProcessProdExport implements WithEvents, WithTitle
                         $sheet->setCellValue("R{$dataRow}", $sensoriDetail);
                         $sheet->setCellValue("S{$dataRow}", $detail->notes ?? '-');
                         $sheet->setCellValue("T{$dataRow}", $detail->machine_name ?? '-');
+                        $sheet->setCellValue("U{$dataRow}", $detail->hasil_penggilingan ?? '-');
+                        $sheet->setCellValue("V{$dataRow}", $detail->hasil_pencampuran ?? '-');
                         // Emulsifying
-                        $sheet->setCellValue("Z{$dataRow}", $emuls?->standard_mixture_temp ?? '-');
-                        $sheet->setCellValue("AA{$dataRow}", $emuls?->actual_mixture_temp_1 ?? '-');
-                        $sheet->setCellValue("AB{$dataRow}", $emuls?->actual_mixture_temp_2 ?? '-');
-                        $sheet->setCellValue("AC{$dataRow}", $emuls?->actual_mixture_temp_3 ?? '-');
-                        $sheet->setCellValue("AD{$dataRow}", $emuls?->average_mixture_temp ?? '-');
+                        $sheet->setCellValue("AC{$dataRow}", $emuls?->standard_mixture_temp ?? '-');
+                        $sheet->setCellValue("AD{$dataRow}", $emuls?->actual_mixture_temp_1 ?? '-');
+                        $sheet->setCellValue("AE{$dataRow}", $emuls?->actual_mixture_temp_2 ?? '-');
+                        $sheet->setCellValue("AF{$dataRow}", $emuls?->actual_mixture_temp_3 ?? '-');
+                        $sheet->setCellValue("AG{$dataRow}", $emuls?->average_mixture_temp ?? '-');
                         // Sensoric
-                        $sheet->setCellValue("AE{$dataRow}", $sens?->homogeneous ?? '-');
-                        $sheet->setCellValue("AF{$dataRow}", $sens?->stiffness ?? '-');
-                        $sheet->setCellValue("AG{$dataRow}", $sens?->aroma ?? '-');
-                        $sheet->setCellValue("AH{$dataRow}", $sens?->foreign_object ?? '-');
+                        $sheet->setCellValue("AH{$dataRow}", $sens?->homogeneous ?? '-');
+                        $sheet->setCellValue("AI{$dataRow}", $sens?->stiffness ?? '-');
+                        $sheet->setCellValue("AJ{$dataRow}", $sens?->aroma ?? '-');
+                        $sheet->setCellValue("AK{$dataRow}", $sens?->foreign_object ?? '-');
                         // Tumbling
-                        $sheet->setCellValue("AI{$dataRow}", $tumble?->tumbling_process ?? '-');
-                        $sheet->setCellValue("AJ{$dataRow}", $tumble?->process_duration ?? '-');
-                        $sheet->setCellValue("AK{$dataRow}", $tumble?->final_temperature ?? '-');
+                        $sheet->setCellValue("AL{$dataRow}", $tumble?->tumbling_process ?? '-');
+                        $sheet->setCellValue("AM{$dataRow}", $tumble?->process_duration ?? '-');
+                        $sheet->setCellValue("AN{$dataRow}", $tumble?->final_temperature ?? '-');
                         // Aging
-                        $sheet->setCellValue("AL{$dataRow}", $aging?->aging_process ?? '-');
-                        $sheet->setCellValue("AM{$dataRow}", $aging?->stuffing_result ?? '-');
+                        $sheet->setCellValue("AO{$dataRow}", $aging?->aging_process ?? '-');
+                        $sheet->setCellValue("AP{$dataRow}", $aging?->stuffing_result ?? '-');
 
                         // Style merged cols: center + middle
                         foreach ($mergedCols as $col) {
@@ -224,13 +229,14 @@ class ProcessProdExport implements WithEvents, WithTitle
                                     ?? '-')
                                 : '-';
 
-                            $sheet->setCellValue("U{$itemRow}", $namaItem);
-                            $sheet->setCellValue("V{$itemRow}", $item?->prod_code ?? '-');
-                            $sheet->setCellValue("W{$itemRow}", $item?->actual_weight ?? '-');
-                            $sheet->setCellValue("X{$itemRow}", $item?->sensory ?? '-');
-                            $sheet->setCellValue("Y{$itemRow}", $item?->temperature ?? '-');
+                            $sheet->setCellValue("W{$itemRow}", $namaItem);
+                            $sheet->setCellValue("X{$itemRow}", $item?->prod_code ?? '-');
+                            $sheet->setCellValue("Y{$itemRow}", $item?->actual_weight ?? '-');
+                            $sheet->setCellValue("Z{$itemRow}", $item?->sensory ?? '-');
+                            $sheet->setCellValue("AA{$itemRow}", $item?->temperature ?? '-');
+                            $sheet->setCellValue("AB{$itemRow}", $item?->keterangan ?? '-');
 
-                            $sheet->getStyle("U{$itemRow}:Y{$itemRow}")->getAlignment()
+                            $sheet->getStyle("W{$itemRow}:AB{$itemRow}")->getAlignment()
                                 ->setHorizontal('center')->setVertical('center');
                             $sheet->getStyle("A{$itemRow}:{$lastCol}{$itemRow}")->getBorders()
                                 ->getAllBorders()->setBorderStyle('thin');

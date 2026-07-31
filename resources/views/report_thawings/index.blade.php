@@ -32,15 +32,15 @@
 
                 <form method="GET" action="{{ route('report_thawings.index') }}" class="d-flex align-items-center"
                     style="gap:.4rem;">
-                    <input type="text" name="search" class="form-control" placeholder="Cari laporan..."
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari laporan..."
                         value="{{ request('search') }}">
 
-                    <button type="submit" class="btn btn-outline-primary">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
                         Cari
                     </button>
 
                     @if(request('search'))
-                    <a href="{{ route('report_thawings.index') }}" class="btn btn-danger">
+                    <a href="{{ route('report_thawings.index') }}" class="btn btn-danger btn-sm">
                         Reset
                     </a>
                     @endif
@@ -67,6 +67,7 @@
                     :route="route('report_thawings.export_pdf_bulk')"
                     title="Thawing"
                     modal-id="modalExportPdfThawing"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -129,6 +130,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Kode Produksi</th>
                             <th>Dibuat Oleh</th>
                             <th width="400" class="text-center">Aksi</th>
                         </tr>
@@ -156,6 +158,31 @@
 
                             <td>
                                 {{ $report->area->name ?? '-' }}
+                            </td>
+
+                            @php
+                                $codes = $report->details->pluck('production_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
                             </td>
 
                             <td>
@@ -189,7 +216,7 @@
                                     class="d-inline" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -257,7 +284,7 @@
                         {{-- DETAIL ROW --}}
                         <tr id="detail-{{ $report->uuid }}" class="d-none">
 
-                            <td colspan="8">
+                            <td colspan="9">
 
                                 <div class="table-responsive">
 
@@ -379,12 +406,14 @@
 
                 </table>
 
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
+
             </div>
 
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
 
 
         </div>
@@ -411,6 +440,13 @@ $('.toggle-detail').click(function() {
     $('tr[id^="detail-"]').not(target).addClass('d-none')
     target.toggleClass('d-none')
 })
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 
 @endsection

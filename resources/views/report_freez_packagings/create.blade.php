@@ -42,8 +42,8 @@
                 <button type="button" class="btn btn-outline-primary" onclick="addDetailRow()">+ Tambah Baris
                     Detail</button>
 
-                <button type="submit" class="btn btn-success">Simpan</button>
-                <a href="{{ route('report_freez_packagings.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Simpan</button>
             </form>
         </div>
     </div>

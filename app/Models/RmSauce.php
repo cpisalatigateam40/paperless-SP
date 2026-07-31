@@ -15,11 +15,14 @@ class RmSauce extends Model implements Auditable
     protected $fillable = [
         'uuid',
         'detail_uuid',
+        'formulation_uuid',
         'raw_material_uuid',
         'material_uuid',
         'material_type',
         'amount',
         'sensory',
+        'corrective_action',
+        'keterangan',
     ];
 
     protected $auditEvents = [
@@ -41,5 +44,10 @@ class RmSauce extends Model implements Auditable
     public function premix()
     {
         return $this->belongsTo(Premix::class, 'material_uuid', 'uuid');
+    }
+
+    public function formulation()
+    {
+        return $this->belongsTo(Formulation::class, 'formulation_uuid', 'uuid');
     }
 }

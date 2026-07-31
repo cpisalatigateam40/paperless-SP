@@ -21,7 +21,7 @@ class SauceExport implements WithEvents, WithTitle
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastCol = 'X';
+                $lastCol = 'AE';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'LAPORAN PEMASAKAN PRODUK DI STEAM KETTLE (SAUCE)');
@@ -42,22 +42,29 @@ class SauceExport implements WithEvents, WithTitle
                     'F' => 'Group',
                     'G' => 'Nama Produk',
                     'H' => 'Kode Prod',
-                    'I' => 'Waktu Start',
-                    'J' => 'Waktu Stop',
-                    'K' => 'Bahan',
-                    'L' => 'Berat',
-                    'M' => 'Sensori RM',
-                    'N' => 'Lama Proses',
-                    'O' => 'Nomor Mesin',
-                    'P' => 'Mixing Paddle',
-                    'Q' => 'Pressure',
-                    'R' => 'Target Temp. (°C)',
-                    'S' => 'Aktual Temp. (°C)',
-                    'T' => 'Sensori Warna',
-                    'U' => 'Sensori Aroma',
-                    'V' => 'Sensori Rasa',
-                    'W' => 'Sensori Tekstur',
-                    'X' => 'Catatan',
+                    'I' => 'Formula',
+                    'J' => 'Waktu Start',
+                    'K' => 'Waktu Stop',
+                    'L' => 'Bahan',
+                    'M' => 'Berat',
+                    'N' => 'Status',
+                    'O' => 'Tindakan Koreksi RM',
+                    'P' => 'Keterangan RM',
+                    'Q' => 'Lama Proses',
+                    'R' => 'Nomor Mesin',
+                    'S' => 'Mixing Paddle',
+                    'T' => 'Pressure',
+                    'U' => 'Target Temp. (°C)',
+                    'V' => 'Aktual Temp. (°C)',
+                    'W' => 'Kenampakan',
+                    'X' => 'Sensori Warna',
+                    'Y' => 'Sensori Aroma',
+                    'Z' => 'Sensori Rasa',
+                    'AA' => 'Sensori Tekstur',
+                    'AB' => 'Status Produk',
+                    'AC' => 'Tindakan Perbaikan',
+                    'AD' => 'Catatan',
+                    'AE' => 'Catatan & Dokumentasi',
                 ];
 
                 foreach ($headers as $col => $label) {
@@ -90,6 +97,14 @@ class SauceExport implements WithEvents, WithTitle
                             ->map(fn($rm) => $rm->sensory ?? '-')
                             ->implode(', ');
 
+                        $correctiveRmList = $detail->rawMaterials
+                            ->map(fn($rm) => $rm->corrective_action ?? '-')
+                            ->implode(', ');
+
+                        $keteranganRmList = $detail->rawMaterials
+                            ->map(fn($rm) => $rm->keterangan ?? '-')
+                            ->implode(', ');
+
                         $mixingPaddle = '-';
                         if ($detail->mixing_paddle_on)  $mixingPaddle = 'On';
                         if ($detail->mixing_paddle_off) $mixingPaddle = 'Off';
@@ -109,22 +124,29 @@ class SauceExport implements WithEvents, WithTitle
                             trim(($report->product->product_name ?? '-') . ' - ' . ($report->gramase ?? '-'))
                         );
                         $sheet->setCellValue("H{$row}", $report->production_code ?? '-');
-                        $sheet->setCellValue("I{$row}", $report->start_time ?? '-');
-                        $sheet->setCellValue("J{$row}", $report->end_time ?? '-');
-                        $sheet->setCellValue("K{$row}", $bahanList ?: '-');
-                        $sheet->setCellValue("L{$row}", $beratList ?: '-');
-                        $sheet->setCellValue("M{$row}", $sensoriRmList ?: '-');
-                        $sheet->setCellValue("N{$row}", $detail->duration ?? '-');
-                        $sheet->setCellValue("O{$row}", $detail->no_mesin ?? '-');
-                        $sheet->setCellValue("P{$row}", $mixingPaddle);
-                        $sheet->setCellValue("Q{$row}", $detail->pressure ?? '-');
-                        $sheet->setCellValue("R{$row}", $detail->target_temperature ?? '-');
-                        $sheet->setCellValue("S{$row}", $detail->actual_temperature ?? '-');
-                        $sheet->setCellValue("T{$row}", $detail->color ?? '-');
-                        $sheet->setCellValue("U{$row}", $detail->aroma ?? '-');
-                        $sheet->setCellValue("V{$row}", $detail->taste ?? '-');
-                        $sheet->setCellValue("W{$row}", $detail->texture ?? '-');
-                        $sheet->setCellValue("X{$row}", $detail->notes ?? '-');
+                        $sheet->setCellValue("I{$row}", $report->formula->formula_name ?? '-');
+                        $sheet->setCellValue("J{$row}", $report->start_time ?? '-');
+                        $sheet->setCellValue("K{$row}", $report->end_time ?? '-');
+                        $sheet->setCellValue("L{$row}", $bahanList ?: '-');
+                        $sheet->setCellValue("M{$row}", $beratList ?: '-');
+                        $sheet->setCellValue("N{$row}", $sensoriRmList ?: '-');
+                        $sheet->setCellValue("O{$row}", $correctiveRmList ?: '-');
+                        $sheet->setCellValue("P{$row}", $keteranganRmList ?: '-');
+                        $sheet->setCellValue("Q{$row}", $detail->duration ?? '-');
+                        $sheet->setCellValue("R{$row}", $detail->no_mesin ?? '-');
+                        $sheet->setCellValue("S{$row}", $mixingPaddle);
+                        $sheet->setCellValue("T{$row}", $detail->pressure ?? '-');
+                        $sheet->setCellValue("U{$row}", $detail->target_temperature ?? '-');
+                        $sheet->setCellValue("V{$row}", $detail->actual_temperature ?? '-');
+                        $sheet->setCellValue("W{$row}", $detail->appearance ?? '-');
+                        $sheet->setCellValue("X{$row}", $detail->color ?? '-');
+                        $sheet->setCellValue("Y{$row}", $detail->aroma ?? '-');
+                        $sheet->setCellValue("Z{$row}", $detail->taste ?? '-');
+                        $sheet->setCellValue("AA{$row}", $detail->texture ?? '-');
+                        $sheet->setCellValue("AB{$row}", $detail->product_status ?? '-');
+                        $sheet->setCellValue("AC{$row}", $detail->corrective_action ?? '-');
+                        $sheet->setCellValue("AD{$row}", $detail->notes ?? '-');
+                        $sheet->setCellValue("AE{$row}", $report->documentation_notes ?? '-');
 
                         $sheet->getStyle("A{$row}:{$lastCol}{$row}")
                             ->getAlignment()->setHorizontal('center');

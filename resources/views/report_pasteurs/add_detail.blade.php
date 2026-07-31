@@ -163,8 +163,8 @@
                 </div>
 
                 <button type="button" class="btn btn-primary mt-3 d-none" id="add-detail">Tambah Detail</button>
-                <button type="submit" class="btn btn-success mt-3">Simpan Detail</button>
                 <a href="{{ route('report_pasteurs.index', $report->uuid) }}" class="btn btn-secondary mt-3">Kembali</a>
+                <button type="submit" class="btn btn-success mt-3">Simpan</button>
             </form>
         </div>
     </div>

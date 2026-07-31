@@ -310,6 +310,11 @@
         </div>
     </div>
 </div>
+
+<div class="d-flex" style="gap: .4rem;">
+    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+    <button type="submit" class="btn btn-success">Simpan</button>
+</div>
 </div>
 
 
@@ -321,7 +326,7 @@
 </div>
 @endif
 
-<button type="submit" class="btn btn-success">Simpan Report</button>
+
 
 </form>
 </div>{{-- end card-body --}}

@@ -81,6 +81,7 @@
                     :route="route('gmp-employee.export_pdf_bulk')"
                     title="GMP Employee"
                     modal-id="modalExportPdfGmpEmployee"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -219,7 +220,7 @@
                                         onsubmit="return confirm('Ketahui laporan ini?')" class="d-inline-block">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-check-double"></i>
                                         </button>
                                     </form>
                                     @else

@@ -74,6 +74,7 @@
                     :route="route('report_startup_labels.export_pdf_bulk')"
                     title="Startup Label"
                     modal-id="modalExportPdfStartupLabel"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -138,6 +139,7 @@
                             <th class="align-middle">Tanggal</th>
                             <th class="align-middle">Shift</th>
                             <th class="align-middle">Area</th>
+                            <th class="align-middle">Kode Produksi</th>
                             <th class="align-middle">Dibuat Oleh</th>
                             <th class="align-middle text-center">Aksi</th>
                         </tr>
@@ -149,6 +151,30 @@
                             <td class="align-middle">{{ $report->date ? $report->date->format('d-m-Y') : '-' }}</td>
                             <td class="align-middle">{{ $report->shift ?? '-' }}</td>
                             <td class="align-middle">{{ $report->area->name ?? '-' }}</td>
+                            @php
+                                $codes = $report->details->pluck('production_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td class="align-middle">{{ $report->created_by ?? '-' }}</td>
                             <td class="align-middle text-center">
                                 {{-- Toggle Detail --}}
@@ -183,7 +209,7 @@
                                     class="d-inline" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -293,11 +319,13 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
         </div>
     </div>
 </div>
@@ -324,5 +352,12 @@ $(document).ready(function() {
         }
     });
 });
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 @endsection

@@ -80,6 +80,7 @@
                     :route="route('report_pasteurs.export_pdf_bulk')"
                     title="Verifikasi Pasteurisasi"
                     modal-id="modalExportPdfPasteur"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -130,6 +131,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Kode Produksi</th>
                             <th>Dibuat Oleh</th>
                             <th>Aksi</th>
                         </tr>
@@ -142,6 +144,30 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
+                            @php
+                                $codes = $report->details->pluck('product_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ $report->created_by }}</td>
                             <td class="d-flex" style="gap: .4rem;">
                                 {{-- Toggle Detail --}}
@@ -182,7 +208,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -233,7 +259,7 @@
                         </tr>
                         {{-- Detail Collapse --}}
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
                                         <thead class="text-center align-middle">
@@ -429,14 +455,23 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
 
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
         </div>
     </div>
 </div>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
+</script>
 @endsection

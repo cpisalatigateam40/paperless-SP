@@ -163,7 +163,10 @@
                     </tbody>
                 </table>
 
-                <button type="submit" class="btn btn-success mt-3">Update</button>
+                <div class="mt-3">
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Update</button>
+                </div>
             </form>
         </div>
     </div>

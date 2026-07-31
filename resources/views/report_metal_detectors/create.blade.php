@@ -129,7 +129,10 @@
                 <button type="button" class="btn btn-outline-secondary" onclick="addDetail()">+ Tambah
                     Detail</button>
 
-                <button type="submit" class="btn btn-success">Simpan</button>
+                    <div class="mt-3">
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
             </form>
         </div>
     </div>

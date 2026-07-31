@@ -172,10 +172,10 @@
                 </div>
 
                 <div class="mt-4 d-flex gap-2" style="gap: .4rem;">
-                    <button type="submit" class="btn btn-primary">
-                        {{ $isEdit ? 'Simpan Perubahan' : 'Simpan Laporan' }}
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">
+                        {{ $isEdit ? 'Update' : 'Simpan' }}
                     </button>
-                    <a href="{{ route('report_startup_labels.index') }}" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
 

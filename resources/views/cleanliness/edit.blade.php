@@ -198,7 +198,8 @@
 
                 <button type="button" id="add-inspection" class="btn btn-secondary mr-2 d-none">+ Tambah Detail
                     Inspeksi</button>
-                <button type="submit" class="btn btn-primary">Perbarui</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Update</button>
             </form>
         </div>
     </div>

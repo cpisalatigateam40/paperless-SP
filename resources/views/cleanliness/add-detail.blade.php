@@ -14,7 +14,8 @@
 
                 <button type="button" id="add-inspection" class="btn btn-secondary mb-3 d-none">+ Tambah Detail
                     Inspeksi</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Simpan</button>
 
                 <template id="inspection-template">
                     <div class="inspection-block border rounded p-3 mb-3 position-relative" data-index="__index__">

@@ -136,8 +136,8 @@
                     Detail</button> -->
                 <br>
                 <div class="text-end">
-                    <a href="{{ route('report_lab_samples.index') }}" class="btn btn-secondary">Batal</a>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Update</button>
                 </div>
             </form>
         </div>

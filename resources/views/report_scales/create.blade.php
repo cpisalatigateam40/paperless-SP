@@ -50,8 +50,8 @@
                 </div>
 
                 <div class="mt-4">
-                    <button class="btn btn-success">Simpan Laporan</button>
                     <a href="{{ route('report-scales.index') }}" class="btn btn-secondary">Kembali</a>
+                    <button class="btn btn-success">Simpan</button>
                 </div>
             </form>
         </div>

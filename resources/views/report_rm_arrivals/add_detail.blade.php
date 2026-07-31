@@ -232,8 +232,11 @@
 
                 <button type="button" class="btn btn-sm btn-outline-primary" id="add-detail-btn">+ Tambah Baris
                     Pemeriksaan</button>
-                <button type="submit" class="btn btn-success">Simpan Pemeriksaan</button>
-                <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-secondary">Kembali</a>
+
+                    <div class="mt-4">
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
             </form>
         </div>
     </div>

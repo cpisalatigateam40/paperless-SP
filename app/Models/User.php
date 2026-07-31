@@ -29,12 +29,12 @@ class User extends Authenticatable
         'area_uuid',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($user) {
-            $user->uuid = (string) Str::uuid();
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::creating(function ($user) {
+    //         $user->uuid = (string) Str::uuid();
+    //     });
+    // }
 
     /**
      * The attributes that should be hidden for serialization.

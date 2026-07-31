@@ -83,6 +83,7 @@
                     :route="route('report_baso_cookings.export_pdf_bulk')"
                     title="Verifikasi Pemasakan Baso"
                     modal-id="modalExportPdfRmArrival"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -136,6 +137,7 @@
                             <th>Area</th>
                             <th>Ketidaksesuaian</th>
                             <th>Produk</th>
+                            <th>Kode Produksi</th>
                             <th>STD Suhu Pusat</th>
                             <th>STD Berat akhir/potong</th>
                             <th>Set suhu tangki perebusan 1</th>
@@ -163,6 +165,30 @@
                                 {{ !empty($report->gramase) 
                                                         ? $report->gramase 
                                                         : ($report->product->nett_weight ?? '-') }} g</td>
+                            @php
+                                $codes = $report->details->pluck('production_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ $report->std_core_temp ?? '-' }}</td>
                             <td>{{ $report->std_weight ?? '-' }}</td>
                             <td>{{ $report->set_boiling_1 ?? '-' }}</td>
@@ -201,7 +227,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -259,7 +285,7 @@
                             </td>
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="13">
+                            <td colspan="14">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm text-center align-middle">
                                         <thead class="table-secondary">
@@ -390,5 +416,12 @@ $(document).ready(function() {
         $('#error-alert').fadeOut('slow');
     }, 3000);
 });
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 @endsection

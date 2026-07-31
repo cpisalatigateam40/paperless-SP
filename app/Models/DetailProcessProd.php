@@ -31,6 +31,8 @@ class DetailProcessProd extends Model implements Auditable
         'gramase',
         'notes',
         'machine_name',
+        'hasil_penggilingan',
+        'hasil_pencampuran'
     ];
 
     protected $auditEvents = [

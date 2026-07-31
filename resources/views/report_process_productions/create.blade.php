@@ -53,7 +53,7 @@
 
                     <div class="col-md-6">
                         <label>Kode Produksi</label>
-                        <input type="text" name="production_code" class="form-control">
+                        <input type="text" name="production_code" class="form-control" placeholder="mis: QE12171AA0">
                     </div>
                 </div>
 
@@ -68,7 +68,7 @@
 
                     <div class="col-md-6 mb-3">
                         <label>Waktu Mixing (Menit)</label>
-                        <input type="text" name="mixing_time" class="form-control">
+                        <input type="text" name="mixing_time" class="form-control" placeholder="mis: 6">
                     </div>
 
                     <div class="col-md-6">
@@ -87,11 +87,23 @@
 
                 <datalist id="prod-code-list"></datalist>
 
+                <h5 class="mt-4 font-weight-bold">Hasil Proses</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label>Hasil Penggilingan</label>
+                        <input type="text" name="hasil_penggilingan" class="form-control" placeholder="masukkan hasil penggilingan">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Hasil Pencampuran</label>
+                        <input type="text" name="hasil_pencampuran" class="form-control" placeholder="masukkan hasil pencampuran">
+                    </div>
+                </div>
+
                 <h5 class="mt-4 font-weight-bold">Penggunaan Rework</h5>
                 <div class=" row mt-4">
                     <div class="mb-3 col-md-3">
                         <label>Rework (kg)</label>
-                        <input type="number" step="0.01" name="rework_kg" class="form-control">
+                        <input type="number" step="0.01" name="rework_kg" class="form-control" placeholder="mis: 6">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Produk Rework</label>
@@ -104,15 +116,15 @@
                     </div>
                     <div class="mb-3 col-md-3">
                         <label>Rework (%)</label>
-                        <input type="number" step="0.01" name="rework_percent" class="form-control">
+                        <input type="number" step="0.01" name="rework_percent" class="form-control" placeholder="mis: 6">
                     </div>
                     <div class="mb-3 col-md-3">
                         <label>Total Bahan (kg)</label>
-                        <input type="number" step="0.01" name="total_material" class="form-control">
+                        <input type="number" step="0.01" name="total_material" class="form-control" placeholder="mis: 6">
                     </div>
                 </div>
 
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-4">
                         <label>Sensori Homogenitas</label>
                         <select name="sensory_homogenity" class="form-control">
@@ -137,7 +149,7 @@
                             <option value="x">x</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -159,17 +171,17 @@
                     <div class="col">
                         <label>Suhu Aktual 1 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_1" id="actual_mixture_temp_1"
-                            class="form-control">
+                            class="form-control" placeholder="mis: 6">
                     </div>
                     <div class="col">
                         <label>Suhu Aktual 2 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_2" id="actual_mixture_temp_2"
-                            class="form-control">
+                            class="form-control" placeholder="mis: 6">
                     </div>
                     <div class="col">
                         <label>Suhu Aktual 3 (°C)</label>
                         <input type="number" step="0.1" name="actual_mixture_temp_3" id="actual_mixture_temp_3"
-                            class="form-control">
+                            class="form-control" placeholder="mis: 6">
                     </div>
                     <div class="col">
                         <label>Rata-rata Suhu (°C)</label>
@@ -221,7 +233,7 @@
                 <div class="row">
                     <div class=" col-md-4 mb-3">
                         <label>Proses Tumbling</label>
-                        <input type="text" name="tumbling_process" class="form-control">
+                        <input type="text" name="tumbling_process" class="form-control" placeholder="masukkan proses tumbling">
                     </div>
                     <div class="mb-3 col-md-4">
                         <label>Lama Proses (Menit)</label>
@@ -239,11 +251,11 @@
                 <div class="row">
                     <div class="mb-3 col-md-6">
                         <label>Proses Aging</label>
-                        <input type="text" name="aging_process" class="form-control">
+                        <input type="text" name="aging_process" class="form-control" placeholder="masukkan proses aging">
                     </div>
                     <div class="mb-3 col-md-6">
                         <label>Hasil Stuffing</label>
-                        <input type="text" name="stuffing_result" class="form-control">
+                        <input type="text" name="stuffing_result" class="form-control" placeholder="masukkan hasil stuffing">
                     </div>
                 </div>
 
@@ -254,7 +266,8 @@
                     <textarea name="report_notes" class="form-control" rows="3"></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-success mt-3">Simpan Laporan</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mt-3">Kembali</a>
+                <button type="submit" class="btn btn-success mt-3">Simpan</button>
             </form>
         </div>
     </div>
@@ -346,7 +359,7 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <input type="number"
                             step="0.00001"
                             name="actual_weight[${fm.uuid}]" 
@@ -354,17 +367,20 @@ document.getElementById('formula-select').addEventListener('change', function() 
                             placeholder="Berat Aktual (kg)"
                             data-standard="${fm.weight}">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
                             <option value="OK">OK</option>
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <input type="text" name="prod_code[${fm.uuid}]" class="form-control" list="prod-code-list" placeholder="Kode Produksi">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <input type="text" name="keterangan[${fm.uuid}]" class="form-control" placeholder="Keterangan">
                     </div>
                 </div>
             </div>
@@ -383,25 +399,28 @@ document.getElementById('formula-select').addEventListener('change', function() 
                 <p class="text-muted mb-2">Standard: <strong class="standard-weight">${fm.weight}</strong> kg</p>
                 <input type="hidden" name="formulation_uuids[]" value="${fm.uuid}">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <input type="number" step="0.00001" 
                             name="actual_weight[${fm.uuid}]" 
                             class="form-control actual-weight" 
                             placeholder="Berat Aktual (kg)"
                             data-standard="${fm.weight}">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <select name="sensory[${fm.uuid}]" class="form-control sensory-select">
                             <option value="">-- Pilih --</option>
                             <option value="OK">OK</option>
                             <option value="Tidak OK">Tidak OK</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <input type="text" name="prod_code[${fm.uuid}]" class="form-control" list="prod-code-list" placeholder="Kode Produksi">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4 mb-3">
                         <input type="number" step="0.1" name="temperature[${fm.uuid}]" class="form-control" placeholder="Suhu (℃)">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <input type="text" name="keterangan[${fm.uuid}]" class="form-control" placeholder="Keterangan">
                     </div>
                 </div>
             </div>

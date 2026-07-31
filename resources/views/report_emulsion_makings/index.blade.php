@@ -80,6 +80,7 @@
                     :route="route('report_emulsion_makings.export_pdf_bulk')"
                     title="Emulsion Making"
                     modal-id="modalExportPdfEmulsionMaking"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -161,6 +162,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Kode Produksi</th>
                             <th>Ketidaksesuaian</th>
                             <th>Dibuat Oleh</th>
                             <th>Aksi</th>
@@ -174,6 +176,9 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ optional($report->area)->name }}</td>
+                            <td>{{ $report->header->production_code }}</td>
+                            
+                            
                             <td>
                                 @if ($report->ketidaksesuaian > 0)
                                 Ada
@@ -226,7 +231,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -391,13 +396,15 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
 
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
         </div>
     </div>
 </div>
@@ -413,5 +420,12 @@ $(document).ready(function() {
         $('#error-alert').fadeOut('slow');
     }, 3000);
 });
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 @endsection

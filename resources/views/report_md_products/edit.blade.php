@@ -173,8 +173,8 @@
                 </div>
                 @endforeach
 
-                <button type="submit" class="btn btn-success">Perbarui</button>
                 <a href="{{ route('report_md_products.index') }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Perbarui</button>
             </form>
         </div>
     </div>

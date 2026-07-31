@@ -122,7 +122,8 @@
                     </div>
                 </div>
 
-                <button class="btn btn-success mt-3">Simpan Laporan</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mt-3">Kembali</a>
+                <button class="btn btn-success mt-3">Simpan</button>
             </div>
         </div>
     </form>

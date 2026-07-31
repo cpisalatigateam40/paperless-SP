@@ -87,8 +87,8 @@
                                 Baris</button>
                         </div>
 
-                        <button type="submit" class="btn btn-primary mt-3">Simpan Laporan</button>
-                        <a href="{{ route('report-premixes.index') }}" class="btn btn-secondary mt-3">Batal</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary mt-3">Kembali</a>
+                        <button type="submit" class="btn btn-success mt-3">Simpan</button>
                     </div>
                 </div>
             </div>
