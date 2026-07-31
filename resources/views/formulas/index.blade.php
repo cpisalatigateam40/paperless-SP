@@ -24,6 +24,14 @@
                             </option>
                         @endforeach
                     </select>
+                    <select name="category" class="form-select form-control-sm form-control" onchange="this.form.submit()">
+                        <option value="">Semua Kategori</option>
+                        @foreach($categories as $value => $label)
+                        <option value="{{ $value }}" {{ request('category') == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                        @endforeach
+                    </select>
                 </form>
                 @endhasanyrole
                 <form action="{{ route('formulas.index') }}" method="GET">
@@ -100,6 +108,7 @@
                             <th>Nama Formula</th>
                             <th>Produk</th>
                             <th>Area</th>
+                            <th>Kategori</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -109,6 +118,7 @@
                             <td>{{ $formula->formula_name }}</td>
                             <td>{{ $formula->product->product_name ?? '-' }}</td>
                             <td>{{ $formula->area->name ?? '-' }}</td>
+                            <td>{{ \App\Models\Formula::categories()[$formula->category] ?? 'Formulasi Produk' }}</td>
                             <td>
                                 <a href="{{ route('formulas.detail', $formula->uuid) }}" class="btn btn-info btn-sm">Lihat
                                     Formula</a>

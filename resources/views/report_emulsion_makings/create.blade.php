@@ -160,7 +160,10 @@
                     </tbody>
                 </table>
 
-                <button type="submit" class="btn btn-success mt-3">Simpan</button>
+                <div class="mt-3">
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                </div>
             </form>
         </div>
     </div>

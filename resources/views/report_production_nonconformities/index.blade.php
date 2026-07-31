@@ -82,6 +82,7 @@
                     :route="route('report-production-nonconformities.export_pdf_bulk')"
                     title="Verifikasi Ketidaksesuaian Proses Produksi"
                     modal-id="modalExportPdfProductionNonconformity"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -208,7 +209,7 @@
                                         onsubmit="return confirm('Ketahui laporan ini?')">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-check-double"></i>
                                         </button>
                                     </form>
                                     @else

@@ -277,7 +277,7 @@
 
 <button type="button" class="btn btn-success btn-sm mb-3 mt-3" onclick="addBatch()">+ Tambah Steamer / Batch</button>
 
-<div class="d-flex justify-content-end gap-2">
-    <a href="{{ route('report_steamer_cookings.index') }}" class="btn btn-secondary">Batal</a>
-    <button type="submit" class="btn btn-primary">Simpan</button>
+<div class="d-flex justify-content-end gap-2" style="gap: .5rem;">
+    <a href="{{ route('report_steamer_cookings.index') }}" class="btn btn-secondary">Kembali</a>
+    <button type="submit" class="btn btn-success">Simpan</button>
 </div>

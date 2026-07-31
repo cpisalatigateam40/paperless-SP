@@ -83,6 +83,7 @@
                     :route="route('report-fragile-item.export_pdf_bulk')"
                     title="Verifikasi Barang Mudah Pecah"
                     modal-id="modalExportPdfFragileItem"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -189,7 +190,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -324,11 +325,15 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }} {{-- Pagination --}}
+                </div>
             </div>
 
         </div>
 
-        {{ $reports->links('pagination::bootstrap-5') }} {{-- Pagination --}}
+        
     </div>
 </div>
 @endsection

@@ -73,123 +73,127 @@ class ReportReCleanlinessController extends Controller
         return 'laporan_re_cleanliness';
     }
 
-public function index(Request $request)
-{
-    $query = ReportReCleanliness::with([
-        'area',
-        'roomDetails.room',
-        'roomDetails.element',
-        'equipmentDetails.equipment',
-        'equipmentDetails.part'
-    ]);
+    public function index(Request $request)
+    {
+        $query = ReportReCleanliness::with([
+            'area',
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
-        $request->filled('area')
-    ) {
-        $query->where('area_uuid', $request->area);
+            'roomDetails.room',
+            'roomDetails.element',
+            'roomDetails.followups',
+
+            'equipmentDetails.equipment',
+            'equipmentDetails.part',
+            'equipmentDetails.followups',
+        ]);
+
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
+
+        // 🔍 Tanggal
+        $query->when($request->date, function ($q) use ($request) {
+            $q->whereDate('date', $request->date);
+        });
+
+        // 🔍 Global search
+        $query->when($request->search, function ($q) use ($request) {
+
+            $search = $request->search;
+
+            $q->where(function ($qq) use ($search) {
+
+                // 🔹 Header laporan
+                $qq->where('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%")
+                    ->orWhere('date', 'like', "%{$search}%");
+
+                // 🔹 Area
+                $qq->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 Room cleanliness
+                $qq->orWhereHas('roomDetails', function ($d) use ($search) {
+
+                    $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verification', 'like', "%{$search}%")
+                        ->orWhereHas('room', function ($r) use ($search) {
+                            $r->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('element', function ($e) use ($search) {
+                            $e->where('element_name', 'like', "%{$search}%");
+                        });
+
+                });
+
+                // 🔹 Equipment cleanliness
+                $qq->orWhereHas('equipmentDetails', function ($d) use ($search) {
+
+                    $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verification', 'like', "%{$search}%")
+                        ->orWhereHas('equipment', function ($e) use ($search) {
+                            $e->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('part', function ($p) use ($search) {
+                            $p->where('part_name', 'like', "%{$search}%");
+                        });
+
+                });
+
+            });
+
+        });
+
+        // 🚨 Hanya Tidak OK
+        $query->when($request->only_nc, function ($q) {
+
+            $q->where(function ($qq) {
+
+                $qq->whereHas('roomDetails', fn($d) =>
+                    $d->where('verification', 'Tidak OK')
+                )
+                ->orWhereHas('equipmentDetails', fn($d) =>
+                    $d->where('verification', 'Tidak OK')
+                );
+
+            });
+
+        });
+
+        $reports = $query->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        // 🔢 Hitung ketidaksesuaian
+        $reports->getCollection()->transform(function ($report) {
+
+            $roomIssues = $report->roomDetails
+                ->where('verification', 'Tidak OK')
+                ->count();
+
+            $equipmentIssues = $report->equipmentDetails
+                ->where('verification', 'Tidak OK')
+                ->count();
+
+            $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
+
+            return $report;
+        });
+
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('report_re_cleanliness.index', compact('reports', 'areas'));
     }
-
-    // 🔍 Tanggal
-    $query->when($request->date, function ($q) use ($request) {
-        $q->whereDate('date', $request->date);
-    });
-
-    // 🔍 Global search
-    $query->when($request->search, function ($q) use ($request) {
-
-        $search = $request->search;
-
-        $q->where(function ($qq) use ($search) {
-
-            // 🔹 Header laporan
-            $qq->where('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%")
-                ->orWhere('date', 'like', "%{$search}%");
-
-            // 🔹 Area
-            $qq->orWhereHas('area', function ($a) use ($search) {
-                $a->where('name', 'like', "%{$search}%");
-            });
-
-            // 🔹 Room cleanliness
-            $qq->orWhereHas('roomDetails', function ($d) use ($search) {
-
-                $d->where('notes', 'like', "%{$search}%")
-                    ->orWhere('corrective_action', 'like', "%{$search}%")
-                    ->orWhere('verification', 'like', "%{$search}%")
-                    ->orWhereHas('room', function ($r) use ($search) {
-                        $r->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('element', function ($e) use ($search) {
-                        $e->where('element_name', 'like', "%{$search}%");
-                    });
-
-            });
-
-            // 🔹 Equipment cleanliness
-            $qq->orWhereHas('equipmentDetails', function ($d) use ($search) {
-
-                $d->where('notes', 'like', "%{$search}%")
-                    ->orWhere('corrective_action', 'like', "%{$search}%")
-                    ->orWhere('verification', 'like', "%{$search}%")
-                    ->orWhereHas('equipment', function ($e) use ($search) {
-                        $e->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('part', function ($p) use ($search) {
-                        $p->where('part_name', 'like', "%{$search}%");
-                    });
-
-            });
-
-        });
-
-    });
-
-    // 🚨 Hanya Tidak OK
-    $query->when($request->only_nc, function ($q) {
-
-        $q->where(function ($qq) {
-
-            $qq->whereHas('roomDetails', fn($d) =>
-                $d->where('verification', 'Tidak OK')
-            )
-            ->orWhereHas('equipmentDetails', fn($d) =>
-                $d->where('verification', 'Tidak OK')
-            );
-
-        });
-
-    });
-
-    $reports = $query->latest()
-        ->paginate(10)
-        ->withQueryString();
-
-    // 🔢 Hitung ketidaksesuaian
-    $reports->getCollection()->transform(function ($report) {
-
-        $roomIssues = $report->roomDetails
-            ->where('verification', 'Tidak OK')
-            ->count();
-
-        $equipmentIssues = $report->equipmentDetails
-            ->where('verification', 'Tidak OK')
-            ->count();
-
-        $report->ketidaksesuaian = $roomIssues + $equipmentIssues;
-
-        return $report;
-    });
-
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
-
-    return view('report_re_cleanliness.index', compact('reports', 'areas'));
-}
 
     public function create()
     {

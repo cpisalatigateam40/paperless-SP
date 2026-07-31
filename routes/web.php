@@ -78,6 +78,7 @@ use App\Http\Controllers\ReportSmokeHouseController;
 use App\Http\Controllers\SteamerStandardController;
 use App\Http\Controllers\ReportSteamerCookingController;
 use App\Http\Controllers\FormNumberController;
+use	App\Http\Controllers\SsoLoginController;
 
 
 Route::get('/', function () {
@@ -87,6 +88,8 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/sso/login',	[SsoLoginController::class,	'login'])->name('sso.login');
 
 Route::middleware(['auth'])->group(function () {
     
@@ -1350,6 +1353,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');
+
+            Route::get('/get-formulas/{productUuid}', 'getFormulas')->name('getFormulas');
+            Route::get('/get-formulations/{formulaUuid}', 'getFormulations')->name('getFormulations');
         });
     Route::post('report-sauces/bulk-known', [ReportSauceController::class, 'bulkKnown'])->name('report-sauces.bulk-known');
     Route::post('report-sauces/bulk-approve', [ReportSauceController::class, 'bulkApprove'])->name('report-sauces.bulk-approve');

@@ -110,7 +110,8 @@
         </div>
 
         <div class="mt-4 text-end">
-            <button type="submit" class="btn btn-success">Simpan Laporan</button>
+            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-success">Simpan</button>
         </div>
 </div>
 

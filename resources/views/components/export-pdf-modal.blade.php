@@ -7,9 +7,10 @@
 
 @props([
     'route',
-    'title'    => 'Export PDF',
-    'modalId'  => 'modalExportPdf',
-    'btnLabel' => 'Export PDF',
+    'title'        => 'Export PDF',
+    'modalId'      => 'modalExportPdf',
+    'btnLabel'     => 'Export PDF',
+    'shiftOptions' => [], // contoh: ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']
 ])
 
 {{-- ── Tombol trigger ──────────────────────────────────────────────────────── --}}
@@ -42,7 +43,7 @@
                     {{-- Tipe filter --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-muted">Tipe Filter</label>
-                        <div class="d-flex gap-3">
+                        <div class="d-flex gap-3 flex-wrap">
                             <div class="form-check">
                                 <input class="form-check-input export-pdf-filter-type"
                                     type="radio" name="export_type"
@@ -55,14 +56,24 @@
                                 <input class="form-check-input export-pdf-filter-type"
                                     type="radio" name="export_type"
                                     id="pdf_opt_month_{{ $modalId }}" value="month">
-                                <label class="form-check-label" for="pdf_opt_month_{{ $modalId }}">
+                                <label class="form-check-label mr-3" for="pdf_opt_month_{{ $modalId }}">
                                     Per Bulan
                                 </label>
                             </div>
+                            @if (count($shiftOptions))
+                                <div class="form-check">
+                                    <input class="form-check-input export-pdf-filter-type"
+                                        type="radio" name="export_type"
+                                        id="pdf_opt_shift_{{ $modalId }}" value="shift">
+                                    <label class="form-check-label" for="pdf_opt_shift_{{ $modalId }}">
+                                        Per Shift
+                                    </label>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
-                    {{-- Range Tanggal --}}
+                    {{-- Range Tanggal (dipakai oleh export_type=range DAN export_type=shift) --}}
                     <div class="export-pdf-section-range_{{ $modalId }}">
                         <div class="row g-2">
                             <div class="col-6">
@@ -96,6 +107,21 @@
                         <input type="hidden" name="year" id="pdf_year_{{ $modalId }}">
                     </div>
 
+                    {{-- Pilihan Shift (hanya muncul saat export_type=shift, di bawah range tanggal) --}}
+                    @if (count($shiftOptions))
+                        <div class="export-pdf-section-shift_{{ $modalId }} d-none mt-3">
+                            <label class="form-label small fw-semibold text-muted">
+                                Shift
+                            </label>
+                            <select class="form-select form-control form-select-sm" name="shift">
+                                <option value="semua">Semua Shift</option>
+                                @foreach ($shiftOptions as $shiftValue => $shiftLabel)
+                                    <option value="{{ $shiftValue }}">{{ $shiftLabel }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
                 </div>
 
                 <div class="modal-footer">
@@ -119,24 +145,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formExportPdf_' + modalId);
     if (!form) return;
 
-    const radios      = form.querySelectorAll('.export-pdf-filter-type');
+    const radios       = form.querySelectorAll('.export-pdf-filter-type');
     const rangeSection = form.querySelector('.export-pdf-section-range_' + modalId);
     const monthSection = form.querySelector('.export-pdf-section-month_' + modalId);
+    const shiftSection = form.querySelector('.export-pdf-section-shift_' + modalId);
 
     const rangeInputs = rangeSection.querySelectorAll('input');
+    const shiftSelect = shiftSection ? shiftSection.querySelector('select[name="shift"]') : null;
     const periodInput = document.getElementById('pdf_period_' + modalId);
     const monthHidden  = document.getElementById('pdf_month_' + modalId);
     const yearHidden   = document.getElementById('pdf_year_' + modalId);
 
     function toggleFields() {
         const checked = form.querySelector('.export-pdf-filter-type:checked');
-        const isRange = checked ? checked.value === 'range' : true;
+        const type = checked ? checked.value : 'range';
 
-        rangeSection.classList.toggle('d-none', !isRange);
-        monthSection.classList.toggle('d-none', isRange);
+        const isRange = type === 'range';
+        const isMonth = type === 'month';
+        const isShift = type === 'shift';
 
-        rangeInputs.forEach(el => el.disabled = !isRange);
-        periodInput.disabled = isRange;
+        // Range Tanggal ditampilkan untuk mode 'range' maupun 'shift'
+        rangeSection.classList.toggle('d-none', !(isRange || isShift));
+        monthSection.classList.toggle('d-none', !isMonth);
+        rangeInputs.forEach(el => el.disabled = !(isRange || isShift));
+        periodInput.disabled = !isMonth;
+
+        if (shiftSection) {
+            shiftSection.classList.toggle('d-none', !isShift);
+            shiftSelect.disabled = !isShift;
+        }
     }
 
     radios.forEach(r => r.addEventListener('change', toggleFields));

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Area;
+use App\Models\Plant;
 use App\Models\Department;
 use App\Models\User;
 use Exception;
@@ -38,6 +39,7 @@ class ApiController extends Controller
 
 
             $userData = [
+                'uuid' => $user['uuid'] ?? null,
                 'username' => $user['username'] ?? null,
                 'name' => $user['name'] ?? null,
                 'email' => $user['email'] ?? null,

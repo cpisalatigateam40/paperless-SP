@@ -82,6 +82,7 @@
                     :route="route('report-re-cleanliness.export_pdf_bulk')"
                     title="Laporan Kebersihan"
                     modal-id="modalExportPdfReportReCleanliness"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -208,7 +209,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -401,13 +402,15 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="d-flex justify-content-end mt-4">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
 
 
-            <div class="d-flex justify-content-end mt-4">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
         </div>
     </div>
 </div>

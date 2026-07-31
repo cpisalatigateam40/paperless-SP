@@ -26,6 +26,7 @@
             <p> <span style="font-weight: bold;">Nama Formula:</span> {{ $formula->formula_name }}</p>
             <p> <span style="font-weight: bold;">Nama Produk:</span> {{ $formula->product->product_name ?? '-' }}</p>
             <p> <span style="font-weight: bold;">Area:</span> {{ $formula->area->name ?? '-' }}</p>
+            <p> <span style="font-weight: bold;">Kategori:</span> {{ \App\Models\Formula::categories()[$formula->category] ?? 'Formulasi Produk' }}</p>
 
             <hr>
             <form action="{{ route('formulas.addDetail', $formula->uuid) }}" method="POST">

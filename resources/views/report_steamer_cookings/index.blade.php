@@ -54,7 +54,7 @@
                 </div>
 
                 <x-export-pdf-modal :route="route('report_steamer_cookings.export-pdf-bulk')" title="Steamer Reports"
-                    modal-id="modalExportPdfSmokeHouse" />
+                    modal-id="modalExportPdfSmokeHouse" :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']" />
 
                 <x-export-excel-modal :route="route('report_steamer_cookings.export_excel')"
                     title="Verifikasi Pemasakan di Steamer" />
@@ -113,6 +113,7 @@
                             <th>Area</th>
                             <th>Gramasi</th>
                             <th>Jml Batch</th>
+                            <th>Kode Produksi</th>
                             <th>Diperiksa</th>
                             <th width="160">Aksi</th>
                         </tr>
@@ -127,6 +128,34 @@
                                 <td>{{ $report->area->name ?? '-' }}</td>
                                 <td>{{ $report->gramase }}</td>
                                 <td class="text-center">{{ $report->batches_count }}</td>
+                                @php
+                                    $codes = $report->batches
+                                        ->flatMap(fn($batch) => $batch->details)
+                                        ->pluck('production_code')
+                                        ->filter()
+                                        ->implode(', ');
+                                    $collapseId = 'codes-' . $report->uuid;
+                                @endphp
+
+                                <td>
+                                    @if($codes)
+                                        @if(strlen($codes) > 50)
+                                            <span id="{{ $collapseId }}-short">
+                                                {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                                <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                            </span>
+
+                                            <span id="{{ $collapseId }}-full" class="d-none">
+                                                {{ $codes }}
+                                                <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                            </span>
+                                        @else
+                                            {{ $codes }}
+                                        @endif
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td>{{ $report->created_by ?? '-' }}</td>
                                 <td class="d-flex" style="gap: .4rem;">
                                     <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
@@ -154,7 +183,7 @@
                                         style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-check-double"></i>
                                         </button>
                                     </form>
                                     @else
@@ -216,9 +245,13 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
-            {{ $reports->links() }}
+            
         </div>
     </div>
 </div>
@@ -268,4 +301,11 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
+</script>
 @endsection

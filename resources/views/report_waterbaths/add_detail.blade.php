@@ -196,8 +196,8 @@
                 </div>
 
                 <button type="button" id="add-block" class="btn btn-info">Tambah Blok</button>
-                <button type="submit" class="btn btn-success">Simpan Detail</button>
                 <a href="{{ route('report_waterbaths.index') }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Simpan Detail</button>
             </form>
         </div>
     </div>

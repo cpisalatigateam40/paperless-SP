@@ -85,6 +85,7 @@
                     :route="route('storage-rm-cleanliness.export_pdf_bulk')"
                     title="Verifikasi Kebersihan Ruang Penyimpanan"
                     modal-id="modalExportPdfCleanliness"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}

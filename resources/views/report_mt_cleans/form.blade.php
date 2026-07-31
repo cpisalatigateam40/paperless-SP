@@ -310,22 +310,22 @@
 
                 <div class="mt-4 d-flex gap-2"
                     style="gap:.4rem;">
+                    <a href="{{ route('report_mt_cleans.index') }}"
+                        class="btn btn-secondary">
+                    
+                        Kembali
+                    </a>
 
                     <button
                         type="submit"
-                        class="btn btn-primary">
+                        class="btn btn-success">
 
                         {{ $isEdit
-                            ? 'Simpan Perubahan'
-                            : 'Simpan Laporan' }}
+                            ? 'Update'
+                            : 'Simpan' }}
 
                     </button>
 
-                    <a href="{{ route('report_mt_cleans.index') }}"
-                        class="btn btn-secondary">
-
-                        Batal
-                    </a>
 
                 </div>
 

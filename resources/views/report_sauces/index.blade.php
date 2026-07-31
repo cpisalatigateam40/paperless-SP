@@ -81,6 +81,7 @@
                     :route="route('report_sauces.export_pdf_bulk')"
                     title="Sauce Reports"
                     modal-id="modalExportPdfSauce"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -131,6 +132,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Kode Produksi</th>
                             <th>Ketidaksesuaian</th>
                             <th>Dibuat Oleh</th>
                             <th>Aksi</th>
@@ -144,6 +146,7 @@
                             <td>{{ $r->shift }}</td>
                             <td>{{ $r->created_at->format('H:i') }}</td>
                             <td>{{ $r->area->name ?? '-' }}</td>
+                            <td>{{ $r->production_code ?? '-' }}</td>
                             <td>
                                 @if ($r->ketidaksesuaian > 0)
                                 Ada
@@ -190,7 +193,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -241,19 +244,25 @@
                         </tr>
                         {{-- Detail Collapse --}}
                         <tr class="collapse" id="detail-{{ $r->id }}">
-                            <td colspan="8">
+                            <td colspan="9">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-sm align-middle text-center">
                                         {{-- Header Informasi --}}
                                         <tr>
                                             <th class="text-start">Nama Produk</th>
-                                            <td colspan="16" class="text-start" style="text-align: start !important;">
+                                            <td colspan="20" class="text-start" style="text-align: start !important;">
                                                 {{ $r->product->product_name }}</td>
                                         </tr>
 
                                         <tr>
+                                            <th class="text-start">Formula</th>
+                                            <td colspan="20" class="text-start" style="text-align: start !important;">
+                                                {{ $r->formula->formula_name ?? '-' }}</td>
+                                        </tr>
+
+                                        <tr>
                                             <th class="text-start">Gramase</th>
-                                            <td colspan="16" class="text-start" style="text-align: start !important;">
+                                            <td colspan="20" class="text-start" style="text-align: start !important;">
                                                 {{ !empty($r->gramase) 
                                                         ? $r->gramase 
                                                         : ($r->product->nett_weight ?? '-') }} g</td>
@@ -261,38 +270,48 @@
 
                                         <tr>
                                             <th class="text-start">Kode Produksi</th>
-                                            <td colspan="16" class="text-start" style="text-align: start !important;">
+                                            <td colspan="20" class="text-start" style="text-align: start !important;">
                                                 {{ $r->production_code }}</td>
                                         </tr>
 
                                         <tr>
                                             <th class="text-start">Waktu (Start - Stop)</th>
-                                            <td colspan="16" class="text-start" style="text-align: start !important;">
+                                            <td colspan="20" class="text-start" style="text-align: start !important;">
                                                 {{ $r->start_time }} -
                                                 {{ $r->end_time }}</td>
                                         </tr>
                                         <tr>
                                             <th class="text-center">Nomor Mesin</th>
-                                            <td colspan="16" class="text-left">
+                                            <td colspan="20" class="text-left">
                                                 @foreach($r->details as $detail)
                                                     {{ $detail->no_mesin }}@if(!$loop->last), @endif
                                                 @endforeach
                                             </td>
                                         </tr>
 
+                                        <tr>
+                                            <th class="text-start">Catatan &amp; Dokumentasi</th>
+                                            <td colspan="20" class="text-start" style="text-align: start !important;">
+                                                {{ $r->documentation_notes ?? '-' }}</td>
+                                        </tr>
+
                                         {{-- Header Kolom Utama --}}
                                         <tr>
                                             <th rowspan="2">Pukul</th>
                                             <th rowspan="2">Tahapan Proses</th>
-                                            <th colspan="3">Bahan Baku</th>
+                                            <th colspan="5">Bahan Baku</th>
                                             <th colspan="6">Parameter Pemasakan</th>
-                                            <th colspan="4">Produk Organoleptik</th>
+                                            <th colspan="5">Produk Organoleptik</th>
+                                            <th rowspan="2">Status Produk</th>
+                                            <th rowspan="2">Tindakan Perbaikan</th>
                                             <th rowspan="2">Catatan</th>
                                         </tr>
                                         <tr>
                                             <th>Jenis Bahan</th>
                                             <th>Jumlah (Kg)</th>
-                                            <th>Sensori</th>
+                                            <th>Status</th>
+                                            <th>Tindakan Koreksi</th>
+                                            <th>Keterangan</th>
 
                                             <th>Lama Proses (menit)</th>
                                             <th>Mixing Paddle On</th>
@@ -301,6 +320,7 @@
                                             <th>Target Temp (°C)</th>
                                             <th>Actual Temp (°C)</th>
 
+                                            <th>Kenampakan</th>
                                             <th>Warna</th>
                                             <th>Aroma</th>
                                             <th>Rasa</th>
@@ -315,7 +335,7 @@
                                             <td>{{ $d->process_step }}</td>
 
                                             {{-- bahan baku ditaruh di cell bersarang --}}
-                                            <td colspan="3" class="p-0">
+                                            <td colspan="5" class="p-0">
                                                 <table class="table table-sm mb-0 table-borderless">
                                                     @foreach($d->rawMaterials as $rm)
                                                     <tr>
@@ -328,6 +348,8 @@
                                                         </td>
                                                         <td style="text-align: start !important;">{{ $rm->amount }}</td>
                                                         <td style="text-align: start !important;">{{ $rm->sensory }}</td>
+                                                        <td style="text-align: start !important;">{{ $rm->corrective_action ?? '-' }}</td>
+                                                        <td style="text-align: start !important;">{{ $rm->keterangan ?? '-' }}</td>
                                                     </tr>
                                                     @endforeach
                                                 </table>
@@ -340,24 +362,27 @@
                                             <td>{{ $d->target_temperature }}</td>
                                             <td>{{ $d->actual_temperature }}</td>
 
+                                            <td>{{ $d->appearance }}</td>
                                             <td>{{ $d->color }}</td>
                                             <td>{{ $d->aroma }}</td>
                                             <td>{{ $d->taste }}</td>
                                             <td>{{ $d->texture }}</td>
 
+                                            <td>{{ $d->product_status }}</td>
+                                            <td>{{ $d->corrective_action }}</td>
                                             <td>{{ $d->notes }}</td>
                                         </tr>
                                         @endforeach
                                     </table>
                                 </div>
-                                @can('create report')
+                                <!-- @can('create report')
                                 <div class="d-flex justify-content-end">
                                     <a href="{{ route('report_sauces.add_detail', $r->uuid) }}"
                                         class="btn btn-sm btn-outline-secondary mt-2" title="Tambah Detail">
                                         Tambah Detail
                                     </a>
                                 </div>
-                                @endcan
+                                @endcan -->
                             </td>
                         </tr>
                         @empty
@@ -367,12 +392,10 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
 
-
-
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>

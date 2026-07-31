@@ -288,8 +288,9 @@
                     + Tambah Pemeriksaan
                 </button> -->
 
-                <div class="d-flex justify-content-end mt-3">
-                    <button type="submit" class="btn btn-primary">Perbarui Laporan</button>
+                <div class="mt-3">
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Update</button>
                 </div>
             </form>
         </div>
