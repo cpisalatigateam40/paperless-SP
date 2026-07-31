@@ -82,6 +82,7 @@
                     :route="route('report_freez_packagings.export_pdf_bulk')"
                     title="Freez Packaging"
                     modal-id="modalExportPdfFreezPackaging"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -145,6 +146,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Kode Produksi</th>
                             <th>Ketidaksesuaian</th>
                             <th>Catatan</th>
                             <th>Dibuat Oleh</th>
@@ -159,6 +161,30 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
+                            @php
+                                $codes = $report->details->pluck('production_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>
                                 @if ($report->ketidaksesuaian > 0)
                                 Ada
@@ -212,7 +238,7 @@
                                     style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -435,11 +461,13 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
 
         </div>
     </div>
@@ -454,5 +482,12 @@ $(document).ready(function() {
         $('#error-alert').fadeOut('slow');
     }, 3000);
 });
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 @endsection

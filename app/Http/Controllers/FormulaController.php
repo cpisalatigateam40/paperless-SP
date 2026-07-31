@@ -18,49 +18,46 @@ use Illuminate\Support\Facades\DB;
 
 class FormulaController extends Controller
 {
-public function index(Request $request)
-{
-    $search = $request->search;
+    public function index(Request $request)
+    {
+        $search = $request->search;
 
-    $query = Formula::with(['product', 'area']);
+        $query = Formula::with(['product', 'area']);
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin'])
-    ) {
-        if ($request->filled('area')) {
-            $query->where('area_uuid', $request->area);
+        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+            if ($request->filled('area')) {
+                $query->where('area_uuid', $request->area);
+            }
+        } else {
+            $query->where('area_uuid', auth()->user()->area_uuid);
         }
-    } else {
-        // User selain admin mengikuti area miliknya
-        $query->where('area_uuid', auth()->user()->area_uuid);
+
+        if ($request->filled('category')) {
+            $query->category($request->category);
+        }
+
+        $formulas = $query
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('formula_name', 'like', "%{$search}%")
+                        ->orWhere('product_name', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($p) use ($search) {
+                            $p->where('product_name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        $categories = Formula::categories();
+
+        return view('formulas.index', compact('formulas', 'search', 'areas', 'categories'));
     }
-
-    $formulas = $query
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('formula_name', 'like', "%{$search}%")
-                    ->orWhere('product_name', 'like', "%{$search}%")
-                    ->orWhereHas('product', function ($p) use ($search) {
-                        $p->where('product_name', 'like', "%{$search}%");
-                    });
-            });
-        })
-        ->orderBy('product_name', 'asc')
-        ->paginate(10)
-        ->withQueryString();
-
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
-
-    return view('formulas.index', compact(
-        'formulas',
-        'search',
-        'areas'
-    ));
-}
-
 
     public function create()
     {
@@ -69,7 +66,8 @@ public function index(Request $request)
             ->get();
 
         $areas = \App\Models\Area::all();
-        return view('formulas.create', compact('products', 'areas'));
+        $categories = Formula::categories();
+        return view('formulas.create', compact('products', 'areas', 'categories'));
     }
 
     public function store(Request $request)
@@ -77,6 +75,7 @@ public function index(Request $request)
         $request->validate([
             'formula_name' => 'required|string|max:255',
             'product_uuid' => 'nullable|exists:products,uuid',
+            'category' => 'nullable|in:' . implode(',', array_keys(Formula::categories())),
         ]);
 
         $product = Product::where('uuid', $request->product_uuid)->first();
@@ -87,6 +86,7 @@ public function index(Request $request)
             'product_uuid' => $request->product_uuid,
             'product_name' => $product?->product_name,
             'area_uuid' => Auth::user()->area_uuid,
+            'category' => $request->category ?: Formula::CATEGORY_PRODUK,
         ]);
 
         return redirect()->route('formulas.index')->with('success', 'Formula created successfully.');

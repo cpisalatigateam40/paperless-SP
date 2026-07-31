@@ -273,10 +273,15 @@
             </div>
         </div>
     </div>
+
+    <div class="d-flex" style="gap: .4rem;;">
+    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+    <button type="submit" class="btn btn-success">Simpan Detail</button>
+</div>
 </div>
 </div>
 
-<button type="submit" class="btn btn-success">Simpan Detail</button>
+
 </form>
 </div>
 </div>

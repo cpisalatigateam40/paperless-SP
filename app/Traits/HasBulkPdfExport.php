@@ -37,14 +37,30 @@ trait HasBulkPdfExport
         return 'laporan';
     }
 
+    protected function getBulkExportShiftColumn(): string
+    {
+        return 'shift';
+    }
+
+    protected function getBulkExportShiftOptions(): array
+    {
+        // key = value yang dikirim form & dicocokkan ke DB (prefix sebelum "-"), value = label tampilan
+        return [
+            '1' => 'Shift 1',
+            '2' => 'Shift 2',
+            '3' => 'Shift 3',
+        ];
+    }
+
     public function exportPdfBulk(Request $request)
     {
         $request->validate([
-            'export_type' => 'required|in:range,month',
-            'start_date'  => 'nullable|required_if:export_type,range|date',
-            'end_date'    => 'nullable|required_if:export_type,range|date|after_or_equal:start_date',
+            'export_type' => 'required|in:range,month,shift',
+            'start_date'  => 'nullable|required_if:export_type,range,shift|date',
+            'end_date'    => 'nullable|required_if:export_type,range,shift|date|after_or_equal:start_date',
             'month'       => 'nullable|required_if:export_type,month|integer|between:1,12',
             'year'        => 'nullable|required_if:export_type,month|integer|digits:4',
+            'shift'       => ['nullable', 'required_if:export_type,shift', \Illuminate\Validation\Rule::in(array_merge(['semua'], array_keys($this->getBulkExportShiftOptions())))],
         ]);
 
         $modelClass = $this->getBulkExportModelClass();
@@ -52,14 +68,20 @@ trait HasBulkPdfExport
 
         $query = $modelClass::with($this->getBulkExportEagerLoad());
 
-        if ($request->export_type === 'range') {
-            $start = Carbon::parse($request->start_date)->startOfDay();
-            $end   = Carbon::parse($request->end_date)->endOfDay();
-            $labelPeriod = $start->format('Ymd') . '-' . $end->format('Ymd');
-        } else {
+        if ($request->export_type === 'month') {
             $start = Carbon::createFromDate($request->year, $request->month, 1)->startOfMonth();
             $end   = (clone $start)->endOfMonth();
             $labelPeriod = $start->format('Ym');
+        } else {
+            // 'range' dan 'shift' sama-sama pakai start_date/end_date
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end   = Carbon::parse($request->end_date)->endOfDay();
+            $labelPeriod = $start->format('Ymd') . '-' . $end->format('Ymd');
+
+            if ($request->export_type === 'shift' && $request->shift !== 'semua') {
+                $query->where($this->getBulkExportShiftColumn(), 'LIKE', $request->shift . '-%');
+                $labelPeriod .= '_shift' . $request->shift;
+            }
         }
 
         $reports = $query->whereBetween($dateColumn, [$start, $end])

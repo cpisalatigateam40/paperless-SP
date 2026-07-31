@@ -161,7 +161,8 @@
 
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-3">Update Laporan</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mt-3">Kembali</a>
+                <button type="submit" class="btn btn-success mt-3">Update</button>
             </form>
         </div>
     </div>

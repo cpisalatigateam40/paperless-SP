@@ -46,8 +46,8 @@
                 {{-- Tempat koreksi lanjutan --}}
                 <div id="followup-wrapper"></div>
 
-                <button type="submit" class="btn btn-success">Simpan Detail</button>
                 <a href="{{ route('gmp-employee.index') }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Simpan Detail</button>
             </form>
         </div>
     </div>

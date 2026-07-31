@@ -65,7 +65,7 @@
 
     </a>
 
-    <button class="btn btn-primary">
+    <button class="btn btn-success">
 
         Simpan
 

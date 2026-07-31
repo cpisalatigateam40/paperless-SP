@@ -136,8 +136,8 @@
                 </div>
 
                 <div class="mt-3">
-                    <button type="submit" class="btn btn-success">Simpan Detail</button>
-                    <a href="{{ route('report_siomays.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
             </form>
         </div>

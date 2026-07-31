@@ -147,8 +147,8 @@
                 </div>
 
                 <!-- <button type="button" class="btn btn-outline-secondary" onclick="addDetail()">+ Tambah Detail</button> -->
-                <button type="submit" class="btn btn-primary">Perbarui</button>
-                <a href="{{ route('report_metal_detectors.index') }}" class="btn btn-secondary">Batal</a>
+                 <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Update</button>
             </form>
         </div>
     </div>

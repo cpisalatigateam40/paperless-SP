@@ -81,6 +81,7 @@
                     :route="route('process-area-cleanliness.export_pdf_bulk')"
                     title="Verifikasi Kebersihan Area Proses"
                     modal-id="modalExportPdfProcessAreaCleanliness"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}

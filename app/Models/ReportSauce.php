@@ -18,6 +18,7 @@ class ReportSauce extends Model implements Auditable
         'uuid',
         'area_uuid',
         'product_uuid',
+        'formula_uuid',
         'production_code',
         'date',
         'shift',
@@ -27,7 +28,8 @@ class ReportSauce extends Model implements Auditable
         'known_by',
         'approved_by',
         'approved_at',
-        'gramase'
+        'gramase',
+        'documentation_notes'
     ];
 
     protected $auditEvents = [
@@ -58,5 +60,10 @@ class ReportSauce extends Model implements Auditable
     public function details()
     {
         return $this->hasMany(DetailSauce::class, 'report_uuid', 'uuid');
+    }
+
+    public function formula()
+    {
+        return $this->belongsTo(Formula::class, 'formula_uuid', 'uuid');
     }
 }

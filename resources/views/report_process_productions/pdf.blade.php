@@ -148,32 +148,32 @@
     <table>
         <tr>
             <th colspan="2">NAMA PRODUK</th>
-            <td colspan="4">{{ $detail->product->product_name ?? '-' }}</td>
+            <td colspan="5">{{ $detail->product->product_name ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">GRAMASE</th>
-            <td colspan="4">{{ number_format($detail->gramase, 0) }} g</td>
+            <td colspan="5">{{ number_format($detail->gramase, 0) }} g</td>
         </tr>
         <tr>
             <th colspan="2">KODE PRODUKSI</th>
-            <td colspan="4">{{ $detail->production_code ?? '-' }}</td>
+            <td colspan="5">{{ $detail->production_code ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">NOMOR FORMULA</th>
-            <td colspan="4">{{ $detail->formula->formula_name ?? '-' }}</td>
+            <td colspan="5">{{ $detail->formula->formula_name ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">WAKTU MIXING</th>
-            <td colspan="4">{{ $detail->mixing_time ?? '-' }}</td>
+            <td colspan="5">{{ $detail->mixing_time ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">NAMA MESIN MIXER/CHOPPER</th>
-            <td colspan="4">{{ $detail->machine_name ?? '-' }}</td>
+            <td colspan="5">{{ $detail->machine_name ?? '-' }}</td>
         </tr>
 
         {{-- A. BAHAN BAKU --}}
         <tr class="table-secondary">
-            <td colspan="6">A. BAHAN BAKU</td>
+            <td colspan="7">A. BAHAN BAKU</td>
         </tr>
         <tr>
             <th>No</th>
@@ -182,6 +182,7 @@
             <th>Sensorik</th>
             <th>Kode Produksi</th>
             <th>Suhu (℃)</th>
+            <th>Keterangan</th>
         </tr>
         @php $i = 1; @endphp
         @foreach ($detail->items->filter(fn($item) => $item->material_type
@@ -194,12 +195,13 @@
             <td>{{ $item->sensory }}</td>
             <td>{{ $item->prod_code }}</td>
             <td>{{ $item->temperature }}</td>
+            <td>{{ $item->keterangan }}</td>
         </tr>
         @endforeach
 
         {{-- B. PREMIX --}}
         <tr class="table-secondary">
-            <td colspan="6">B. PREMIX / BAHAN TAMBAHAN</td>
+            <td colspan="7">B. PREMIX / BAHAN TAMBAHAN</td>
         </tr>
         <tr>
             <th>No</th>
@@ -208,6 +210,7 @@
             <th>Sensorik</th>
             <th>Kode Produksi</th>
             <th>Suhu (℃)</th>
+            <th>Keterangan</th>
         </tr>
         @php $j = 1; @endphp
         @foreach ($detail->items->filter(fn($item) => $item->material_type
@@ -220,23 +223,35 @@
             <td>{{ $item->sensory }}</td>
             <td>{{ $item->prod_code }}</td>
             <td>{{ $item->temperature }}</td>
+            <td>{{ $item->keterangan }}</td>
         </tr>
         @endforeach
 
+        <tr>
+            <th colspan="2">Hasil Penggilingan</th>
+
+            <td colspan="5">{{$detail->hasil_penggilingan ?? '-' }}</td>
+        </tr>
+
+        <tr>
+            <th colspan="2">Hasil Pencampuran</th>
+
+            <td colspan="5">{{$detail->hasil_pencampuran ?? '-' }}</td>
+        </tr>
         {{-- REWORK --}}
         <tr>
             <th colspan="2">REWORK (kg/%)</th>
-            <td colspan="4">{{ $detail->rework_kg ?? '-' }} / {{ $detail->rework_percent ?? '-' }}</td>
+            <td colspan="5">{{ $detail->rework_kg ?? '-' }} / {{ $detail->rework_percent ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">PRODUK REWORK</th>
-            <td colspan="4">{{ $detail->reworkProduct->product_name ?? '-' }}</td>
+            <td colspan="5">{{ $detail->reworkProduct->product_name ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">TOTAL BAHAN (kg)</th>
-            <td colspan="4">{{ $detail->total_material ?? '-' }}</td>
+            <td colspan="5">{{ $detail->total_material ?? '-' }}</td>
         </tr>
-        <tr>
+        <!-- <tr>
             <th colspan="2">Sensori Homogenitas</th>
             <td colspan="4">{{ $detail->sensory_homogenity ?? '-' }}</td>
         </tr>
@@ -247,23 +262,23 @@
         <tr>
             <th colspan="2">Sensori Aroma</th>
             <td colspan="4">{{ $detail->sensory_aroma ?? '-' }}</td>
-        </tr>
+        </tr> -->
         <tr>
             <th colspan="2">Catatan After Rework</th>
-            <td colspan="4">{{ $detail->notes ?? '-' }}</td>
+            <td colspan="5">{{ $detail->notes ?? '-' }}</td>
         </tr>
 
         {{-- EMULSIFYING --}}
         <tr class="table-secondary">
-            <td colspan="6">C. EMULSIFYING</td>
+            <td colspan="7">C. EMULSIFYING</td>
         </tr>
         <tr>
             <th colspan="2">Standar suhu adonan (℃)</th>
-            <td colspan="4">{{ $detail->emulsifying->standard_mixture_temp ?? '14 ± 2' }}</td>
+            <td colspan="5">{{ $detail->emulsifying->standard_mixture_temp ?? '14 ± 2' }}</td>
         </tr>
         <tr>
             <th colspan="2">Aktual suhu adonan (℃)</th>
-            <td colspan="4">
+            <td colspan="5">
                 {{ $detail->emulsifying->actual_mixture_temp_1 ?? '-' }} /
                 {{ $detail->emulsifying->actual_mixture_temp_2 ?? '-' }} /
                 {{ $detail->emulsifying->actual_mixture_temp_3 ?? '-' }}
@@ -271,61 +286,61 @@
         </tr>
         <tr>
             <th colspan="2">Rata-rata suhu adonan (℃)</th>
-            <td colspan="4">{{ $detail->emulsifying->average_mixture_temp ?? '-' }}</td>
+            <td colspan="5">{{ $detail->emulsifying->average_mixture_temp ?? '-' }}</td>
         </tr>
 
         {{-- SENSORIK --}}
         <tr class="table-secondary">
-            <td colspan="6">D. SENSORIK</td>
+            <td colspan="7">D. SENSORIK</td>
         </tr>
         <tr>
             <th colspan="2">Homogenitas</th>
-            <td colspan="4">{{ $detail->sensoric->homogeneous ?? '-' }}</td>
+            <td colspan="5">{{ $detail->sensoric->homogeneous ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">Kekentalan</th>
-            <td colspan="4">{{ $detail->sensoric->stiffness ?? '-' }}</td>
+            <td colspan="5">{{ $detail->sensoric->stiffness ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">Aroma</th>
-            <td colspan="4">{{ $detail->sensoric->aroma ?? '-' }}</td>
+            <td colspan="5">{{ $detail->sensoric->aroma ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">Benda Asing</th>
-            <td colspan="4">{{ $detail->sensoric->foreign_object ?? '-' }}</td>
+            <td colspan="5">{{ $detail->sensoric->foreign_object ?? '-' }}</td>
         </tr>
 
         {{-- TUMBLING --}}
         <tr class="table-secondary">
-            <td colspan="6">E. TUMBLING</td>
+            <td colspan="7">E. TUMBLING</td>
         </tr>
         <tr>
             <th colspan="2">Proses Tumbling</th>
-            <td colspan="4">{{ $detail->tumbling->tumbling_process ?? '-' }}</td>
+            <td colspan="5">{{ $detail->tumbling->tumbling_process ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">Lama Proses (Menit)</th>
-            <td colspan="4">{{ $detail->tumbling->process_duration ?? '-' }}</td>
+            <td colspan="5">{{ $detail->tumbling->process_duration ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">Suhu Akhir Tumbling (°C)</th>
-            <td colspan="4">{{ $detail->tumbling->final_temperature ?? '-' }}</td>
+            <td colspan="5">{{ $detail->tumbling->final_temperature ?? '-' }}</td>
         </tr>
 
         {{-- AGING --}}
         <tr class="table-secondary">
-            <td colspan="6">F. AGING</td>
+            <td colspan="7">F. AGING</td>
         </tr>
         <tr>
             <th colspan="2">Proses Aging</th>
-            <td colspan="4">{{ $detail->aging->aging_process ?? '-' }}</td>
+            <td colspan="5">{{ $detail->aging->aging_process ?? '-' }}</td>
         </tr>
         <tr>
             <th colspan="2">Hasil Stuffing</th>
-            <td colspan="4">{{ $detail->aging->stuffing_result ?? '-' }}</td>
+            <td colspan="5">{{ $detail->aging->stuffing_result ?? '-' }}</td>
         </tr>
         <tr>
-            <td colspan="6" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+            <td colspan="7" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
         </tr>
     </table>
     @endforeach

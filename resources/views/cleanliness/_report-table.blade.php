@@ -74,7 +74,7 @@
                     onsubmit="return confirm('Ketahui laporan ini?')">
                     @csrf
                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-check-double"></i> 
                     </button>
                 </form>
                 @else

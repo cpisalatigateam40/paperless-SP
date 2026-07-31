@@ -256,7 +256,8 @@
                     </div>
                 </template>
 
-                <button class="btn btn-primary" style="margin-top: 1rem;">Edit Laporan</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mt-4">Kembali</a>
+                <button class="btn btn-success mt-4">Edit Laporan</button>
             </form>
         </div>
     </div>

@@ -22,6 +22,16 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="mb-3">
+                    <label>Kategori Formula</label>
+                    <select name="category" class="form-control">
+                        @foreach($categories as $value => $label)
+                        <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
                 <button class="btn btn-success">Save</button>
             </form>
         </div>

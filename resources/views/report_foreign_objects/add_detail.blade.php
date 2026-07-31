@@ -91,8 +91,8 @@
 
 
                 <div class="d-flex mt-4" style="gap: .5rem;">
-                    <button class="btn btn-success">Simpan Detail</button>
-                    <a href="{{ route('report-foreign-objects.index') }}" class="btn btn-secondary btn-sm">Kembali</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                    <button class="btn btn-success">Simpan</button>
                 </div>
             </div>
 

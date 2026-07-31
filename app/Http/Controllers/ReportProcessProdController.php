@@ -259,7 +259,7 @@ class ReportProcessProdController extends Controller
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
             ->get();
-        $formulas = Formula::all();
+        $formulas = Formula::category(Formula::CATEGORY_PRODUK)->get();
         $formulations = Formulation::all();
 
         return view('report_process_productions.create', compact('areas', 'sections', 'products', 'formulas', 'formulations'));
@@ -300,6 +300,8 @@ class ReportProcessProdController extends Controller
             'gramase' => $request->gramase,
             'notes' => $request->detail_notes,
             'machine_name' => $request->machine_name,
+            'hasil_penggilingan' => $request->hasil_penggilingan,
+            'hasil_pencampuran' => $request->hasil_pencampuran,
         ]);
 
         $formulations = Formulation::with(['rawMaterial', 'premix'])
@@ -322,6 +324,7 @@ class ReportProcessProdController extends Controller
                 'sensory' => $request->sensory[$uuid] ?? null,
                 'prod_code' => $request->prod_code[$uuid] ?? null,
                 'temperature' => $request->temperature[$uuid] ?? null,
+                'keterangan' => $request->keterangan[$uuid] ?? null,
             ]);
         }
 
@@ -377,7 +380,9 @@ class ReportProcessProdController extends Controller
 
     public function getFormulas($productUuid)
     {
-        $formulas = Formula::where('product_uuid', $productUuid)->get();
+        $formulas = Formula::category(Formula::CATEGORY_PRODUK)
+        ->where('product_uuid', $productUuid)
+        ->get();
         return response()->json(['formulas' => $formulas]);
     }
 
@@ -569,17 +574,21 @@ class ReportProcessProdController extends Controller
         $detail = $report->detail->first();
 
         $sections = Section::all();
-        $products = Product::all()->groupBy('product_name')->map(fn($group) => $group->first());
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
 
         // Ambil formulas hanya untuk product yang dipilih
-        $formulas = Formula::where('product_uuid', $detail->product_uuid)->get();
+        $formulas = Formula::category(Formula::CATEGORY_PRODUK)
+        ->where('product_uuid', $detail->product_uuid)
+        ->get();
 
         return view('report_process_productions.edit', compact('report', 'detail', 'sections', 'products', 'formulas'));
     }
 
 
 
-    public function update(Request $request, $uuid)
+public function update(Request $request, $uuid)
     {
         $report = ReportProcessProd::where('uuid', $uuid)->firstOrFail();
 
@@ -606,14 +615,29 @@ class ReportProcessProdController extends Controller
                 'sensory_aroma' => $request->sensory_aroma,
                 'notes' => $request->detail_notes,
                 'machine_name' => $request->machine_name,
+                'gramase' => $request->gramase,
+                'hasil_penggilingan' => $request->hasil_penggilingan,
+                'hasil_pencampuran' => $request->hasil_pencampuran,
             ]);
 
+            $submittedUuids = $request->formulation_uuids ?? [];
+
             $formulations = Formulation::with(['rawMaterial', 'premix'])
-                ->whereIn('uuid', $request->formulation_uuids ?? [])
+                ->whereIn('uuid', $submittedUuids)
                 ->get()
                 ->keyBy('uuid');
 
-            foreach ($request->formulation_uuids ?? [] as $uuidFm) {
+            // Hapus item lama yang formulation_uuid-nya sudah tidak ada di request
+            // (terjadi saat produk/formula diganti sehingga daftar bahan berubah).
+            // Guard dengan request->has() supaya tidak menghapus semua item
+            // kalau field formulation_uuids ternyata tidak terkirim sama sekali.
+            if ($request->has('formulation_uuids')) {
+                $detail->items()
+                    ->whereNotIn('formulation_uuid', $submittedUuids)
+                    ->delete();
+            }
+
+            foreach ($submittedUuids as $uuidFm) {
                 $formulation = $formulations->get($uuidFm);
                 $materialName = $formulation?->raw_material_uuid
                     ? $formulation->rawMaterial?->material_name
@@ -625,9 +649,11 @@ class ReportProcessProdController extends Controller
                     $item->update([
                         'actual_weight' => $request->actual_weight[$uuidFm] ?? null,
                         'sensory' => $request->sensory[$uuidFm] ?? null,
+                        'prod_code' => $request->prod_code[$uuidFm] ?? $item->prod_code,
                         'temperature' => $request->temperature[$uuidFm] ?? null,
                         'material_name' => $materialName,
                         'material_type' => $materialType,
+                        'keterangan' => $request->keterangan[$uuidFm] ?? null,
                     ]);
                 } else {
                     ItemDetailProd::create([
@@ -640,6 +666,7 @@ class ReportProcessProdController extends Controller
                         'temperature' => $request->temperature[$uuidFm] ?? null,
                         'material_name' => $materialName,
                         'material_type' => $materialType,
+                        'keterangan' => $request->keterangan[$uuidFm] ?? null,
                     ]);
                 }
             }
@@ -690,9 +717,12 @@ class ReportProcessProdController extends Controller
     {
         $productName = $request->get('product_name');
 
-        $formulas = \App\Models\Formula::whereHas('product', function ($q) use ($productName) {
+        $formulas = \App\Models\Formula::category(\App\Models\Formula::CATEGORY_PRODUK)
+        ->whereHas('product', function ($q) use ($productName) {
             $q->where('product_name', $productName);
-        })->select('uuid', 'formula_name')->get();
+        })
+        ->select('uuid', 'formula_name')
+        ->get();
 
         return response()->json($formulas);
     }

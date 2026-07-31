@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\RawMaterial;
 use App\Models\Premix;
 use App\Models\Area;
+use App\Models\Formula;
+use App\Models\Formulation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -191,10 +193,40 @@ class ReportSauceController extends Controller
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
             ->get();
-        $rawMaterials = RawMaterial::all();
-        $premixes = Premix::orderBy('name')->get(); // tambah
 
-        return view('report_sauces.create', compact('products', 'rawMaterials', 'premixes'));
+        return view('report_sauces.create', compact('products'));
+    }
+
+    public function getFormulas($productUuid)
+    {
+        $product = Product::where('uuid', $productUuid)->first();
+
+        if (!$product) {
+            return response()->json(['formulas' => []]);
+        }
+
+        $formulas = Formula::category(Formula::CATEGORY_SAUS_FLA_KULIT)
+            ->whereHas('product', function ($q) use ($product) {
+                $q->where('product_name', $product->product_name);
+            })
+            ->get();
+
+        return response()->json(['formulas' => $formulas]);
+    }
+
+    public function getFormulations($formulaUuid)
+    {
+        $formulations = Formulation::with(['rawMaterial', 'premix'])
+            ->where('formula_uuid', $formulaUuid)
+            ->get();
+
+        $rawMaterials = $formulations->whereNotNull('raw_material_uuid')->values();
+        $premixes = $formulations->whereNotNull('premix_uuid')->values();
+
+        return response()->json([
+            'raw_materials' => $rawMaterials,
+            'premixes' => $premixes,
+        ]);
     }
 
     public function store(Request $request)
@@ -211,13 +243,25 @@ class ReportSauceController extends Controller
                 'date' => $request->date,
                 'shift' => $shift,
                 'product_uuid' => $request->product_uuid,
+                'formula_uuid' => $request->formula_uuid,
                 'production_code' => $request->production_code,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'sensory' => $request->sensory,
                 'created_by' => Auth::user()->name,
                 'gramase' => $request->gramase,
+                'documentation_notes' => $request->documentation_notes,
             ]);
+
+            $formulationUuids = collect($request->details ?? [])
+                ->pluck('raw_materials')
+                ->flatten(1)
+                ->pluck('formulation_uuid')
+                ->filter()
+                ->unique()
+                ->values();
+
+            $formulations = Formulation::whereIn('uuid', $formulationUuids)->get()->keyBy('uuid');
 
             // 2. Simpan DETAIL proses + raw materials per detail
             if ($request->has('details')) {
@@ -230,32 +274,36 @@ class ReportSauceController extends Controller
                         'pressure' => $detail['pressure'] ?? null,
                         'target_temperature' => $detail['target_temperature'] ?? null,
                         'actual_temperature' => $detail['actual_temperature'] ?? null,
+                        'appearance' => $detail['appearance'] ?? null,
                         'color' => $detail['color'] ?? null,
                         'aroma' => $detail['aroma'] ?? null,
                         'taste' => $detail['taste'] ?? null,
                         'texture' => $detail['texture'] ?? null,
+                        'product_status' => $detail['product_status'] ?? null,
+                        'corrective_action' => $detail['corrective_action'] ?? null,
                         'notes' => $detail['notes'] ?? null,
                         'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
                         'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
                         'no_mesin' => $detail['no_mesin'] ?? null,
                     ]);
 
-                    // simpan raw materials untuk detail ini
-                    if (isset($detail['raw_materials'])) {
-                        foreach ($detail['raw_materials'] as $rm) {
-                            if (!empty($rm['material_uuid'])) {
-                                $materialType = $rm['material_type'] ?? 'raw';
+                    foreach ($detail['raw_materials'] ?? [] as $rm) {
+                        if (empty($rm['formulation_uuid'])) continue;
 
-                                $detailModel->rawMaterials()->create([
-                                    'uuid'             => Str::uuid(),
-                                    'raw_material_uuid' => $materialType === 'raw' ? $rm['material_uuid'] : null,
-                                    'material_uuid'    => $rm['material_uuid'],
-                                    'material_type'    => $materialType,
-                                    'amount'           => $rm['amount'] ?? null,
-                                    'sensory'          => $rm['sensory'] ?? null,
-                                ]);
-                            }
-                        }
+                        $formulation = $formulations->get($rm['formulation_uuid']);
+                        if (!$formulation) continue;
+
+                        $detailModel->rawMaterials()->create([
+                            'uuid' => Str::uuid(),
+                            'formulation_uuid' => $formulation->uuid,
+                            'raw_material_uuid' => $formulation->raw_material_uuid,
+                            'material_uuid' => $formulation->raw_material_uuid ?? $formulation->premix_uuid,
+                            'material_type' => $formulation->raw_material_uuid ? 'raw' : 'premix',
+                            'amount' => $rm['amount'] ?? null,
+                            'sensory' => $rm['sensory'] ?? null,
+                            'corrective_action' => $rm['corrective_action'] ?? null,
+                            'keterangan' => $rm['keterangan'] ?? null,
+                        ]);
                     }
                 }
             }
@@ -308,47 +356,45 @@ class ReportSauceController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
     }
 
-    public function exportPdf($uuid)
-    {
-        $report = ReportSauce::with([
-            'product',
-            'area',
-            'details.rawMaterials.rawMaterial',
-            'details.rawMaterials.premix',
-        ])->where('uuid', $uuid)->firstOrFail();
+public function exportPdf($uuid)
+{
+    $report = ReportSauce::with([
+        'product',
+        'area',
+        'formula',
+        'details.rawMaterials.rawMaterial',
+        'details.rawMaterials.premix',
+    ])->where('uuid', $uuid)->firstOrFail();
 
-        // Generate QR untuk created_by
-        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
-        $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
-        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+    $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+    $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
+    $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
 
-        // Generate QR untuk approved_by
-        $approvedInfo = $report->approved_by
-            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
-            : "Belum disetujui";
-        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
-        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+    $approvedInfo = $report->approved_by
+        ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+        : "Belum disetujui";
+    $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
+    $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
-        // Generate QR untuk known_by
-        $knownInfo = $report->known_by
-            ? "Diketahui oleh: {$report->known_by}"
-            : "Belum disetujui";
-        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
-        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+    $knownInfo = $report->known_by
+        ? "Diketahui oleh: {$report->known_by}"
+        : "Belum disetujui";
+    $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
+    $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
 
-        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_sauces');
+    $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_sauces');
 
-        $pdf = Pdf::loadView('report_sauces.export_pdf', [
-            'report' => $report,
-            'createdQr' => $createdQrBase64,
-            'approvedQr' => $approvedQrBase64,
-            'knownQr' => $knownQrBase64,
-            'formNumber' => $formNumber,
-        ])
-            ->setPaper('a4', 'landscape');
+    $pdf = Pdf::loadView('report_sauces.export_pdf', [
+        'report' => $report,
+        'createdQr' => $createdQrBase64,
+        'approvedQr' => $approvedQrBase64,
+        'knownQr' => $knownQrBase64,
+        'formNumber' => $formNumber,
+    ])
+        ->setPaper('a4', 'portrait');
 
-        return $pdf->stream('report_sauce_' . $report->uuid . '.pdf');
-    }
+    return $pdf->stream('report_sauce_' . $report->uuid . '.pdf');
+}
 
     // Form tambah detail
     public function addDetail($reportUuid)
@@ -365,7 +411,6 @@ class ReportSauceController extends Controller
     {
         $report = ReportSauce::where('uuid', $reportUuid)->firstOrFail();
 
-        // Ambil 1 detail (karena form add-detail hanya kirim 1 detail per kali submit)
         $detailData = $request->input('details')[0];
 
         $detail = new DetailSauce();
@@ -379,7 +424,6 @@ class ReportSauceController extends Controller
         $detail->actual_temperature = $detailData['actual_temperature'] ?? null;
         $detail->no_mesin = $detailData['no_mesin'] ?? null;
 
-        // Mixing paddle (radio on/off)
         if (isset($detailData['mixing_paddle'])) {
             if ($detailData['mixing_paddle'] === 'on') {
                 $detail->mixing_paddle_on = 1;
@@ -390,26 +434,30 @@ class ReportSauceController extends Controller
             }
         }
 
+        $detail->appearance = $detailData['appearance'] ?? null;
         $detail->color = $detailData['color'] ?? null;
         $detail->aroma = $detailData['aroma'] ?? null;
         $detail->taste = $detailData['taste'] ?? null;
         $detail->texture = $detailData['texture'] ?? null;
+        $detail->product_status = $detailData['product_status'] ?? null;
+        $detail->corrective_action = $detailData['corrective_action'] ?? null;
         $detail->notes = $detailData['notes'] ?? null;
         $detail->save();
 
-        // ✅ Simpan raw materials ke tabel rm_sauces lewat detail_uuid
         if (!empty($detailData['raw_materials'])) {
             foreach ($detailData['raw_materials'] as $rm) {
                 if (!empty($rm['material_uuid'])) {
                     $materialType = $rm['material_type'] ?? 'raw';
 
                     $detail->rawMaterials()->create([
-                        'uuid'             => Str::uuid(),
+                        'uuid'              => Str::uuid(),
                         'raw_material_uuid' => $materialType === 'raw' ? $rm['material_uuid'] : null,
-                        'material_uuid'    => $rm['material_uuid'],
-                        'material_type'    => $materialType,
-                        'amount'           => $rm['amount'] ?? null,
-                        'sensory'          => $rm['sensory'] ?? null,
+                        'material_uuid'     => $rm['material_uuid'],
+                        'material_type'     => $materialType,
+                        'amount'            => $rm['amount'] ?? null,
+                        'sensory'           => $rm['sensory'] ?? null,
+                        'corrective_action' => $rm['corrective_action'] ?? null,
+                        'keterangan'        => $rm['keterangan'] ?? null,
                     ]);
                 }
             }
@@ -421,14 +469,24 @@ class ReportSauceController extends Controller
 
     public function edit($uuid)
     {
-        $report = ReportSauce::with(['details.rawMaterials'])->where('uuid', $uuid)->firstOrFail();
-        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
-        ->groupBy('product_name')
-        ->get();
-        $rawMaterials = RawMaterial::all();
-        $premixes = Premix::orderBy('name')->get(); // tambah
+        $report = ReportSauce::with([
+            'product',
+            'formula',
+            'details.rawMaterials.formulation.rawMaterial',
+            'details.rawMaterials.formulation.premix',
+        ])->where('uuid', $uuid)->firstOrFail();
 
-        return view('report_sauces.edit', compact('report', 'products', 'rawMaterials', 'premixes'));
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
+
+        $formulas = Formula::category(Formula::CATEGORY_SAUS_FLA_KULIT)
+            ->whereHas('product', function ($q) use ($report) {
+                $q->where('product_name', $report->product->product_name);
+            })
+            ->get();
+
+        return view('report_sauces.edit', compact('report', 'products', 'formulas'));
     }
 
     public function update(Request $request, $uuid)
@@ -437,25 +495,34 @@ class ReportSauceController extends Controller
         try {
             $report = ReportSauce::where('uuid', $uuid)->firstOrFail();
 
-            // ✅ Update header laporan
             $report->update([
                 'date' => $request->date,
                 'shift' => $request->shift,
                 'product_uuid' => $request->product_uuid,
+                'formula_uuid' => $request->formula_uuid,
                 'production_code' => $request->production_code,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'sensory' => $request->sensory,
                 'gramase' => $request->gramase,
+                'documentation_notes' => $request->documentation_notes,
             ]);
 
-            // ✅ Hapus detail lama (biar tidak dobel data nested)
             $report->details()->each(function ($detail) {
                 $detail->rawMaterials()->delete();
                 $detail->delete();
             });
 
-            // ✅ Simpan ulang detail baru
+            $formulationUuids = collect($request->details ?? [])
+                ->pluck('raw_materials')
+                ->flatten(1)
+                ->pluck('formulation_uuid')
+                ->filter()
+                ->unique()
+                ->values();
+
+            $formulations = Formulation::whereIn('uuid', $formulationUuids)->get()->keyBy('uuid');
+
             if ($request->has('details')) {
                 foreach ($request->details as $detail) {
                     $detailModel = $report->details()->create([
@@ -466,31 +533,36 @@ class ReportSauceController extends Controller
                         'pressure' => $detail['pressure'] ?? null,
                         'target_temperature' => $detail['target_temperature'] ?? null,
                         'actual_temperature' => $detail['actual_temperature'] ?? null,
+                        'appearance' => $detail['appearance'] ?? null,
                         'color' => $detail['color'] ?? null,
                         'aroma' => $detail['aroma'] ?? null,
                         'taste' => $detail['taste'] ?? null,
                         'texture' => $detail['texture'] ?? null,
+                        'product_status' => $detail['product_status'] ?? null,
+                        'corrective_action' => $detail['corrective_action'] ?? null,
                         'notes' => $detail['notes'] ?? null,
                         'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
                         'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
                         'no_mesin' => $detail['no_mesin'] ?? null,
                     ]);
 
-                    if (isset($detail['raw_materials'])) {
-                        foreach ($detail['raw_materials'] as $rm) {
-                            if (!empty($rm['material_uuid'])) {
-                                $materialType = $rm['material_type'] ?? 'raw';
+                    foreach ($detail['raw_materials'] ?? [] as $rm) {
+                        if (empty($rm['formulation_uuid'])) continue;
 
-                                $detailModel->rawMaterials()->create([
-                                    'uuid'              => Str::uuid(),
-                                    'raw_material_uuid' => $materialType === 'raw' ? $rm['material_uuid'] : null,
-                                    'material_uuid'     => $rm['material_uuid'],
-                                    'material_type'     => $materialType,
-                                    'amount'            => $rm['amount'] ?? null,
-                                    'sensory'           => $rm['sensory'] ?? null,
-                                ]);
-                            }
-                        }
+                        $formulation = $formulations->get($rm['formulation_uuid']);
+                        if (!$formulation) continue;
+
+                        $detailModel->rawMaterials()->create([
+                            'uuid' => Str::uuid(),
+                            'formulation_uuid' => $formulation->uuid,
+                            'raw_material_uuid' => $formulation->raw_material_uuid,
+                            'material_uuid' => $formulation->raw_material_uuid ?? $formulation->premix_uuid,
+                            'material_type' => $formulation->raw_material_uuid ? 'raw' : 'premix',
+                            'amount' => $rm['amount'] ?? null,
+                            'sensory' => $rm['sensory'] ?? null,
+                            'corrective_action' => $rm['corrective_action'] ?? null,
+                            'keterangan' => $rm['keterangan'] ?? null,
+                        ]);
                     }
                 }
             }
@@ -523,15 +595,16 @@ class ReportSauceController extends Controller
         }
     
         $reports = ReportSauce::with([
-                'product',
-                'details.rawMaterials.rawMaterial',
-                'details.rawMaterials.premix',
-            ])
-            ->where('area_uuid', auth()->user()->area_uuid)
-            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
-            ->orderBy('date')
-            ->orderBy('shift')
-            ->get();
+            'product',
+            'formula',
+            'details.rawMaterials.rawMaterial',
+            'details.rawMaterials.premix',
+        ])
+        ->where('area_uuid', auth()->user()->area_uuid)
+        ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+        ->orderBy('date')
+        ->orderBy('shift')
+        ->get();
     
         $filename = 'Sauce_'
             . $dateFrom->format('Ymd') . '_'

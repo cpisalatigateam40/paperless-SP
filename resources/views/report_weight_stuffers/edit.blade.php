@@ -326,9 +326,9 @@
 
         @endforeach
 
-        <div class="mb-4 d-flex justify-content-end gap-2">
-            <a href="{{ route('report_weight_stuffers.index') }}" class="btn btn-secondary">Batal</a>
-            <button type="submit" class="btn btn-success px-4">Update Laporan</button>
+        <div class="mt-3">
+            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-success px-4">Update</button>
         </div>
 
     </form>

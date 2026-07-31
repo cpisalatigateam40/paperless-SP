@@ -91,8 +91,10 @@
                         <button type="button" class="btn btn-success btn-sm" onclick="addRow()">+ Tambah Baris</button>
                     </div> -->
 
-                    <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>
-                    <a href="{{ route('report-premixes.index') }}" class="btn btn-secondary mt-3">Batal</a>
+                    <div class="mt-3">
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
                 </div>
             </div>
         </div>

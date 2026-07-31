@@ -220,7 +220,8 @@
                     @endforeach
                 </div>
 
-                <button type="submit" class="btn btn-success mt-4">Perbarui</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mt-4">Kembali</a>
+                <button type="submit" class="btn btn-success mt-4">Update</button>
             </form>
         </div>
     </div>

@@ -183,7 +183,8 @@
                     </div>
                 </template>
 
-                <button class="btn btn-primary" style="margin-top: 1rem;">Simpan Laporan</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                <button class="btn btn-success">Simpan</button>
             </form>
         </div>
     </div>

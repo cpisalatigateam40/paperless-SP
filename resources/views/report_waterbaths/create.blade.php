@@ -212,6 +212,7 @@
 
                 <hr>
 
+                <a href="{{ url()->previous() }}" class="btn btn-secondary mt-4">Kembali</a>
                 <button type="submit" class="btn btn-success mt-4">Simpan</button>
             </form>
         </div>

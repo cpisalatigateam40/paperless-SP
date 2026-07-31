@@ -90,8 +90,8 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success">Simpan Detail</button>
                 <a href="{{ route('report_metal_detectors.index') }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-success">Simpan</button>
             </form>
         </div>
     </div>

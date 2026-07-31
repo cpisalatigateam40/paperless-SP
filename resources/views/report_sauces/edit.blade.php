@@ -28,12 +28,23 @@
                 <div class="row mb-3">
                     <div class="col-md-6 mb-3">
                         <label>Produk</label>
-                        <select name="product_uuid" class="form-control select2-product" required>
+                        <select name="product_uuid" id="product-select" class="form-control select2-product" required>
                             <option value="">-- pilih produk --</option>
                             @foreach($products as $product)
                             <option value="{{ $product->uuid }}"
                                 {{ $product->uuid == $report->product_uuid ? 'selected' : '' }}>
                                 {{ $product->product_name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Formula</label>
+                        <select name="formula_uuid" id="formula-select" class="form-control" required>
+                            <option value="">-- Pilih Formula --</option>
+                            @foreach($formulas as $formula)
+                            <option value="{{ $formula->uuid }}" {{ $formula->uuid == $report->formula_uuid ? 'selected' : '' }}>
+                                {{ $formula->formula_name }}
                             </option>
                             @endforeach
                         </select>
@@ -87,52 +98,56 @@
                         </div>
                     </div>
 
-                    <h6>Bahan Baku</h6>
-                    <div id="raw-materials-wrapper-{{ $detailIndex }}">
-                        @foreach($detail->rawMaterials as $rmIndex => $rm)
-                        <div class="row mb-2 raw-material-item">
-                            <div class="col-md-4">
-                                <select name="details[{{ $detailIndex }}][raw_materials][{{ $rmIndex }}][material_uuid]"
-                                        class="form-control"
-                                        onchange="updateRmMaterialType(this)"
-                                        required>
-                                    <option value="">-- Pilih Bahan Baku --</option>
-                                    @foreach($rawMaterials as $material)
-                                        <option value="{{ $material->uuid }}" data-type="raw"
-                                            {{ $rm->material_type === 'raw' && $rm->material_uuid == $material->uuid ? 'selected' : '' }}>
-                                            {{ $material->material_name }}
-                                        </option>
-                                    @endforeach
-                                    @foreach($premixes as $premix)
-                                        <option value="{{ $premix->uuid }}" data-type="premix"
-                                            {{ $rm->material_type === 'premix' && $rm->material_uuid == $premix->uuid ? 'selected' : '' }}>
-                                            {{ $premix->name }} (Premix)
-                                        </option>
-                                    @endforeach
-                                </select>
+                    <h6>Bahan Baku &amp; Premix</h6>
+                    <div id="raw-materials-wrapper-{{ $detailIndex }}" class="raw-materials-wrapper">
+                        @foreach($detail->rawMaterials as $rm)
+                        <div class="row mb-3 raw-material-item">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ $rm->material_type === 'raw' ? 'Bahan Baku' : 'Premix' }} (Standard: {{ $rm->formulation?->weight }} kg)</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $rm->formulation?->rawMaterial?->material_name ?? $rm->formulation?->premix?->name ?? '-' }}"
+                                    readonly>
                                 <input type="hidden"
-                                    name="details[{{ $detailIndex }}][raw_materials][{{ $rmIndex }}][material_type]"
-                                    value="{{ $rm->material_type ?? 'raw' }}">
+                                    name="details[{{ $detailIndex }}][raw_materials][{{ $rm->uuid }}][formulation_uuid]"
+                                    value="{{ $rm->formulation_uuid }}">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Berat Aktual (Kg)</label>
                                 <input type="number" step="0.01"
-                                    name="details[{{ $detailIndex }}][raw_materials][{{ $rmIndex }}][amount]"
+                                    name="details[{{ $detailIndex }}][raw_materials][{{ $rm->uuid }}][amount]"
                                     class="form-control" value="{{ $rm->amount }}">
                             </div>
-                            <div class="col-md-4">
-                                <select name="details[{{ $detailIndex }}][raw_materials][{{ $rmIndex }}][sensory]"
-                                        class="form-control" required>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="details[{{ $detailIndex }}][raw_materials][{{ $rm->uuid }}][sensory]" class="form-control" required>
                                     <option value="OK" {{ $rm->sensory == 'OK' ? 'selected' : '' }}>OK</option>
                                     <option value="Tidak OK" {{ $rm->sensory == 'Tidak OK' ? 'selected' : '' }}>Tidak OK</option>
                                 </select>
                             </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tindakan Koreksi</label>
+                                <input type="text"
+                                    name="details[{{ $detailIndex }}][raw_materials][{{ $rm->uuid }}][corrective_action]"
+                                    class="form-control" value="{{ $rm->corrective_action }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Keterangan</label>
+                                <input type="text"
+                                    name="details[{{ $detailIndex }}][raw_materials][{{ $rm->uuid }}][keterangan]"
+                                    class="form-control" value="{{ $rm->keterangan }}">
+                            </div>
                         </div>
                         @endforeach
                     </div>
-                    <button type="button" class="btn btn-sm btn-secondary mt-2"
-                        onclick="addRawMaterial({{ $detailIndex }})">+ Tambah Bahan Baku</button>
 
                     <div class="row mt-3">
+                        <div class="col-md-6 mb-3">
+                            <label>Kenampakan</label>
+                            <select name="details[{{ $detailIndex }}][appearance]" class="form-control" required>
+                                <option value="OK" {{ $detail->appearance == 'OK' ? 'selected' : '' }}>OK</option>
+                                <option value="Tidak OK" {{ $detail->appearance == 'Tidak OK' ? 'selected' : '' }}>Tidak OK</option>
+                            </select>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label>Warna</label>
                             <select name="details[{{ $detailIndex }}][color]" class="form-control" required>
@@ -213,74 +228,120 @@
                                 class="form-control" value="{{ $detail->actual_temperature }}">
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label>Status Produk</label>
+                            <select name="details[{{ $detailIndex }}][product_status]" class="form-control" required>
+                                <option value="Release" {{ $detail->product_status == 'Release' ? 'selected' : '' }}>Release</option>
+                                <option value="Reject" {{ $detail->product_status == 'Reject' ? 'selected' : '' }}>Reject</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Tindakan Perbaikan</label>
+                            <input type="text" name="details[{{ $detailIndex }}][corrective_action]" class="form-control" value="{{ $detail->corrective_action }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label>Catatan</label>
                             <input type="text" name="details[{{ $detailIndex }}][notes]" class="form-control"
                                 value="{{ $detail->notes }}">
                         </div>
+
+                        
                     </div>
+
+                    <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Catatan &amp; Dokumentasi</label>
+                                <textarea name="documentation_notes" class="form-control" rows="2">{{ $report->documentation_notes }}</textarea>
+                            </div>
+                        </div>
                 </div>
                 @endforeach
 
                 <div class="mt-3">
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-success">Update</button>
-                    <a href="{{ route('report_sauces.index') }}" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script>
-function addRawMaterial(detailIndex) {
-    const wrapper = document.getElementById(`raw-materials-wrapper-${detailIndex}`);
-    const rmCount = wrapper.querySelectorAll('.raw-material-item').length;
-    const html = `
-        <div class="row mb-2 raw-material-item mt-3">
-            <div class="col-md-4">
-                <select name="details[${detailIndex}][raw_materials][${rmCount}][material_uuid]"
-                        class="form-control"
-                        onchange="updateRmMaterialType(this)"
-                        required>
-                    <option value="">-- Pilih Bahan Baku --</option>
-                    @foreach($rawMaterials as $material)
-                        <option value="{{ $material->uuid }}" data-type="raw">
-                            {{ $material->material_name }}
-                        </option>
-                    @endforeach
-                    @foreach($premixes as $premix)
-                        <option value="{{ $premix->uuid }}" data-type="premix">
-                            {{ $premix->name }} (Premix)
-                        </option>
-                    @endforeach
-                </select>
-                <input type="hidden"
-                       name="details[${detailIndex}][raw_materials][${rmCount}][material_type]"
-                       value="raw">
-            </div>
-            <div class="col-md-4">
-                <input type="number" step="0.01"
-                       name="details[${detailIndex}][raw_materials][${rmCount}][amount]"
-                       class="form-control" placeholder="Berat (kg)">
-            </div>
-            <div class="col-md-4">
-                <div class="d-flex gap-2">
-                    <select name="details[${detailIndex}][raw_materials][${rmCount}][sensory]"
-                            class="form-control" required>
-                        <option value="OK">OK</option>
-                        <option value="Tidak OK">Tidak OK</option>
-                    </select>
-                    <button type="button" class="btn btn-danger btn-sm"
-                            onclick="this.closest('.raw-material-item').remove()">✕</button>
-                </div>
-            </div>
-        </div>`;
-    wrapper.insertAdjacentHTML('beforeend', html);
-}
 
-function updateRmMaterialType(selectEl) {
-    const type = selectEl.options[selectEl.selectedIndex].getAttribute('data-type') || 'raw';
-    const hiddenInput = selectEl.closest('div').querySelector('input[type="hidden"]');
-    if (hiddenInput) hiddenInput.value = type;
-}
+@endsection
+
+@section('script')
+<script>
+$(document).ready(function () {
+    $('#product-select').on('change', function () {
+        const productUuid = this.value;
+        const formulaSelect = document.getElementById('formula-select');
+        const getFormulasUrl = "{{ route('report_sauces.getFormulas', ['productUuid' => 'PRODUCT_UUID_PLACEHOLDER']) }}";
+
+        formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
+
+        if (!productUuid) return;
+
+        fetch(getFormulasUrl.replace('PRODUCT_UUID_PLACEHOLDER', productUuid))
+            .then(res => res.json())
+            .then(data => {
+                data.formulas.forEach(formula => {
+                    const opt = document.createElement('option');
+                    opt.value = formula.uuid;
+                    opt.textContent = formula.formula_name;
+                    formulaSelect.appendChild(opt);
+                });
+            });
+    });
+});
+
+document.getElementById('formula-select').addEventListener('change', function () {
+    const formulaUuid = this.value;
+    const getFormulationsUrl = "{{ route('report_sauces.getFormulations', ['formulaUuid' => 'FORMULA_UUID_PLACEHOLDER']) }}";
+
+    if (!formulaUuid) return;
+
+    fetch(getFormulationsUrl.replace('FORMULA_UUID_PLACEHOLDER', formulaUuid))
+        .then(res => res.json())
+        .then(data => {
+            const buildRow = (fm, label) => `
+                <div class="row mb-3 raw-material-item">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">${label} (Standard: ${fm.weight} kg)</label>
+                        <input type="text" class="form-control" value="${fm.raw_material?.material_name ?? fm.premix?.name ?? '-'}" readonly>
+                        <input type="hidden" name="__NAME_PREFIX__[raw_materials][${fm.uuid}][formulation_uuid]" value="${fm.uuid}">
+                        
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Berat Aktual (Kg)</label>
+                        <input type="number" step="0.01" name="__NAME_PREFIX__[raw_materials][${fm.uuid}][amount]" class="form-control" value="${fm.weight}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="__NAME_PREFIX__[raw_materials][${fm.uuid}][sensory]" class="form-control" required>
+                            <option value="OK">OK</option>
+                            <option value="Tidak OK">Tidak OK</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tindakan Koreksi</label>
+                        <input type="text" name="__NAME_PREFIX__[raw_materials][${fm.uuid}][corrective_action]" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Keterangan</label>
+                        <input type="text" name="__NAME_PREFIX__[raw_materials][${fm.uuid}][keterangan]" class="form-control">
+                    </div>
+                </div>
+            `;
+
+            // formula ganti → regenerate SEMUA blok Detail Proses yang ada, karena satu report cuma pakai satu formula
+            document.querySelectorAll('.raw-materials-wrapper').forEach(wrapper => {
+                const detailIndex = wrapper.id.replace('raw-materials-wrapper-', '');
+                const namePrefix = `details[${detailIndex}]`;
+                wrapper.innerHTML = '';
+
+                data.raw_materials.forEach(fm => wrapper.insertAdjacentHTML('beforeend', buildRow(fm, 'Bahan Baku').replaceAll('__NAME_PREFIX__', namePrefix)));
+                data.premixes.forEach(fm => wrapper.insertAdjacentHTML('beforeend', buildRow(fm, 'Premix').replaceAll('__NAME_PREFIX__', namePrefix)));
+            });
+        });
+});
 </script>
 @endsection

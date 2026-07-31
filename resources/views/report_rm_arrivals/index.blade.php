@@ -4,9 +4,9 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">
+            <h6 class="mb-0">
                 Laporan Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang
-            </h5>
+            </h6>
 
             <div class="d-flex flex-wrap align-items-center gap-2">
                 @hasanyrole('admin|superadmin')
@@ -67,11 +67,11 @@
                     @endrole
                 </div>
 
-                {{-- Export PDF --}}
                 <x-export-pdf-modal
                     :route="route('report_rm_arrivals.export_pdf_bulk')"
                     title="RM Arrival"
                     modal-id="modalExportPdfRmArrival"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -108,7 +108,7 @@
 
                 @can('create report')
                 <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
-                    <i class="bi bi-plus-lg"></i> Tambah
+                    Tambah Laporan
                 </a>
                 @endcan
 
@@ -137,6 +137,7 @@
                             <th>Waktu</th>
                             <th>Area</th>
                             <th>Section</th>
+                            <th>Kode Produksi</th>
                             <th>Ketidaksesuaian</th>
                             <th>Dibuat oleh</th>
                             <th>Aksi</th>
@@ -151,6 +152,30 @@
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
                             <td>{{ $report->section->section_name ?? '-' }}</td>
+                            @php
+                                $codes = $report->details->pluck('production_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>
                                 @if ($report->ketidaksesuaian > 0)
                                     Ada
@@ -207,7 +232,7 @@
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success"
                                         title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -261,7 +286,7 @@
 
                         {{-- DETAIL --}}
                         <tr id="detail-{{ $report->id }}" class="d-none">
-                            <td colspan="9">
+                            <td colspan="10">
                                 <table class="table table-sm table-bordered mb-0">
                                     <thead>
                                         <tr class="text-center align-middle">
@@ -332,12 +357,14 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                {{-- PAGINATION --}}
+                <div class="d-flex justify-content-end mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
-            {{-- PAGINATION --}}
-            <div class="d-flex justify-content-end mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
 
 
         </div>
@@ -369,5 +396,14 @@ $(document).ready(function() {
         }
     });
 });
+
+
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 @endsection

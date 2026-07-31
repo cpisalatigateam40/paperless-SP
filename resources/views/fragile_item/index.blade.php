@@ -120,10 +120,10 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
 
-            <div class="d-flex justify-content-end mt-4">
-                {{ $fragileItems->links('pagination::bootstrap-5') }}
+                <div class="d-flex justify-content-end mt-4">
+                    {{ $fragileItems->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>

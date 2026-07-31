@@ -80,6 +80,7 @@
                     :route="route('report_premixes.export_pdf_bulk')"
                     title="Premix"
                     modal-id="modalExportPdfPremix"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -143,6 +144,7 @@
                             <th class="align-middle">Shift</th>
                             <th class="align-middle">Waktu</th>
                             <th class="align-middle">Area</th>
+                            <th class="align-middle">Kode Produksi</th>
                             <th class="align-middle">Ketidaksesuaian</th>
                             <th class="align-middle">Dibuat Oleh</th>
                             <th class="align-middle text-center">Aksi</th>
@@ -156,6 +158,30 @@
                             <td class="align-middle">{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td class="align-middle">{{ $report->area->name ?? '-' }}</td>
+                            @php
+                                $codes = $report->detailPremixes->pluck('production_code')->filter()->implode(', ');
+                                $collapseId = 'codes-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>
                                 @if ($report->ketidaksesuaian > 0)
                                 Ada
@@ -208,7 +234,7 @@
                                     class="d-inline" onsubmit="return confirm('Ketahui laporan ini?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
                                 @else
@@ -261,7 +287,7 @@
                         </tr>
 
                         <tr id="detail-{{ $report->id }}" class="d-none">
-                            <td colspan="8">
+                            <td colspan="9">
                                 <table class="table table-sm table-bordered mb-0">
                                     <thead class="text-center">
                                         <tr>
@@ -296,11 +322,13 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
         </div>
     </div>
 </div>
@@ -332,5 +360,12 @@ $(document).ready(function() {
         }
     });
 });
+</script>
+
+<script>
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
 </script>
 @endsection

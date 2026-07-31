@@ -27,11 +27,18 @@
                 <div class="row mb-3">
                     <div class="col-md-6 mb-3">
                         <label>Produk</label>
-                        <select name="product_uuid" class="form-control select2-product" required>
+                        <select name="product_uuid" id="product-select" class="form-control select2-product" required>
                             <option value="">-- pilih produk --</option>
                             @foreach($products as $product)
                             <option value="{{ $product->uuid }}">{{ $product->product_name }}</option>
                             @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Formula</label>
+                        <select name="formula_uuid" id="formula-select" class="form-control" required>
+                            <option value="">-- Pilih Formula --</option>
+                            {{-- Diisi via JavaScript --}}
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -41,7 +48,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Kode Produksi</label>
-                        <input type="text" name="production_code" class="form-control">
+                        <input type="text" name="production_code" class="form-control" placeholder="mis: QD15601AA0">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Start</label>
@@ -65,64 +72,28 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Tahapan Proses</label>
-                        <input type="text" name="details[0][process_step]" class="form-control">
+                        <input type="text" name="details[0][process_step]" class="form-control" placeholder="masukkan tahapan proses">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Nomor Mesin</label>
-                        <input type="text" name="details[0][no_mesin]" class="form-control">
+                        <input type="text" name="details[0][no_mesin]" class="form-control" placeholder="mis: 1">
                     </div>
                 </div>
 
                 {{-- RAW MATERIALS --}}
-                <!-- <h6>Bahan Baku</h6> -->
+                <h6 class="mt-3">Bahan Baku &amp; Premix</h6>
                 <div id="raw-materials-wrapper">
-                    <div class="row mb-2 raw-material-item">
-                        <div class="col-md-4">
-                            <label class="form-label">Bahan Baku</label>
-                            <select name="details[0][raw_materials][0][material_uuid]"
-                                    class="form-control"
-                                    onchange="updateRmMaterialType(this)"
-                                    required>
-
-                                <option value="">-- Pilih Bahan Baku --</option>
-
-                                @foreach($rawMaterials as $material)
-                                    <option value="{{ $material->uuid }}" data-type="raw">
-                                        {{ $material->material_name }}
-                                    </option>
-                                @endforeach
-
-                                @foreach($premixes as $premix)
-                                    <option value="{{ $premix->uuid }}" data-type="premix">
-                                        {{ $premix->name }} (Premix)
-                                    </option>
-                                @endforeach
-
-                            </select>
-
-                            <input type="hidden"
-                                name="details[0][raw_materials][0][material_type]"
-                                value="raw">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Berat (Kg)</label>
-                            <input type="number" step="0.01" name="details[0][raw_materials][0][amount]"
-                                class="form-control" placeholder="Berat (kg)">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Sensory</label>
-                            <select name="details[0][raw_materials][0][sensory]" class="form-control" required>
-                                <option value="OK">OK</option>
-                                <option value="Tidak OK">Tidak OK</option>
-                            </select>
-                        </div>
-                    </div>
+                    {{-- Diisi otomatis via JS setelah formula dipilih --}}
                 </div>
 
-                <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
-                    Baku</button>
-
                 <div class="row mb-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Kenampakan</label>
+                        <select name="details[0][appearance]" class="form-control" required>
+                            <option value="OK">OK</option>
+                            <option value="Tidak OK">Tidak OK</option>
+                        </select>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Warna</label>
                         <select name="details[0][color]" class="form-control" required>
@@ -176,94 +147,135 @@
                 <div class="row mb-2">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Lama Proses (menit)</label>
-                        <input type="number" step="0.01" name="details[0][duration]" class="form-control">
+                        <input type="number" step="0.01" name="details[0][duration]" class="form-control" placeholder="mis: 6">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Pressure (Bar)</label>
-                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control">
+                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control" placeholder="mis: 6.5">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Target Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control">
+                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control" placeholder="mis: 6.5">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Actual Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control">
+                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control" placeholder="mis: 6.5">
                     </div>
                 </div>
 
-
+                <div class="row mb-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status Produk</label>
+                        <select name="details[0][product_status]" class="form-control" required>
+                            <option value="Release">Release</option>
+                            <option value="Reject">Reject</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tindakan Perbaikan</label>
+                        <input type="text" name="details[0][corrective_action]" class="form-control" placeholder="masukkan tindakan perbaikan">
+                    </div>
+                </div>
 
                 <div class="row mb-2">
                     <div class="col-md-6">
                         <label class="form-label">Catatan</label>
-                        <input type="text" name="details[0][notes]" class="form-control">
+                        <input type="text" name="details[0][notes]" class="form-control" placeholder="masukkan catatan">
+                    </div>
+                </div>
+
+                
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Catatan &amp; Dokumentasi</label>
+                        <textarea name="documentation_notes" class="form-control" rows="2"></textarea>
                     </div>
                 </div>
 
                 <div class="mt-3">
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-success">Simpan</button>
-                    <a href="{{ route('report_sauces.index') }}" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+@endsection
 
+@section('script')
 <script>
-let rmIndex = 1;
+$(document).ready(function () {
+    $('#product-select').on('change', function () {
+        const productUuid = this.value;
+        const formulaSelect = document.getElementById('formula-select');
+        const wrapper = document.getElementById('raw-materials-wrapper');
+        const getFormulasUrl = "{{ route('report_sauces.getFormulas', ['productUuid' => 'PRODUCT_UUID_PLACEHOLDER']) }}";
 
-function addRawMaterial() {
-    let wrapper = document.getElementById('raw-materials-wrapper');
-    let html = `
-        <div class="row mb-2 raw-material-item mt-3">
-            <div class="col-md-4">
-                <select name="details[0][raw_materials][${rmIndex}][material_uuid]"
-                        class="form-control"
-                        onchange="updateRmMaterialType(this)"
-                        required>
-                    <option value="">-- Pilih Bahan Baku --</option>
-                    @foreach($rawMaterials as $material)
-                        <option value="{{ $material->uuid }}" data-type="raw">
-                            {{ $material->material_name }}
-                        </option>
-                    @endforeach
-                    @foreach($premixes as $premix)
-                        <option value="{{ $premix->uuid }}" data-type="premix">
-                            {{ $premix->name }} (Premix)
-                        </option>
-                    @endforeach
-                </select>
-                <input type="hidden"
-                       name="details[0][raw_materials][${rmIndex}][material_type]"
-                       value="raw">
-            </div>
-            <div class="col-md-4">
-                <input type="number" step="0.01"
-                       name="details[0][raw_materials][${rmIndex}][amount]"
-                       class="form-control" placeholder="Berat (kg)">
-            </div>
-            <div class="col-md-4">
-                <div class="d-flex gap-2">
-                    <select name="details[0][raw_materials][${rmIndex}][sensory]"
-                            class="form-control" required>
-                        <option value="OK">OK</option>
-                        <option value="Tidak OK">Tidak OK</option>
-                    </select>
-                    <button type="button" class="btn btn-danger btn-sm"
-                            onclick="this.closest('.raw-material-item').remove()">✕</button>
+        formulaSelect.innerHTML = '<option value="">-- Pilih Formula --</option>';
+        wrapper.innerHTML = '';
+
+        if (!productUuid) return;
+
+        fetch(getFormulasUrl.replace('PRODUCT_UUID_PLACEHOLDER', productUuid))
+            .then(res => res.json())
+            .then(data => {
+                data.formulas.forEach(formula => {
+                    const opt = document.createElement('option');
+                    opt.value = formula.uuid;
+                    opt.textContent = formula.formula_name;
+                    formulaSelect.appendChild(opt);
+                });
+            });
+    });
+});
+
+document.getElementById('formula-select').addEventListener('change', function () {
+    const formulaUuid = this.value;
+    const wrapper = document.getElementById('raw-materials-wrapper');
+    const getFormulationsUrl = @json(route('report_sauces.getFormulations', ['formulaUuid' => 'FORMULA_UUID_PLACEHOLDER']));
+
+    wrapper.innerHTML = '';
+
+    if (!formulaUuid) return;
+
+    fetch(getFormulationsUrl.replace('FORMULA_UUID_PLACEHOLDER', formulaUuid))
+        .then(res => res.json())
+        .then(data => {
+            const buildRow = (fm, label) => `
+                <div class="row mb-3 raw-material-item">
+                    <div class="col-md-4 mt-3">
+                        <label class="form-label">${label} (Standard: ${fm.weight} kg)</label>
+                        <input type="text" class="form-control" value="${fm.raw_material?.material_name ?? fm.premix?.name ?? '-'}" readonly>
+                        <input type="hidden" name="details[0][raw_materials][${fm.uuid}][formulation_uuid]" value="${fm.uuid}">
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <label class="form-label">Berat Aktual (Kg)</label>
+                        <input type="number" step="0.01"
+                            name="details[0][raw_materials][${fm.uuid}][amount]"
+                            class="form-control" value="${fm.weight}">
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <label class="form-label">Status</label>
+                        <select name="details[0][raw_materials][${fm.uuid}][sensory]" class="form-control" required>
+                            <option value="OK">OK</option>
+                            <option value="Tidak OK">Tidak OK</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <label class="form-label">Tindakan Koreksi</label>
+                        <input type="text" name="details[0][raw_materials][${fm.uuid}][corrective_action]" class="form-control" placeholder="masukkan tindakan koreksi">
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <label class="form-label">Keterangan</label>
+                        <input type="text" name="details[0][raw_materials][${fm.uuid}][keterangan]" class="form-control" placeholder="masukkan keterangan">
+                    </div>
                 </div>
-            </div>
-        </div>
-    `;
-    wrapper.insertAdjacentHTML('beforeend', html);
-    rmIndex++;
-}
+            `;
 
-function updateRmMaterialType(selectEl) {
-    const type = selectEl.options[selectEl.selectedIndex].getAttribute('data-type') || 'raw';
-    const hiddenInput = selectEl.closest('div').querySelector('input[type="hidden"]');
-    if (hiddenInput) hiddenInput.value = type;
-}
+            data.raw_materials.forEach(fm => wrapper.insertAdjacentHTML('beforeend', buildRow(fm, 'Bahan Baku')));
+            data.premixes.forEach(fm => wrapper.insertAdjacentHTML('beforeend', buildRow(fm, 'Premix')));
+        });
+});
 </script>
 @endsection

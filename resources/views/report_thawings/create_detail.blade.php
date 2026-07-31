@@ -126,13 +126,12 @@
 
                 <hr>
 
-                <button class="btn btn-primary">
-                    Simpan Detail
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+
+                <button class="btn btn-success">
+                    Simpan
                 </button>
 
-                <a href="{{ route('report_thawings.index') }}" class="btn btn-secondary">
-                    Kembali
-                </a>
 
             </form>
 

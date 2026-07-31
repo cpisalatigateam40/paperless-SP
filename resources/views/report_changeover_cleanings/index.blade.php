@@ -75,6 +75,7 @@
                     :route="route('report-changeover-cleanings.export_pdf_bulk')"
                     title="Kebersihan Setelah Pergantian Produk"
                     modal-id="modalExportPdfChangeoverCleaning"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
 
                 {{-- Modals --}}
@@ -188,7 +189,7 @@
                                         @csrf
 
                                         <button class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-check-double"></i>
                                         </button>
 
                                     </form>
@@ -373,11 +374,13 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="mt-3">
+                    {{ $reports->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
-            <div class="mt-3">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
+            
         </div>
     </div>
 </div>
