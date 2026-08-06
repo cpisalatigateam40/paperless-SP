@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Edit Verifikasi Kemasan Plastik</h4>
+            <h4>Edit Verifikasi Proses Pengemasan</h4>
         </div>
 
         <div class="card-body">

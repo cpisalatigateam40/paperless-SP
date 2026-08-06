@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4 class="mb-4">Buat Laporan Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h4>
+            <h4 class="mb-4">Tambah Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h4>
         </div>
 
         <div class="card-body">

@@ -4,9 +4,9 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">
-                Laporan Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang
-            </h6>
+            <h5>
+                Verifikasi Bahan Baku dan Bahan Penunjang
+            </h5>
 
             <div class="d-flex flex-wrap align-items-center gap-2">
                 @hasanyrole('admin|superadmin')

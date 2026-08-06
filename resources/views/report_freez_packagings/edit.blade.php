@@ -364,7 +364,8 @@ function addDetailRow(detail = null) {
         <div class="col-md-2">
             <label>Berat Aktual Hasil Karton ${i}</label>
             <input type="number" step="0.01" name="details[${index}][kartoning][weight_${i}]" class="form-control weight-input"
-                value="${detail?.kartoning?.['weight_'+i] ?? ''}">
+                value="${detail?.kartoning?.['weight_'+i] ?? ''}"
+                oninput="calcAvgWeight(this)">
         </div>`).join('')}
         <div class="col-md-2">
             <label>Rata-Rata Berat</label>
@@ -465,22 +466,33 @@ existingDetails.forEach((detail, i) => {
     }
 });
 
-document.addEventListener("input", function(e){
-    if(e.target.classList.contains("weight-input")){
-        const group = e.target.closest(".kartoning-group");
-        const weightInputs = group.querySelectorAll(".weight-input");
-        const avgInput = group.querySelector(".avg-weight");
+document.querySelectorAll('.kartoning-group').forEach(group => {
+    const firstWeightInput = group.querySelector('.weight-input');
+    if (firstWeightInput) calcAvgWeight(firstWeightInput);
+});
 
-        let total = 0;
-        let count = 0;
-        weightInputs.forEach(input => {
-            const val = parseFloat(input.value);
-            if(!isNaN(val)){
-                total += val;
-                count++;
-            }
-        });
-        avgInput.value = count > 0 ? (total/count).toFixed(2) : "";
+function calcAvgWeight(el) {
+    const group = el.closest('.kartoning-group');
+    if (!group) return;
+
+    const weightInputs = group.querySelectorAll('.weight-input');
+    const avgInput = group.querySelector('.avg-weight');
+
+    let total = 0;
+    let count = 0;
+    weightInputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val)) {
+            total += val;
+            count++;
+        }
+    });
+    avgInput.value = count > 0 ? (total / count).toFixed(2) : '';
+}
+
+document.addEventListener("input", function(e){
+    if (e.target.classList.contains("weight-input")) {
+        calcAvgWeight(e.target);
     }
 });
 
@@ -636,6 +648,8 @@ document.addEventListener('click', function(e) {
         }
     });
 
+
+    
 
 </script>
 @endsection

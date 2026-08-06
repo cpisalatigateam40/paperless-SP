@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Buat Laporan Verifikasi Proses Produksi</h4>
+            <h4>Verifikasi Proses Mixing, Chopping, dan Emulsifying</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_process_productions.store') }}" method="POST">

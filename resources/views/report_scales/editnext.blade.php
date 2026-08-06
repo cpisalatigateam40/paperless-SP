@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Edit Laporan Verifikasi Timbangan & Thermometer</h5>
+            <h5>Edit Verifikasi Alat Ukur</h5>
         </div>
 
         <div class="card-body">

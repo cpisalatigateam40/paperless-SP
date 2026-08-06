@@ -6,7 +6,7 @@
     <div class="card shadow">
 
         <div class="card-header">
-            <h4>Tambah Detail Pemeriksaan</h4>
+            <h4>Tambah Detail Verifikasi Proses Thawing</h4>
         </div>
 
         <div class="card-body">

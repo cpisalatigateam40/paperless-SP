@@ -24,7 +24,7 @@ class ScaleExport implements WithEvents, WithTitle
                 $lastCol = 'K';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI TIMBANGAN');
+                $sheet->setCellValue('A1', 'Verifikasi Alat Ukur');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

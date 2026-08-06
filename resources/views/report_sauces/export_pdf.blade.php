@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Verifikasi Pemasakan di Steam Kettle</title>
+    <title>Verifikasi Proses Pemasakan di Steam Kettle</title>
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
@@ -79,7 +79,10 @@
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 30%; vertical-align: middle;">
+                <td class="no-border" style="width: 50%; vertical-align: middle;">
+                    <table style="border: none; border-collapse: collapse;">
+                        <tr>
+                            <td class="no-border" style="width: 50%; vertical-align: middle;">
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
@@ -97,9 +100,12 @@
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
                                     PT. CHAROEN POKPHAND INDONESIA<br>
                                     FOOD DIVISION<br>
-                                    INDONESIA
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
                             </td>
+                        </tr>
+                    </table>
+                </td>
                         </tr>
                     </table>
                 </td>
@@ -111,8 +117,8 @@
     </div>
 
     {{-- ===== JUDUL ===== --}}
-    <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 12px;">
-        VERIFIKASI PEMASAKAN DI STEAM KETTLE
+    <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 12px; text-transform: uppercase;">
+        Verifikasi Proses Pemasakan di Steam Kettle
     </h3>
 
     @php

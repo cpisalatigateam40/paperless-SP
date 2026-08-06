@@ -7,7 +7,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5> Laporan Verifikasi Kebersihan Ruang Penyimpanan</h5>
+            <h6>Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang</h6>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 

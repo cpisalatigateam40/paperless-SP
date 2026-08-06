@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Verifikasi Proses Pembekuan</title>
+    <title>Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</title>
 
     <style>
     body {
@@ -71,29 +71,25 @@
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 30%;">
-                    <table style="border: none;">
+                <td class="no-border" style="width: 30%; vertical-align: middle;">
+                    <table style="border: none; border-collapse: collapse;">
                         <tr>
-                            <td class="no-border" style="width: 50px;">
+                            <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
                                     $path = public_path('storage/image/logo.png');
-
                                     if (file_exists($path)) {
-                                        $type = pathinfo($path, PATHINFO_EXTENSION);
-                                        $data = file_get_contents($path);
+                                        $type   = pathinfo($path, PATHINFO_EXTENSION);
+                                        $data   = file_get_contents($path);
                                         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
                                     }
                                 @endphp
-
-                                <img src="{{ $base64 ?? '' }}" style="width: 50px;">
+                                <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
-
-                            <td class="no-border" style="padding-left: 10px;">
+                            <td class="no-border" style="vertical-align: middle; padding-left: 8px;">
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    CHAROEN<br>
-                                    POKPHAND<br>
-                                    INDONESIA PT.<br>
-                                    Food Division
+                                    PT. CHAROEN POKPHAND INDONESIA<br>
+                                    FOOD DIVISION<br>
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
                             </td>
                         </tr>
@@ -126,8 +122,8 @@
     ])->filter()->implode(' / ');
     @endphp
 
-    <h3>
-        VERIFIKASI PROSES PEMBEKUAN, PENGEMASAN SEKUNDER, DAN RELEASE PRODUK
+    <h3 style="text-transform: uppercase;">
+        Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk
     </h3>
 
     <div class="section-title">A. Informasi Produk</div>

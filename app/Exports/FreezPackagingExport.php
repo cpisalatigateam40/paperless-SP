@@ -30,7 +30,7 @@ class FreezPackagingExport implements WithEvents, WithTitle
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue(
                     'A1',
-                    'LAPORAN VERIFIKASI PEMBEKUAN IQF & PENGEMASAN KARTON BOX'
+                    'Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk'
                 );
 
                 $sheet->getStyle('A1')->getFont()

@@ -12,7 +12,7 @@
 
             <h5 class="mb-0">
 
-                Tambah Report Smoke House
+                Tambah Verifikasi Proses Pemasakan di Smoke House
 
             </h5>
 

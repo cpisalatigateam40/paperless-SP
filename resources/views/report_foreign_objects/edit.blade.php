@@ -9,7 +9,7 @@
         {{-- HEADER FORM --}}
         <div class="card shadow mb-3">
             <div class="card-header">
-                <h5>Edit Laporan Verifikasi Kontaminasi Benda Asing</h5>
+                <h5>Edit Pemeriksaan Kontaminasi Benda Asing</h5>
             </div>
             <div class="card-body">
                 <div class="row mb-3">

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Laporan Verifikasi Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Verifikasi Proses Pemasakan di Steam Kettle</h5>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 
@@ -298,7 +298,7 @@
                                         {{-- Header Kolom Utama --}}
                                         <tr>
                                             <th rowspan="2">Pukul</th>
-                                            <th rowspan="2">Tahapan Proses</th>
+                                            <th rowspan="2">Durasi Proses</th>
                                             <th colspan="5">Bahan Baku</th>
                                             <th colspan="6">Parameter Pemasakan</th>
                                             <th colspan="5">Produk Organoleptik</th>

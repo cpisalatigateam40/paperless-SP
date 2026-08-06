@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Edit Laporan Verifikasi Pemasakan di Steamer</h4>
+            <h4>Edit Verifikasi Proses Pemasakan di Steamer</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_steamer_cookings.update', $report->uuid) }}" method="POST"

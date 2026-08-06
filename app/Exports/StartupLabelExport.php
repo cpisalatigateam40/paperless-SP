@@ -33,7 +33,7 @@ class StartupLabelExport implements WithEvents, WithTitle
                 $sheet->mergeCells('A1:K1');
                 $sheet->setCellValue(
                     'A1',
-                    'LAPORAN PEMERIKSAAN STARTUP LABEL'
+                    'Verifikasi Labelisasi Start-Up'
                 );
 
                 $sheet->getStyle('A1')

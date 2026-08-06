@@ -24,7 +24,7 @@ class ProductionNonconformityExport implements WithEvents, WithTitle
                 $lastCol = 'L';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI KETIDAKSESUAIAN PROSES PRODUKSI');
+                $sheet->setCellValue('A1', 'Laporan Ketidaksesuaian Proses Produksi');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

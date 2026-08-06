@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5> Laporan Verifikasi Kebersihan Area Proses</h5>
+            <h5>Verifikasi Kesesuaian Area Proses Produksi</h5>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
                 @hasanyrole('admin|superadmin')

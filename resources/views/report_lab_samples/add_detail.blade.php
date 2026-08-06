@@ -36,7 +36,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>Best Before</label>
-                        <input type="date" name="best_before" class="form-control best-before" readonly>
+                        <input type="date" name="best_before" class="form-control best-before">
                     </div>
                 </div>
 

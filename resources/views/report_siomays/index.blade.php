@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Laporan Verifikasi Pembuatan Kulit Siomay, Gioza & Mandu</h5>
+            <h5>Verifikasi Proses Pembuatan Kulit Siomay/Gyoza</h5>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
                 @hasanyrole('admin|superadmin')

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Verifikasi Metal Detector Adonan</title>
+    <title>Verifikasi Kinerja Metal Detector Adonan</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -87,7 +87,7 @@
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 40%; vertical-align: middle;">
+                <td class="no-border" style="width: 30%; vertical-align: middle;">
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
@@ -105,6 +105,7 @@
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
                                     PT. CHAROEN POKPHAND INDONESIA<br>
                                     FOOD DIVISION<br>
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
                             </td>
                         </tr>
@@ -119,7 +120,7 @@
 
     {{-- ===== JUDUL ===== --}}
     <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 12px;">
-        VERIFIKASI METAL DETECTOR ADONAN
+        VERIFIKASI KINERJA METAL DETECTOR ADONAN
     </h3>
 
     {{-- ===== A. INFORMASI PRODUK ===== --}}

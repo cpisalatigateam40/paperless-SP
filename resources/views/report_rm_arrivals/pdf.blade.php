@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang</title>
+    <title>Verifikasi Bahan Baku dan Bahan Penunjang</title>
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
@@ -97,6 +97,7 @@
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
                                     PT. CHAROEN POKPHAND INDONESIA<br>
                                     FOOD DIVISION<br>
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
                             </td>
                         </tr>
@@ -110,8 +111,8 @@
     </div>
 
     {{-- ===== JUDUL ===== --}}
-    <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 12px;">
-        PEMERIKSAAN KEDATANGAN BAHAN BAKU DAN BAHAN PENUNJANG
+    <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 12px; text-transform: uppercase;">
+        Verifikasi Bahan Baku dan Bahan Penunjang
     </h3>
 
     {{-- ===== A. INFORMASI PRODUK ===== --}}

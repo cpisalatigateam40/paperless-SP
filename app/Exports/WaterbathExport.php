@@ -32,7 +32,7 @@ class WaterbathExport implements WithEvents, WithTitle
                 $lastCol = 'AF';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI PASTEURISASI WATERBATH');
+                $sheet->setCellValue('A1', 'Verifikasi Proses Pasteurisasi Produk di Waterbath');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h5>Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h5>
+            <h6>Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h6>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 

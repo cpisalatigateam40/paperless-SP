@@ -114,23 +114,30 @@ function rangeStyle($value, $min, $max)
                 <td class="no-border" style="width: 60%; vertical-align: middle;">
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
+                            <td class="no-border" style="width: 30%; vertical-align: middle;">
+                    <table style="border: none; border-collapse: collapse;">
+                        <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
-                                $path = public_path('storage/image/logo.png');
-                                if (file_exists($path)) {
-                                $type = pathinfo($path, PATHINFO_EXTENSION);
-                                $data = file_get_contents($path);
-                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                }
+                                    $path = public_path('storage/image/logo.png');
+                                    if (file_exists($path)) {
+                                        $type   = pathinfo($path, PATHINFO_EXTENSION);
+                                        $data   = file_get_contents($path);
+                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    }
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
-                            <td class="no-border" style="vertical-align: middle; padding-left: 10px;">
+                            <td class="no-border" style="vertical-align: middle; padding-left: 8px;">
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    CHAROEN POKPHAND INDONESIA PT.<br>
+                                    PT. CHAROEN POKPHAND INDONESIA<br>
                                     FOOD DIVISION<br>
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
                             </td>
+                        </tr>
+                    </table>
+                </td>
                         </tr>
                     </table>
                 </td>

@@ -5,7 +5,7 @@
     <div class="card shadow">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5>Laporan Verifikasi Barang Mudah Pecah</h5>
+                <h5>Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)</h5>
                 
                 <div class="d-flex gap-2" style="gap: .4rem;">
 

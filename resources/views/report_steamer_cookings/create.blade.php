@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h4>Tambah Laporan Verifikasi Pemasakan di Steamer</h4>
+            <h4>Tambah Verifikasi Proses Pemasakan di Steamer</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_steamer_cookings.store') }}" method="POST" id="steamerCookingForm">

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Tambah Detail Inspeksi</h5>
+            <h5>Tambah Detail Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('cleanliness.detail.store', $report->id) }}" method="POST">

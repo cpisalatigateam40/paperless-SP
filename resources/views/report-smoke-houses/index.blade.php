@@ -18,7 +18,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
 
             <h5 class="mb-0">
-                Report Smoke House
+                Verifikasi Proses Pemasakan di Smoke House
             </h5>
 
             

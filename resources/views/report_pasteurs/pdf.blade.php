@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Report Pasteur</title>
+    <title>Verifikasi Proses Pasteurisasi Produk di Retort Chamber</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -96,18 +96,20 @@
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
                                 @php
-                                $path = public_path('storage/image/logo.png');
-                                if (file_exists($path)) {
-                                $type = pathinfo($path, PATHINFO_EXTENSION);
-                                $data = file_get_contents($path);
-                                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                }
+                                    $path = public_path('storage/image/logo.png');
+                                    if (file_exists($path)) {
+                                        $type   = pathinfo($path, PATHINFO_EXTENSION);
+                                        $data   = file_get_contents($path);
+                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    }
                                 @endphp
                                 <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
-                            <td class="no-border" style="vertical-align: middle; padding-left: 10px;">
+                            <td class="no-border" style="vertical-align: middle; padding-left: 8px;">
                                 <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    CHAROEN<br>POKPHAND<br>INDONESIA PT.<br>Food Division
+                                    PT. CHAROEN POKPHAND INDONESIA<br>
+                                    FOOD DIVISION<br>
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
                             </td>
                         </tr>
@@ -117,7 +119,7 @@
         </table>
     </div>
 
-    <h3 class="mb-2 text-center">PEMERIKSAAN PASTEURISASI</h3>
+    <h3 class="mb-2 text-center" style="text-transform: uppercase;">Verifikasi Proses Pasteurisasi Produk di Retort Chamber</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">

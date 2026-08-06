@@ -27,7 +27,7 @@ class WeightStufferExport implements WithEvents, WithTitle
 
                 // ── Judul ──────────────────────────────────────────────────
                 $sheet->mergeCells('A1:X1');
-                $sheet->setCellValue('A1', 'LAPORAN PEMERIKSAAN WEIGHT STUFFER');
+                $sheet->setCellValue('A1', 'Verifikasi Proses Stuffing');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

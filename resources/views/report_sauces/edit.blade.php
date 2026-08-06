@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Edit Laporan Verifikasi Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Edit Verifikasi Proses Pemasakan di Steam Kettle</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('report_sauces.update', $report->uuid) }}" method="POST">
@@ -65,11 +65,11 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Start</label>
-                        <input type="time" name="start_time" class="form-control" value="{{ $report->start_time }}">
+                        <input type="time" name="start_time" id="start_time" class="form-control" value="{{ $report->start_time }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Stop</label>
-                        <input type="time" name="end_time" class="form-control" value="{{ $report->end_time }}">
+                        <input type="time" name="end_time" id="end_time" class="form-control" value="{{ $report->end_time }}">
                     </div>
                 </div>
 
@@ -84,8 +84,8 @@
                                 value="{{ $detail->time }}">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Tahapan Proses</label>
-                            <input type="text" name="details[{{ $detailIndex }}][process_step]" class="form-control"
+                            <label class="form-label">Durasi Proses</label>
+                            <input type="text" name="details[{{ $detailIndex }}][process_step]" class="form-control process-step-input"
                                 value="{{ $detail->process_step }}">
                         </div>
                         <div class="col-md-6">
@@ -343,5 +343,31 @@ document.getElementById('formula-select').addEventListener('change', function ()
             });
         });
 });
+
+function calcDuration() {
+    const startVal = document.getElementById('start_time').value;
+    const endVal = document.getElementById('end_time').value;
+    const processInputs = document.querySelectorAll('.process-step-input');
+
+    processInputs.forEach(processInput => {
+        const baseText = processInput.value.replace(/\s*-?\s*\d+\s*menit\s*$/i, '').trim();
+
+        if (!startVal || !endVal) {
+            processInput.value = baseText;
+            return;
+        }
+
+        const [startH, startM] = startVal.split(':').map(Number);
+        const [endH, endM] = endVal.split(':').map(Number);
+
+        let diff = (endH * 60 + endM) - (startH * 60 + startM);
+        if (diff < 0) diff += 24 * 60; // lewat tengah malam
+
+        processInput.value = baseText ? `${baseText} - ${diff} menit` : `${diff} menit`;
+    });
+}
+
+document.getElementById('start_time').addEventListener('input', calcDuration);
+document.getElementById('end_time').addEventListener('input', calcDuration);
 </script>
 @endsection

@@ -24,7 +24,7 @@ class FragileItemExport implements WithEvents, WithTitle
                 $lastCol = 'J';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI BARANG MUDAH PECAH');
+                $sheet->setCellValue('A1', 'Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

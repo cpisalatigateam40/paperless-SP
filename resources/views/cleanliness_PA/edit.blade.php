@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Edit Laporan Verifikasi Kebersihan Area Proses</h5>
+            <h5>Edit Verifikasi Kesesuaian Area Proses Produksi</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('process-area-cleanliness.update', $report->uuid) }}" method="POST">

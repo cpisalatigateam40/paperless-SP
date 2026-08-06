@@ -52,6 +52,9 @@ $isKetidaksesuaian = Request::is([
 'report-production-nonconformities*',
 'report-foreign-objects*'
 ]);
+$isAudit = Request::is([
+'report-audit-packing-primers*'
+]);
 @endphp
 
 <style>
@@ -194,7 +197,7 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-rm-arrivals*') ? 'active' : '' }}"
                     href="{{ route('report_rm_arrivals.index') }}">
-                    Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang
+                    Verifikasi Bahan Baku dan Bahan Penunjang
                 </a>
                 <a class="collapse-item {{ Request::is('report-premixes*') ? 'active' : '' }}"
                     href="{{ route('report-premixes.index') }}">
@@ -202,29 +205,29 @@ $isKetidaksesuaian = Request::is([
                 </a>
                 <a class="collapse-item {{ Request::is('report-emulsion-makings*') ? 'active' : '' }}"
                     href="{{ route('report_emulsion_makings.index') }}">
-                    Verifikasi Pembuatan Emulsi / CCM Block
+                    Verifikasi Proses Pembuatan Emulsi
                 </a>
                 <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
                     href="{{ route('report_metal_detectors.index') }}">
-                    Pemeriksaan Metal Detector Adonan
+                    Verifikasi Kinerja Metal Detector Adonan
                 </a>
                 <a class="collapse-item {{ Request::is('report-process-productions*') ? 'active' : '' }}"
                     href="{{ route('report_process_productions.index') }}">
-                    Verifikasi Proses Produksi
+                    Verifikasi Proses Mixing, Chopping, dan Emulsifying
                 </a>
                 <a class="collapse-item {{ Request::is('report-weight-stuffers*') ? 'active' : '' }}"
                     href="{{ route('report_weight_stuffers.index') }}">
-                    Verifikasi Berat Stuffer
+                    Verifikasi Proses Stuffing
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-siomays*') ? 'active' : '' }}"
                     href="{{ route('report_siomays.index') }}">
-                    Pembuatan Kulit Siomay
+                    Verifikasi Proses Pembuatan Kulit Siomay/Gyoza
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-thawings*') ? 'active' : '' }}"
                     href="{{ route('report_thawings.index') }}">
-                    Pemeriksaan Proses Thawing
+                    Verifikasi Proses Thawing
                 </a>
                 <a class="collapse-item {{ Request::is('report-mt-cleans*') ? 'active' : '' }}"
                     href="{{ route('report_mt_cleans.index') }}">
@@ -245,7 +248,7 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-smoke-houses*') ? 'active' : '' }}"
                     href="{{ route('report-smoke-houses.index') }}">
-                    Cooking Smoke House
+                    Verifikasi Proses Pemasakan di Smoke House
                 </a>
                 <a class="collapse-item {{ Request::is('report_steamer_cookings*') ? 'active' : '' }}"
                     href="{{ route('report_steamer_cookings.index') }}">
@@ -253,11 +256,11 @@ $isKetidaksesuaian = Request::is([
                 </a>
                 <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
                     href="{{ route('report_baso_cookings.index') }}">
-                    Verifikasi Pemasakan Baso
+                    Verifikasi Proses Pemasakan di Boiling Tank
                 </a>
                 <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
                     href="{{ route('report_sauces.index') }}">
-                    Pemasakan Produk Di Steam Kettle
+                    Verifikasi Proses Pemasakan di Steam Kettle
                 </a>
             </div>
         </div>
@@ -274,27 +277,27 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-packaging-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_packaging_verifs.index') }}">
-                    Verifikasi Kemasan Plastik
+                    Verifikasi Proses Pengemasan
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-md-products*') ? 'active' : '' }}"
                     href="{{ route('report_md_products.index') }}">
-                    Pemeriksaan Metal Detector Produk
+                    Verifikasi Kinerja Metal Detector Produk
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-tofu-verifs*') ? 'active' : '' }}"
                     href="{{ route('report_tofu_verifs.index') }}">
-                    Verifikasi Produk Tofu
+                    Verifikasi Hasil Produksi Tofu
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-lab-samples*') ? 'active' : '' }}"
                     href="{{ route('report_lab_samples.index') }}">
-                    Verifikasi Pengambilan Sample
+                    Form Pengambilan Sample
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
                     href="{{ route('report_startup_labels.index') }}">
-                    Pemeriksaan Labelisasi Startup
+                    Verifikasi Labelisasi Start-Up
                 </a>
             </div>
         </div>
@@ -311,12 +314,12 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-pasteurs*') ? 'active' : '' }}"
                     href="{{ route('report_pasteurs.index') }}">
-                    Pemeriksaan Pasteurisasi Retort Chamber
+                    Verifikasi Proses Pasteurisasi Produk di Retort Chamber
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-waterbaths*') ? 'active' : '' }}"
                     href="{{ route('report_waterbaths.index') }}">
-                    Pemeriksaan Pasteurisasi Waterbath
+                    Verifikasi Proses Pasteurisasi Produk di Waterbath
                 </a>
             </div>
         </div>
@@ -351,36 +354,36 @@ $isKetidaksesuaian = Request::is([
 
                 <a class="collapse-item {{ Request::is('storage-rm-cleanliness*') ? 'active' : '' }}"
                     href="{{ route('cleanliness.index') }}">
-                    Kebersihan Area Penyimpanan Bahan
+                    Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang
                 </a>
 
                 <a class="collapse-item {{ Request::is('process-area-cleanliness*') ? 'active' : '' }}"
                     href="{{ route('process-area-cleanliness.index') }}">
-                    Kebersihan Area Proses
+                    Verifikasi Kesesuaian Area Proses Produksi
                 </a>
 
                 <a class="collapse-item {{ Request::is('gmp-employee*') ? 'active' : '' }}"
                     href="{{ route('gmp-employee.index') }}">
-                    GMP karyawan & Kontrol Sanitasi
+                    Verifikasi Penerapan GMP Karyawan & Sanitasi Area
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-fragile-item*') ? 'active' : '' }}"
                     href="{{ route('report-fragile-item.index') }}">
-                    Barang Mudah Pecah
+                    Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-re-cleanliness*') ? 'active' : '' }}"
                     href="{{ route('report-re-cleanliness.index') }}">
-                    Kebersihan Ruangan, Mesin, dan Peralatan
+                    Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-scales*') ? 'active' : '' }}"
                     href="{{ route('report-scales.index') }}">
-                    Timbangan & Thermometer
+                    Verifikasi Alat Ukur
                 </a>
                 <a class="collapse-item {{ Request::is('report-changeover-cleanings*') ? 'active' : '' }}"
                     href="{{ route('report_changeover_cleanings.index') }}">
-                    Pemeriksaan Kebersihan Setelah Pergantian Produk
+                    Pemeriksaan Kebersihan Setelah Change-Over
                 </a>
             </div>
         </div>
@@ -397,7 +400,7 @@ $isKetidaksesuaian = Request::is([
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-production-nonconformities*') ? 'active' : '' }}"
                     href="{{ route('report_production_nonconformities.index') }}">
-                    Pemeriksaan Ketidaksesuaian Proses Produksi
+                    Laporan Ketidaksesuaian Proses Produksi
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-foreign-objects*') ? 'active' : '' }}"
@@ -407,6 +410,25 @@ $isKetidaksesuaian = Request::is([
             </div>
         </div>
     </li>
+
+    @hasanyrole('admin|superadmin|Produksi|SPV QC')
+    <li class="nav-item {{ $isAudit ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesaudit"
+            aria-expanded="{{ $isAudit ? 'true' : 'false' }}" aria-controls="collapsePagesaudit">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Audit</span>
+        </a>
+        <div id="collapsePagesaudit" class="collapse {{ $isAudit ? 'show' : '' }}"
+            aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="soft-salmon py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('report-audit-packing-primers*') ? 'active' : '' }}"
+                    href="{{ route('report_audit_packing_primers.index') }}">
+                    Checklist Audit Kepatuhan Proses Packing Primer
+                </a>
+            </div>
+        </div>
+    </li>
+    @endhasanyrole
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

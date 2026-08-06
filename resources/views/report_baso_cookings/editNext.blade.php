@@ -9,7 +9,7 @@
 
         <div class="card shadow mb-4">
             <div class="card-header">
-                <h5 class="mb-0">Edit Laporan Verifikasi Pemasakan Baso</h5>
+                <h5 class="mb-0">Edit Verifikasi Proses Pemasakan di Boiling Tank</h5>
             </div>
 
             <div class="card-body">

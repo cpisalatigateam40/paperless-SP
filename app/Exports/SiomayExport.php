@@ -27,7 +27,7 @@ class SiomayExport implements WithEvents, WithTitle
 
                 // ── Judul ──────────────────────────────────────────────────
                 $sheet->mergeCells('A1:W1');
-                $sheet->setCellValue('A1', 'VERIFIKASI PEMBUATAN KULIT SIOMAY, GIOZA & MANDU');
+                $sheet->setCellValue('A1', 'Verifikasi Proses Pembuatan Kulit Siomay/Gyoza');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

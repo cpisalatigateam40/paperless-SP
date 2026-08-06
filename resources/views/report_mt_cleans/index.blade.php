@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Laporan Kebersihan Magnet Trap</h4>
+            <h5>Pemeriksaan Kebersihan Magnet Trap</h5>
 
             <div class="d-flex gap-2" style="gap: .4rem;">
                 @hasanyrole('admin|superadmin')
@@ -110,7 +110,6 @@
                 @can('create report')
                 <a href="{{ route('report_mt_cleans.create') }}"
                     class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i>
                     Tambah Laporan
                 </a>
                 @endcan

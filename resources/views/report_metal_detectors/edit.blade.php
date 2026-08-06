@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Edit Laporan Verifikasi Metal Detector Adonan</h4>
+            <h4>Edit Verifikasi Kinerja Metal Detector Adonan</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_metal_detectors.update', $report->uuid) }}" method="POST">

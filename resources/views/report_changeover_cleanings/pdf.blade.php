@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Pemeriksaan Kebersihan Setelah Pergantian Produk</title>
+    <title>Pemeriksaan Kebersihan Setelah Change-Over</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -102,40 +102,22 @@
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
-
                                 @php
                                     $path = public_path('storage/image/logo.png');
-
                                     if (file_exists($path)) {
-                                        $type = pathinfo($path, PATHINFO_EXTENSION);
-                                        $data = file_get_contents($path);
-
-                                        $base64 =
-                                            'data:image/' .
-                                            $type .
-                                            ';base64,' .
-                                            base64_encode($data);
+                                        $type   = pathinfo($path, PATHINFO_EXTENSION);
+                                        $data   = file_get_contents($path);
+                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
                                     }
                                 @endphp
-
-                                <img src="{{ $base64 ?? '' }}"
-                                    style="width: 50px;">
+                                <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
                             </td>
-
-                            <td class="no-border"
-                                style="vertical-align: middle; padding-left: 10px;">
-
-                                <div style="font-size: 9px;
-                                            font-weight: bold;
-                                            line-height: 1.2;">
-
-                                    CHAROEN<br>
-                                    POKPHAND<br>
-                                    INDONESIA PT.<br>
-                                    Food Division
-
+                            <td class="no-border" style="vertical-align: middle; padding-left: 8px;">
+                                <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
+                                    PT. CHAROEN POKPHAND INDONESIA<br>
+                                    FOOD DIVISION<br>
+                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
                                 </div>
-
                             </td>
                         </tr>
                     </table>
@@ -144,7 +126,7 @@
         </table>
     </div>
 
-    <h3 style="text-align: center;">PEMERIKSAAN KEBERSIHAN SETELAH PERGANTIAN PRODUK</h3>
+    <h3 style="text-align: center;">PEMERIKSAAN KEBERSIHAN SETELAH CHANGE-OVER</h3>
 
     <table style="width: 100%; border: none;">
         <tr style="border: none;">

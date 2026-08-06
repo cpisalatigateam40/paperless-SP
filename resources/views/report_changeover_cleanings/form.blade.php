@@ -42,7 +42,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>{{ $isEdit ? 'Edit Laporan Pemeriksaan Kebersihan' : 'Tambah Laporan Pemeriksaan Kebersihan' }}</h4>
+            <h4>{{ $isEdit ? 'Edit Pemeriksaan Kebersihan Setelah Change-Over' : 'Tambah Pemeriksaan Kebersihan Setelah Change-Over' }}</h4>
             <small class="text-muted">Setelah Pergantian Produk</small>
         </div>
 

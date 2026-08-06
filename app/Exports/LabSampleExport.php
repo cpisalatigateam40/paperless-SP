@@ -24,7 +24,7 @@ class LabSampleExport implements WithEvents, WithTitle
                 $lastCol = 'N';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI LAB SAMPLE');
+                $sheet->setCellValue('A1', 'Form Pengambilan Sample');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

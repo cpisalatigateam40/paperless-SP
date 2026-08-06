@@ -24,7 +24,7 @@ class SteamerCookingExport implements WithEvents, WithTitle
                 $lastCol = 'V';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI PROSES PEMASAKAN DI STEAMER');
+                $sheet->setCellValue('A1', 'Verifikasi Proses Pemasakan di Steamer');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

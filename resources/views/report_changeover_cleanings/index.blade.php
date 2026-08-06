@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Pemeriksaan Kebersihan Setelah Pergantian Produk</h4>
+            <h5>Pemeriksaan Kebersihan Setelah Change-Over</h5>
 
             <div class="d-flex gap-2" style="gap: .4rem;">
                 @hasanyrole('admin|superadmin')
@@ -136,23 +136,23 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="align-middle">No</th>
-                            <th class="align-middle">Tanggal</th>
-                            <th class="align-middle">Shift</th>
-                            <th class="align-middle">Area</th>
-                            <th class="align-middle">Dibuat Oleh</th>
-                            <th class="align-middle text-center">Aksi</th>
+                            <th class="">No</th>
+                            <th class="">Tanggal</th>
+                            <th class="">Shift</th>
+                            <th class="">Area</th>
+                            <th class="">Dibuat Oleh</th>
+                            <th class="">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($reports as $i => $report)
                         <tr>
-                            <td class="align-middle">{{ $i + $reports->firstItem() }}</td>
-                            <td class="align-middle">{{ $report->date ? $report->date->format('d-m-Y') : '-' }}</td>
-                            <td class="align-middle">{{ $report->shift ?? '-' }}</td>
-                            <td class="align-middle">{{ $report->area->name ?? '-' }}</td>
-                            <td class="align-middle">{{ $report->created_by ?? '-' }}</td>
-                            <td class="align-middle text-center">
+                            <td class="">{{ $i + $reports->firstItem() }}</td>
+                            <td class="">{{ $report->date ? $report->date->format('d-m-Y') : '-' }}</td>
+                            <td class="">{{ $report->shift ?? '-' }}</td>
+                            <td class="">{{ $report->area->name ?? '-' }}</td>
+                            <td class="">{{ $report->created_by ?? '-' }}</td>
+                            <td class=" ">
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-sm btn-info toggle-detail"
                                     data-target="#detail-{{ $report->id }}" title="Lihat Detail">
@@ -269,24 +269,24 @@
                                     $colCount = 2 + (count($batches) * 2) + 2;
                                 @endphp
 
-                                <table class="table table-sm table-bordered mb-0 text-center">
+                                <table class="table table-sm table-bordered mb-0 ">
                                     <thead>
                                         <tr>
-                                            <th rowspan="2" class="align-middle">No</th>
-                                            <th rowspan="2" class="align-middle">Item</th>
+                                            <th rowspan="2" class="">No</th>
+                                            <th rowspan="2" class="">Item</th>
                                             @foreach($batches as $batch)
-                                            <th colspan="2" class="align-middle">
+                                            <th colspan="2" class="">
                                                 {{ $batch['product_name'] }}<br>
                                                 <small>Jam: {{ $batch['time'] }}</small>
                                             </th>
                                             @endforeach
-                                            <th rowspan="2" class="align-middle">Keterangan</th>
-                                            <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
+                                            <th rowspan="2" class="">Keterangan</th>
+                                            <th rowspan="2" class="">Tindakan Koreksi</th>
                                         </tr>
                                         <tr>
                                             @foreach($batches as $batch)
-                                            <th class="align-middle">Hasil</th>
-                                            <th class="align-middle">Penjelasan</th>
+                                            <th class="">Hasil</th>
+                                            <th class="">Penjelasan</th>
                                             @endforeach
                                         </tr>
                                     </thead>
@@ -311,9 +311,9 @@
                                             @endphp
 
                                             <tr>
-                                                <td class="align-middle">{{ $no++ }}</td>
+                                                <td class="">{{ $no++ }}</td>
 
-                                                <td class="align-middle text-start">
+                                                <td class=" text-start">
                                                     <span class="ms-3">
                                                         {{ $item->name }}
                                                     </span>
@@ -324,11 +324,11 @@
                                                         $cell = $matrix[$item->uuid][$batchKey] ?? null;
                                                     @endphp
 
-                                                    <td class="align-middle">
+                                                    <td class="">
                                                         {{ $cell->result ?? '-' }}
                                                     </td>
 
-                                                    <td class="align-middle">
+                                                    <td class="">
                                                         {{ $cell->explanation ?? '-' }}
                                                     </td>
 
@@ -345,11 +345,11 @@
                                                     @endphp
                                                 @endforeach
 
-                                                <td class="align-middle text-start">
+                                                <td class=" text-start">
                                                     {{ $rowKeterangan ? implode('; ', $rowKeterangan) : '-' }}
                                                 </td>
 
-                                                <td class="align-middle text-start">
+                                                <td class=" text-start">
                                                     {{ $rowTindakan ? implode('; ', $rowTindakan) : '-' }}
                                                 </td>
                                             </tr>
@@ -358,7 +358,7 @@
 
                                         @empty
                                             <tr>
-                                                <td colspan="{{ $colCount }}" class="text-center">
+                                                <td colspan="{{ $colCount }}" class="">
                                                     Belum ada detail
                                                 </td>
                                             </tr>
@@ -369,7 +369,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center">Belum ada laporan.</td>
+                            <td colspan="8" class="">Belum ada laporan.</td>
                         </tr>
                         @endforelse
                     </tbody>

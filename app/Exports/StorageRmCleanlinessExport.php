@@ -27,7 +27,7 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
 
                 // ── Judul ──────────────────────────────────────────────────
                 $sheet->mergeCells('A1:X1');
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI KEBERSIHAN RUANG PENYIMPANAN RM');
+                $sheet->setCellValue('A1', 'Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

@@ -174,6 +174,12 @@ class Product extends Model
         );
     }
 
+    // Product.php
+    public function reportAuditPackingPrimers()
+    {
+        return $this->hasMany(ReportAuditPackingPrimer::class, 'product_uuid', 'uuid');
+    }
+
 
 
 

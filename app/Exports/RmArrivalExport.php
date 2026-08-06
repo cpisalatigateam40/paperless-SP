@@ -27,7 +27,7 @@ class RmArrivalExport implements WithEvents, WithTitle
 
                 // ── Judul ──────────────────────────────────────────────────
                 $sheet->mergeCells('A1:U1');
-                $sheet->setCellValue('A1', 'Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang (Chillroom & Seasoning)');
+                $sheet->setCellValue('A1', 'Verifikasi Bahan Baku dan Bahan Penunjang');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

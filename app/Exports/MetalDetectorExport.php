@@ -27,7 +27,7 @@ class MetalDetectorExport implements WithEvents, WithTitle
 
                 // ── Judul ──────────────────────────────────────────────────
                 $sheet->mergeCells('A1:O1');
-                $sheet->setCellValue('A1', 'LAPORAN PEMERIKSAAN METAL DETECTOR');
+                $sheet->setCellValue('A1', 'Verifikasi Kinerja Metal Detector Adonan');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

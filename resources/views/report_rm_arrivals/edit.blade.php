@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h5>Edit Laporan Verifikasi Kedatangan Bahan Baku dan Bahan Penunjang</h5>
+            <h5>Edit Verifikasi Bahan Baku dan Bahan Penunjang</h5>
         </div>
 
         <div class="card-body">

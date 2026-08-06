@@ -94,4 +94,10 @@ class Section extends Model
     {
         return $this->hasMany(ReportRMArrival::class, 'section_uuid', 'uuid');
     }
+
+    // Section.php
+    public function reportAuditPackingPrimers()
+    {
+        return $this->hasMany(ReportAuditPackingPrimer::class, 'section_uuid', 'uuid');
+    }
 }

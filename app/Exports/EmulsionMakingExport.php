@@ -48,7 +48,7 @@ class EmulsionMakingDataSheet implements WithEvents
 
                 // ── Judul ──────────────────────────────────────────────────
                 $sheet->mergeCells('A1:R1');
-                $sheet->setCellValue('A1', 'LAPORAN PEMBUATAN EMULSI');
+                $sheet->setCellValue('A1', 'Verifikasi Proses Pembuatan Emulsi');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

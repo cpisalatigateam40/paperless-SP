@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Laporan Verifikasi Pasteurisasi Waterbath</h4>
+            <h5>Verifikasi Proses Pasteurisasi Produk di Waterbath</h5>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5 class="mb-3">Edit Laporan Verifikasi Barang Mudah Pecah (Tahap 2)</h5>
+            <h5 class="mb-3">Edit Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic) (Tahap 2)</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('report-fragile-item.update-next', $report->uuid) }}" method="POST">

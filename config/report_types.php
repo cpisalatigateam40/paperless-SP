@@ -52,4 +52,7 @@ return [
     // Verifikasi dan Penanganan Ketidaksesuaian
     'report_production_nonconformities' => 'Pemeriksaan Ketidaksesuaian Proses Produksi',
     'report_foreign_objects' => 'Pemeriksaan Kontaminasi Benda Asing',
+
+    //audit
+    'report_audit_packing_primers' => 'Checklist Audit Kepatuhan Proses Packing Primer'
 ];

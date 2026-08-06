@@ -24,7 +24,7 @@ class ForeignObjectExport implements WithEvents, WithTitle
                 $lastCol = 'M';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI KONTAMINASI BENDA ASING');
+                $sheet->setCellValue('A1', 'Pemeriksaan Kontaminasi Benda Asing');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

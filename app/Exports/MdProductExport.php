@@ -24,7 +24,7 @@ class MdProductExport implements WithEvents, WithTitle
                 $lastCol = 'W';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI METAL DETECTOR PRODUK');
+                $sheet->setCellValue('A1', 'Verifikasi Kinerja Metal Detector Produk');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

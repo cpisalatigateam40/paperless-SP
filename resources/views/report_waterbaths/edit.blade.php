@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Edit Laporan Verifikasi Pasteurisasi Waterbath</h4>
+            <h4>Edit Verifikasi Proses Pasteurisasi Produk di Waterbath</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_waterbaths.update', $report->uuid) }}" method="POST">

@@ -6,7 +6,7 @@
     <div class="card shadow">
 
         <div class="card-header">
-            <h4>Edit Laporan Thawing</h4>
+            <h4>Edit Verifikasi Proses Thawing</h4>
         </div>
 
         <div class="card-body">

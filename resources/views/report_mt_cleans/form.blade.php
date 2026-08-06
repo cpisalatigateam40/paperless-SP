@@ -39,8 +39,8 @@
         <div class="card-header">
             <h4>
                 {{ $isEdit
-                    ? 'Edit Laporan Kebersihan Magnet Trap'
-                    : 'Tambah Laporan Kebersihan Magnet Trap' }}
+                    ? 'Edit Pemeriksaan Kebersihan Magnet Trap'
+                    : 'Tambah Pemeriksaan Kebersihan Magnet Trap' }}
             </h4>
         </div>
 

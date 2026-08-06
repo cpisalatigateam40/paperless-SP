@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Edit Laporan Verifikasi Lab Sample</h4>
+            <h4>Edit Form Pengambilan Sample</h4>
         </div>
         <div class="card-body">
             <form action="{{ route('report_lab_samples.update', $report->uuid) }}" method="POST">
@@ -84,7 +84,7 @@
                             <div class="col-md-6">
                                 <label>Best Before</label>
                                 <input type="date" name="details[{{ $i }}][best_before]" class="form-control mb-3 best-before"
-                                    value="{{ $detail->best_before }}" readonly>
+                                    value="{{ $detail->best_before }}">
                             </div>
                         </div>
 

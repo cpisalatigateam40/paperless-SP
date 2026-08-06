@@ -37,7 +37,7 @@ class ChangeoverCleaningExport implements WithEvents, WithTitle
                 $sheet->mergeCells('A1:L1');
                 $sheet->setCellValue(
                     'A1',
-                    'LAPORAN PEMERIKSAAN KEBERSIHAN SETELAH PERGANTIAN PRODUK'
+                    'Pemeriksaan Kebersihan Setelah Change-Over'
                 );
 
                 $sheet->getStyle('A1')

@@ -8,7 +8,7 @@
         {{-- HEADER --}}
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Tambah Laporan Verifikasi Produk Tofu</h5>
+                <h5>Tambah Verifikasi Hasil Produksi Tofu</h5>
             </div>
             <div class="card-body row g-3">
                 <div class="col-md-6">
@@ -46,7 +46,7 @@
                     </div>
                     <div class="col-md-4">
                         <label>Best Before</label>
-                        <input type="date" name="products[{{ $i }}][expired_date]" class="form-control best-before" readonly>
+                        <input type="date" name="products[{{ $i }}][expired_date]" class="form-control best-before">
                     </div>
 
                     <div class="col-md-4">

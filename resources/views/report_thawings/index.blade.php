@@ -6,7 +6,7 @@
     <div class="card shadow">
 
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Laporan Pemeriksaan Proses Thawing</h4>
+            <h5>Verifikasi Proses Thawing</h5>
 
             <div class="d-flex align-items-center" style="gap:.4rem;">
 

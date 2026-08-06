@@ -41,7 +41,7 @@ class PasteurExport implements WithEvents, WithTitle
                 $lastCol = 'AT';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI PASTEURISASI');
+                $sheet->setCellValue('A1', 'Verifikasi Proses Pasteurisasi Produk di Retort Chamber');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

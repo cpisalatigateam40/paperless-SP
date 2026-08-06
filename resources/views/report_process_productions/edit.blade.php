@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>Edit Laporan Verifikasi Proses Produksi</h4>
+            <h4>Edit Verifikasi Proses Mixing, Chopping, dan Emulsifying</h4>
         </div>
         <div class="card-body">
 

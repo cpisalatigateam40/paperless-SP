@@ -79,6 +79,7 @@ use App\Http\Controllers\SteamerStandardController;
 use App\Http\Controllers\ReportSteamerCookingController;
 use App\Http\Controllers\FormNumberController;
 use	App\Http\Controllers\SsoLoginController;
+use App\Http\Controllers\ReportAuditPackingPrimerController;
 
 
 Route::get('/', function () {
@@ -1446,6 +1447,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('report-mt-cleans/bulk-approve', [ReportMtCleanController::class, 'bulkApprove'])->name('report-mt-cleans.bulk-approve');
     Route::get('report-mt-cleans/bulk-known-count', [ReportMtCleanController::class, 'bulkKnownCount'])->name('report-mt-cleans.bulk-known-count');
     Route::get('report-mt-cleans/bulk-approve-count', [ReportMtCleanController::class, 'bulkApproveCount'])->name('report-mt-cleans.bulk-approve-count');
+
+
+    Route::get('report-audit-packing-primers/export-pdf-bulk', [ReportAuditPackingPrimerController::class, 'exportPdfBulk'])->name('report_audit_packing_primers.exportPdfBulk');
+
+    Route::prefix('report-audit-packing-primers')
+    ->name('report_audit_packing_primers.')
+    ->controller(ReportAuditPackingPrimerController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+    });
     
 
     Route::prefix('report-waterbaths')

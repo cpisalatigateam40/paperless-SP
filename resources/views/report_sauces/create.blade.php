@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header">
-            <h5>Tambah Laporan Verifikasi Pemasakan Produk Di Steam Kettle</h5>
+            <h5>Tambah Verifikasi Proses Pemasakan di Steam Kettle</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('report_sauces.store') }}" method="POST">
@@ -52,12 +52,12 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Start</label>
-                        <input type="time" name="start_time" class="form-control"
+                        <input type="time" name="start_time" id="start_time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Stop</label>
-                        <input type="time" name="end_time" class="form-control"
+                        <input type="time" name="end_time" id="end_time" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                     </div>
                 </div>
@@ -71,8 +71,8 @@
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Tahapan Proses</label>
-                        <input type="text" name="details[0][process_step]" class="form-control" placeholder="masukkan tahapan proses">
+                        <label class="form-label">Durasi Proses</label>
+                        <input type="text" name="details[0][process_step]" id="process_step" class="form-control" placeholder="masukkan durasi proses">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Nomor Mesin</label>
@@ -277,5 +277,31 @@ document.getElementById('formula-select').addEventListener('change', function ()
             data.premixes.forEach(fm => wrapper.insertAdjacentHTML('beforeend', buildRow(fm, 'Premix')));
         });
 });
+
+function calcDuration() {
+    const startVal = document.getElementById('start_time').value;
+    const endVal = document.getElementById('end_time').value;
+    const processInput = document.getElementById('process_step');
+
+    // hapus suffix durasi lama, baik format "- 15 menit" maupun "15 menit" polos
+    const baseText = processInput.value.replace(/\s*-?\s*\d+\s*menit\s*$/i, '').trim();
+
+    if (!startVal || !endVal) {
+        processInput.value = baseText;
+        return;
+    }
+
+    const [startH, startM] = startVal.split(':').map(Number);
+    const [endH, endM] = endVal.split(':').map(Number);
+
+    let diff = (endH * 60 + endM) - (startH * 60 + startM);
+    if (diff < 0) diff += 24 * 60; // lewat tengah malam
+
+    processInput.value = baseText ? `${baseText} - ${diff} menit` : `${diff} menit`;
+}
+
+document.getElementById('start_time').addEventListener('input', calcDuration);
+document.getElementById('end_time').addEventListener('input', calcDuration);
+document.addEventListener('DOMContentLoaded', calcDuration);
 </script>
 @endsection

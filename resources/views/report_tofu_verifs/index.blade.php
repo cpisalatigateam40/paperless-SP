@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Laporan Verifikasi Produk Tofu</h5>
+            <h5 class="mb-0">Verifikasi Hasil Produksi Tofu</h5>
             
             <div class="d-flex gap-2" style="gap: .4rem;">
 

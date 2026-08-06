@@ -28,7 +28,7 @@ class ProcessAreaCleanlinessExport implements WithEvents, WithTitle
                 $lastCol = 'U';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
-                $sheet->setCellValue('A1', 'LAPORAN VERIFIKASI KEBERSIHAN AREA PROSES');
+                $sheet->setCellValue('A1', 'Verifikasi Kesesuaian Area Proses Produksi');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 

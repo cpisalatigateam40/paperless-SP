@@ -34,7 +34,7 @@
 <div class="container-fluid">
     <div class="card shadow">
         <div class="card-header">
-            <h4>{{ $isEdit ? 'Edit Laporan Startup Label' : 'Tambah Laporan Startup Label' }}</h4>
+            <h4>{{ $isEdit ? 'Edit Verifikasi Labelisasi Start-Up' : 'Tambah Verifikasi Labelisasi Start-Up' }}</h4>
         </div>
 
         <div class="card-body">

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Laporan Verifikasi Pemasakan di Steamer</h4>
+            <h5>Verifikasi Proses Pemasakan di Steamer</h5>
 
             <div class="d-flex align-items-center" style="gap: .4rem;">
                 @hasanyrole('admin|superadmin')

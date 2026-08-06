@@ -8,7 +8,7 @@
 
         {{-- HEADER --}}
         <div class="card mb-4">
-            <div class="card-header">Edit Laporan Verifikasi Produk Tofu</div>
+            <div class="card-header">Edit Verifikasi Hasil Produksi Tofu</div>
             <div class="card-body row g-3">
                 <div class="col-md-3">
                     <label>Tanggal</label>
