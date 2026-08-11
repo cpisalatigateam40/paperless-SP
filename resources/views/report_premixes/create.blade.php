@@ -59,7 +59,7 @@
                                             <input type="text" name="details[0][production_code]" class="form-control">
                                         </td>
 
-                                        <td><input type="number" name="details[0][weight]" class="form-control" step="0.001"
+                                        <td><input type="number" name="details[0][weight]" class="form-control" step="0.00001"
                                                 required></td>
                                         <td><input type="text" name="details[0][used_for_batch]" class="form-control">
                                         </td>
@@ -125,7 +125,7 @@ function addRow() {
         <td>
             <input type="text" name="details[${rowIdx}][production_code]" class="form-control">
         </td>
-        <td><input type="number" step="0.001" name="details[${rowIdx}][weight]" class="form-control" required></td>
+        <td><input type="number" step="0.00001" name="details[${rowIdx}][weight]" class="form-control" required></td>
         <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control"></td>
         <td><input type="text" name="details[${rowIdx}][notes]" class="form-control"></td>
         <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control"></td>

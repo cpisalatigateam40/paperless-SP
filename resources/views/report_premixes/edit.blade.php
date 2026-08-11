@@ -58,7 +58,7 @@
                                     <td><input type="text" name="details[{{ $index }}][production_code]"
                                             value="{{ $detail->production_code }}" class="form-control"></td>
                                     <td><input type="number" name="details[{{ $index }}][weight]"
-                                            value="{{ $detail->weight }}" class="form-control" step="0.001" required>
+                                            value="{{ $detail->weight }}" class="form-control" step="0.00001" required>
                                     </td>
                                     <td><input type="text" name="details[{{ $index }}][used_for_batch]"
                                             value="{{ $detail->used_for_batch }}" class="form-control"></td>
@@ -130,7 +130,7 @@ function addRow() {
             </select>
         </td>
         <td><input type="text" name="details[${rowIdx}][production_code]" class="form-control"></td>
-        <td><input type="number" step="0.001" name="details[${rowIdx}][weight]" class="form-control" required></td>
+        <td><input type="number" step="0.00001" name="details[${rowIdx}][weight]" class="form-control" required></td>
         <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control"></td>
         <td><input type="text" name="details[${rowIdx}][notes]" class="form-control"></td>
         <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control"></td>
