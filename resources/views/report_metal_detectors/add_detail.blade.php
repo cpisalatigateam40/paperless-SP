@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Kinerja Metal Detector Adonan', 'url' => route('report_metal_detectors.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>Tambah Detail Pemeriksaan ({{ $report->date }} - Shift {{ $report->shift }})</h4>

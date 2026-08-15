@@ -21,10 +21,11 @@ use App\Traits\HasBulkApproval;
 use Illuminate\Support\Facades\Storage;
 use App\Models\DocumentationFreezPackaging;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportFreezPackagingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportFreezPackaging::class;
 
     protected function getBulkExportModelClass(): string
@@ -72,111 +73,124 @@ class ReportFreezPackagingController extends Controller
         return 'laporan_freez_packaging';
     }
 
-public function index(Request $request)
-{
-    $search = $request->search;
+    public function index(Request $request)
+    {
+        $search = $request->search;
 
-    $query = ReportFreezPackaging::with([
-        'area',
-        'details.product',
-        'details.freezing.actualTemps',
-        'details.kartoning',
-        'details.documentations',
-        'details.kartoningDocumentations',
-    ]);
+        $query = ReportFreezPackaging::with([
+            'area',
+            'details.product',
+            'details.freezing.actualTemps',
+            'details.kartoning',
+            'details.documentations',
+            'details.kartoningDocumentations',
+        ]);
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
-        $request->filled('area')
-    ) {
-        $query->where('area_uuid', $request->area);
-    }
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
-    $query->when($search, function ($q) use ($search) {
+        $query->when($search, function ($q) use ($search) {
 
-        $q->where(function ($qq) use ($search) {
+            $q->where(function ($qq) use ($search) {
 
-            /* ================= HEADER ================= */
-            $qq->where('date', 'like', "%{$search}%")
-                ->orWhere('shift', 'like', "%{$search}%")
-                ->orWhere('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%");
+                /* ================= HEADER ================= */
+                $qq->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
 
-            /* ================= AREA ================= */
-            $qq->orWhereHas('area', function ($qa) use ($search) {
-                $qa->where('name', 'like', "%{$search}%");
-            });
+                /* ================= AREA ================= */
+                $qq->orWhereHas('area', function ($qa) use ($search) {
+                    $qa->where('name', 'like', "%{$search}%");
+                });
 
-            /* ================= DETAIL ================= */
-            $qq->orWhereHas('details', function ($qd) use ($search) {
+                /* ================= DETAIL ================= */
+                $qq->orWhereHas('details', function ($qd) use ($search) {
 
-                $qd->where('start_time', 'like', "%{$search}%")
-                    ->orWhere('end_time', 'like', "%{$search}%")
-                    ->orWhere('production_code', 'like', "%{$search}%")
-                    ->orWhere('best_before', 'like', "%{$search}%")
-                    ->orWhere('corrective_action', 'like', "%{$search}%")
-                    ->orWhere('verif_after', 'like', "%{$search}%")
+                    $qd->where('start_time', 'like', "%{$search}%")
+                        ->orWhere('end_time', 'like', "%{$search}%")
+                        ->orWhere('production_code', 'like', "%{$search}%")
+                        ->orWhere('best_before', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verif_after', 'like', "%{$search}%")
 
-                    ->orWhereHas('product', function ($qp) use ($search) {
-                        $qp->where('product_name', 'like', "%{$search}%")
-                            ->orWhere('production_code', 'like', "%{$search}%");
-                    })
+                        ->orWhereHas('product', function ($qp) use ($search) {
+                            $qp->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('production_code', 'like', "%{$search}%");
+                        })
 
-                    ->orWhereHas('freezing', function ($qf) use ($search) {
-                        $qf->where('start_product_temp', 'like', "%{$search}%")
-                            ->orWhere('end_product_temp', 'like', "%{$search}%")
-                            ->orWhere('iqf_room_temp', 'like', "%{$search}%")
-                            ->orWhere('iqf_suction_temp', 'like', "%{$search}%")
-                            ->orWhere('freezing_time_display', 'like', "%{$search}%")
-                            ->orWhere('freezing_time_actual', 'like', "%{$search}%")
-                            ->orWhere('standard_temp', 'like', "%{$search}%");
-                    })
+                        ->orWhereHas('freezing', function ($qf) use ($search) {
+                            $qf->where('start_product_temp', 'like', "%{$search}%")
+                                ->orWhere('end_product_temp', 'like', "%{$search}%")
+                                ->orWhere('iqf_room_temp', 'like', "%{$search}%")
+                                ->orWhere('iqf_suction_temp', 'like', "%{$search}%")
+                                ->orWhere('freezing_time_display', 'like', "%{$search}%")
+                                ->orWhere('freezing_time_actual', 'like', "%{$search}%")
+                                ->orWhere('standard_temp', 'like', "%{$search}%");
+                        })
 
-                    ->orWhereHas('kartoning', function ($qk) use ($search) {
-                        $qk->where('carton_code', 'like', "%{$search}%")
-                            ->orWhere('carton_condition', 'like', "%{$search}%")
-                            ->orWhere('carton_weight_standard', 'like', "%{$search}%")
-                            ->orWhere('carton_weight_actual', 'like', "%{$search}%")
-                            ->orWhere('avg_weight', 'like', "%{$search}%")
-                            ->orWhere('content_rtg', 'like', "%{$search}%");
-                    });
+                        ->orWhereHas('kartoning', function ($qk) use ($search) {
+                            $qk->where('carton_code', 'like', "%{$search}%")
+                                ->orWhere('carton_condition', 'like', "%{$search}%")
+                                ->orWhere('carton_weight_standard', 'like', "%{$search}%")
+                                ->orWhere('carton_weight_actual', 'like', "%{$search}%")
+                                ->orWhere('avg_weight', 'like', "%{$search}%")
+                                ->orWhere('content_rtg', 'like', "%{$search}%");
+                        });
+
+                });
 
             });
 
         });
 
-    });
-
-    $reports = $query->latest()
-        ->paginate(10)
-        ->withQueryString();
-
-    // Hitung ketidaksesuaian
-    foreach ($reports as $report) {
-        $count = 0;
-
-        foreach ($report->details as $detail) {
-            if ($detail->verif_after === 'x') {
-                $count++;
-                continue;
-            }
-
-            if (optional($detail->kartoning)->carton_condition === 'x') {
-                $count++;
-            }
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
         }
 
-        $report->ketidaksesuaian = $count;
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        $reports = $query->paginate(10)
+            ->withQueryString();
+
+        // Hitung ketidaksesuaian
+        foreach ($reports as $report) {
+            $count = 0;
+
+            foreach ($report->details as $detail) {
+                if ($detail->verif_after === 'x') {
+                    $count++;
+                    continue;
+                }
+
+                if (optional($detail->kartoning)->carton_condition === 'x') {
+                    $count++;
+                }
+            }
+
+            $report->ketidaksesuaian = $count;
+        }
+
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('report_freez_packagings.index', compact('reports', 'areas'));
     }
-
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
-
-    return view('report_freez_packagings.index', compact('reports', 'areas'));
-}
 
     public function create()
     {

@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang', 'url' => route('cleanliness.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5>Edit Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang</h5>

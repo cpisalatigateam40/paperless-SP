@@ -32,6 +32,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Labelisasi Start-Up', 'url' => route('report_startup_labels.index')],
+        ['label' => 'Tambah/Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>{{ $isEdit ? 'Edit Verifikasi Labelisasi Start-Up' : 'Tambah Verifikasi Labelisasi Start-Up' }}</h4>

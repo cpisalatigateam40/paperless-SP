@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Laporan Ketidaksesuaian Proses Produksi', 'url' => route('report_production_nonconformities.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>Tambah Detail Ketidaksesuaian untuk Tanggal {{ $report->date }} - Shift {{ $report->shift }}</h4>

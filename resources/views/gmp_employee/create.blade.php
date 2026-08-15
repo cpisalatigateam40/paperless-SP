@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Penerapan GMP Karyawan & Sanitasi Area', 'url' => route('gmp-employee.index')],
+        ['label' => 'Tambah Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5>Tambah Verifikasi Penerapan GMP Karyawan & Sanitasi Area</h5>

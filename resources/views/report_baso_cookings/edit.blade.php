@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pemasakan di Boiling Tank', 'url' => route('report_baso_cookings.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <form action="{{ route('report_baso_cookings.update', $report->uuid) }}" method="POST">
         @csrf
         @method('PUT')

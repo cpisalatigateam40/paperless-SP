@@ -21,7 +21,7 @@ class MdProductExport implements WithEvents, WithTitle
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastCol = 'W';
+                $lastCol = 'T';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'Verifikasi Kinerja Metal Detector Produk');
@@ -38,21 +38,21 @@ class MdProductExport implements WithEvents, WithTitle
                 foreach (['A','B','C','D','E','F','G','H','I'] as $col) {
                     $sheet->mergeCells("{$col}4:{$col}5");
                 }
-                // Fe 1.5mm : J-M
-                $sheet->mergeCells('J4:M4');
+                // Fe 1.5mm : J-L
+                $sheet->mergeCells('J4:L4');
                 $sheet->setCellValue('J4', 'Speci. Fe 1,5 mm');
-                // Non-Fe 2.0mm : N-Q
-                $sheet->mergeCells('N4:Q4');
-                $sheet->setCellValue('N4', 'Speci. Non-Fe 2,0 mm');
-                // SUS 2.5mm : R-U
-                $sheet->mergeCells('R4:U4');
-                $sheet->setCellValue('R4', 'Speci. SUS 2,5 mm');
-                // V-X span row 4-5
-                foreach (['V','W'] as $col) {
+                // Non-Fe 2.0mm : M-O
+                $sheet->mergeCells('M4:O4');
+                $sheet->setCellValue('M4', 'Speci. Non-Fe 2,0 mm');
+                // SUS 2.5mm : P-R
+                $sheet->mergeCells('P4:R4');
+                $sheet->setCellValue('P4', 'Speci. SUS 2,5 mm');
+                // S-T span row 4-5
+                foreach (['S','T'] as $col) {
                     $sheet->mergeCells("{$col}4:{$col}5");
                 }
 
-                foreach (['J4','N4','R4'] as $cell) {
+                foreach (['J4','M4','P4'] as $cell) {
                     $sheet->getStyle($cell)->getFont()->setBold(true);
                     $sheet->getStyle($cell)->getAlignment()
                         ->setHorizontal('center')->setVertical('center');
@@ -78,11 +78,11 @@ class MdProductExport implements WithEvents, WithTitle
                         ->setHorizontal('center')->setVertical('center')->setWrapText(true);
                 }
 
-                $posLabels = ['Depan', 'Tengah', 'Belakang', 'Dalam'];
+                $posLabels = ['Depan', 'Tengah', 'Belakang'];
                 $posCols   = [
-                    'fe_1_5mm'   => ['J','K','L','M'],
-                    'non_fe_2mm' => ['N','O','P','Q'],
-                    'sus_2_5mm'  => ['R','S','T','U'],
+                    'fe_1_5mm'   => ['J','K','L'],
+                    'non_fe_2mm' => ['M','N','O'],
+                    'sus_2_5mm'  => ['P','Q','R'],
                 ];
 
                 foreach ($posCols as $cols) {
@@ -94,10 +94,10 @@ class MdProductExport implements WithEvents, WithTitle
                     }
                 }
 
-                $sheet->setCellValue('V4', 'Tindakan Perbaikan');
-                $sheet->setCellValue('W4', "Verifikasi\nSetelah Perbaikan");
+                $sheet->setCellValue('S4', 'Tindakan Perbaikan');
+                $sheet->setCellValue('T4', "Verifikasi\nSetelah Perbaikan");
 
-                foreach (['V4','W4'] as $cell) {
+                foreach (['S4','T4'] as $cell) {
                     $sheet->getStyle($cell)->getFont()->setBold(true);
                     $sheet->getStyle($cell)->getAlignment()
                         ->setHorizontal('center')->setVertical('center')->setWrapText(true);
@@ -149,20 +149,17 @@ class MdProductExport implements WithEvents, WithTitle
                         $sheet->setCellValue("J{$dataRow}", $get('fe_1_5mm', 'd'));
                         $sheet->setCellValue("K{$dataRow}", $get('fe_1_5mm', 't'));
                         $sheet->setCellValue("L{$dataRow}", $get('fe_1_5mm', 'b'));
-                        $sheet->setCellValue("M{$dataRow}", $get('fe_1_5mm', 'dl'));
                         // Non-Fe 2.0mm
-                        $sheet->setCellValue("N{$dataRow}", $get('non_fe_2mm', 'd'));
-                        $sheet->setCellValue("O{$dataRow}", $get('non_fe_2mm', 't'));
-                        $sheet->setCellValue("P{$dataRow}", $get('non_fe_2mm', 'b'));
-                        $sheet->setCellValue("Q{$dataRow}", $get('non_fe_2mm', 'dl'));
+                        $sheet->setCellValue("M{$dataRow}", $get('non_fe_2mm', 'd'));
+                        $sheet->setCellValue("N{$dataRow}", $get('non_fe_2mm', 't'));
+                        $sheet->setCellValue("O{$dataRow}", $get('non_fe_2mm', 'b'));
                         // SUS 2.5mm
-                        $sheet->setCellValue("R{$dataRow}", $get('sus_2_5mm', 'd'));
-                        $sheet->setCellValue("S{$dataRow}", $get('sus_2_5mm', 't'));
-                        $sheet->setCellValue("T{$dataRow}", $get('sus_2_5mm', 'b'));
-                        $sheet->setCellValue("U{$dataRow}", $get('sus_2_5mm', 'dl'));
+                        $sheet->setCellValue("P{$dataRow}", $get('sus_2_5mm', 'd'));
+                        $sheet->setCellValue("Q{$dataRow}", $get('sus_2_5mm', 't'));
+                        $sheet->setCellValue("R{$dataRow}", $get('sus_2_5mm', 'b'));
                         // Koreksi & verifikasi
-                        $sheet->setCellValue("V{$dataRow}", $detail->corrective_action ?? '-');
-                        $sheet->setCellValue("W{$dataRow}", $verif);
+                        $sheet->setCellValue("S{$dataRow}", $detail->corrective_action ?? '-');
+                        $sheet->setCellValue("T{$dataRow}", $verif);
 
                         $sheet->getStyle("A{$dataRow}:{$lastCol}{$dataRow}")
                             ->getAlignment()->setHorizontal('center');
@@ -184,7 +181,7 @@ class MdProductExport implements WithEvents, WithTitle
                 // Auto width
                 $allCols = array_merge(
                     array_keys($headerLabels),
-                    ['J','K','L','M','N','O','P','Q','R','S','T','U','V','W']
+                    ['J','K','L','M','N','O','P','Q','R','S','T']
                 );
                 foreach ($allCols as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);

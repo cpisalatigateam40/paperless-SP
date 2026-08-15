@@ -121,7 +121,7 @@
             </div>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
             <div class="table-responsive">
                 @if(session('success'))
                 <div id="success-alert" class="alert alert-success">
@@ -138,6 +138,16 @@
                     </ul>
                 </div>
                 @endif
+
+                <x-report-sort
+                    :sort-options="[
+                        'latest' => 'Terbaru',
+                        'report_date' => 'Tanggal Laporan',
+                        'submitted_at' => 'Tanggal Submit',
+                    ]"
+                    :with-date-filter="true"
+                />
+
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -166,11 +176,12 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                {{-- Update --}}
+                                @can('edit report')
                                 <a href="{{ route('report-fragile-item.edit-next', $report->uuid) }}"
                                     class="btn btn-warning btn-sm" title="Update">
                                     <i class="fas fa-pen"></i>
                                 </a>
+                                @endcan
 
                                 @can('delete report')
                                 <form action="{{ route('report-fragile-item.destroy', $report->uuid) }}" method="POST"

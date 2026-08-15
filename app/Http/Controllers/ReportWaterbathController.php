@@ -21,10 +21,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportWaterbathController extends Controller
 {
-    use HasBulkApproval,HasBulkPdfExport;
+    use HasBulkApproval,HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportWaterbath::class;
 
     protected function getBulkExportModelClass(): string
@@ -148,8 +149,21 @@ class ReportWaterbathController extends Controller
             });
         });
 
-        $reports = $query->latest()
-            ->paginate(10)
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'batch_code',
+            ],
+        ]);
+
+        $reports = $query->paginate(10)
             ->withQueryString();
 
         $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])

@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pemasakan di Steamer', 'url' => route('report_steamer_cookings.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h4>Edit Verifikasi Proses Pemasakan di Steamer</h4>

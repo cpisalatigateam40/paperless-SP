@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Checklist Audit Kepatuhan Proses Packing Primer', 'url' => route('report_audit_packing_primers.index')],
+        ['label' => 'Tambah/Edit Data', 'url' => null],
+    ]" />
+
     <div class="card">
         <div class="card-header">
             <h4 class="mb-0">

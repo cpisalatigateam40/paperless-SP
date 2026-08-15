@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Pemeriksaan Kontaminasi Benda Asing', 'url' => route('report-foreign-objects.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <form action="{{ route('report-foreign-objects.store-detail', $report->uuid) }}" method="POST"
         enctype="multipart/form-data" id="foreign-object-form">
         @csrf

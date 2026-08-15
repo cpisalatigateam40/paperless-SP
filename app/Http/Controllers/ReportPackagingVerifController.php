@@ -18,10 +18,11 @@ use App\Traits\HasBulkApproval;
 use App\Models\Product;
 use App\Traits\HasBulkPdfExport;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\HasSortableReport;
 
 class ReportPackagingVerifController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportPackagingVerif::class;
 
     protected function getBulkExportModelClass(): string
@@ -71,7 +72,7 @@ class ReportPackagingVerifController extends Controller
             'section',
             'details.product',
             'details.checklist'
-        ])->latest();
+        ]);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -149,6 +150,20 @@ class ReportPackagingVerifController extends Controller
                 });
             });
         }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
 
         $reports = $query->paginate(10)->withQueryString();
 

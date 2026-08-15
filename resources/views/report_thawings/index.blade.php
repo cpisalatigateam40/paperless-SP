@@ -110,13 +110,23 @@
         </div>
 
 
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
 
             @if(session('success'))
             <div id="success-alert" class="alert alert-success">
                 {{ session('success') }}
             </div>
             @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
 
             <div class="table-responsive">
@@ -259,6 +269,7 @@
                                 @endif
                                 @endcan
 
+                                @can('delete report')
                                 <form action="{{ route('report_thawings.destroy',$report->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Hapus laporan ini?')">
 
@@ -270,6 +281,7 @@
                                     </button>
 
                                 </form>
+                                @endcan
 
                                 <a href="{{ route('report_thawings.export_pdf', $report->uuid) }}"
                                     class="btn btn-sm btn-outline-secondary" target="_blank" title="Cetak PDF">

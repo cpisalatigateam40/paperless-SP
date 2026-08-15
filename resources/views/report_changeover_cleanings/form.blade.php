@@ -40,6 +40,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Pemeriksaan Kebersihan Setelah Change-Over', 'url' => route('report_changeover_cleanings.index')],
+        ['label' => 'Tambah/Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>{{ $isEdit ? 'Edit Pemeriksaan Kebersihan Setelah Change-Over' : 'Tambah Pemeriksaan Kebersihan Setelah Change-Over' }}</h4>

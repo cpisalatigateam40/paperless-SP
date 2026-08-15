@@ -67,13 +67,16 @@
                     modal-id="modalExportPdfAuditPackingPrimer"
                     :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
                 />
+
+                @can('create report')
                 <a href="{{ route('report_audit_packing_primers.create') }}" class="btn btn-primary">
                     Tambah Laporan
                 </a>
+                @endcan
             </div>
             
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
 
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
@@ -88,6 +91,16 @@
                     <a href="{{ route('report_audit_packing_primers.index') }}" class="btn btn-outline-secondary">Reset</a>
                 </div>
             </form> -->
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <table class="table table-bordered align-middle">
                 <thead class="table-light">
@@ -117,9 +130,12 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
             
+                                @can('edit report')
                                 <a href="{{ route('report_audit_packing_primers.edit', $report->uuid) }}"
                                    class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                @endcan
 
+                                @can('delete report')
                                 <form action="{{ route('report_audit_packing_primers.destroy', $report->uuid) }}"
                                       method="POST" class="d-inline"
                                       onsubmit="return confirm('Hapus checklist ini?')">
@@ -127,6 +143,7 @@
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                 </form>
+                                @endcan
 
                                 <a href="{{ route('report_audit_packing_primers.export-pdf', $report->uuid) }}" target="_blank"
                                     class="btn btn-outline-secondary btn-sm" title="Cetak PDF">

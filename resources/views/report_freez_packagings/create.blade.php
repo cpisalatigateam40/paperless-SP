@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk', 'url' => route('report_freez_packagings.index')],
+        ['label' => 'Tambah Data', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4 class="mb-4">Tambah Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk</h4>

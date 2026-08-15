@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pasteurisasi Produk di Waterbath', 'url' => route('report_waterbaths.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>Tambah Detail untuk Report Tanggal {{ $report->date }} Shift {{ $report->shift }}</h4>

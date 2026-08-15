@@ -33,7 +33,8 @@ class MtCleanExport implements WithEvents, WithTitle
                 | JUDUL
                 |--------------------------------------------------------------------------
                 */
-                $sheet->mergeCells('A1:L1');
+                $sheet->mergeCells('A1:M1');
+
                 $sheet->setCellValue(
                     'A1',
                     'LAPORAN PEMERIKSAAN MT CLEAN'
@@ -55,7 +56,7 @@ class MtCleanExport implements WithEvents, WithTitle
                 | PERIODE
                 |--------------------------------------------------------------------------
                 */
-                $sheet->mergeCells('A2:L2');
+                $sheet->mergeCells('A2:M2');
 
                 $sheet->setCellValue(
                     'A2',
@@ -80,10 +81,11 @@ class MtCleanExport implements WithEvents, WithTitle
                 $sheet->mergeCells('E4:E5'); // Jam
                 $sheet->mergeCells('F4:F5'); // MT I
                 $sheet->mergeCells('G4:G5'); // MT II
-                $sheet->mergeCells('H4:H5'); // Temuan
-                $sheet->mergeCells('I4:J4'); // Kondisi
-                $sheet->mergeCells('K4:K5'); // Keterangan
-                $sheet->mergeCells('L4:L5'); // Koreksi
+                $sheet->mergeCells('H4:H5'); // Berat Tangkapan Logam
+                $sheet->mergeCells('I4:I5'); // Temuan
+                $sheet->mergeCells('J4:K4'); // Kondisi
+                $sheet->mergeCells('L4:L5'); // Keterangan
+                $sheet->mergeCells('M4:M5'); // Koreksi
 
                 $sheet->setCellValue('A4', 'No');
                 $sheet->setCellValue('B4', 'Tanggal');
@@ -92,30 +94,38 @@ class MtCleanExport implements WithEvents, WithTitle
                 $sheet->setCellValue('E4', 'Jam');
                 $sheet->setCellValue('F4', 'Magnet Trap I');
                 $sheet->setCellValue('G4', 'Magnet Trap II');
-                $sheet->setCellValue('H4', 'Jenis Temuan');
-                $sheet->setCellValue('I4', 'Kondisi');
-                $sheet->setCellValue('I5', 'Bersih');
-                $sheet->setCellValue('J5', 'Tidak Bersih');
-                $sheet->setCellValue('K4', 'Keterangan');
-                $sheet->setCellValue('L4', 'Tindakan Koreksi');
+                $sheet->setCellValue('H4', 'Berat Tangkapan Logam (gr)');
+                $sheet->setCellValue('I4', 'Jenis Temuan');
 
-                $sheet->getStyle('A4:L5')
+                $sheet->setCellValue('J4', 'Kondisi');
+                $sheet->setCellValue('J5', 'Bersih');
+                $sheet->setCellValue('K5', 'Tidak Bersih');
+
+                $sheet->setCellValue('L4', 'Keterangan');
+                $sheet->setCellValue('M4', 'Tindakan Koreksi');
+
+                /*
+                |--------------------------------------------------------------------------
+                | STYLE HEADER
+                |--------------------------------------------------------------------------
+                */
+                $sheet->getStyle('A4:M5')
                     ->getFont()
                     ->setBold(true);
 
-                $sheet->getStyle('A4:L5')
+                $sheet->getStyle('A4:M5')
                     ->getAlignment()
                     ->setHorizontal(
                         Alignment::HORIZONTAL_CENTER
                     );
 
-                $sheet->getStyle('A4:L5')
+                $sheet->getStyle('A4:M5')
                     ->getAlignment()
                     ->setVertical(
                         Alignment::VERTICAL_CENTER
                     );
 
-                $sheet->getStyle('A4:L5')
+                $sheet->getStyle('A4:M5')
                     ->getAlignment()
                     ->setWrapText(true);
 
@@ -171,37 +181,54 @@ class MtCleanExport implements WithEvents, WithTitle
                             $detail->mt_2 ?? '-'
                         );
 
+                        /*
+                        |--------------------------------------------------------------------------
+                        | BERAT TANGKAPAN LOGAM
+                        |--------------------------------------------------------------------------
+                        */
                         $sheet->setCellValue(
                             "H{$row}",
-                            $detail->finding_type ?? '-'
+                            $detail->metal_weight !== null
+                                ? $detail->metal_weight
+                                : '-'
                         );
 
                         $sheet->setCellValue(
                             "I{$row}",
+                            $detail->finding_type ?? '-'
+                        );
+
+                        $sheet->setCellValue(
+                            "J{$row}",
                             $detail->condition == 'Bersih'
                                 ? '✓'
                                 : ''
                         );
 
                         $sheet->setCellValue(
-                            "J{$row}",
+                            "K{$row}",
                             $detail->condition == 'Tidak Bersih'
                                 ? '✓'
                                 : ''
                         );
 
                         $sheet->setCellValue(
-                            "K{$row}",
+                            "L{$row}",
                             $detail->note ?? '-'
                         );
 
                         $sheet->setCellValue(
-                            "L{$row}",
+                            "M{$row}",
                             $detail->corrective_action ?? '-'
                         );
 
+                        /*
+                        |--------------------------------------------------------------------------
+                        | ALIGNMENT DATA
+                        |--------------------------------------------------------------------------
+                        */
                         $sheet->getStyle(
-                            "A{$row}:L{$row}"
+                            "A{$row}:M{$row}"
                         )->getAlignment()
                             ->setVertical(
                                 Alignment::VERTICAL_CENTER
@@ -219,7 +246,7 @@ class MtCleanExport implements WithEvents, WithTitle
                 */
                 if ($no === 1) {
 
-                    $sheet->mergeCells('A6:L6');
+                    $sheet->mergeCells('A6:M6');
 
                     $sheet->setCellValue(
                         'A6',
@@ -245,7 +272,7 @@ class MtCleanExport implements WithEvents, WithTitle
                 |--------------------------------------------------------------------------
                 */
                 $sheet->getStyle(
-                    "A4:L" . ($row - 1)
+                    "A4:M" . ($row - 1)
                 )->getBorders()
                     ->getAllBorders()
                     ->setBorderStyle(
@@ -258,7 +285,7 @@ class MtCleanExport implements WithEvents, WithTitle
                 |--------------------------------------------------------------------------
                 */
                 $sheet->getStyle(
-                    "A4:L" . ($row - 1)
+                    "A4:M" . ($row - 1)
                 )->getAlignment()
                     ->setWrapText(true);
 
@@ -275,7 +302,14 @@ class MtCleanExport implements WithEvents, WithTitle
                     );
 
                 $sheet->getStyle(
-                    "I6:J" . ($row - 1)
+                    "E6:H" . ($row - 1)
+                )->getAlignment()
+                    ->setHorizontal(
+                        Alignment::HORIZONTAL_CENTER
+                    );
+
+                $sheet->getStyle(
+                    "J6:K" . ($row - 1)
                 )->getAlignment()
                     ->setHorizontal(
                         Alignment::HORIZONTAL_CENTER
@@ -286,7 +320,7 @@ class MtCleanExport implements WithEvents, WithTitle
                 | AUTO WIDTH
                 |--------------------------------------------------------------------------
                 */
-                foreach (range('A', 'L') as $col) {
+                foreach (range('A', 'M') as $col) {
                     $sheet->getColumnDimension($col)
                         ->setAutoSize(true);
                 }
@@ -297,10 +331,10 @@ class MtCleanExport implements WithEvents, WithTitle
                 |--------------------------------------------------------------------------
                 */
                 $sheet->getRowDimension(4)
-                    ->setRowHeight(25);
+                    ->setRowHeight(30);
 
                 $sheet->getRowDimension(5)
-                    ->setRowHeight(25);
+                    ->setRowHeight(30);
             }
         ];
     }

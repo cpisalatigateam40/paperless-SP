@@ -23,11 +23,13 @@ class DetailMtClean extends Model
         'condition',
         'note',
         'corrective_action',
+        'metal_weight',
     ];
 
     protected $casts = [
-       
+        'metal_weight' => 'decimal:3',
     ];
+
 
     protected static function boot()
     {

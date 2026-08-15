@@ -17,10 +17,11 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportThawingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportThawing::class;
 
     protected function getBulkExportModelClass(): string
@@ -122,8 +123,21 @@ class ReportThawingController extends Controller
 
         });
 
-        $reports = $query->latest()
-            ->paginate(10)
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        $reports = $query->paginate(10)
             ->withQueryString();
 
         $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])

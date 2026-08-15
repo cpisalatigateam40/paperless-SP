@@ -6,13 +6,6 @@
 
 <div class="container-fluid">
 
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
     <div class="card shadow">
 
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -53,6 +46,38 @@
                     Akses Data Lama
 
                 </button>
+                {{-- 🔍 SEARCH --}}
+                <form method="GET"
+                    action="{{ route('report-smoke-houses.index') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    {{-- pertahankan filter area kalau ada --}}
+                    <input type="hidden" name="area" value="{{ request('area') }}">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari laporan..."
+                        value="{{ request('search') }}"
+                    >
+
+                    {{-- 🔍 BUTTON CARI --}}
+                    <button type="submit" class="btn btn-outline-primary">
+                        Cari
+                    </button>
+
+                    {{-- 🔄 RESET --}}
+                    @if(request('search') || request('area'))
+                        <a href="{{ route('report-smoke-houses.index') }}"
+                        class="btn btn-danger"
+                        title="Reset Filter">
+                            Reset
+                        </a>
+                    @endif
+                </form>
+
                 {{-- Buttons --}}
                 <div class="d-flex gap-2">
                     @role('Produksi')
@@ -103,7 +128,26 @@
 
         </div>
 
-        <div class=" card-body table-responsive">
+        <div class=" card-body table-responsive" style="padding-top: 1rem !important;">
+            {{-- Alert --}}
+            @if(session('success'))
+            <div id="success-alert" class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if ($errors->any())
+            <div id="error-alert" class="alert alert-danger">
+                <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            </div>
+            @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <table class="table table-bordered table-hover">
 

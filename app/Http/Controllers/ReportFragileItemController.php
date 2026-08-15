@@ -18,11 +18,12 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 
 class ReportFragileItemController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportFragileItem::class;
 
     protected function getBulkExportModelClass(): string
@@ -65,80 +66,93 @@ class ReportFragileItemController extends Controller
         return 'laporan_fragile_item';
     }
 
-public function index(Request $request)
-{
-    $query = ReportFragileItem::with([
-        'area',
-        'details.item',
-        'detailManuals.section'
-    ]);
+    public function index(Request $request)
+    {
+        $query = ReportFragileItem::with([
+            'area',
+            'details.item',
+            'detailManuals.section'
+        ]);
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
-        $request->filled('area')
-    ) {
-        $query->where('area_uuid', $request->area);
-    }
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
-    // 🔍 Tanggal
-    $query->when($request->date, function ($q) use ($request) {
-        $q->whereDate('date', $request->date);
-    });
+        // 🔍 Tanggal
+        $query->when($request->date, function ($q) use ($request) {
+            $q->whereDate('date', $request->date);
+        });
 
-    // 🔍 Shift
-    $query->when($request->shift, function ($q) use ($request) {
-        $q->where('shift', $request->shift);
-    });
+        // 🔍 Shift
+        $query->when($request->shift, function ($q) use ($request) {
+            $q->where('shift', $request->shift);
+        });
 
-    // 🔍 Global Search
-    $query->when($request->search, function ($q) use ($request) {
+        // 🔍 Global Search
+        $query->when($request->search, function ($q) use ($request) {
 
-        $search = $request->search;
+            $search = $request->search;
 
-        $q->where(function ($qq) use ($search) {
+            $q->where(function ($qq) use ($search) {
 
-            // 🔹 Header report
-            $qq->where('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%")
-                ->orWhere('date', 'like', "%{$search}%")
-                ->orWhere('shift', 'like', "%{$search}%");
+                // 🔹 Header report
+                $qq->where('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%")
+                    ->orWhere('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%");
 
-            // 🔹 Area
-            $qq->orWhereHas('area', function ($a) use ($search) {
-                $a->where('name', 'like', "%{$search}%");
-            });
+                // 🔹 Area
+                $qq->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
 
-            // 🔹 Detail laporan
-            $qq->orWhereHas('details', function ($d) use ($search) {
+                // 🔹 Detail laporan
+                $qq->orWhereHas('details', function ($d) use ($search) {
 
-                $d->where('notes', 'like', "%{$search}%")
-                    ->orWhere('actual_quantity', 'like', "%{$search}%")
+                    $d->where('notes', 'like', "%{$search}%")
+                        ->orWhere('actual_quantity', 'like', "%{$search}%")
 
-                    // 🔹 Master Fragile Item
-                    ->orWhereHas('item', function ($i) use ($search) {
-                        $i->where('item_name', 'like', "%{$search}%")
-                            ->orWhere('section_name', 'like', "%{$search}%")
-                            ->orWhere('owner', 'like', "%{$search}%");
-                    });
+                        // 🔹 Master Fragile Item
+                        ->orWhereHas('item', function ($i) use ($search) {
+                            $i->where('item_name', 'like', "%{$search}%")
+                                ->orWhere('section_name', 'like', "%{$search}%")
+                                ->orWhere('owner', 'like', "%{$search}%");
+                        });
+
+                });
 
             });
 
         });
 
-    });
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
 
-    $reports = $query->latest()
-        ->paginate(10)
-        ->withQueryString();
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
 
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
+        $reports = $query->paginate(10)
+            ->withQueryString();
 
-    return view('report_fragile_item.index', compact('reports', 'areas'));
-}
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('report_fragile_item.index', compact('reports', 'areas'));
+    }
 
     public function create()
     {

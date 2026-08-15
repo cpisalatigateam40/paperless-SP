@@ -138,7 +138,7 @@
                 @endcan
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
             @if(session('success'))
             <div id="success-alert" class="alert alert-success">
                 {{ session('success') }}
@@ -154,6 +154,16 @@
                 </ul>
             </div>
             @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
@@ -339,9 +349,9 @@
                                                 <th rowspan="2" class="align-middle">Best Before</th>
                                                 <th rowspan="2" class="align-middle">No. Program</th>
                                                 <th rowspan="2" class="align-middle">Tipe</th>
-                                                <th colspan="4" class="align-middle">Fe 1.5 mm</th>
-                                                <th colspan="4" class="align-middle">Non Fe 2 mm</th>
-                                                <th colspan="4" class="align-middle">SUS 2.5 mm</th>
+                                                <th colspan="3" class="align-middle">Fe 1.5 mm</th>
+                                                <th colspan="3" class="align-middle">Non Fe 2 mm</th>
+                                                <th colspan="3" class="align-middle">SUS 2.5 mm</th>
                                                 <th rowspan="2" class="align-middle">Tindakan Perbaikan</th>
                                                 <th rowspan="2" class="align-middle">Verifikasi setelah perbaikan</th>
                                             </tr>
@@ -349,15 +359,12 @@
                                                 <th>D</th>
                                                 <th>T</th>
                                                 <th>B</th>
-                                                <th>DL</th>
                                                 <th>D</th>
                                                 <th>T</th>
                                                 <th>B</th>
-                                                <th>DL</th>
                                                 <th>D</th>
                                                 <th>T</th>
                                                 <th>B</th>
-                                                <th>DL</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -376,7 +383,7 @@
                                                 {{-- Verifikasi Specimen --}}
                                                 @php
                                                 $specimens = ['fe_1_5mm', 'non_fe_2mm', 'sus_2_5mm'];
-                                                $positions = ['d', 't', 'b', 'dl'];
+                                                $positions = ['d', 't', 'b'];
                                                 @endphp
                                                 @foreach ($specimens as $specimen)
                                                 @foreach ($positions as $pos)

@@ -157,6 +157,10 @@
                     Nama Produk
                 </th>
 
+                <th rowspan="2" style="width:18%;">
+                    Berat Tangkapan Logam (gr)
+                </th>
+
                 <th rowspan="2" style="width:6%;">
                     Jam
                 </th>
@@ -212,6 +216,10 @@
                     {{ $detail->product->product_name ?? '-' }}
                 </td>
 
+                <td>
+                    {{ $detail->metal_weight ?? '-' }}
+                </td>
+
                 <td class="text-center">
                     {{ $detail->time
                         ? \Illuminate\Support\Str::substr($detail->time,0,5)
@@ -230,7 +238,7 @@
                     @if ($detail->photos->isNotEmpty())
                         @foreach ($detail->photos as $photo)
                             @php $base64 = $photo->base64; @endphp
-                            @if ($base64)
+                            @if ($base64) 
                                 <img src="{{ $base64 }}"
                                     style="width:50px;object-fit:cover;border:1px solid #ccc;margin:1px;">
                             @endif
@@ -260,7 +268,7 @@
 
             @endforeach
 
-            <td colspan="10" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+            <td colspan="11" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
 
         </tbody>
 

@@ -19,10 +19,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StartupLabelExport;
 use App\Traits\HasBulkPdfExport;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\HasSortableReport;
 
 class ReportStartupLabelController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportStartupLabel::class;
 
     protected function getBulkExportModelClass(): string
@@ -74,7 +75,7 @@ class ReportStartupLabelController extends Controller
             'area',
             'details.product',
             'details.photos',
-        ])->latest();
+        ]);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -117,6 +118,20 @@ class ReportStartupLabelController extends Controller
                 });
             });
         }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
 
         $reports = $query
             ->paginate(10)

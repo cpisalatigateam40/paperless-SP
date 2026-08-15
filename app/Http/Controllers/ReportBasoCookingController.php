@@ -19,10 +19,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportBasoCookingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportBasoCooking::class;
 
     protected function getBulkExportModelClass(): string
@@ -71,7 +72,7 @@ class ReportBasoCookingController extends Controller
             'area',
             'product',
             'details.temperatures'
-        ])->latest();
+        ]);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -137,6 +138,20 @@ class ReportBasoCookingController extends Controller
                 });
             });
         }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
 
         $reports = $query->paginate(10)->withQueryString();
 
