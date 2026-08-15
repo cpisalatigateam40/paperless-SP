@@ -20,10 +20,11 @@ use App\Exports\MetalDetectorExport;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportMetalDetectorController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportMetalDetector::class;
 
     protected function getBulkExportModelClass(): string
@@ -68,8 +69,7 @@ class ReportMetalDetectorController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportMetalDetector::with(['area', 'section', 'details.product'])
-            ->latest();
+        $query = ReportMetalDetector::with(['area', 'section', 'details.product']);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -122,6 +122,20 @@ class ReportMetalDetectorController extends Controller
                     });
                 });
             });
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
         }
 
         $reports = $query->paginate(10)->withQueryString();

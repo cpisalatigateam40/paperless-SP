@@ -22,10 +22,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportPasteurController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportPasteur::class;
 
     protected function getBulkExportModelClass(): string
@@ -80,7 +81,7 @@ class ReportPasteurController extends Controller
             'details.steps.drainageStep',
             'details.steps.finishStep',
             'area'
-        ])->latest();
+        ]);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -150,6 +151,20 @@ class ReportPasteurController extends Controller
                 });
             });
         }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'product_code',
+            ],
+        ]);
 
         $reports = $query->paginate(10)->withQueryString();
 

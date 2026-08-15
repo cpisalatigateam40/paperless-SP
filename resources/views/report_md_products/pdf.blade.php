@@ -140,9 +140,9 @@
                 <th rowspan="2">Best Before</th>
                 <th rowspan="2">No Program</th>
                 <th rowspan="2">Tipe</th>
-                <th colspan="4">Fe 1.5 mm</th>
-                <th colspan="4">Non Fe 2 mm</th>
-                <th colspan="4">SUS 2.5 mm</th>
+                <th colspan="3">Fe 1.5 mm</th>
+                <th colspan="3">Non Fe 2 mm</th>
+                <th colspan="3">SUS 2.5 mm</th>
                 <th rowspan="2">Tindakan Perbaikan</th>
                 <th rowspan="2">Verifikasi</th>
             </tr>
@@ -150,15 +150,12 @@
                 <th>D</th>
                 <th>T</th>
                 <th>B</th>
-                <th>DL</th>
                 <th>D</th>
                 <th>T</th>
                 <th>B</th>
-                <th>DL</th>
                 <th>D</th>
                 <th>T</th>
                 <th>B</th>
-                <th>DL</th>
             </tr>
         </thead>
         <tbody>
@@ -175,7 +172,7 @@
                 <td>{{ $detail->process_type }}</td>
                 @php
                 $specimens = ['fe_1_5mm', 'non_fe_2mm', 'sus_2_5mm'];
-                $positions = ['d', 't', 'b', 'dl'];
+                $positions = ['d', 't', 'b'];
                 @endphp
                 @foreach ($specimens as $specimen)
                 @foreach ($positions as $pos)
@@ -190,12 +187,12 @@
             </tr>
             @endforeach
             <tr>
-                <td colspan="21" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+                <td colspan="18" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <p>D = depan ; T = tengah ; B = belakang, DL = dalam tumpukan produk</p>
+    <p>D = depan ; T = tengah ; B = belakang</p>
 
     <table style="width: 100%; border: none; margin-top: 4rem;">
         <tr style="border: none;">

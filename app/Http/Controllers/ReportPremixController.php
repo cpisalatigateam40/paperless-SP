@@ -15,10 +15,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportPremixController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportPremix::class;
 
     protected function getBulkExportModelClass(): string
@@ -63,8 +64,7 @@ class ReportPremixController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportPremix::with(['area', 'detailPremixes.premix'])
-            ->latest();
+        $query = ReportPremix::with(['area', 'detailPremixes.premix']);
 
         // FILTER AREA (hanya admin & superadmin)
         if (
@@ -104,6 +104,20 @@ class ReportPremixController extends Controller
                     });
                 });
             });
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'detailPremixes',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
         }
 
         $reports = $query->paginate(10)->withQueryString();

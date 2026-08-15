@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pemasakan di Steam Kettle', 'url' => route('report_sauces.index')],
+        ['label' => 'Tambah Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5>Tambah Verifikasi Proses Pemasakan di Steam Kettle</h5>
@@ -50,6 +55,14 @@
                         <label class="form-label">Kode Produksi</label>
                         <input type="text" name="production_code" class="form-control" placeholder="mis: QD15601AA0">
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Nomor Mesin</label>
+                        <input type="text" name="details[0][no_mesin]" class="form-control" placeholder="mis: 1">
+                    </div>
+                    
+                </div>
+
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Waktu Start</label>
                         <input type="time" name="start_time" id="start_time" class="form-control"
@@ -62,22 +75,17 @@
                     </div>
                 </div>
 
-                <h6 class="mt-4">Detail Proses</h6>
-
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <label class="form-label">Pukul</label>
                         <input type="time" name="details[0][time]" class="form-control"
                             value="{{ \Carbon\Carbon::now()->format('H:i') }}">
-                    </div>
+                    </div> -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Durasi Proses</label>
                         <input type="text" name="details[0][process_step]" id="process_step" class="form-control" placeholder="masukkan durasi proses">
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Nomor Mesin</label>
-                        <input type="text" name="details[0][no_mesin]" class="form-control" placeholder="mis: 1">
-                    </div>
+                    
                 </div>
 
                 {{-- RAW MATERIALS --}}
@@ -145,10 +153,10 @@
                 </div>
 
                 <div class="row mb-2">
-                    <div class="col-md-6 mb-3">
+                    <!-- <div class="col-md-6 mb-3">
                         <label class="form-label">Lama Proses (menit)</label>
                         <input type="number" step="0.01" name="details[0][duration]" class="form-control" placeholder="mis: 6">
-                    </div>
+                    </div> -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Pressure (Bar)</label>
                         <input type="number" step="0.01" name="details[0][pressure]" class="form-control" placeholder="mis: 6.5">
@@ -161,9 +169,6 @@
                         <label class="form-label">Actual Temperature (&deg;C)</label>
                         <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control" placeholder="mis: 6.5">
                     </div>
-                </div>
-
-                <div class="row mb-2">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Status Produk</label>
                         <select name="details[0][product_status]" class="form-control" required>
@@ -175,16 +180,12 @@
                         <label class="form-label">Tindakan Perbaikan</label>
                         <input type="text" name="details[0][corrective_action]" class="form-control" placeholder="masukkan tindakan perbaikan">
                     </div>
-                </div>
-
-                <div class="row mb-2">
                     <div class="col-md-6">
                         <label class="form-label">Catatan</label>
                         <input type="text" name="details[0][notes]" class="form-control" placeholder="masukkan catatan">
                     </div>
                 </div>
 
-                
 
                 <div class="row mb-3">
                     <div class="col-md-12">
@@ -283,8 +284,8 @@ function calcDuration() {
     const endVal = document.getElementById('end_time').value;
     const processInput = document.getElementById('process_step');
 
-    // hapus suffix durasi lama, baik format "- 15 menit" maupun "15 menit" polos
-    const baseText = processInput.value.replace(/\s*-?\s*\d+\s*menit\s*$/i, '').trim();
+    // hapus suffix durasi lama, baik format "- 15 menit", "- 1 jam 15 menit", maupun "1 jam" polos
+    const baseText = processInput.value.replace(/\s*-?\s*(\d+\s*jam)?\s*(\d+\s*menit)?\s*$/i, '').trim();
 
     if (!startVal || !endVal) {
         processInput.value = baseText;
@@ -297,7 +298,19 @@ function calcDuration() {
     let diff = (endH * 60 + endM) - (startH * 60 + startM);
     if (diff < 0) diff += 24 * 60; // lewat tengah malam
 
-    processInput.value = baseText ? `${baseText} - ${diff} menit` : `${diff} menit`;
+    const jam = Math.floor(diff / 60);
+    const menit = diff % 60;
+
+    let durasiText;
+    if (jam > 0 && menit > 0) {
+        durasiText = `${jam} jam ${menit} menit`;
+    } else if (jam > 0) {
+        durasiText = `${jam} jam`;
+    } else {
+        durasiText = `${menit} menit`;
+    }
+
+    processInput.value = baseText ? `${baseText} - ${durasiText}` : durasiText;
 }
 
 document.getElementById('start_time').addEventListener('input', calcDuration);

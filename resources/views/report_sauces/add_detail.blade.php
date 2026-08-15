@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pemasakan di Steam Kettle', 'url' => route('report_sauces.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+    
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5>Tambah Detail Verifikasi Proses Pemasakan di Steam Kettle</h5>
@@ -136,10 +141,10 @@
 
                 {{-- DETAIL PROSES --}}
                 <div class="row mb-2">
-                    <div class="col-md-6 mb-3">
+                    <!-- <div class="col-md-6 mb-3">
                         <label class="form-label">Lama Proses (menit)</label>
                         <input type="number" step="0.01" name="details[0][duration]" class="form-control">
-                    </div>
+                    </div> -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Pressure (Bar)</label>
                         <input type="number" step="0.01" name="details[0][pressure]" class="form-control">

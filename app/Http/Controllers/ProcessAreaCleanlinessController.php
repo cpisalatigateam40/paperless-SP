@@ -19,11 +19,12 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ProcessAreaCleanlinessController extends Controller
 {
     use HasRoles;
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportProcessAreaCleanliness::class;
 
     protected function getBulkExportModelClass(): string
@@ -66,106 +67,119 @@ class ProcessAreaCleanlinessController extends Controller
         return 'laporan_verifikasi_kebersihan_area_proses';
     }
 
-public function index(Request $request)
-{
-    $search = $request->search;
+    public function index(Request $request)
+    {
+        $search = $request->search;
 
-    $query = ReportProcessAreaCleanliness::with([
-        'details.items.followups',
-        'area'
-    ]);
+        $query = ReportProcessAreaCleanliness::with([
+            'details.items.followups',
+            'area'
+        ]);
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
-        $request->filled('area')
-    ) {
-        $query->where('area_uuid', $request->area);
-    }
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
-    $query->when($search, function ($query) use ($search) {
-        $query->where(function ($q) use ($search) {
+        $query->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
 
-            /* ================= HEADER ================= */
-            $q->where('date', 'like', "%{$search}%")
-                ->orWhere('shift', 'like', "%{$search}%")
-                ->orWhere('section_name', 'like', "%{$search}%")
-                ->orWhere('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%");
+                /* ================= HEADER ================= */
+                $q->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('section_name', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
 
-            /* ================= AREA ================= */
-            $q->orWhereHas('area', function ($qa) use ($search) {
-                $qa->where('name', 'like', "%{$search}%");
+                /* ================= AREA ================= */
+                $q->orWhereHas('area', function ($qa) use ($search) {
+                    $qa->where('name', 'like', "%{$search}%");
+                });
+
+                /* ================= DETAIL ================= */
+                $q->orWhereHas('details', function ($qd) use ($search) {
+
+                    $qd->where('inspection_hour', 'like', "%{$search}%")
+
+                        /* ================= ITEM ================= */
+                        ->orWhereHas('items', function ($qi) use ($search) {
+
+                            $qi->where('item', 'like', "%{$search}%")
+                                ->orWhere('condition', 'like', "%{$search}%")
+                                ->orWhere('notes', 'like', "%{$search}%")
+                                ->orWhere('corrective_action', 'like', "%{$search}%")
+                                ->orWhere('verification', 'like', "%{$search}%")
+                                ->orWhere('temperature_actual', 'like', "%{$search}%")
+                                ->orWhere('temperature_display', 'like', "%{$search}%")
+
+                                /* ============== FOLLOW UP ============== */
+                                ->orWhereHas('followups', function ($qf) use ($search) {
+                                    $qf->where('notes', 'like', "%{$search}%")
+                                        ->orWhere('action', 'like', "%{$search}%")
+                                        ->orWhere('verification', 'like', "%{$search}%");
+                                });
+
+                        });
+
+                });
+
             });
-
-            /* ================= DETAIL ================= */
-            $q->orWhereHas('details', function ($qd) use ($search) {
-
-                $qd->where('inspection_hour', 'like', "%{$search}%")
-
-                    /* ================= ITEM ================= */
-                    ->orWhereHas('items', function ($qi) use ($search) {
-
-                        $qi->where('item', 'like', "%{$search}%")
-                            ->orWhere('condition', 'like', "%{$search}%")
-                            ->orWhere('notes', 'like', "%{$search}%")
-                            ->orWhere('corrective_action', 'like', "%{$search}%")
-                            ->orWhere('verification', 'like', "%{$search}%")
-                            ->orWhere('temperature_actual', 'like', "%{$search}%")
-                            ->orWhere('temperature_display', 'like', "%{$search}%")
-
-                            /* ============== FOLLOW UP ============== */
-                            ->orWhereHas('followups', function ($qf) use ($search) {
-                                $qf->where('notes', 'like', "%{$search}%")
-                                    ->orWhere('action', 'like', "%{$search}%")
-                                    ->orWhere('verification', 'like', "%{$search}%");
-                            });
-
-                    });
-
-            });
-
         });
-    });
 
-    $reports = $query->latest()
-        ->paginate(20)
-        ->withQueryString();
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
 
-    /* ================= HITUNG KETIDAKSESUAIAN ================= */
-    foreach ($reports as $report) {
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
 
-        $count = 0;
+        $reports = $query->paginate(20)
+            ->withQueryString();
 
-        foreach ($report->details as $detail) {
+        /* ================= HITUNG KETIDAKSESUAIAN ================= */
+        foreach ($reports as $report) {
 
-            foreach ($detail->items as $item) {
+            $count = 0;
 
-                if (
-                    strtolower($item->condition ?? '') === 'kotor' ||
-                    $item->verification == 0
-                ) {
-                    $count++;
-                }
+            foreach ($report->details as $detail) {
 
-                foreach ($item->followups as $followup) {
-                    if ($followup->verification == 0) {
+                foreach ($detail->items as $item) {
+
+                    if (
+                        strtolower($item->condition ?? '') === 'kotor' ||
+                        $item->verification == 0
+                    ) {
                         $count++;
+                    }
+
+                    foreach ($item->followups as $followup) {
+                        if ($followup->verification == 0) {
+                            $count++;
+                        }
                     }
                 }
             }
+
+            $report->ketidaksesuaian = $count;
         }
 
-        $report->ketidaksesuaian = $count;
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('cleanliness_PA.index', compact('reports', 'areas'));
     }
-
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
-
-    return view('cleanliness_PA.index', compact('reports', 'areas'));
-}
 
     public function create()
     {

@@ -13,6 +13,7 @@
                     : null,
                 'mt_1'              => $d->mt_1,
                 'mt_2'              => $d->mt_2,
+                'metal_weight'      => $d->metal_weight,
                 'finding_type'      => $d->finding_type, // fallback teks lama
                 'condition'         => $d->condition,
                 'note'              => $d->note,
@@ -33,6 +34,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Pemeriksaan Kebersihan Magnet Trap', 'url' => route('report_mt_cleans.index')],
+        ['label' => 'Tambah/Edit Data', 'url' => null],
+    ]" />
+
 
     <div class="card shadow">
 
@@ -139,6 +145,10 @@
                                     Produk
                                 </th>
 
+                                <th style="min-width:170px">
+                                    Berat Tangkapan Logam (gr)
+                                </th>
+
                                 <th style="min-width:120px">
                                     Waktu
                                 </th>
@@ -203,6 +213,17 @@
 
                                 <td>
                                     <input
+                                        type="number"
+                                        name="details[{{ $i }}][metal_weight]"
+                                        class="form-control"
+                                        value="{{ $detail['metal_weight'] ?? '' }}"
+                                        min="0"
+                                        step="0.001"
+                                        placeholder="0.000">
+                                </td>
+
+                                <td>
+                                    <input
                                         type="time"
                                         name="details[{{ $i }}][time]"
                                         class="form-control"
@@ -214,7 +235,8 @@
                                         type="text"
                                         name="details[{{ $i }}][mt_1]"
                                         class="form-control"
-                                        value="{{ $detail['mt_1'] ?? '' }}">
+                                        value="{{ $detail['mt_1'] ?? '' }}"
+                                        placeholder="mis: serpihan logam">
                                 </td>
 
                                 <td>
@@ -222,7 +244,8 @@
                                         type="text"
                                         name="details[{{ $i }}][mt_2]"
                                         class="form-control"
-                                        value="{{ $detail['mt_2'] ?? '' }}">
+                                        value="{{ $detail['mt_2'] ?? '' }}"
+                                        placeholder="mis: serpihan logam">
                                 </td>
 
                                 <td>
@@ -280,14 +303,14 @@
                                     <textarea
                                         name="details[{{ $i }}][note]"
                                         class="form-control"
-                                        rows="1">{{ $detail['note'] ?? '' }}</textarea>
+                                        rows="1" placeholder="catatan">{{ $detail['note'] ?? '' }}</textarea>
                                 </td>
 
                                 <td>
                                     <textarea
                                         name="details[{{ $i }}][corrective_action]"
                                         class="form-control"
-                                        rows="1">{{ $detail['corrective_action'] ?? '' }}</textarea>
+                                        rows="1" placeholder="tindakan koreksi">{{ $detail['corrective_action'] ?? '' }}</textarea>
                                 </td>
 
                                 <td class="text-center">
@@ -356,6 +379,16 @@
                         </td>
 
                         <td>
+                            <input
+                                type="number"
+                                name="details[__INDEX__][metal_weight]"
+                                class="form-control"
+                                min="0"
+                                step="0.001"
+                                placeholder="0.000">
+                        </td>
+
+                        <td>
                             <input type="time"
                                 name="details[__INDEX__][time]"
                                 class="form-control">
@@ -364,13 +397,13 @@
                         <td>
                             <input type="text"
                                 name="details[__INDEX__][mt_1]"
-                                class="form-control">
+                                class="form-control" placeholder="mis: serpihan logam">
                         </td>
 
                         <td>
                             <input type="text"
                                 name="details[__INDEX__][mt_2]"
-                                class="form-control">
+                                class="form-control" placeholder="mis: serpihan logam">
                         </td>
 
                         <td>
@@ -400,14 +433,14 @@
                             <textarea
                                 name="details[__INDEX__][note]"
                                 class="form-control"
-                                rows="1"></textarea>
+                                rows="1" placeholder="catatan"></textarea>
                         </td>
 
                         <td>
                             <textarea
                                 name="details[__INDEX__][corrective_action]"
                                 class="form-control"
-                                rows="1"></textarea>
+                                rows="1" placeholder="tindakan koreksi"></textarea>
                         </td>
 
                         <td class="text-center">

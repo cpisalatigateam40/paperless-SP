@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Premix', 'url' => route('report-premixes.index')],
+        ['label' => 'Tambah Data', 'url' => null],
+    ]" />
+
     <form action="{{ route('report-premixes.store') }}" method="POST">
         @csrf
 
@@ -56,18 +61,18 @@
 
                                         </td>
                                         <td>
-                                            <input type="text" name="details[0][production_code]" class="form-control">
+                                            <input type="text" name="details[0][production_code]" class="form-control" placeholder="mis: QG23801AA0">
                                         </td>
 
-                                        <td><input type="number" name="details[0][weight]" class="form-control" step="0.00001"
+                                        <td><input type="number" name="details[0][weight]" class="form-control" step="0.00001" placeholder="mis: 100"
                                                 required></td>
-                                        <td><input type="text" name="details[0][used_for_batch]" class="form-control">
+                                        <td><input type="text" name="details[0][used_for_batch]" class="form-control" placeholder="mis: QG23801-808AAO">
                                         </td>
-                                        <td><input type="text" name="details[0][notes]" class="form-control"></td>
+                                        <td><input type="text" name="details[0][notes]" class="form-control" placeholder="keterangan"></td>
                                         <td><input type="text" name="details[0][corrective_action]"
-                                                class="form-control"></td>
+                                                class="form-control" placeholder="tindakan koreksi"></td>
                                         <td>
-                                            <select name="details[0][verification]" class="form-select form-control">
+                                            <select name="details[0][verification]" class="form-select form-control" >
                                                 <option value="">--</option>
                                                 <option value="✓">✓</option>
                                                 <option value="x">x</option>
@@ -83,7 +88,7 @@
                         </div>
 
                         <div class="d-flex mt-3">
-                            <button type="button" class="btn btn-success btn-sm" onclick="addRow()">+ Tambah
+                            <button type="button" class="btn btn-primary btn-sm" onclick="addRow()">+ Tambah
                                 Baris</button>
                         </div>
 
@@ -123,12 +128,12 @@ function addRow() {
             </select>
         </td>
         <td>
-            <input type="text" name="details[${rowIdx}][production_code]" class="form-control">
+            <input type="text" name="details[${rowIdx}][production_code]" class="form-control" placeholder="mis: QG23801AA0">
         </td>
-        <td><input type="number" step="0.00001" name="details[${rowIdx}][weight]" class="form-control" required></td>
-        <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control"></td>
-        <td><input type="text" name="details[${rowIdx}][notes]" class="form-control"></td>
-        <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control"></td>
+        <td><input type="number" step="0.00001" name="details[${rowIdx}][weight]" class="form-control" required placeholder="mis: 100"></td>
+        <td><input type="text" name="details[${rowIdx}][used_for_batch]" class="form-control" placeholder="mis: QG23801-808AAO"></td>
+        <td><input type="text" name="details[${rowIdx}][notes]" class="form-control" placeholder="keterangan"></td>
+        <td><input type="text" name="details[${rowIdx}][corrective_action]" class="form-control" placeholder="tindakan koreksi"></td>
         <td>
             <select name="details[${rowIdx}][verification]" class="form-select form-control">
                 <option value="">--</option>

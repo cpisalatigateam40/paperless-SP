@@ -24,10 +24,11 @@ use App\Traits\HasBulkPdfExport;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SmokeHouseExport;
+use App\Traits\HasSortableReport;
 
 class ReportSmokeHouseController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportSmokeHouse::class;
 
     protected function getBulkExportModelClass(): string
@@ -97,8 +98,57 @@ class ReportSmokeHouseController extends Controller
             $query->where('area_uuid', $request->area);
         }
 
-        $reports = $query->latest()
-            ->paginate(10)
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('date', 'like', "%{$search}%")
+                ->orWhere('shift', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%")
+                ->orWhere('notes', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 DETAIL SMOKE HOUSE
+                $q->orWhereHas('details', function ($d) use ($search) {
+                    $d->where('machine_name', 'like', "%{$search}%")
+                    ->orWhere('production_code', 'like', "%{$search}%")
+                    ->orWhere('gramase', 'like', "%{$search}%")
+                    ->orWhere('smoke_house_no', 'like', "%{$search}%")
+                    ->orWhere('trolley_count', 'like', "%{$search}%")
+                    ->orWhere('stick_count', 'like', "%{$search}%")
+
+                    // 🔹 PRODUCT (relasi ke Product)
+                    ->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        $reports = $query->paginate(10)
             ->withQueryString();
 
         $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])

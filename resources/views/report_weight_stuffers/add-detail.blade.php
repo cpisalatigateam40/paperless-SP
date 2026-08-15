@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Stuffing', 'url' => route('report_weight_stuffers.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <form action="{{ route('report_weight_stuffers.store-detail', $report->uuid) }}" method="POST" id="addDetailForm" enctype="multipart/form-data">
         @csrf
 
@@ -25,8 +30,8 @@
         {{-- ============================================================
              DATA PRODUK & MESIN
         ============================================================ --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Data Produk</div>
+        <div class="card shadow mb-3">
+            <div class="card-header fw-bold">Detail Produk</div>
             <div class="card-body">
                 <div class="row g-3 mb-3">
                     <div class="col-md-6 mb-3">
@@ -83,15 +88,9 @@
                             placeholder="mis: 180">
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- ============================================================
-             BERAT PER 3 PCS
-        ============================================================ --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Berat per 3 pcs (gr)</div>
-            <div class="card-body">
+                <h5 class="mt-5" style="font-weight: bold;">Berat per 3 pcs (gr)</h5>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Standar Berat</label>
@@ -113,9 +112,9 @@
                     <button type="button" class="btn btn-sm btn-secondary mt-2" id="addWeight">+ Tambah Berat</button>
                 </div>
                 <div class="row g-3 mt-1">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <label>Rata-rata Berat</label>
-                        <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control avg-weight" readonly>
+                        <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control avg-weight" placeholder="terisi otomatis" readonly>
                     </div>
                     <div class="col-md-4">
                         <label>Status</label>
@@ -127,24 +126,18 @@
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
-                        <textarea name="details[0][weight_corrective_action]" class="form-control" rows="1"></textarea>
+                        <textarea name="details[0][weight_corrective_action]" class="form-control" rows="1" placeholder="masukkan tindakan koreksi"></textarea>
                     </div>
                     <div class="col-md-4">
                         <label>Keterangan</label>
-                        <textarea name="details[0][weight_notes]" class="form-control" rows="1"></textarea>
+                        <textarea name="details[0][weight_notes]" class="form-control" rows="1" placeholder="masukkan keterangan"></textarea>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- ============================================================
-             PANJANG PER PCS
-        ============================================================ --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Panjang per pcs (mm)</div>
-            <div class="card-body">
+                <h5 class="mt-5" style="font-weight: bold;">Panjang per pcs (mm)</h5>
+
                 <div class="row g-3 mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <label>Standar Panjang</label>
                         <input type="text" name="details[0][long_standard]" class="form-control" placeholder="mis: 120-130">
                     </div>
@@ -164,9 +157,9 @@
                     <button type="button" class="btn btn-sm btn-secondary mt-2" id="addLong">+ Tambah Panjang</button>
                 </div>
                 <div class="row g-3 mt-1">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <label>Rata-rata Panjang</label>
-                        <input type="number" step="0.01" name="details[0][avg_long]" class="form-control avg-long" readonly>
+                        <input type="number" step="0.01" name="details[0][avg_long]" class="form-control avg-long" placeholder="terisi otomatis" readonly>
                     </div>
                     <div class="col-md-4">
                         <label>Status</label>
@@ -178,22 +171,16 @@
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
-                        <textarea name="details[0][long_corrective_action]" class="form-control" rows="1"></textarea>
+                        <textarea name="details[0][long_corrective_action]" class="form-control" rows="1" placeholder="masukkan tindakan koreksi"></textarea>
                     </div>
                     <div class="col-md-4">
                         <label>Keterangan</label>
-                        <textarea name="details[0][long_notes]" class="form-control" rows="1"></textarea>
+                        <textarea name="details[0][long_notes]" class="form-control" rows="1" placeholder="masukkan keterangan"></textarea>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- ============================================================
-             BERAT FLA
-        ============================================================ --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Berat Fla (gr)</div>
-            <div class="card-body">
+                <h5 class="mt-5" style="font-weight: bold;">Berat Fla (gr)</h5>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Standar Berat Fla</label>
@@ -215,9 +202,9 @@
                     <button type="button" class="btn btn-sm btn-secondary mt-2" id="addFla">+ Tambah Fla</button>
                 </div>
                 <div class="row g-3 mt-1">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <label>Rata-rata Fla</label>
-                        <input type="number" step="0.01" name="details[0][avg_fla]" class="form-control avg-fla" readonly>
+                        <input type="number" step="0.01" name="details[0][avg_fla]" class="form-control avg-fla" placeholder="terisi otomatis" readonly>
                     </div>
                     <div class="col-md-4">
                         <label>Status</label>
@@ -229,31 +216,33 @@
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
-                        <textarea name="details[0][fla_corrective_action]" class="form-control" rows="1"></textarea>
+                        <textarea name="details[0][fla_corrective_action]" class="form-control" rows="1" placeholder="masukkan tindakan koreksi"></textarea>
                     </div>
                     <div class="col-md-4">
                         <label>Keterangan</label>
-                        <textarea name="details[0][fla_notes]" class="form-control" rows="1"></textarea>
+                        <textarea name="details[0][fla_notes]" class="form-control" rows="1" placeholder="masukkan keterangan"></textarea>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- ============================================================
-             CATATAN & DOKUMENTASI
-        ============================================================ --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Catatan & Dokumentasi</div>
-            <div class="card-body row g-3">
-                <div class="col-md-6">
-                    <label>Catatan</label>
-                    <input type="text" name="details[0][notes]" class="form-control">
+                <h5 class="mt-5" style="font-weight: bold;">Catatan & Dokumentasi</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Catatan</label>
+                        <input type="text" name="details[0][notes]" class="form-control" placeholder="masukkan catatan">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Dokumentasi</label>
+                        <input type="file" name="details[0][documentation][]" class="form-control"
+                            accept="image/*" multiple>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label>Dokumentasi</label>
-                    <input type="file" name="details[0][documentation][]" class="form-control"
-                        accept="image/*" multiple>
-                </div>
+
+
+
+
+
+
             </div>
         </div>
 

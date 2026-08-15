@@ -23,11 +23,12 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 
 class ReportSauceController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportSauce::class;
 
     protected function getBulkExportModelClass(): string
@@ -80,7 +81,7 @@ class ReportSauceController extends Controller
             'area',
             'details.rawMaterials.rawMaterial',
             'details.rawMaterials.premix',
-        ])->latest();
+        ]);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -145,6 +146,19 @@ class ReportSauceController extends Controller
                 });
             });
         }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'column' => 'production_code',
+            ],
+        ]);
 
         $reports = $query->paginate(10)->withQueryString();
 

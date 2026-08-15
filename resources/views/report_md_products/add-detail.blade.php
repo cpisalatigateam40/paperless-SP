@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Kinerja Metal Detector Produk', 'url' => route('report_md_products.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4 class="mb-4">Tambah Detail ke Report Tanggal {{ \Carbon\Carbon::parse($report->date)->format('d-m-Y') }}
@@ -87,14 +92,13 @@
                             <th>Depan (D)</th>
                             <th>Tengah (T)</th>
                             <th>Belakang (B)</th>
-                            <th>Dalam Tumpukan (DL)</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
                         $specimens = ['fe_1_5mm' => 'Fe 1.5 mm', 'non_fe_2mm' => 'Non Fe 2 mm', 'sus_2_5mm' => 'SUS 2.5
                         mm'];
-                        $positions = ['d', 't', 'b', 'dl'];
+                        $positions = ['d', 't', 'b'];
                         $posIdx = 0;
                         @endphp
                         @foreach ($specimens as $specimenKey => $specimenName)

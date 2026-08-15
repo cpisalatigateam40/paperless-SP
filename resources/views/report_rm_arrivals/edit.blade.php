@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Report RM Arrivals', 'url' => route('report_rm_arrivals.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h5>Edit Verifikasi Bahan Baku dan Bahan Penunjang</h5>

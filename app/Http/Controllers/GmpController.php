@@ -24,11 +24,12 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class GmpController extends Controller
 {
     use HasRoles;
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportGmpEmployee::class;
 
     protected function getBulkExportModelClass(): string
@@ -73,113 +74,126 @@ class GmpController extends Controller
         return 'laporan_gmp_employee';
     }
 
-public function index(Request $request)
-{
-    $query = ReportGmpEmployee::with([
-        'area',
-        'details.followups',
-        'sanitationCheck.sanitationArea.followups'
-    ]);
+    public function index(Request $request)
+    {
+        $query = ReportGmpEmployee::with([
+            'area',
+            'details.followups',
+            'sanitationCheck.sanitationArea.followups'
+        ]);
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
-        $request->filled('area')
-    ) {
-        $query->where('area_uuid', $request->area);
-    }
-
-    // 🔍 FILTER GLOBAL
-    $query->when(
-        $request->filled('date') ||
-        $request->filled('shift') ||
-        $request->filled('keyword') ||
-        $request->filled('sanitation_area') ||
-        $request->boolean('only_nc'),
-        function ($q) use ($request) {
-
-            $q->where(function ($qq) use ($request) {
-
-                // 📅 tanggal
-                if ($request->filled('date')) {
-                    $qq->whereDate('date', $request->date);
-                }
-
-                // 🔄 shift
-                if ($request->filled('shift')) {
-                    $qq->where('shift', $request->shift);
-                }
-
-                // 👤 pegawai / section
-                if ($request->filled('keyword')) {
-                    $qq->orWhereHas('details', function ($d) use ($request) {
-                        $d->where('employee_name', 'like', "%{$request->keyword}%")
-                            ->orWhere('section_name', 'like', "%{$request->keyword}%")
-                            ->orWhere('notes', 'like', "%{$request->keyword}%");
-                    });
-                }
-
-                // 🧽 area sanitasi
-                if ($request->filled('sanitation_area')) {
-                    $qq->orWhereHas('sanitationCheck.sanitationArea', function ($s) use ($request) {
-                        $s->where('area_name', 'like', "%{$request->sanitation_area}%");
-                    });
-                }
-
-                // ❌ hanya NC
-                if ($request->boolean('only_nc')) {
-                    $qq->orWhereHas('details', fn($d) => $d->where('verification', 0))
-                        ->orWhereHas('details.followups', fn($f) => $f->where('verification', 0))
-                        ->orWhereHas('sanitationCheck.sanitationArea', fn($s) => $s->where('verification', 0))
-                        ->orWhereHas('sanitationCheck.sanitationArea.followups', fn($f) => $f->where('verification', 0));
-                }
-            });
-        }
-    );
-
-    $reports = $query->latest()
-        ->paginate(10)
-        ->withQueryString();
-
-    // 🔢 Hitung ketidaksesuaian
-    foreach ($reports as $report) {
-        $count = 0;
-
-        foreach ($report->details as $detail) {
-            if ($detail->verification == 0) {
-                $count++;
-            }
-
-            foreach ($detail->followups as $followup) {
-                if ($followup->verification == 0) {
-                    $count++;
-                }
-            }
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
         }
 
-        if ($report->sanitationCheck) {
-            foreach ($report->sanitationCheck->sanitationArea as $area) {
-                if ($area->verification == 0) {
+        // 🔍 FILTER GLOBAL
+        $query->when(
+            $request->filled('date') ||
+            $request->filled('shift') ||
+            $request->filled('keyword') ||
+            $request->filled('sanitation_area') ||
+            $request->boolean('only_nc'),
+            function ($q) use ($request) {
+
+                $q->where(function ($qq) use ($request) {
+
+                    // 📅 tanggal
+                    if ($request->filled('date')) {
+                        $qq->whereDate('date', $request->date);
+                    }
+
+                    // 🔄 shift
+                    if ($request->filled('shift')) {
+                        $qq->where('shift', $request->shift);
+                    }
+
+                    // 👤 pegawai / section
+                    if ($request->filled('keyword')) {
+                        $qq->orWhereHas('details', function ($d) use ($request) {
+                            $d->where('employee_name', 'like', "%{$request->keyword}%")
+                                ->orWhere('section_name', 'like', "%{$request->keyword}%")
+                                ->orWhere('notes', 'like', "%{$request->keyword}%");
+                        });
+                    }
+
+                    // 🧽 area sanitasi
+                    if ($request->filled('sanitation_area')) {
+                        $qq->orWhereHas('sanitationCheck.sanitationArea', function ($s) use ($request) {
+                            $s->where('area_name', 'like', "%{$request->sanitation_area}%");
+                        });
+                    }
+
+                    // ❌ hanya NC
+                    if ($request->boolean('only_nc')) {
+                        $qq->orWhereHas('details', fn($d) => $d->where('verification', 0))
+                            ->orWhereHas('details.followups', fn($f) => $f->where('verification', 0))
+                            ->orWhereHas('sanitationCheck.sanitationArea', fn($s) => $s->where('verification', 0))
+                            ->orWhereHas('sanitationCheck.sanitationArea.followups', fn($f) => $f->where('verification', 0));
+                    }
+                });
+            }
+        );
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        $reports = $query->paginate(10)
+            ->withQueryString();
+
+        // 🔢 Hitung ketidaksesuaian
+        foreach ($reports as $report) {
+            $count = 0;
+
+            foreach ($report->details as $detail) {
+                if ($detail->verification == 0) {
                     $count++;
                 }
 
-                foreach ($area->followups as $followup) {
+                foreach ($detail->followups as $followup) {
                     if ($followup->verification == 0) {
                         $count++;
                     }
                 }
             }
+
+            if ($report->sanitationCheck) {
+                foreach ($report->sanitationCheck->sanitationArea as $area) {
+                    if ($area->verification == 0) {
+                        $count++;
+                    }
+
+                    foreach ($area->followups as $followup) {
+                        if ($followup->verification == 0) {
+                            $count++;
+                        }
+                    }
+                }
+            }
+
+            $report->ketidaksesuaian = $count;
         }
 
-        $report->ketidaksesuaian = $count;
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
+
+        return view('gmp_employee.index', compact('reports', 'areas'));
     }
-
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
-
-    return view('gmp_employee.index', compact('reports', 'areas'));
-}
 
     public function create()
     {

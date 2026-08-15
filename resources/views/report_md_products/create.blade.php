@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Kinerja Metal Detector Produk', 'url' => route('report_md_products.index')],
+        ['label' => 'Tambah Data', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4 class="mb-4">Tambah Verifikasi Kinerja Metal Detector Produk</h4>
@@ -71,7 +76,7 @@
                 <div class="mb-3">
                     <label class="form-label">Gramase</label>
                     <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
-                        placeholder="Masukkan gramase" required>
+                        placeholder="mis: 500" required>
                 </div>
                 <!-- <div class="mb-3">
                     <label>Kode Produksi</label>
@@ -84,7 +89,7 @@
                 <div class="detail-row">
                     <div class="mb-3">
                         <label>Kode Produksi</label>
-                        <input type="text" name="details[0][production_code]" class="form-control production-code">
+                        <input type="text" name="details[0][production_code]" class="form-control production-code" placeholder="mis: QG23801AA0">
                     </div>
                     <div class="mb-3">
                         <label>Best Before</label>
@@ -93,7 +98,7 @@
                 </div>
                 <div class="mb-3">
                     <label>Nomor Program</label>
-                    <input type="text" name="details[0][program_number]" class="form-control">
+                    <input type="text" name="details[0][program_number]" class="form-control" placeholder="mis: 013">
                 </div>
 
                 <h6 class="mt-4">Hasil Pemeriksaan Verifikasi Specimen</h6>
@@ -105,14 +110,14 @@
                             <th>Depan (D)</th>
                             <th>Tengah (T)</th>
                             <th>Belakang (B)</th>
-                            <th>Dalam Tumpukan (DL)</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
                         @php
                         $specimens = ['fe_1_5mm' => 'Fe 1.5 mm', 'non_fe_2mm' => 'Non Fe 2 mm', 'sus_2_5mm' => 'SUS 2.5
                         mm'];
-                        $positions = ['d', 't', 'b', 'dl'];
+                        $positions = ['d', 't', 'b',];
                         $posIdx = 0;
                         @endphp
                         @foreach ($specimens as $specimenKey => $specimenName)
@@ -145,7 +150,7 @@
                 <div class="row">
                     <div class="mb-3 mt-3 col-md-6">
                         <label>Tindakan Perbaikan</label>
-                        <input type="text" name="details[0][corrective_action]" class="form-control">
+                        <input type="text" name="details[0][corrective_action]" class="form-control" placeholder="masukkan tindakan perbaikan">
                     </div>
                     <div class="mb-3 mt-3 col-md-6">
                         <label>Verifikasi Setelah Perbaikan</label>
@@ -222,13 +227,13 @@ function addDetail() {
         <div class="mb-3">
             <label class="form-label">Gramase</label>
             <input type="number" step="0.01" name="details[${detailIndex}][gramase]" class="form-control"
-                placeholder="Masukkan gramase" required>
+                placeholder="mis: 500" required>
         </div>
         
         <div class="detail-row">
             <div class="mb-3">
                 <label>Kode Produksi</label>
-                <input type="text" name="details[${detailIndex}][production_code]" class="form-control production-code">
+                <input type="text" name="details[${detailIndex}][production_code]" class="form-control production-code" placeholder="mis: QG23801AA0">
             </div>
             <div class="mb-3">
                 <label>Best Before</label>
@@ -237,7 +242,7 @@ function addDetail() {
         </div>
         <div class="mb-3">
             <label>Nomor Program</label>
-            <input type="text" name="details[${detailIndex}][program_number]" class="form-control">
+            <input type="text" name="details[${detailIndex}][program_number]" class="form-control" placeholder="mis: 013">
         </div>
 
         <h6>Hasil Pemeriksaan Verifikasi Specimen</h6>
@@ -248,13 +253,12 @@ function addDetail() {
                     <th>Depan (D)</th>
                     <th>Tengah (T)</th>
                     <th>Belakang (B)</th>
-                    <th>Dalam Tumpukan (DL)</th>
                 </tr>
             </thead>
             <tbody>
                 @php
                 $specimens = ['fe_1_5mm' => 'Fe 1.5 mm', 'non_fe_2mm' => 'Non Fe 2 mm', 'sus_2_5mm' => 'SUS 2.5 mm'];
-                $positions = ['d', 't', 'b', 'dl'];
+                $positions = ['d', 't', 'b'];
                 @endphp
                 @foreach ($specimens as $specimenKey => $specimenName)
                 <tr>
@@ -281,7 +285,7 @@ function addDetail() {
         <div class="row">
             <div class="mb-3 col-md-6 mt-3">
                 <label>Tindakan Perbaikan</label>
-                <input type="text" name="details[${detailIndex}][corrective_action]" class="form-control">
+                <input type="text" name="details[${detailIndex}][corrective_action]" class="form-control" placeholder="masukkan tindakan perbaikan">
             </div>
             <div class="mb-3 col-md-6 mt-3">
                 <label>Verifikasi Setelah Perbaikan</label>

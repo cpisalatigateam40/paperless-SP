@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Laporan Ketidaksesuaian Proses Produksi', 'url' => route('report_production_nonconformities.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>Edit Laporan Ketidaksesuaian Proses Produksi</h4>

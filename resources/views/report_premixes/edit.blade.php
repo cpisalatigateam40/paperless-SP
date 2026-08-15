@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Premix', 'url' => route('report-premixes.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <form action="{{ route('report-premixes.update', $report->uuid) }}" method="POST">
         @csrf
         @method('PUT')

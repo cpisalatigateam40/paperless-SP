@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pasteurisasi Produk di Retort Chamber', 'url' => route('report_pasteurs.index')],
+        ['label' => 'Tambah Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h4 class="mb-0">Tambah Verifikasi Proses Pasteurisasi Produk di Retort Chamber</h4>

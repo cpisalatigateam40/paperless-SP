@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Form Pengambilan Sample', 'url' => route('report_lab_samples.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <div class="card shadow">
         <div class="card-header">
             <h4>Tambah Detail ke Report Tanggal {{ $report->date }} (Shift {{ $report->shift }})</h4>

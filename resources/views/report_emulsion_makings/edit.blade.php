@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pembuatan Emulsi', 'url' => route('report_emulsion_makings.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" /> 
+
     <div class="card shadow">
         <div class="card-header">
             <h4>Edit Verifikasi Proses Pembuatan Emulsi</h4>

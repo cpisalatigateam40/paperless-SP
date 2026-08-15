@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportAuditPackingPrimerController extends Controller
 {
-    use HasBulkPdfExport;
+    use HasBulkPdfExport, HasSortableReport;
 
     protected string $bulkModel = ReportAuditPackingPrimer::class;
 
@@ -62,7 +63,7 @@ class ReportAuditPackingPrimerController extends Controller
 
     public function index(Request $request)
     {
-        $reports = ReportAuditPackingPrimer::with(['section', 'product', 'details.item'])
+        $query = ReportAuditPackingPrimer::with(['section', 'product', 'details.item'])
             ->when($request->filled('date'), fn ($q) => $q->whereDate('date', $request->date))
             ->when($request->filled('section_uuid'), fn ($q) => $q->where('section_uuid', $request->section_uuid))
             ->when($request->filled('search'), function ($q) use ($request) {
@@ -70,10 +71,22 @@ class ReportAuditPackingPrimerController extends Controller
                     $q2->where('product_name', 'like', '%' . $request->search . '%');
                 });
             })
-            ->when($request->filled('area'), fn ($q) => $q->where('area_uuid', $request->area))
-            ->latest('date')
-            ->paginate(10)
-            ->withQueryString();
+            ->when($request->filled('area'), fn ($q) => $q->where('area_uuid', $request->area));
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'column' => 'production_code',
+            ],
+        ]);
+
+        $reports = $query->paginate(10)->withQueryString();
 
         $areas = Area::all();
 

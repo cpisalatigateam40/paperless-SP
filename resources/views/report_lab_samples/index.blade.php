@@ -119,7 +119,7 @@
                 @endcan
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
             @if(session('success'))
             <div id="success-alert" class="alert alert-success">
                 {{ session('success') }}
@@ -135,6 +135,16 @@
                 </ul>
             </div>
             @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <div class="table-responsive">
                 <table class="table table-bordered">

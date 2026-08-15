@@ -7,22 +7,26 @@
     <style>
     body {
         font-family: DejaVu Sans, sans-serif;
-        font-size: 10px;
-        margin-top: 30px;
+        font-size: 8px;
+        line-height: 1.25;
+        margin: 0;
     }
 
     table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
+        table-layout: fixed;
     }
 
     th,
     td {
         border: 1px solid #000;
-        padding: 2px 3px;
+        padding: 1.5px 2px;
         text-align: left;
         vertical-align: middle;
+        word-wrap: break-word;
+        font-size: 7.5px;
     }
 
     th {
@@ -30,8 +34,20 @@
         font-weight: bold;
     }
 
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
     .text-center {
         text-align: center;
+    }
+
+    .fw-bold {
+        font-weight: bold;
     }
 
     .signature-box {
@@ -46,15 +62,11 @@
     }
 
     .mb-2 {
-        margin-bottom: 1rem;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
+        margin-bottom: 6px;
     }
 
     .mb-4 {
-        margin-bottom: 2rem;
+        margin-bottom: 10px;
     }
 
     .underline {
@@ -76,26 +88,41 @@
 
     @page {
         margin-top: 80px;
-        size: 210mm 330mm;
+        margin-bottom: 45px;
+        margin-left: 35px;
+        margin-right: 35px;
     }
 
-    ul {
-        margin: unset;
-        padding: .5rem;
+    .verif-line {
+        margin: 0 0 2px 0;
     }
 
-    li {
-        list-style-type: none;
+    .verif-line:last-child {
+        margin-bottom: 0;
+    }
+
+    ol {
+        margin: 4px 0;
+        padding-left: 16px;
+    }
+
+    ul.keterangan {
+        list-style: none;
+        padding-left: 0;
+        margin: 4px 0;
     }
     </style>
 </head>
 
 <body>
-    {{-- header --}}
+    {{-- ===== HEADER FIXED ===== --}}
     <div class="header">
         <table class="header-table">
             <tr>
-                <td class="no-border" style="width: 30%; vertical-align: middle;">
+                <td class="no-border" style="width: 25%; vertical-align: middle;">
+                    <table style="border: none; border-collapse: collapse;">
+                        <tr>
+                            <td class="no-border" style="width: 20%; vertical-align: middle;">
                     <table style="border: none; border-collapse: collapse;">
                         <tr>
                             <td class="no-border" style="vertical-align: middle; width: 50px;">
@@ -119,15 +146,23 @@
                         </tr>
                     </table>
                 </td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="no-border" style="text-align: right; vertical-align: middle; font-size: 9px; font-weight: bold;">
+                    {{ $formNumber ?? '-' }}
+                </td>
             </tr>
         </table>
     </div>
 
-    <h3 class="mb-2 text-center" style="text-transform: uppercase;">Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan</h3>
+    <h3 class="mb-2 text-center" style="text-transform: uppercase; margin: 4px 0 8px 0; font-size: 11px;">
+        Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan
+    </h3>
 
-    <table style="width: 100%; border: none;">
+    <table style="width: 100%; border: none; margin-bottom: 6px;">
         <tr style="border: none;">
-            <td style="text-align: left; border: none;">
+            <td style="text-align: left; border: none; padding: 0;">
                 Hari/Tanggal:
                 <span style="text-decoration: underline;">
                     {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
@@ -136,9 +171,18 @@
         </tr>
     </table>
 
-    <h3>Pemeriksaan Ruangan</h3>
-    <table class="table table-bordered table-sm mb-4 align-middle">
-        <thead class="align-middle text-center">
+    <h3 style="margin: 4px 0; font-size: 10px;">Pemeriksaan Ruangan</h3>
+    <table class="mb-4">
+        <colgroup>
+            <col style="width:3%">
+            <col style="width:20%">
+            <col style="width:6%">
+            <col style="width:6%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:35%">
+        </colgroup>
+        <thead>
             <tr>
                 <th rowspan="2">No</th>
                 <th rowspan="2">Area Produksi / Elemen</th>
@@ -155,12 +199,10 @@
         <tbody>
             @php $no = 1; @endphp
             @foreach ($report->roomDetails->groupBy('room.name') as $roomName => $details)
-            {{-- Judul ruangan --}}
             <tr>
                 <td class="text-center fw-bold">{{ $no++ }}</td>
                 <td class="fw-bold" colspan="6">{{ strtoupper($roomName) }}</td>
             </tr>
-            {{-- Elemen --}}
             @foreach ($details as $detail)
             <tr>
                 <td></td>
@@ -174,33 +216,29 @@
                 <td>{{ $detail->notes }}</td>
                 <td>{{ $detail->corrective_action }}</td>
                 <td>
-                    <ul class="mb-0">
-                        <li>
-                            <strong>Verifikasi Utama:</strong><br>
-                            Kondisi: {{ $detail->verification ?? '-' }}<br>
-                            Keterangan: {{ $detail->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
-                        </li>
-                        @foreach($detail->followups as $index => $followup)
-                        <li class="mt-2">
-                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
-                            Kondisi: {{ $followup->verification ?? '-' }}<br>
-                            Keterangan: {{ $followup->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
-                        </li>
-                        @endforeach
-                    </ul>
+                    <div class="verif-line">V.Utama: {{ $detail->verification ?? '-' }} | {{ $detail->notes ?? '-' }} | {{ $detail->corrective_action ?? '-' }}</div>
+                    @foreach($detail->followups as $index => $followup)
+                    <div class="verif-line">Lanjutan #{{ $index + 1 }}: {{ $followup->verification ?? '-' }} | {{ $followup->notes ?? '-' }} | {{ $followup->corrective_action ?? '-' }}</div>
+                    @endforeach
                 </td>
-
             </tr>
             @endforeach
             @endforeach
         </tbody>
     </table>
 
-    <h3>Pemeriksaan Mesin & Peralatan</h3>
-    <table class="table table-bordered table-sm align-middle">
-        <thead class="align-middle text-center">
+    <h3 style="margin: 4px 0; font-size: 10px;">Pemeriksaan Mesin & Peralatan</h3>
+    <table>
+        <colgroup>
+            <col style="width:3%">
+            <col style="width:20%">
+            <col style="width:6%">
+            <col style="width:6%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:35%">
+        </colgroup>
+        <thead>
             <tr>
                 <th rowspan="2">No</th>
                 <th rowspan="2">Peralatan / Part</th>
@@ -234,24 +272,11 @@
                 <td>{{ $detail->notes }}</td>
                 <td>{{ $detail->corrective_action }}</td>
                 <td>
-                    <ul class="mb-0">
-                        <li>
-                            <strong>Verifikasi Utama:</strong><br>
-                            Kondisi: {{ $detail->verification ?? '-' }}<br>
-                            Keterangan: {{ $detail->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $detail->corrective_action ?? '-' }}
-                        </li>
-                        @foreach($detail->followups as $index => $followup)
-                        <li class="mt-2">
-                            <strong>Koreksi Lanjutan #{{ $index + 1 }}:</strong><br>
-                            Kondisi: {{ $followup->verification ?? '-' }}<br>
-                            Keterangan: {{ $followup->notes ?? '-' }}<br>
-                            Tindakan Koreksi: {{ $followup->corrective_action ?? '-' }}
-                        </li>
-                        @endforeach
-                    </ul>
+                    <div class="verif-line">V.Utama: {{ $detail->verification ?? '-' }} | {{ $detail->notes ?? '-' }} | {{ $detail->corrective_action ?? '-' }}</div>
+                    @foreach($detail->followups as $index => $followup)
+                    <div class="verif-line">Lanjutan #{{ $index + 1 }}: {{ $followup->verification ?? '-' }} | {{ $followup->notes ?? '-' }} | {{ $followup->corrective_action ?? '-' }}</div>
+                    @endforeach
                 </td>
-
             </tr>
             @endforeach
             @endforeach
@@ -261,13 +286,13 @@
         </tbody>
     </table>
 
-    <p><strong>Keterangan:</strong></p>
-    <ul style="list-style: none; padding-left: 0;">
+    <p style="margin: 4px 0;"><strong>Keterangan:</strong></p>
+    <ul class="keterangan">
         <li>✔ : Bersih dan bebas material non halal</li>
         <li>x : Kotor</li>
     </ul>
 
-    <ol style="padding-left: 1.2rem;">
+    <ol>
         <li>Berdebu</li>
         <li>Noda (karat, cat atau sejenisnya)</li>
         <li>Endapan kotoran</li>
@@ -275,21 +300,21 @@
         <li>Becek/menggenang</li>
     </ol>
 
-    <table style="width: 100%; border: none; margin-top: 4rem;">
+    <table style="width: 100%; border: none; margin-top: 20px;">
         <tr style="border: none;">
             <td style="text-align: center; border: none; width: 33%;">
                 Diperiksa oleh:<br><br>
-                <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
+                <img src="{{ $createdQr }}" width="60" style="margin: 6px 0;"><br>
                 <strong>{{ $report->created_by }}</strong><br><br>
                 QC Inspector
             </td>
             <td style="text-align: center; border: none; width: 33%;">
                 Diketahui oleh:<br><br>
                 @if($report->known_by)
-                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
+                <img src="{{ $knownQr }}" width="60" style="margin: 6px 0;"><br>
                 <strong>{{ $report->known_by }}</strong><br><br>
                 @else
-                <div style="height: 120px;"></div>
+                <div style="height: 70px;"></div>
                 <strong>-</strong><br>
                 @endif
                 SPV/Foreman/Lady Produksi
@@ -297,10 +322,10 @@
             <td style="text-align: center; border: none; width: 33%;">
                 Disetujui oleh:<br><br>
                 @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
+                <img src="{{ $approvedQr }}" width="60" style="margin: 6px 0;"><br>
                 <strong>{{ $report->approved_by }}</strong><br><br>
                 @else
-                <div style="height: 120px;"></div>
+                <div style="height: 70px;"></div>
                 <strong>-</strong><br>
                 @endif
                 Supervisor QC

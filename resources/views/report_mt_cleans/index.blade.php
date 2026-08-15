@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
 
             @if(session('success'))
             <div id="success-alert" class="alert alert-success">
@@ -134,6 +134,15 @@
                 </ul>
             </div>
             @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <div class="table-responsive">
 
@@ -294,6 +303,7 @@
                                     <thead class="text-center">
                                         <tr>
                                             <th>Produk</th>
+                                            <th>Berat Tangkapan Logam (gr)</th>
                                             <th>Waktu</th>
                                             <th>MT 1</th>
                                             <th>MT 2</th>
@@ -311,6 +321,10 @@
                                         <tr>
                                             <td>
                                                 {{ $detail->product->product_name ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $detail->metal_weight ?? '-' }}
                                             </td>
 
                                             <td class="text-center">

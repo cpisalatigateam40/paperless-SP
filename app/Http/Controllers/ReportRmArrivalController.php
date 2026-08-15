@@ -20,11 +20,12 @@ use App\Exports\RmArrivalExport;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportRmArrivalController extends Controller
 {
 
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     
     protected string $bulkModel = ReportRmArrival::class;
 
@@ -70,8 +71,7 @@ class ReportRmArrivalController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportRmArrival::with('area', 'details.rawMaterial', 'section')
-            ->latest();
+        $query = ReportRmArrival::with('area', 'details.rawMaterial', 'section');
 
         // 🔥 FILTER SECTION
         if ($request->filled('section')) {
@@ -150,6 +150,20 @@ class ReportRmArrivalController extends Controller
                     $qp->where('name', 'like', "%{$search}%");
                 });
             });
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
         }
 
 

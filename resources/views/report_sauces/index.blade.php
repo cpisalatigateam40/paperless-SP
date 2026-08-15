@@ -118,10 +118,20 @@
                 @endcan
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
             @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
             @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <div class="table-responsive">
                 <table class="table table-bordered text-center align-middle">
@@ -297,11 +307,10 @@
 
                                         {{-- Header Kolom Utama --}}
                                         <tr>
-                                            <th rowspan="2">Pukul</th>
                                             <th rowspan="2">Durasi Proses</th>
                                             <th colspan="5">Bahan Baku</th>
                                             <th colspan="6">Parameter Pemasakan</th>
-                                            <th colspan="5">Produk Organoleptik</th>
+                                            <th colspan="4">Produk Organoleptik</th>
                                             <th rowspan="2">Status Produk</th>
                                             <th rowspan="2">Tindakan Perbaikan</th>
                                             <th rowspan="2">Catatan</th>
@@ -313,7 +322,7 @@
                                             <th>Tindakan Koreksi</th>
                                             <th>Keterangan</th>
 
-                                            <th>Lama Proses (menit)</th>
+                                            
                                             <th>Mixing Paddle On</th>
                                             <th>Mixing Paddle Off</th>
                                             <th>Pressure (Bar)</th>
@@ -331,7 +340,6 @@
                                         @foreach($r->details as $d)
                                         {{-- baris utama per proses --}}
                                         <tr>
-                                            <td>{{ $d->time }}</td>
                                             <td>{{ $d->process_step }}</td>
 
                                             {{-- bahan baku ditaruh di cell bersarang --}}
@@ -355,7 +363,6 @@
                                                 </table>
                                             </td>
 
-                                            <td>{{ $d->duration }}</td>
                                             <td>{{ $d->mixing_paddle_on ? '✔' : '-' }}</td>
                                             <td>{{ $d->mixing_paddle_off ? '✔' : '-' }}</td>
                                             <td>{{ $d->pressure }}</td>

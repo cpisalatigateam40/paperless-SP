@@ -23,10 +23,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportReCleanlinessController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportReCleanliness::class;
 
     protected function getBulkExportModelClass(): string
@@ -168,8 +169,20 @@ class ReportReCleanlinessController extends Controller
 
         });
 
-        $reports = $query->latest()
-            ->paginate(10)
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'column' => 'production_code',
+            ],
+        ]);
+
+        $reports = $query->paginate(10)
             ->withQueryString();
 
         // 🔢 Hitung ketidaksesuaian
@@ -355,48 +368,50 @@ class ReportReCleanlinessController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil diketahui.');
     }
 
-    public function exportPdf($uuid)
-    {
-        $report = ReportReCleanliness::with([
-            'roomDetails.room',
-            'roomDetails.element',
-            'equipmentDetails.equipment',
-            'equipmentDetails.part',
-            'area'
-        ])->where('uuid', $uuid)->firstOrFail();
-
-        // Generate QR untuk created_by
-        $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
-        $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
-        $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
-
-        // Generate QR untuk approved_by
-        $approvedInfo = $report->approved_by
-            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
-            : "Belum disetujui";
-        $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
-        $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
-
-        // Generate QR untuk known_by
-        $knownInfo = $report->known_by
-            ? "Diketahui oleh: {$report->known_by}"
-            : "Belum disetujui";
-        $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
-        $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
-
-        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_re_cleanliness');
-
-        $pdf = Pdf::loadView('report_re_cleanliness.pdf', [
-            'report' => $report,
-            'createdQr' => $createdQrBase64,
-            'approvedQr' => $approvedQrBase64,
-            'knownQr' => $knownQrBase64,
-            'formNumber' => $formNumber,
-        ])
-            ->setPaper('A4', 'portrait');
-
-        return $pdf->stream('laporan_kebersihan_' . $report->date . '.pdf');
-    }
+public function exportPdf($uuid)
+{
+    $report = ReportReCleanliness::with([
+        'roomDetails.room',
+        'roomDetails.element',
+        'roomDetails.followups',
+        'equipmentDetails.equipment',
+        'equipmentDetails.part',
+        'equipmentDetails.followups',
+        'area'
+    ])->where('uuid', $uuid)->firstOrFail();
+ 
+    // Generate QR untuk created_by
+    $createdInfo = "Dibuat oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+    $createdQrImage = QrCode::format('png')->size(100)->generate($createdInfo);
+    $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
+ 
+    // Generate QR untuk approved_by
+    $approvedInfo = $report->approved_by
+        ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . \Carbon\Carbon::parse($report->approved_at)->format('Y-m-d H:i')
+        : "Belum disetujui";
+    $approvedQrImage = QrCode::format('png')->size(100)->generate($approvedInfo);
+    $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
+ 
+    // Generate QR untuk known_by
+    $knownInfo = $report->known_by
+        ? "Diketahui oleh: {$report->known_by}"
+        : "Belum disetujui";
+    $knownQrImage = QrCode::format('png')->size(100)->generate($knownInfo);
+    $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
+ 
+    $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_re_cleanliness');
+ 
+    $pdf = Pdf::loadView('report_re_cleanliness.pdf', [
+        'report' => $report,
+        'createdQr' => $createdQrBase64,
+        'approvedQr' => $approvedQrBase64,
+        'knownQr' => $knownQrBase64,
+        'formNumber' => $formNumber,
+    ])
+        ->setPaper('A4', 'landscape');
+ 
+    return $pdf->stream('laporan_kebersihan_' . $report->date . '.pdf');
+}
 
     public function edit($uuid)
     {

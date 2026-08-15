@@ -124,7 +124,7 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
             <div class="table-responsive">
                 @if(session('success'))
                 <div id="success-alert" class="alert alert-success">
@@ -141,6 +141,15 @@
                     </ul>
                 </div>
                 @endif
+
+                <x-report-sort
+                    :sort-options="[
+                        'latest' => 'Terbaru',
+                        'report_date' => 'Tanggal Laporan',
+                        'submitted_at' => 'Tanggal Submit',
+                    ]"
+                    :with-date-filter="true"
+                />
 
                 @php
                 $roomNames = $reports->pluck('room_name')->unique()->filter()->values();

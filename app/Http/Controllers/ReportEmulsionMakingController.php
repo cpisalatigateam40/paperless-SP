@@ -19,10 +19,11 @@ use App\Exports\EmulsionMakingExport;
 use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
+use App\Traits\HasSortableReport;
 
 class ReportEmulsionMakingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportEmulsionMaking::class;
 
     protected function getBulkExportModelClass(): string
@@ -72,7 +73,7 @@ class ReportEmulsionMakingController extends Controller
             'header.details.rawMaterial',
             'header.details.premix',
             'header.agings'
-        ])->latest();
+        ]);
 
         // FILTER AREA (hanya admin & superadmin)
         if (
@@ -128,6 +129,20 @@ class ReportEmulsionMakingController extends Controller
             });
         }
 
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'header',
+                'column' => 'production_code',
+            ],
+        ]);
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+        
         $reports = $query->paginate(10)->withQueryString();
 
         // 🔥 HITUNG KETIDAKSESUAIAN

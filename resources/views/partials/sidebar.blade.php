@@ -12,8 +12,8 @@ Request::is('report-weight-stuffers*') ||
 Request::is('report-emulsion-makings*') ||
 Request::is('report-siomays*') ||
 Request::is('report-thawings*') ||
-Request::is('report-process-productions*') ||
-Request::is('report-mt-cleans*');
+Request::is('report-process-productions*');
+
 $isCooking =
 Request::is('report-smoke-houses*') ||
 Request::is('report-maurer-cookings*') ||
@@ -46,7 +46,9 @@ $isNonProses = Request::is([
 'report-fragile-item*',
 'report-scales*',
 'report-sharp-tools*',
-'report-changeover-cleanings*'
+'report-changeover-cleanings*',
+'report-mt-cleans*',
+'report-alat-verifications*'
 ]);
 $isKetidaksesuaian = Request::is([
 'report-production-nonconformities*',
@@ -229,10 +231,7 @@ $isAudit = Request::is([
                     href="{{ route('report_thawings.index') }}">
                     Verifikasi Proses Thawing
                 </a>
-                <a class="collapse-item {{ Request::is('report-mt-cleans*') ? 'active' : '' }}"
-                    href="{{ route('report_mt_cleans.index') }}">
-                    Pemeriksaan Kebersihan Magnet Trap
-                </a>
+                
             </div>
         </div>
     </li>
@@ -377,14 +376,23 @@ $isAudit = Request::is([
                     Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan
                 </a>
 
-                <a class="collapse-item {{ Request::is('report-scales*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-scales*') ? 'active' : '' }}"
                     href="{{ route('report-scales.index') }}">
+                    Verifikasi Alat Ukur
+                </a> -->
+                <a class="collapse-item {{ Request::is('report-alat-verifications*') ? 'active' : '' }}"
+                    href="{{ route('report-alat-verifications.index') }}">
                     Verifikasi Alat Ukur
                 </a>
                 <a class="collapse-item {{ Request::is('report-changeover-cleanings*') ? 'active' : '' }}"
                     href="{{ route('report_changeover_cleanings.index') }}">
                     Pemeriksaan Kebersihan Setelah Change-Over
                 </a>
+                <a class="collapse-item {{ Request::is('report-mt-cleans*') ? 'active' : '' }}"
+                    href="{{ route('report_mt_cleans.index') }}">
+                    Pemeriksaan Kebersihan Magnet Trap
+                </a>
+                
             </div>
         </div>
     </li>

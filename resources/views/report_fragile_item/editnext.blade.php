@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)', 'url' => route('report-fragile-item.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5 class="mb-3">Edit Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic) (Tahap 2)</h5>

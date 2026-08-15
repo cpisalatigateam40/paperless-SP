@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Thawing', 'url' => route('report_thawings.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
 
     <div class="card shadow">
 

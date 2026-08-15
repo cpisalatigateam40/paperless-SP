@@ -20,10 +20,11 @@ use App\Traits\HasBulkPdfExport;
 use Carbon\Carbon;
 use App\Exports\SteamerCookingExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Traits\HasSortableReport;
 
 class ReportSteamerCookingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
     protected string $bulkModel = ReportSteamerCooking::class;
 
     protected function getBulkExportModelClass(): string
@@ -85,7 +86,70 @@ class ReportSteamerCookingController extends Controller
             $query->whereDate('date', $request->date);
         }
 
-        $reports = $query->latest()->paginate(20);
+        // 🔍 SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+
+                // 🔹 HEADER REPORT
+                $q->where('shift', 'like', "%{$search}%")
+                ->orWhere('product_code_range', 'like', "%{$search}%")
+                ->orWhere('gramase', 'like', "%{$search}%")
+                ->orWhere('notes', 'like', "%{$search}%")
+                ->orWhere('created_by', 'like', "%{$search}%")
+                ->orWhere('known_by', 'like', "%{$search}%")
+                ->orWhere('approved_by', 'like', "%{$search}%");
+
+                // 🔹 AREA
+                $q->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
+
+                // 🔹 PRODUCT
+                $q->orWhereHas('product', function ($p) use ($search) {
+                    $p->where('product_name', 'like', "%{$search}%");
+                });
+
+                // 🔹 BATCH
+                $q->orWhereHas('batches', function ($b) use ($search) {
+                    $b->where('steamer_number', 'like', "%{$search}%")
+                    ->orWhere('trolley_count', 'like', "%{$search}%")
+                    ->orWhere('tray_per_trolley', 'like', "%{$search}%")
+
+                    // 🔹 DETAIL STEAMER COOKING
+                    ->orWhereHas('details', function ($d) use ($search) {
+                        $d->where('production_code', 'like', "%{$search}%")
+                            ->orWhere('room_temp', 'like', "%{$search}%")
+                            ->orWhere('sensory_bentuk', 'like', "%{$search}%")
+                            ->orWhere('sensory_warna', 'like', "%{$search}%")
+                            ->orWhere('sensory_aroma', 'like', "%{$search}%")
+                            ->orWhere('sensory_rasa', 'like', "%{$search}%")
+                            ->orWhere('sensory_tekstur', 'like', "%{$search}%")
+
+                            // 🔹 CORE TEMP
+                            ->orWhereHas('coreTemps', function ($t) use ($search) {
+                                $t->where('temp_value', 'like', "%{$search}%");
+                            });
+                    });
+                });
+            });
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'column' => 'product_code_range',
+            ],
+        ]);
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        $reports = $query->paginate(10);
 
         if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
 

@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pemasakan di Steam Kettle', 'url' => route('report_sauces.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5>Edit Verifikasi Proses Pemasakan di Steam Kettle</h5>
@@ -73,22 +78,10 @@
                     </div>
                 </div>
 
-                <h6 class="mt-4">Detail Proses</h6>
-
                 @foreach($report->details as $detailIndex => $detail)
                 <div class="border p-3 rounded mb-4">
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Pukul</label>
-                            <input type="time" name="details[{{ $detailIndex }}][time]" class="form-control"
-                                value="{{ $detail->time }}">
-                        </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Durasi Proses</label>
-                            <input type="text" name="details[{{ $detailIndex }}][process_step]" class="form-control process-step-input"
-                                value="{{ $detail->process_step }}">
-                        </div>
-                        <div class="col-md-6">
                             <label>Nomor Mesin</label>
                             <input type="text"
                                 name="details[{{ $detailIndex }}][no_mesin]"
@@ -96,6 +89,17 @@
                                 value="{{ $detail->no_mesin }}"
                                 placeholder="Masukkan nomor mesin">
                         </div>
+                        <!-- <div class="col-md-6">
+                            <label class="form-label">Pukul</label>
+                            <input type="time" name="details[{{ $detailIndex }}][time]" class="form-control"
+                                value="{{ $detail->time }}">
+                        </div> -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Durasi Proses</label>
+                            <input type="text" name="details[{{ $detailIndex }}][process_step]" class="form-control process-step-input"
+                                value="{{ $detail->process_step }}">
+                        </div>
+                        
                     </div>
 
                     <h6>Bahan Baku &amp; Premix</h6>
@@ -207,11 +211,11 @@
                         </div>
                         
 
-                        <div class="col-md-6 mb-3">
+                        <!-- <div class="col-md-6 mb-3">
                             <label>Lama Proses (menit)</label>
                             <input type="number" step="0.01" name="details[{{ $detailIndex }}][duration]"
                                 class="form-control" value="{{ $detail->duration }}">
-                        </div>
+                        </div> -->
                         <div class="col-md-6 mb-3">
                             <label>Pressure (Bar)</label>
                             <input type="number" step="0.01" name="details[{{ $detailIndex }}][pressure]"

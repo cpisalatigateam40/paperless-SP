@@ -36,6 +36,40 @@
                     Akses Data Lama
 
                 </button>
+                {{-- 🔍 SEARCH --}}
+                <form method="GET"
+                    action="{{ route('report_steamer_cookings.index') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    {{-- pertahankan filter area & date --}}
+                    <input type="hidden" name="area" value="{{ request('area') }}">
+                    <input type="hidden" name="date" value="{{ request('date') }}">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control-sm form-control"
+                        placeholder="Cari laporan..."
+                        value="{{ request('search') }}"
+                    >
+
+                    {{-- 🔍 BUTTON CARI --}}
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        Cari
+                    </button>
+
+                    {{-- 🔄 RESET --}}
+                    @if(request('search') || request('area') || request('date'))
+                        <a href="{{ route('report_steamer_cookings.index') }}"
+                        class="btn btn-danger btn-sm"
+                        title="Reset Filter">
+                            Reset
+                        </a>
+                    @endif
+
+                </form>
+
                 {{-- Buttons --}}
                 <div class="d-flex gap-2">
                     @role('Produksi')
@@ -79,7 +113,7 @@
             </div>
             
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding-top: 1rem !important;">
 
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
@@ -101,6 +135,16 @@
                 </div>
                 @endif
             </form> -->
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <div class="table-responsive">
                 <table class="table table-bordered align-middle">

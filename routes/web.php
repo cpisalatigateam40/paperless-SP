@@ -65,6 +65,7 @@ use App\Http\Controllers\ReportBasoCookingController;
 use App\Http\Controllers\ReportRtgSteamerController;
 use App\Http\Controllers\ReportPasteurController;
 use App\Http\Controllers\ReportSauceController;
+use App\Http\Controllers\ReportAlatVerificationController;
 use App\Http\Controllers\ReportSiomayController;
 use App\Http\Controllers\ReportWaterbathController;
 use App\Http\Controllers\ShiftController;
@@ -620,6 +621,33 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-premixes/bulk-approve-count', [ReportPremixController::class, 'bulkApproveCount'])->name('report-premixes.bulk-approve-count');
     Route::get('report-premixes/export-pdf-bulk', [ReportPremixController::class, 'exportPdfBulk'])
     ->name('report_premixes.export_pdf_bulk');
+
+    Route::get('report-alat-verifications/export-pdf-bulk', [ReportAlatVerificationController::class, 'exportPdfBulk'])
+    ->name('report-alat-verifications.export_pdf_bulk');
+    Route::post('report-alat-verifications/bulk-known', [ReportAlatVerificationController::class, 'bulkKnown'])->name('report-alat-verifications.bulk-known');
+    Route::post('report-alat-verifications/bulk-approve', [ReportAlatVerificationController::class, 'bulkApprove'])->name('report-alat-verifications.bulk-approve');
+    Route::get('report-alat-verifications/bulk-known-count', [ReportAlatVerificationController::class, 'bulkKnownCount'])->name('report-alat-verifications.bulk-known-count');
+    Route::get('report-alat-verifications/bulk-approve-count', [ReportAlatVerificationController::class, 'bulkApproveCount'])->name('report-alat-verifications.bulk-approve-count');
+
+    Route::prefix('report-alat-verifications')
+    ->name('report-alat-verifications.')
+    ->controller(ReportAlatVerificationController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');   // statis, sebelum /{uuid}
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::get('/{uuid}', 'show')->name('show');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        Route::post('/{uuid}/add-detail', 'addDetail')->name('add-detail');
+        Route::post('/{uuid}/known', 'known')->name('known');
+        Route::post('/{uuid}/approve', 'approve')->name('approve');
+        Route::post('/export-excel', 'exportExcel')->name('export');
+    });
+    
+    
 
     // REPORT FOREIGN OBJECT
     Route::prefix('report-foreign-objects')

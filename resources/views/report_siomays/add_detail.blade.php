@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pembuatan Kulit Siomay/Gyoza', 'url' => route('report_siomays.index')],
+        ['label' => 'Tambah Detail', 'url' => null],
+    ]" />
+
     <div class="card shadow mb-4">
         <div class="card-header">
             <h5>Tambah Detail Verifikasi Proses Pembuatan Kulit Siomay/Gyoza</h5>

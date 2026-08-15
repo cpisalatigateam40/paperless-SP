@@ -46,7 +46,7 @@ return [
     'gmp_employee' => 'GMP Karyawan & Kontrol Sanitasi',
     'report_fragile_item' => 'Barang Mudah Pecah',
     'report_re_cleanliness' => 'Kebersihan Ruangan, Mesin, dan Peralatan',
-    'report_scales' => 'Timbangan & Thermometer',
+    'report-alat-verifications' => 'Timbangan & Thermometer',
     'report_changeover_cleanings' => 'Pemeriksaan Kebersihan Setelah Pergantian Produk',
 
     // Verifikasi dan Penanganan Ketidaksesuaian

@@ -4,9 +4,13 @@
 
 @section('content')
 
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Pemasakan di Smoke House', 'url' => route('report-smoke-houses.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
 
-    <div class="card">
+    <div class="card shadow">
 
         <div class="card-header">
 

@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-breadcrumb :items="[
+        ['label' => 'Verifikasi Proses Stuffing', 'url' => route('report_weight_stuffers.index')],
+        ['label' => 'Edit Data', 'url' => null],
+    ]" />
+
     <form action="{{ route('report_weight_stuffers.update', $report->uuid) }}" method="POST" id="mainForm" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -9,7 +14,7 @@
         {{-- ============================================================
              HEADER LAPORAN
         ============================================================ --}}
-        <div class="card shadow mb-4">
+        <div class="card shadow mb-4" >
             <div class="card-header fw-bold">Header Laporan</div>
             <div class="card-body row g-3">
                 <div class="col-md-6">
@@ -25,14 +30,18 @@
             </div>
         </div>
 
+        @php
+            $headerColors = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0', '#ede7f6', '#e0f7fa'];
+        @endphp
+
         @foreach($report->details as $idx => $d)
         @php $stuffer = $stufferMap[$d->uuid] ?? null; @endphp
 
         {{-- ============================================================
             DATA PRODUK & MESIN
         ============================================================ --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Data Produk #{{ $idx + 1 }}</div>
+        <div class="card shadow mb-4" style="margin-top: 48px;">
+            <div class="card-header fw-bold" style="background-color: {{ $headerColors[$idx % count($headerColors)] }};">Detail Produk #{{ $idx + 1 }}</div>
             <div class="card-body">
                 <div class="row g-3 mb-3">
                     <div class="col-md-6 mb-3">
@@ -96,13 +105,9 @@
                             placeholder="mis: 180">
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- BERAT PER 3 PCS --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Berat per 3 pcs (gr) — Produk #{{ $idx + 1 }}</div>
-            <div class="card-body">
+                <h5 class="mt-5" style="font-weight: bold;">Berat per 3 pcs (gr) — Produk #{{ $idx + 1 }}</h5>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Standar Berat</label>
@@ -158,13 +163,9 @@
                         <textarea name="details[{{ $idx }}][weight_notes]" class="form-control" rows="1">{{ $d->weight_notes }}</textarea>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- PANJANG PER PCS --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Panjang per pcs (mm) — Produk #{{ $idx + 1 }}</div>
-            <div class="card-body">
+                <h5 class="mt-5" style="font-weight: bold;">Panjang per pcs (mm) — Produk #{{ $idx + 1 }}</h5>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Standar Panjang</label>
@@ -220,13 +221,9 @@
                         <textarea name="details[{{ $idx }}][long_notes]" class="form-control" rows="1">{{ $d->long_notes }}</textarea>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- BERAT FLA --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Berat Fla (gr) — Produk #{{ $idx + 1 }}</div>
-            <div class="card-body">
+                <h5 class="mt-5" style="font-weight: bold;">Berat Fla (gr) — Produk #{{ $idx + 1 }}</h5>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Standar Berat Fla</label>
@@ -282,45 +279,50 @@
                         <textarea name="details[{{ $idx }}][fla_notes]" class="form-control" rows="1">{{ $d->fla_notes }}</textarea>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- CATATAN & DOKUMENTASI --}}
-        <div class="card shadow mb-4">
-            <div class="card-header fw-bold">Catatan & Dokumentasi — Produk #{{ $idx + 1 }}</div>
-            <div class="card-body row g-3">
-                <div class="col-md-6">
-                    <label>Catatan</label>
-                    <input type="text" name="details[{{ $idx }}][notes]" class="form-control"
-                        value="{{ $stuffer?->notes }}">
-                </div>
-                <div class="col-md-6">
-                    <label>Upload Dokumentasi Baru</label>
-                    <input type="file" name="details[{{ $idx }}][documentation][]" class="form-control"
-                        accept="image/*" multiple>
-                </div>
-                @if($d->documentations->isNotEmpty())
-                <div class="col-12">
-                    <label class="fw-semibold" style="font-size:13px">Dokumentasi Tersimpan</label>
-                    <div class="d-flex flex-wrap gap-2 mt-1" id="existingDocsWrapper-{{ $idx }}">
-                        @foreach($d->documentations as $doc)
-                        <div class="position-relative" id="docItem-{{ $doc->uuid }}">
-                            <input type="hidden" name="details[{{ $idx }}][keep_docs][]" value="{{ $doc->uuid }}" class="keep-doc-input">
-                            <a href="{{ Storage::url($doc->image) }}" target="_blank">
-                                <img src="{{ Storage::url($doc->image) }}"
-                                    style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;">
-                            </a>
-                            <button type="button"
-                                class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 btn-remove-doc"
-                                style="width:18px;height:18px;font-size:10px;line-height:1"
-                                data-uuid="{{ $doc->uuid }}"
-                                data-idx="{{ $idx }}"
-                                title="Hapus">&times;</button>
-                        </div>
-                        @endforeach
+                <h5 class="mt-5" style="font-weight: bold;">Catatan & Dokumentasi — Produk #{{ $idx + 1 }}</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Catatan</label>
+                        <input type="text" name="details[{{ $idx }}][notes]" class="form-control"
+                            value="{{ $stuffer?->notes }}">
                     </div>
+                    <div class="col-md-6">
+                        <label>Upload Dokumentasi Baru</label>
+                        <input type="file" name="details[{{ $idx }}][documentation][]" class="form-control"
+                            accept="image/*" multiple>
+                    </div>
+                    @if($d->documentations->isNotEmpty())
+                    <div class="col-12">
+                        <label class="fw-semibold" style="font-size:13px">Dokumentasi Tersimpan</label>
+                        <div class="d-flex flex-wrap gap-2 mt-1" id="existingDocsWrapper-{{ $idx }}">
+                            @foreach($d->documentations as $doc)
+                            <div class="position-relative" id="docItem-{{ $doc->uuid }}">
+                                <input type="hidden" name="details[{{ $idx }}][keep_docs][]" value="{{ $doc->uuid }}" class="keep-doc-input">
+                                <a href="{{ Storage::url($doc->image) }}" target="_blank">
+                                    <img src="{{ Storage::url($doc->image) }}"
+                                        style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;">
+                                </a>
+                                <button type="button"
+                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 btn-remove-doc"
+                                    style="width:18px;height:18px;font-size:10px;line-height:1"
+                                    data-uuid="{{ $doc->uuid }}"
+                                    data-idx="{{ $idx }}"
+                                    title="Hapus">&times;</button>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                 </div>
-                @endif
+
+
+
+
+
+
+
             </div>
         </div>
 

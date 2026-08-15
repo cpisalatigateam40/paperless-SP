@@ -19,10 +19,11 @@ use App\Exports\MtCleanExport;
 use App\Traits\HasBulkPdfExport;
 use App\Models\DetailMtCleanPhoto;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\HasSortableReport;
 
 class ReportMtCleanController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
 
     protected string $bulkModel = ReportMtClean::class;
 
@@ -76,7 +77,7 @@ class ReportMtCleanController extends Controller
             'area',
             'details.product',
             'details.photos'
-        ])->latest('date');
+        ]);
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -120,6 +121,20 @@ class ReportMtCleanController extends Controller
                 });
             });
         }
+
+        // 📅 FILTER TANGGAL REPORT
+        if ($request->filled('report_date')) {
+            $query->whereDate('date', $request->report_date);
+        }
+
+        // 🔽 SORTING
+        $this->applyReportSort($query, $request, [
+            'report_date_column' => 'date',
+            'production_code' => [
+                'relation' => 'details',
+                'column' => 'production_code',
+            ],
+        ]);
 
         $reports = $query
             ->paginate(10)
@@ -172,6 +187,7 @@ class ReportMtCleanController extends Controller
             'details.*.note'               => 'nullable|string',
             'details.*.corrective_action'  => 'nullable|string',
             'details.*.photos.*'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'details.*.metal_weight' => 'nullable|numeric|min:0',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
@@ -203,6 +219,7 @@ class ReportMtCleanController extends Controller
                 'condition'          => $detail['condition'] ?? null,
                 'note'               => $detail['note'] ?? null,
                 'corrective_action'  => $detail['corrective_action'] ?? null,
+                'metal_weight' => $detail['metal_weight'] ?? null,
             ]);
 
             if (!empty($detailsFiles[$i]['photos'])) {
@@ -280,6 +297,7 @@ class ReportMtCleanController extends Controller
             'details.*.photos.*'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'details.*.deleted_photos'      => 'nullable|array',
             'details.*.deleted_photos.*'    => 'nullable|string',
+            'details.*.metal_weight' => 'nullable|numeric|min:0',
         ]);
 
         $detailsFiles = $request->file('details', []);
@@ -303,8 +321,7 @@ class ReportMtCleanController extends Controller
                     'condition'          => $detail['condition'] ?? null,
                     'note'               => $detail['note'] ?? null,
                     'corrective_action'  => $detail['corrective_action'] ?? null,
-                    // finding_type sengaja TIDAK disentuh di sini,
-                    // supaya data lama yang masih teks tetap utuh kalau row-nya dari data lama.
+                    'metal_weight' => $detail['metal_weight'] ?? null,
                 ];
 
                 $detailUuid = $detail['uuid'] ?? null;
