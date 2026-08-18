@@ -10,47 +10,47 @@
 
 return [
     // Meat Preparation
-    'report_rm_arrivals' => 'Pemeriksaan Kedatangan Bahan Baku dan Bahan Penunjang',
+    'report_rm_arrivals' => 'Verifikasi Bahan Baku dan Bahan Penunjang',
     'report_premixes' => 'Pemeriksaan Premix',
-    'report_emulsion_makings' => 'Verifikasi Pembuatan Emulsi / CCM Block',
-    'report_metal_detectors' => 'Pemeriksaan Metal Detector Adonan',
-    'report_process_productions' => 'Verifikasi Proses Produksi',
-    'report_weight_stuffers' => 'Verifikasi Berat Stuffer',
-    'report_siomays' => 'Pembuatan Kulit Siomay',
-    'report_thawings' => 'Pemeriksaan Proses Thawing',
+    'report_emulsion_makings' => 'Verifikasi Proses Pembuatan Emulsi',
+    'report_metal_detectors' => 'Verifikasi Kinerja Metal Detector Adonan',
+    'report_process_productions' => 'Verifikasi Proses Mixing, Chopping, dan Emulsifying',
+    'report_weight_stuffers' => 'Verifikasi Proses Stuffing',
+    'report_siomays' => 'Verifikasi Proses Pembuatan Kulit Siomay/Gyoza',
+    'report_thawings' => 'Verifikasi Proses Thawing',
     'report_mt_cleans' => 'Pemeriksaan Kebersihan Magnet Trap',
 
     // Cooking
-    'report_smoke_houses' => 'Cooking Smoke House',
+    'report_smoke_houses' => 'Verifikasi Proses Pemasakan di Smoke House',
     'report_steamer_cookings' => 'Verifikasi Proses Pemasakan di Steamer',
-    'report_baso_cookings' => 'Verifikasi Pemasakan Baso',
-    'report_sauces' => 'Pemasakan Produk Di Steam Kettle',
+    'report_baso_cookings' => 'Verifikasi Proses Pemasakan di Boiling Tank',
+    'report_sauces' => 'Verifikasi Proses Pemasakan di Steam Kettle',
 
     // Packing
-    'report_packaging_verifs' => 'Verifikasi Kemasan Plastik',
-    'report_md_products' => 'Pemeriksaan Metal Detector Produk',
-    'report_tofu_verifs' => 'Verifikasi Produk Tofu',
-    'report_lab_samples' => 'Verifikasi Pengambilan Sample',
-    'report_startup_labels' => 'Pemeriksaan Labelisasi Startup',
+    'report_packaging_verifs' => 'Verifikasi Proses Pengemasan',
+    'report_md_products' => 'Verifikasi Kinerja Metal Detector Produk',
+    'report_tofu_verifs' => 'Verifikasi Hasil Produksi Tofu',
+    'report_lab_samples' => 'Form Pengambilan Sample',
+    'report_startup_labels' => 'Verifikasi Labelisasi Start-Up',
 
     // Pasteurizing
-    'report_pasteurs' => 'Pemeriksaan Pasteurisasi Retort Chamber',
-    'report_waterbaths' => 'Pemeriksaan Pasteurisasi Waterbath',
+    'report_pasteurs' => 'Verifikasi Proses Pasteurisasi Produk di Retort Chamber',
+    'report_waterbaths' => 'Verifikasi Proses Pasteurisasi Produk di Waterbath',
 
     // Cartoning
     'report_freez_packagings' => 'Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk',
 
     // Verifikasi Non Proses
-    'storage_rm_cleanliness' => 'Kebersihan Area Penyimpanan Bahan',
-    'process_area_cleanliness' => 'Kebersihan Area Proses',
-    'gmp_employee' => 'GMP Karyawan & Kontrol Sanitasi',
-    'report_fragile_item' => 'Barang Mudah Pecah',
-    'report_re_cleanliness' => 'Kebersihan Ruangan, Mesin, dan Peralatan',
-    'report-alat-verifications' => 'Timbangan & Thermometer',
-    'report_changeover_cleanings' => 'Pemeriksaan Kebersihan Setelah Pergantian Produk',
+    'storage_rm_cleanliness' => 'Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang',
+    'process_area_cleanliness' => 'Verifikasi Kesesuaian Area Proses Produksi',
+    'gmp_employee' => 'Verifikasi Penerapan GMP Karyawan & Sanitasi Area',
+    'report_fragile_item' => 'Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)',
+    'report_re_cleanliness' => 'Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan',
+    'report-alat-verifications' => 'Verifikasi Alat Ukur',
+    'report_changeover_cleanings' => 'Pemeriksaan Kebersihan Setelah Change-Over',
 
     // Verifikasi dan Penanganan Ketidaksesuaian
-    'report_production_nonconformities' => 'Pemeriksaan Ketidaksesuaian Proses Produksi',
+    'report_production_nonconformities' => 'Laporan Ketidaksesuaian Proses Produksi',
     'report_foreign_objects' => 'Pemeriksaan Kontaminasi Benda Asing',
 
     //audit
