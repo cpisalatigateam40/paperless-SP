@@ -202,12 +202,16 @@ class FormulaController extends Controller
             ->with('success', 'Formula berhasil diimport');
     }
 
-    public function editDetail($uuid, $formulation_name)
+    public function editDetail(Request $request, $uuid)
     {
         $formula = Formula::with([
             'formulations.rawMaterial',
             'formulations.premix'
         ])->where('uuid', $uuid)->firstOrFail();
+
+        $formulation_name = $request->query('formulation_name');
+
+        abort_unless($formulation_name, 404);
 
         $details = $formula->formulations
             ->where('formulation_name', $formulation_name);
@@ -224,9 +228,13 @@ class FormulaController extends Controller
         ));
     }
 
-    public function updateDetail(Request $request, $uuid, $formulation_name)
+    public function updateDetail(Request $request, $uuid)
     {
         $formula = Formula::where('uuid', $uuid)->firstOrFail();
+
+        $formulation_name = $request->query('formulation_name');
+
+        abort_unless($formulation_name, 404);
 
         $request->validate([
             'formulation_name' => 'required|string|max:255',
@@ -240,14 +248,14 @@ class FormulaController extends Controller
 
         DB::transaction(function () use ($request, $formula, $formulation_name) {
 
-            // 🔥 hapus semua detail lama
             Formulation::where('formula_uuid', $formula->uuid)
                 ->where('formulation_name', $formulation_name)
                 ->delete();
 
-            // simpan raw material
             foreach ($request->raw_material_uuid ?? [] as $i => $raw_uuid) {
-                if (!$raw_uuid) continue;
+                if (!$raw_uuid) {
+                    continue;
+                }
 
                 Formulation::create([
                     'uuid' => Str::uuid(),
@@ -259,9 +267,10 @@ class FormulaController extends Controller
                 ]);
             }
 
-            // simpan premix
             foreach ($request->premix_uuid ?? [] as $i => $premix_uuid) {
-                if (!$premix_uuid) continue;
+                if (!$premix_uuid) {
+                    continue;
+                }
 
                 Formulation::create([
                     'uuid' => Str::uuid(),
@@ -278,7 +287,5 @@ class FormulaController extends Controller
             ->route('formulas.detail', $formula->uuid)
             ->with('success', 'Formulasi berhasil diperbarui.');
     }
-
-
 
 }

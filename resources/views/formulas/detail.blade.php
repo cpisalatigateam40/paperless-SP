@@ -102,7 +102,10 @@
                             </button>
                         </td>
                         <td class="d-flex" style="gap: .4rem;">
-                            <a href="{{ route('formulas.editDetail', [$formula->uuid, $formulationName]) }}"
+                            <a href="{{ route('formulas.editDetail', [
+                                'uuid' => $formula->uuid,
+                                'formulation_name' => $formulationName,
+                            ]) }}"
                             class="btn btn-warning btn-sm">
                                 Edit
                             </a>

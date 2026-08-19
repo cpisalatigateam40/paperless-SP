@@ -1583,10 +1583,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/production-codes', [ReportRmArrivalController::class, 'productionCodes'])
     ->name('production-codes');
 
-    Route::get('/formulas/{uuid}/edit/{formulation_name}', [FormulaController::class, 'editDetail'])
+    Route::get('/formulas/{uuid}/edit', [FormulaController::class, 'editDetail'])
     ->name('formulas.editDetail');
 
-    Route::put('/formulas/{uuid}/update/{formulation_name}', [FormulaController::class, 'updateDetail'])
+    Route::put('/formulas/{uuid}/update', [FormulaController::class, 'updateDetail'])
         ->name('formulas.updateDetail');
 
     Route::get('/check-vars', function () {

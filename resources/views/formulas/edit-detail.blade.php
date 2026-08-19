@@ -26,7 +26,10 @@
 
             <hr>
 
-            <form action="{{ route('formulas.updateDetail', [$formula->uuid, $formulation_name]) }}" method="POST">
+            <form action="{{ route('formulas.updateDetail', [
+                'uuid' => $formula->uuid,
+                'formulation_name' => $formulation_name,
+            ]) }}" method="POST">
                 @csrf
                 @method('PUT')
 
