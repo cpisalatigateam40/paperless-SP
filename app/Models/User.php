@@ -27,6 +27,7 @@ class User extends Authenticatable
         'email',
         'password',
         'area_uuid',
+        'force_logout_after'
     ];
 
     // protected static function booted()

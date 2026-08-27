@@ -21,7 +21,7 @@ class MdProductExport implements WithEvents, WithTitle
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastCol = 'T';
+                $lastCol = 'X';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'Verifikasi Kinerja Metal Detector Produk');
@@ -34,25 +34,25 @@ class MdProductExport implements WithEvents, WithTitle
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
                 // ── Row 4: Group header ────────────────────────────────────
-                // A-I span row 4-5 (merge vertikal)
-                foreach (['A','B','C','D','E','F','G','H','I'] as $col) {
+                // A-L span row 4-5 (merge vertikal)
+                foreach (['A','B','C','D','E','F','G','H','I','J','K','L'] as $col) {
                     $sheet->mergeCells("{$col}4:{$col}5");
                 }
-                // Fe 1.5mm : J-L
-                $sheet->mergeCells('J4:L4');
-                $sheet->setCellValue('J4', 'Speci. Fe 1,5 mm');
-                // Non-Fe 2.0mm : M-O
+                // Fe 1.5mm : M-O
                 $sheet->mergeCells('M4:O4');
-                $sheet->setCellValue('M4', 'Speci. Non-Fe 2,0 mm');
-                // SUS 2.5mm : P-R
+                $sheet->setCellValue('M4', 'Speci. Fe 1,5 mm');
+                // Non-Fe 2.0mm : P-R
                 $sheet->mergeCells('P4:R4');
-                $sheet->setCellValue('P4', 'Speci. SUS 2,5 mm');
-                // S-T span row 4-5
-                foreach (['S','T'] as $col) {
+                $sheet->setCellValue('P4', 'Speci. Non-Fe 2,0 mm');
+                // SUS 2.5mm : S-U
+                $sheet->mergeCells('S4:U4');
+                $sheet->setCellValue('S4', 'Speci. SUS 2,5 mm');
+                // V-X span row 4-5
+                foreach (['V','W','X'] as $col) {
                     $sheet->mergeCells("{$col}4:{$col}5");
                 }
 
-                foreach (['J4','M4','P4'] as $cell) {
+                foreach (['M4','P4','S4'] as $cell) {
                     $sheet->getStyle($cell)->getFont()->setBold(true);
                     $sheet->getStyle($cell)->getAlignment()
                         ->setHorizontal('center')->setVertical('center');
@@ -63,12 +63,15 @@ class MdProductExport implements WithEvents, WithTitle
                     'A' => 'No',
                     'B' => 'Tanggal',
                     'C' => 'Shift',
-                    'D' => 'Time',
+                    'D' => 'Waktu Verifikasi',
                     'E' => 'QC',
                     'F' => 'Group',
-                    'G' => 'Nama Produk',
-                    'H' => 'Kode Prod',
-                    'I' => 'Line',
+                    'G' => 'Merk',
+                    'H' => 'Type/Model',
+                    'I' => 'No. Series',
+                    'J' => 'Nama Produk',
+                    'K' => 'Gramase (gr)',
+                    'L' => 'Kode Produksi',
                 ];
 
                 foreach ($headerLabels as $col => $label) {
@@ -80,9 +83,9 @@ class MdProductExport implements WithEvents, WithTitle
 
                 $posLabels = ['Depan', 'Tengah', 'Belakang'];
                 $posCols   = [
-                    'fe_1_5mm'   => ['J','K','L'],
-                    'non_fe_2mm' => ['M','N','O'],
-                    'sus_2_5mm'  => ['P','Q','R'],
+                    'fe_1_5mm'   => ['M','N','O'],
+                    'non_fe_2mm' => ['P','Q','R'],
+                    'sus_2_5mm'  => ['S','T','U'],
                 ];
 
                 foreach ($posCols as $cols) {
@@ -94,10 +97,11 @@ class MdProductExport implements WithEvents, WithTitle
                     }
                 }
 
-                $sheet->setCellValue('S4', 'Tindakan Perbaikan');
-                $sheet->setCellValue('T4', "Verifikasi\nSetelah Perbaikan");
+                $sheet->setCellValue('V4', 'Status (OK/NG)');
+                $sheet->setCellValue('W4', 'Tindakan Koreksi');
+                $sheet->setCellValue('X4', 'Keterangan');
 
-                foreach (['S4','T4'] as $cell) {
+                foreach (['V4','W4','X4'] as $cell) {
                     $sheet->getStyle($cell)->getFont()->setBold(true);
                     $sheet->getStyle($cell)->getAlignment()
                         ->setHorizontal('center')->setVertical('center')->setWrapText(true);
@@ -116,6 +120,10 @@ class MdProductExport implements WithEvents, WithTitle
                         explode('-', $report->shift ?? '', 2), 2, ''
                     );
 
+                    $merk      = $report->metalDetector->merk ?? '-';
+                    $typeModel = $report->metalDetector->type_model ?? '-';
+                    $noSeries  = $report->metalDetector->no_series ?? '-';
+
                     foreach ($report->details as $detail) {
                         // Kelompokkan positions: [specimen][position] => status
                         $pos = [];
@@ -126,11 +134,7 @@ class MdProductExport implements WithEvents, WithTitle
                         $get = fn($specimen, $position) =>
                             $pos[$specimen][$position] ?? '-';
 
-                        $verif = match ((string)($detail->verification ?? '')) {
-                            '1', 'true' => 'OK',
-                            '0', 'false' => 'Tidak OK',
-                            default => '-',
-                        };
+                        $status = $detail->status ? 'OK' : 'NG';
 
                         $sheet->setCellValue("A{$dataRow}", $no);
                         $sheet->setCellValue("B{$dataRow}", Carbon::parse($report->date)->format('d/m/Y'));
@@ -139,27 +143,28 @@ class MdProductExport implements WithEvents, WithTitle
                             ? Carbon::parse($detail->time)->format('H:i') : '-');
                         $sheet->setCellValue("E{$dataRow}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$dataRow}", $shiftGroup ?: '-');
-                        $sheet->setCellValue(
-                            "G{$dataRow}",
-                            trim(($detail->product->product_name ?? '-') . ' - ' . ($detail->gramase ?? '-'))
-                        );
-                        $sheet->setCellValue("H{$dataRow}", $detail->production_code ?? '-');
-                        $sheet->setCellValue("I{$dataRow}", $detail->process_type ?? '-');
+                        $sheet->setCellValue("G{$dataRow}", $merk);
+                        $sheet->setCellValue("H{$dataRow}", $typeModel);
+                        $sheet->setCellValue("I{$dataRow}", $noSeries);
+                        $sheet->setCellValue("J{$dataRow}", $detail->product->product_name ?? '-');
+                        $sheet->setCellValue("K{$dataRow}", $detail->gramase ?? '-');
+                        $sheet->setCellValue("L{$dataRow}", $detail->production_code ?? '-');
                         // Fe 1.5mm
-                        $sheet->setCellValue("J{$dataRow}", $get('fe_1_5mm', 'd'));
-                        $sheet->setCellValue("K{$dataRow}", $get('fe_1_5mm', 't'));
-                        $sheet->setCellValue("L{$dataRow}", $get('fe_1_5mm', 'b'));
+                        $sheet->setCellValue("M{$dataRow}", $get('fe_1_5mm', 'd'));
+                        $sheet->setCellValue("N{$dataRow}", $get('fe_1_5mm', 't'));
+                        $sheet->setCellValue("O{$dataRow}", $get('fe_1_5mm', 'b'));
                         // Non-Fe 2.0mm
-                        $sheet->setCellValue("M{$dataRow}", $get('non_fe_2mm', 'd'));
-                        $sheet->setCellValue("N{$dataRow}", $get('non_fe_2mm', 't'));
-                        $sheet->setCellValue("O{$dataRow}", $get('non_fe_2mm', 'b'));
+                        $sheet->setCellValue("P{$dataRow}", $get('non_fe_2mm', 'd'));
+                        $sheet->setCellValue("Q{$dataRow}", $get('non_fe_2mm', 't'));
+                        $sheet->setCellValue("R{$dataRow}", $get('non_fe_2mm', 'b'));
                         // SUS 2.5mm
-                        $sheet->setCellValue("P{$dataRow}", $get('sus_2_5mm', 'd'));
-                        $sheet->setCellValue("Q{$dataRow}", $get('sus_2_5mm', 't'));
-                        $sheet->setCellValue("R{$dataRow}", $get('sus_2_5mm', 'b'));
-                        // Koreksi & verifikasi
-                        $sheet->setCellValue("S{$dataRow}", $detail->corrective_action ?? '-');
-                        $sheet->setCellValue("T{$dataRow}", $verif);
+                        $sheet->setCellValue("S{$dataRow}", $get('sus_2_5mm', 'd'));
+                        $sheet->setCellValue("T{$dataRow}", $get('sus_2_5mm', 't'));
+                        $sheet->setCellValue("U{$dataRow}", $get('sus_2_5mm', 'b'));
+                        // Status, koreksi & keterangan
+                        $sheet->setCellValue("V{$dataRow}", $status);
+                        $sheet->setCellValue("W{$dataRow}", $detail->corrective_action ?? '-');
+                        $sheet->setCellValue("X{$dataRow}", $detail->verification ?? '-');
 
                         $sheet->getStyle("A{$dataRow}:{$lastCol}{$dataRow}")
                             ->getAlignment()->setHorizontal('center');
@@ -181,7 +186,7 @@ class MdProductExport implements WithEvents, WithTitle
                 // Auto width
                 $allCols = array_merge(
                     array_keys($headerLabels),
-                    ['J','K','L','M','N','O','P','Q','R','S','T']
+                    ['M','N','O','P','Q','R','S','T','U','V','W','X']
                 );
                 foreach ($allCols as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);

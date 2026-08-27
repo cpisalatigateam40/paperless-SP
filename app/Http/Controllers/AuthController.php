@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftSelection;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -53,6 +54,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = $request->user();
+
         // Hapus session shift saat logout
         $request->session()->forget(['shift_number', 'shift_group', 'shift_label']);
         
@@ -60,6 +63,18 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        if ($user) {
+            try {
+            Http::withToken(config('services.employee_api.sso_secret'))
+            ->timeout(5)
+            ->post(config('services.employee_api.url') . '/sso/report-logout', [
+            'user_uuid' => $user->uuid,
+            'project_uuid' => config('services.employee_api.this_project_uuid'),
+            ]);
+            } catch (\Throwable $e) {
+            // jangan blokir proses logout lokal walau central tidak terjangkau
+            }
+            }
+            return redirect(config('services.employee_api.portal_url'));
     }
 }

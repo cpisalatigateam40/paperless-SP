@@ -20,6 +20,7 @@ class MasterChecklistItem extends Model
         'name',
         'order_number',
         'is_active',
+        'section_uuid',
     ];
 
     protected $casts = [
@@ -45,5 +46,15 @@ class MasterChecklistItem extends Model
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class, 'section_uuid', 'uuid');
+    }
+
+    public function detailChangeoverCleanings()
+    {
+        return $this->hasMany(DetailChangeoverCleaning::class, 'item_uuid', 'uuid');
     }
 }

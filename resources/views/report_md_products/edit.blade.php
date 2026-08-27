@@ -32,32 +32,6 @@
                 <hr>
                 <h5 class="mt-5">Detail Pemeriksaan</h5>
                 @foreach ($report->details as $i => $detail)
-                <p class="mt-5">Pilih Tipe</p>
-                <div class="d-flex mb-3" style="gap: 2rem;">
-                    <label>
-                        <input type="radio" name="details[{{ $i }}][process_type]" value="Manual"
-                            {{ old("details.$i.process_type", $detail->process_type) == 'Manual' ? 'checked' : '' }}>
-                        Manual
-                    </label>
-
-                    <label>
-                        <input type="radio" name="details[{{ $i }}][process_type]" value="CFS"
-                            {{ old("details.$i.process_type", $detail->process_type) == 'CFS' ? 'checked' : '' }}>
-                        CFS
-                    </label>
-
-                    <label>
-                        <input type="radio" name="details[{{ $i }}][process_type]" value="Colimatic"
-                            {{ old("details.$i.process_type", $detail->process_type) == 'Colimatic' ? 'checked' : '' }}>
-                        Colimatic
-                    </label>
-
-                    <label>
-                        <input type="radio" name="details[{{ $i }}][process_type]" value="Multivac"
-                            {{ old("details.$i.process_type", $detail->process_type) == 'Multivac' ? 'checked' : '' }}>
-                        Multivac
-                    </label>
-                </div>
                 <div class="border rounded p-3 mb-3">
                     <div class="mb-3">
                         <label>Waktu Pengecekan</label>
@@ -100,13 +74,6 @@
                             <input type="date" name="details[{{ $i }}][best_before]" class="form-control best-before"
                                 value="{{ $detail->best_before }}">
                         </div>
-                    </div>
-                    
-
-                    <div class="mb-3">
-                        <label>Nomor Program</label>
-                        <input type="text" name="details[{{ $i }}][program_number]" class="form-control"
-                            value="{{ $detail->program_number }}">
                     </div>
 
                     <h6 class="mt-4">Hasil Pemeriksaan Verifikasi Specimen</h6>
@@ -160,22 +127,33 @@
                     </table>
 
                     <div class="row">
-                        <div class="mb-3 mt-3 col-md-6">
-                            <label>Tindakan Perbaikan</label>
+                        <div class="mb-3 mt-3 col-md-4">
+                            <label>Status (OK/NG)</label>
+                            <select name="details[{{ $i }}][status]" class="form-control">
+                                <option value="1" {{ $detail->status ? 'selected' : '' }}>OK</option>
+                                <option value="0" {{ !$detail->status ? 'selected' : '' }}>NG</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 mt-3 col-md-4">
+                            <label>Tindakan Koreksi</label>
                             <input type="text" name="details[{{ $i }}][corrective_action]" class="form-control"
                                 value="{{ $detail->corrective_action }}">
                         </div>
-                        <div class="mb-3 mt-3 col-md-6">
-                            <label>Verifikasi Setelah Perbaikan</label>
-                            <select name="details[{{ $i }}][verification]" class="form-control">
-                                <option value="">-- Pilih Verifikasi --</option>
-                                <option value="0" {{ $detail->verification == 0 ? 'selected' : '' }}>Tidak OK</option>
-                                <option value="1" {{ $detail->verification == 1 ? 'selected' : '' }}>OK</option>
-                            </select>
+                        <div class="mb-3 mt-3 col-md-4">
+                            <label>Keterangan</label>
+                            <input type="text" name="details[{{ $i }}][verification]" class="form-control"
+                                value="{{ $detail->verification }}">
                         </div>
                     </div>
                 </div>
                 @endforeach
+
+                <div class="row">
+                    <div class="mb-3 col-md-12">
+                        <label>Catatan</label>
+                        <textarea name="notes" class="form-control" rows="2">{{ old('notes', $report->notes) }}</textarea>
+                    </div>
+                </div>
 
                 <a href="{{ route('report_md_products.index') }}" class="btn btn-secondary">Kembali</a>
                 <button type="submit" class="btn btn-success">Perbarui</button>

@@ -2,7 +2,7 @@
 $isMasterData =
 Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
 'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*',
-'steamer-standards*', 'form-numbers*');
+'steamer-standards*', 'form-numbers*', 'metal_detectors*');
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -21,6 +21,7 @@ Request::is('report-fessman-cookings*') ||
 Request::is('report-baso-cookings*') ||
 Request::is('report-rtg-steamers*') ||
 Request::is('report-sauces*') ||
+Request::is('report-boiling-tank*') ||
 Request::is('report_steamer_cookings*');
 $isPacking =
 Request::is('report-lab-samples*') ||
@@ -41,14 +42,14 @@ $isNonProses = Request::is([
 'storage-rm-cleanliness*',
 'process-area-cleanliness*',
 'report-conveyor-cleanliness*',
-'gmp-employee*',
 'report-chlorine-residues*',
 'report-fragile-item*',
 'report-scales*',
 'report-sharp-tools*',
 'report-changeover-cleanings*',
 'report-mt-cleans*',
-'report-alat-verifications*'
+'report-alat-verifications*',
+'gmp*'
 ]);
 $isKetidaksesuaian = Request::is([
 'report-production-nonconformities*',
@@ -141,6 +142,8 @@ $isAudit = Request::is([
                     href="{{ route('steamer-standards.index') }}">Master Steamer</a>
                 <a class="collapse-item {{ Request::is('form-numbers*') ? 'active' : '' }}"
                     href="{{ route('form-numbers.index') }}">Nomor Form</a>
+                <a class="collapse-item {{ Request::is('metal_detectors*') ? 'active' : '' }}"
+                    href="{{ route('metal_detectors.index') }}">Metal Detector</a>
             </div>
         </div>
     </li>
@@ -253,8 +256,12 @@ $isAudit = Request::is([
                     href="{{ route('report_steamer_cookings.index') }}">
                     Verifikasi Proses Pemasakan di Steamer
                 </a>
-                <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-baso-cookings*') ? 'active' : '' }}"
                     href="{{ route('report_baso_cookings.index') }}">
+                    Verifikasi Proses Pemasakan di Boiling Tank
+                </a> -->
+                <a class="collapse-item {{ Request::is('report-boiling-tank*') ? 'active' : '' }}"
+                    href="{{ route('report_boiling_tanks.index') }}">
                     Verifikasi Proses Pemasakan di Boiling Tank
                 </a>
                 <a class="collapse-item {{ Request::is('report-sauces*') ? 'active' : '' }}"
@@ -361,8 +368,13 @@ $isAudit = Request::is([
                     Verifikasi Kesesuaian Area Proses Produksi
                 </a>
 
-                <a class="collapse-item {{ Request::is('gmp-employee*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('gmp-employee*') ? 'active' : '' }}"
                     href="{{ route('gmp-employee.index') }}">
+                    Verifikasi Penerapan GMP Karyawan & Sanitasi Area
+                </a> -->
+
+                <a class="collapse-item {{ Request::is('gmp*') ? 'active' : '' }}"
+                    href="{{ route('gmp.index') }}">
                     Verifikasi Penerapan GMP Karyawan & Sanitasi Area
                 </a>
 

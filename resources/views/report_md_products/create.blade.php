@@ -27,36 +27,39 @@
                         <input type="text" name="shift" class="form-control" value="{{ session('shift_number') }}-{{ session('shift_group') }}" required>
                     </div>
                 </div>
-                <hr>
 
-                <p class="mt-5">Pilih Tipe</p>
-                <div class="d-flex " style="gap: 2rem;">
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="Manual">
-                        Manual
-                    </label>
-
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="CFS">
-                        CFS
-                    </label>
-
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="Colimatic">
-                        Colimatic
-                    </label>
-
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="Multivac">
-                        Multivac
-                    </label>
+                {{-- METAL DETECTOR (MASTER DATA) --}}
+                <div class="row">
+                    <div class="mb-3 col-md-4">
+                        <label>Metal Detector</label>
+                        <select name="metal_detector_uuid" id="metal_detector_uuid" class="form-control select2-md"
+                            onchange="updateMdInfo(this)" required>
+                            <option value="">-- Pilih Metal Detector --</option>
+                            @foreach ($metalDetectors as $md)
+                            <option value="{{ $md->uuid }}"
+                                data-type="{{ $md->type_model }}"
+                                data-series="{{ $md->no_series }}">
+                                {{ $md->merk }} - {{ $md->type_model }} ({{ $md->no_series }})
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>Type/Model</label>
+                        <input type="text" id="md_type_model" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label>No. Series</label>
+                        <input type="text" id="md_no_series" class="form-control" readonly>
+                    </div>
                 </div>
+                <hr>
 
                 <h5 class="mt-5">Detail Pemeriksaan</h5>
 
                 {{-- DETAIL --}}
                 <div class="mb-3">
-                    <label>Waktu Pengecekan</label>
+                    <label>Waktu Verifikasi</label>
                     <input type="time" name="details[0][time]" class="form-control"
                         value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                 </div>
@@ -74,18 +77,10 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Gramase</label>
+                    <label class="form-label">Gramase (gr)</label>
                     <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
                         placeholder="mis: 500" required>
                 </div>
-                <!-- <div class="mb-3">
-                    <label>Kode Produksi</label>
-                    <input type="text" name="details[0][production_code]" class="form-control production-code">
-                </div>
-                <div class="mb-3">
-                    <label>Best Before</label>
-                    <input type="date" name="details[0][best_before]" class="form-control best-before">
-                </div> -->
                 <div class="detail-row">
                     <div class="mb-3">
                         <label>Kode Produksi</label>
@@ -95,10 +90,6 @@
                         <label>Best Before</label>
                         <input type="date" name="details[0][best_before]" class="form-control best-before">
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label>Nomor Program</label>
-                    <input type="text" name="details[0][program_number]" class="form-control" placeholder="mis: 013">
                 </div>
 
                 <h6 class="mt-4">Hasil Pemeriksaan Verifikasi Specimen</h6>
@@ -110,7 +101,7 @@
                             <th>Depan (D)</th>
                             <th>Tengah (T)</th>
                             <th>Belakang (B)</th>
-                            
+
                         </tr>
                     </thead>
                     <tbody>
@@ -148,22 +139,34 @@
                 </table>
 
                 <div class="row">
-                    <div class="mb-3 mt-3 col-md-6">
-                        <label>Tindakan Perbaikan</label>
-                        <input type="text" name="details[0][corrective_action]" class="form-control" placeholder="masukkan tindakan perbaikan">
-                    </div>
-                    <div class="mb-3 mt-3 col-md-6">
-                        <label>Verifikasi Setelah Perbaikan</label>
-                        <select name="details[0][verification]" class="form-control">
-                            <option value="">-- Pilih Verifikasi --</option>
-                            <option value="0">Tidak OK</option>
+                    <div class="mb-3 mt-3 col-md-4">
+                        <label>Status (OK/NG)</label>
+                        <select name="details[0][status]" class="form-control">
                             <option value="1">OK</option>
+                            <option value="0">NG</option>
                         </select>
+                    </div>
+                    <div class="mb-3 mt-3 col-md-4">
+                        <label>Tindakan Koreksi</label>
+                        <input type="text" name="details[0][corrective_action]" class="form-control" placeholder="masukkan tindakan koreksi">
+                    </div>
+                    <div class="mb-3 mt-3 col-md-4">
+                        <label>Catatan</label>
+                        <input type="text" name="details[0][verification]" class="form-control" placeholder="masukkan catatan">
                     </div>
                 </div>
 
+                
+
                 <div id="details-wrapper">
                     {{-- detail pertama di sini --}}
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-12">
+                        <label>Catatan</label>
+                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    </div>
                 </div>
 
                 <button type="button" class="btn btn-primary" onclick="addDetail()">+ Tambah Detail</button>
@@ -180,34 +183,18 @@
 <script>
 let detailIndex = 1; // detail pertama sudah [0]
 
+function updateMdInfo(select) {
+    let option = select.options[select.selectedIndex];
+    document.getElementById('md_type_model').value = option.getAttribute('data-type') || '';
+    document.getElementById('md_no_series').value = option.getAttribute('data-series') || '';
+}
+
 function addDetail() {
     let html = `
 
-    <p class="mt-5">Pilih Tipe</p>
-    <div class="d-flex " style="gap: 2rem;">
-        <label class="me-3">
-            <input type="radio" name="details[${detailIndex}][process_type]" value="Manual">
-            Manual
-        </label>
-
-        <label class="me-3">
-            <input type="radio" name="details[${detailIndex}][process_type]" value="CFS">
-            CFS
-        </label>
-
-        <label class="me-3">
-            <input type="radio" name="details[${detailIndex}][process_type]" value="Colimatic">
-            Colimatic
-        </label>
-
-        <label class="me-3">
-            <input type="radio" name="details[${detailIndex}][process_type]" value="Multivac">
-            Multivac
-        </label>
-    </div>
     <div class="border rounded p-3 mb-3 mt-5">
         <div class="mb-3">
-            <label>Waktu Pengecekan</label>
+            <label>Waktu Verifikasi</label>
             <input type="time" name="details[${detailIndex}][time]" class="form-control" value="{{ \Carbon\Carbon::now()->format('H:i') }}">
         </div>
         <div class="mb-3">
@@ -225,11 +212,11 @@ function addDetail() {
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">Gramase</label>
+            <label class="form-label">Gramase (gr)</label>
             <input type="number" step="0.01" name="details[${detailIndex}][gramase]" class="form-control"
                 placeholder="mis: 500" required>
         </div>
-        
+
         <div class="detail-row">
             <div class="mb-3">
                 <label>Kode Produksi</label>
@@ -239,10 +226,6 @@ function addDetail() {
                 <label>Best Before</label>
                 <input type="date" name="details[${detailIndex}][best_before]" class="form-control best-before">
             </div>
-        </div>
-        <div class="mb-3">
-            <label>Nomor Program</label>
-            <input type="text" name="details[${detailIndex}][program_number]" class="form-control" placeholder="mis: 013">
         </div>
 
         <h6>Hasil Pemeriksaan Verifikasi Specimen</h6>
@@ -283,17 +266,20 @@ function addDetail() {
         </table>
 
         <div class="row">
-            <div class="mb-3 col-md-6 mt-3">
-                <label>Tindakan Perbaikan</label>
-                <input type="text" name="details[${detailIndex}][corrective_action]" class="form-control" placeholder="masukkan tindakan perbaikan">
-            </div>
-            <div class="mb-3 col-md-6 mt-3">
-                <label>Verifikasi Setelah Perbaikan</label>
-                <select name="details[${detailIndex}][verification]" class="form-control">
-                    <option value="">-- Pilih Verifikasi --</option>
-                    <option value="0">Tidak OK</option>
+            <div class="mb-3 col-md-4 mt-3">
+                <label>Status (OK/NG)</label>
+                <select name="details[${detailIndex}][status]" class="form-control">
                     <option value="1">OK</option>
+                    <option value="0">NG</option>
                 </select>
+            </div>
+            <div class="mb-3 col-md-4 mt-3">
+                <label>Tindakan Koreksi</label>
+                <input type="text" name="details[${detailIndex}][corrective_action]" class="form-control" placeholder="masukkan tindakan koreksi">
+            </div>
+            <div class="mb-3 col-md-4 mt-3">
+                <label>Catatan</label>
+                <input type="text" name="details[${detailIndex}][verification]" class="form-control" placeholder="masukkan catatan">
             </div>
         </div>
         <button type="button" onclick="this.parentElement.remove()" class="btn btn-sm btn-danger">Hapus Detail</button>

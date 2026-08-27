@@ -2,6 +2,17 @@
 
 @section('content')
 <div class="container-fluid">
+    @if(session('success'))
+    <div id="success-alert" class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div id="error-alert-flash" class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+    @endif
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4>Master Item Checklist</h4>
@@ -26,9 +37,31 @@
                     </select>
                 </form>
                 @endhasanyrole
+
+                <form method="GET" action="{{ route('master_checklist_items.index') }}">
+                    <input type="hidden" name="area" value="{{ request('area') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <select name="section"
+                            class="form-select form-control form-control"
+                            onchange="this.form.submit()">
+                        <option value="">Semua Section</option>
+
+                        @foreach($sections as $section)
+                            <option value="{{ $section->uuid }}"
+                                {{ request('section') == $section->uuid ? 'selected' : '' }}>
+                                {{ $section->section_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
                 {{-- 🔍 SEARCH --}}
                 <form method="GET" action="{{ route('master_checklist_items.index') }}"
                     class="d-flex align-items-center" style="gap: .4rem;">
+                    <input type="hidden" name="area" value="{{ request('area') }}">
+                    <input type="hidden" name="section" value="{{ request('section') }}">
+
                     <input type="text" name="search" class="form-control" placeholder="Cari item..."
                         value="{{ request('search') }}">
                     <button type="submit" class="btn btn-outline-primary">Cari</button>
@@ -41,26 +74,22 @@
                 </form>
 
                 <a href="{{ route('master_checklist_items.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Tambah Item
+                    Tambah Item
                 </a>
             </div>
         </div>
 
         <div class="card-body">
-            @if(session('success'))
-            <div id="success-alert" class="alert alert-success">
-                {{ session('success') }}
-            </div>
-            @endif
 
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="align-middle">No</th>
-                            <th class="align-middle">Kategori</th>
+                            <th class="align-middle">Section</th>
                             <th class="align-middle">Nama Item</th>
                             <th class="align-middle">Area</th>
+                            <th class="align-middle text-center">Status</th>
                             <th class="align-middle text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -68,14 +97,34 @@
                         @forelse($items as $i => $item)
                         <tr>
                             <td class="align-middle">{{ $i + $items->firstItem() }}</td>
-                            <td class="align-middle">{{ $item->category ?? '-' }}</td>
+                            <td class="align-middle">{{ $item->section->section_name ?? '-' }}</td>
                             <td class="align-middle">{{ $item->name }}</td>
                             <td class="align-middle">{{ $item->area->name ?? '-' }}</td>
+                            <td class="align-middle text-center">
+                                @if($item->is_active)
+                                    <span class="badge bg-success" style="color: white !important;">Aktif</span>
+                                @else
+                                    <span class="badge bg-secondary" style="color: white !important;">Nonaktif</span>
+                                @endif
+                            </td>
                             <td class="align-middle text-center">
                                 <a href="{{ route('master_checklist_items.edit', $item->uuid) }}"
                                     class="btn btn-sm btn-warning" title="Edit Item">
                                     <i class="fas fa-edit"></i>
                                 </a>
+
+                                <form action="{{ route('master_checklist_items.toggle_active', $item->uuid) }}" method="POST"
+                                    class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    @foreach(request()->query() as $key => $value)
+                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                    @endforeach
+                                    <button class="btn btn-sm {{ $item->is_active ? 'btn-outline-success' : 'btn-outline-secondary' }}"
+                                        title="{{ $item->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                        <i class="fas {{ $item->is_active ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                                    </button>
+                                </form>
 
                                 <form action="{{ route('master_checklist_items.destroy', $item->uuid) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin hapus item ini?')">
@@ -89,7 +138,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center">Belum ada item checklist.</td>
+                            <td colspan="6" class="text-center">Belum ada item checklist.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -108,7 +157,7 @@
 <script>
 $(document).ready(function() {
     setTimeout(() => {
-        $('#success-alert').fadeOut('slow');
+        $('#success-alert, #error-alert-flash').fadeOut('slow');
     }, 3000);
 });
 </script>

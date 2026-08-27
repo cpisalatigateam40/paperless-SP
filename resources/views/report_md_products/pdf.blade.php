@@ -74,6 +74,15 @@
         border-collapse: collapse;
     }
 
+    .info-table td {
+        border: none;
+        padding: 1px 3px;
+    }
+
+    .info-label {
+        width: 110px;
+    }
+
     @page {
         margin-top: 80px;
         size: 210mm 330mm;
@@ -110,41 +119,69 @@
                         </tr>
                     </table>
                 </td>
+                <td class="no-border" style="width: 40%; text-align: right; vertical-align: middle; font-size: 9px;">
+                    {{ $formNumber ?? '-' }}
+                </td>
             </tr>
         </table>
     </div>
 
     <h3 class="mb-2 text-center" style="text-transform: uppercase;">Verifikasi Kinerja Metal Detector Produk</h3>
 
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td style="text-align: left; border: none;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
+    {{-- A. INFORMASI PRODUK --}}
+    <strong>A. Informasi Produk</strong>
+    <table class="info-table">
+        <tr>
+            <td class="info-label">Hari, Tanggal</td>
+            <td style="width: 15px;">:</td>
+            <td class="underline">{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Shift</td>
+            <td>:</td>
+            <td class="underline">{{ $report->shift }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Area</td>
+            <td>:</td>
+            <td class="underline">{{ $report->area->name ?? '-' }} (Packing)</td>
+        </tr>
+    </table>
+
+    {{-- B. HASIL VERIFIKASI --}}
+    <strong>B. Hasil Verifikasi</strong>
+    <table class="info-table">
+        <tr>
+            <td class="info-label">Merk</td>
+            <td style="width: 15px;">:</td>
+            <td class="underline">{{ $report->metalDetector->merk ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Type/model</td>
+            <td>:</td>
+            <td class="underline">{{ $report->metalDetector->type_model ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">No. Series</td>
+            <td>:</td>
+            <td class="underline">{{ $report->metalDetector->no_series ?? '-' }}</td>
         </tr>
     </table>
 
     <table>
         <thead>
             <tr>
-                <th rowspan="2">Waktu</th>
-                <th rowspan="2">Produk</th>
-                <th rowspan="2">Gramase</th>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Waktu<br>Verifikasi</th>
+                <th rowspan="2">Nama Produk</th>
+                <th rowspan="2">Gramase<br>(gr)</th>
                 <th rowspan="2">Kode Produksi</th>
-                <th rowspan="2">Best Before</th>
-                <th rowspan="2">No Program</th>
-                <th rowspan="2">Tipe</th>
                 <th colspan="3">Fe 1.5 mm</th>
-                <th colspan="3">Non Fe 2 mm</th>
+                <th colspan="3">Non-Fe 2.0 mm</th>
                 <th colspan="3">SUS 2.5 mm</th>
-                <th rowspan="2">Tindakan Perbaikan</th>
-                <th rowspan="2">Verifikasi</th>
+                <th rowspan="2">Status<br>(OK/NG)</th>
+                <th rowspan="2">Tindakan<br>Koreksi</th>
+                <th rowspan="2">Keterangan</th>
             </tr>
             <tr>
                 <th>D</th>
@@ -161,15 +198,13 @@
         <tbody>
             @foreach ($report->details as $detail)
             <tr>
-                <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
+                <td class="text-center">{{ $loop->iteration }}</td>
+                <td class="text-center">{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
                 <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td>{{ !empty($detail->gramase) 
-                                                        ? $detail->gramase 
-                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
-                <td>{{ $detail->production_code }}</td>
-                <td>{{ $detail->best_before }}</td>
-                <td>{{ $detail->program_number }}</td>
-                <td>{{ $detail->process_type }}</td>
+                <td class="text-center">{{ !empty($detail->gramase)
+                                                        ? $detail->gramase
+                                                        : ($detail->product->nett_weight ?? '-') }}</td>
+                <td>{{ $detail->production_code ?? '-' }}</td>
                 @php
                 $specimens = ['fe_1_5mm', 'non_fe_2mm', 'sus_2_5mm'];
                 $positions = ['d', 't', 'b'];
@@ -179,22 +214,31 @@
                 @php
                 $posDetail = $detail->positions->where('specimen', $specimen)->where('position', $pos)->first();
                 @endphp
-                <td>{{ $posDetail ? ($posDetail->status ? '✓' : '×') : '-' }}</td>
+                <td class="text-center">{{ $posDetail ? ($posDetail->status ? 'OK' : 'NG') : '-' }}</td>
                 @endforeach
                 @endforeach
-                <td>{{ $detail->corrective_action }}</td>
-                <td>{{ $detail->verification ? 'OK' : 'Tidak OK' }}</td>
+                <td class="text-center">{{ $detail->status ? 'OK' : 'NG' }}</td>
+                <td>{{ $detail->corrective_action ?: '-' }}</td>
+                <td>{{ $detail->verification ?: '-' }}</td>
             </tr>
             @endforeach
-            <tr>
-                <td colspan="18" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
-            </tr>
+            <!-- <tr>
+                <td colspan="17" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+            </tr> -->
         </tbody>
     </table>
 
     <p>D = depan ; T = tengah ; B = belakang</p>
 
-    <table style="width: 100%; border: none; margin-top: 4rem;">
+    {{-- C. CATATAN & DOKUMENTASI --}}
+    <strong>C. Catatan & Dokumentasi</strong>
+    <table class="info-table">
+        <tr>
+            <td>{{ $report->notes ?? '-' }}</td>
+        </tr>
+    </table>
+
+    <table style="width: 100%; border: none; margin-top: 2rem;">
         <tr style="border: none;">
             <td style="text-align: center; border: none; width: 33%;">
                 Diperiksa oleh:<br><br>

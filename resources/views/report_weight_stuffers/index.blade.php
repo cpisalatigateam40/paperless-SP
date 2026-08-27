@@ -198,7 +198,10 @@
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
                             <td>{{ $report->created_by }}</td>
-                            <td class="d-flex" style="gap: .2rem;">
+                            <td >
+                                <div class="d-flex" style="gap: .2rem;">
+
+                                
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
@@ -301,6 +304,7 @@
                                     data-bs-target="#modalPilihProduk">
                                     <i class="fas fa-file-pdf"></i>
                                 </button>
+                                </div>
                             </td>
 
                         </tr>

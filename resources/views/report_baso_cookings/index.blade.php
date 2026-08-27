@@ -115,9 +115,9 @@
                     :route="route('report_baso_cookings.export')" 
                     title="Verifikasi Pemasakan Baso" />
 
-                @can('create report')
+                <!-- @can('create report')
                 <a href="{{ route('report_baso_cookings.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
-                @endcan
+                @endcan -->
             </div>
         </div>
 
@@ -204,7 +204,10 @@
                             <td>{{ $report->set_boiling_1 ?? '-' }}</td>
                             <td>{{ $report->set_boiling_2 ?? '-' }}</td>
                             <td>{{ $report->created_by }}</td>
-                            <td class="d-flex align-items-center" style="gap: .2rem;">
+                            <td >
+                                <div class="d-flex align-items-center" style="gap: .2rem;">
+
+                                
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
@@ -291,6 +294,7 @@
                                     class="btn btn-outline-secondary btn-sm" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+                                </div>
 
                             </td>
                         </tr>

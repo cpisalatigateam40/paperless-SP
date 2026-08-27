@@ -93,9 +93,9 @@
                     :route="route('report_maurer_cookings.export')" 
                     title="Verifikasi Pemasakan Maurer" />
 
-                @can('create report')
+                <!-- @can('create report')
                 <a href="{{ route('report_maurer_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
-                @endcan
+                @endcan -->
             </div>
         </div>
 

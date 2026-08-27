@@ -15,13 +15,20 @@ class DetailChangeoverCleaning extends Model
     protected $fillable = [
         'uuid',
         'report_uuid',
+        'group',
         'item_uuid',
+        'item_name',
         'product_uuid',
         'time',
-        'result',
+        'score',
         'explanation',
         'notes',
         'corrective_action',
+        'production_code',
+    ];
+
+    protected $casts = [
+        'score' => 'integer',
     ];
 
     protected static function boot()
@@ -57,5 +64,10 @@ class DetailChangeoverCleaning extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_uuid', 'uuid');
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->item_name ?? $this->item?->name ?? '-';
     }
 }

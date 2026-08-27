@@ -16,32 +16,9 @@
             <form method="POST" action="{{ route('report_md_products.store-detail', $report->uuid) }}">
                 @csrf
 
-                <p class="mt-5">Pilih Tipe</p>
-                <div class="d-flex " style="gap: 2rem;">
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="Manual">
-                        Manual
-                    </label>
-
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="CFS">
-                        CFS
-                    </label>
-
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="Colimatic">
-                        Colimatic
-                    </label>
-
-                    <label class="me-3">
-                        <input type="radio" name="details[0][process_type]" value="Multivac">
-                        Multivac
-                    </label>
-                </div>
-
                 {{-- DETAIL --}}
-                <div class="mb-3 mt-5">
-                    <label>Waktu Pengecekan</label>
+                <div class="mb-3">
+                    <label>Waktu Verifikasi</label>
                     <input type="time" name="details[0][time]" class="form-control"
                         value="{{ \Carbon\Carbon::now()->format('H:i') }}">
                 </div>
@@ -59,7 +36,7 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Gramase</label>
+                    <label class="form-label">Gramase (gr)</label>
                     <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
                         placeholder="Masukkan gramase" required>
                 </div>
@@ -72,16 +49,6 @@
                         <label>Best Before</label>
                         <input type="date" name="details[0][best_before]" class="form-control best-before">
                     </div>
-                </div>
-                <!-- <div class="mb-3">
-                    <label>Gramase</label>
-                    <input type="number" name="details[0][gramase]" class="form-control">
-                </div> -->
-
-                
-                <div class="mb-3">
-                    <label>Nomor Program</label>
-                    <input type="text" name="details[0][program_number]" class="form-control">
                 </div>
 
                 <h6 class="mt-4">Hasil Pemeriksaan Verifikasi Specimen</h6>
@@ -129,17 +96,20 @@
                 </table>
 
                 <div class="row">
-                    <div class="mb-3 mt-3 col-md-6">
-                        <label>Tindakan Perbaikan</label>
+                    <div class="mb-3 mt-3 col-md-4">
+                        <label>Status (OK/NG)</label>
+                        <select name="details[0][status]" class="form-control">
+                            <option value="1" selected>OK</option>
+                            <option value="0">NG</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 mt-3 col-md-4">
+                        <label>Tindakan Koreksi</label>
                         <input type="text" name="details[0][corrective_action]" class="form-control">
                     </div>
-                    <div class="mb-3 mt-3 col-md-6">
-                        <label>Verifikasi Setelah Perbaikan</label>
-                        <select name="details[0][verification]" class="form-control">
-                            <option value="">-- Pilih Verifikasi --</option>
-                            <option value="0">Tidak OK</option>
-                            <option value="1">OK</option>
-                        </select>
+                    <div class="mb-3 mt-3 col-md-4">
+                        <label>Keterangan</label>
+                        <input type="text" name="details[0][verification]" class="form-control">
                     </div>
                 </div>
 
