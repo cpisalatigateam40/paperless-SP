@@ -26,7 +26,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Nama Produk</label>
-                <select name="product_uuid" class="form-select form-control" required>
+                <select name="product_uuid" id="productSelect" class="form-select form-control" required>
                     <option value="">-- Pilih Produk --</option>
                     @foreach($products as $product)
                         <option value="{{ $product->uuid }}"

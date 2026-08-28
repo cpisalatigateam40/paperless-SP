@@ -79,6 +79,11 @@ class ReportBoilingTankController extends Controller
             3
         );
 
+        // STANDARD
+        $standard = \App\Models\MasterBoilingTankStandard::where('area_uuid', $report->area_uuid)
+            ->where('product_uuid', $report->product_uuid)
+            ->first();
+
         return [
             'createdQr' => 'data:image/png;base64,' . base64_encode($createdQrImage),
 
@@ -87,6 +92,8 @@ class ReportBoilingTankController extends Controller
             'approvedQr' => 'data:image/png;base64,' . base64_encode($approvedQrImage),
 
             'maxChecks' => $maxChecks,
+
+            'standard' => $standard,
         ];
     }
 
@@ -414,6 +421,10 @@ class ReportBoilingTankController extends Controller
             'details.checks',
         ])->where('uuid', $uuid)->firstOrFail();
 
+        $standard = \App\Models\MasterBoilingTankStandard::where('area_uuid', $report->area_uuid)
+            ->where('product_uuid', $report->product_uuid)
+            ->first();
+
         $createdInfo = "Diperiksa oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
         $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
         $createdQr = 'data:image/png;base64,' . base64_encode($createdQrImage);
@@ -436,12 +447,13 @@ class ReportBoilingTankController extends Controller
 
         $pdf = Pdf::loadView('report_boiling_tanks.pdf', [
             'report' => $report,
+            'standard' => $standard,
             'createdQr' => $createdQr,
             'knownQr' => $knownQr,
             'approvedQr' => $approvedQr,
             'formNumber' => $formNumber,
             'maxChecks' => $maxChecks,
-        ])->setPaper('a4', 'portrait');
+        ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('boiling_tank_' . $report->uuid . '.pdf');
     }
@@ -532,10 +544,16 @@ class ReportBoilingTankController extends Controller
             ->orderBy('shift')
             ->get();
 
+        // Preload semua standar yang relevan sekali saja (hindari N+1 di export)
+        $standards = \App\Models\MasterBoilingTankStandard::where('area_uuid', auth()->user()->area_uuid)
+            ->whereIn('product_uuid', $reports->pluck('product_uuid')->filter()->unique())
+            ->get()
+            ->keyBy(fn ($s) => $s->area_uuid . '|' . $s->product_uuid);
+
         $filename = 'Boiling_Tank_'
             . $dateFrom->format('Ymd') . '_'
             . $dateTo->format('Ymd') . '.xlsx';
 
-        return Excel::download(new BoilingTankExport($reports, $periodLabel), $filename);
+        return Excel::download(new BoilingTankExport($reports, $periodLabel, $standards), $filename);
     }
 }

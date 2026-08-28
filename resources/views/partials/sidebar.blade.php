@@ -2,7 +2,7 @@
 $isMasterData =
 Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
 'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*',
-'steamer-standards*', 'form-numbers*', 'metal_detectors*');
+'steamer-standards*', 'form-numbers*', 'metal_detectors*', 'master-boiling-tank-standard*');
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -138,6 +138,8 @@ $isAudit = Request::is([
                     href="{{ route('master_checklist_items.index') }}">Item Pergantian Produk</a>
                 <a class="collapse-item {{ Request::is('master-smoke-houses*') ? 'active' : '' }}"
                     href="{{ route('master-smoke-houses.index') }}">Master Cooking Smoke Houses</a>
+                <a class="collapse-item {{ Request::is('master-boiling-tank-standard*') ? 'active' : '' }}"
+                    href="{{ route('master_boiling_tank_standards.index') }}">Master Boiling Tank</a>
                 <a class="collapse-item {{ Request::is('steamer-standards*') ? 'active' : '' }}"
                     href="{{ route('steamer-standards.index') }}">Master Steamer</a>
                 <a class="collapse-item {{ Request::is('form-numbers*') ? 'active' : '' }}"

@@ -163,11 +163,11 @@
                 <th rowspan="2">Start</th>
                 <th rowspan="2">End</th>
                 <th rowspan="2">Suhu Adonan (°C)<br><span style="font-weight: normal;">Std 16 ± 2°C</span></th>
-                <th rowspan="2">Aktual Suhu Air<br>Tangki I (°C)<br><span style="font-weight: normal;">Std 75-85°C</span></th>
-                <th rowspan="2">Aktual Suhu Air<br>Tangki II (°C)<br><span style="font-weight: normal;">Std 85-95°C</span></th>
-                <th colspan="{{ $maxChecks }}">Berat Mentah (gr)<br><span style="font-weight: normal;">Std 11-12 gr</span></th>
-                <th colspan="{{ $maxChecks }}">Actual Core<br>Temp. (°C)<br><span style="font-weight: normal;">Std 12°C</span></th>
-                <th colspan="{{ $maxChecks }}">Berat Matang (gr)<br><span style="font-weight: normal;">Std 12 gr</span></th>
+                <th rowspan="2">Aktual Suhu Air<br>Tangki I (°C)<br><span style="font-weight: normal;">{{ $standard?->suhu_tangki_1_label ? 'Std ' . $standard->suhu_tangki_1_label . '°C' : '-' }}</span></th>
+                <th rowspan="2">Aktual Suhu Air<br>Tangki II (°C)<br><span style="font-weight: normal;">{{ $standard?->suhu_tangki_2_label ? 'Std ' . $standard->suhu_tangki_2_label . '°C' : '-' }}</span></th>
+                <th colspan="{{ $maxChecks }}">Berat Mentah (gr)<br><span style="font-weight: normal;">{{ $standard?->berat_mentah_label ? 'Std ' . $standard->berat_mentah_label . ' gr' : '-' }}</span></th>
+                <th colspan="{{ $maxChecks }}">Actual Core<br>Temp. (°C)<br><span style="font-weight: normal;">{{ $standard?->actual_core_temp_label ? 'Std ' . $standard->actual_core_temp_label . '°C' : '-' }}</span></th>
+                <th colspan="{{ $maxChecks }}">Berat Matang (gr)<br><span style="font-weight: normal;">{{ $standard?->berat_matang_label ? 'Std ' . $standard->berat_matang_label . ' gr' : '-' }}</span></th>
                 <th colspan="{{ $maxChecks }}">Suhu After<br>Cooling (°C)</th>
                 <th rowspan="2">Bentuk</th>
                 <th rowspan="2">Warna</th>

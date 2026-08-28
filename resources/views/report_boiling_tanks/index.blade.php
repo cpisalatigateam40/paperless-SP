@@ -223,8 +223,9 @@
 
                                     @else
 
-                                    <span class="badge bg-success">
-                                        {{ $report->known_by }}
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $report->known_by }}
                                     </span>
 
                                     @endif
@@ -250,8 +251,9 @@
 
                                     @else
 
-                                    <span class="badge bg-success">
-                                        {{ $report->approved_by }}
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $report->approved_by }}
                                     </span>
 
                                     @endif

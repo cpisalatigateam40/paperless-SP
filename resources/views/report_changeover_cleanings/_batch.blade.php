@@ -60,6 +60,7 @@
 
     {{-- ===== SISA BAHAN DAN KEMASAN (manual) ===== --}}
     <h6 class="fw-bold">Sisa Bahan dan Kemasan</h6>
+    <div class="table-responsive">
     <table class="table table-sm table-bordered mb-3">
         <thead>
             <tr>
@@ -97,12 +98,14 @@
             @endforeach
         </tbody>
     </table>
+    </div>
     <button type="button" class="btn btn-sm btn-info mb-4 add-manual-row" data-group="sisa_bahan_items">
         <i class="fas fa-plus"></i> Tambah Baris Sisa Bahan/Kemasan
     </button>
 
     {{-- ===== MESIN DAN PERALATAN (dari master, difilter Section) ===== --}}
     <h6 class="fw-bold">Mesin dan Peralatan <small class="text-muted">(menyesuaikan Section yang dipilih)</small></h6>
+    <div class="table-responsive">
     <table class="table table-sm table-bordered mb-4">
         <thead>
             <tr>
@@ -137,9 +140,11 @@
             @endif
         </tbody>
     </table>
+    </div>
 
     {{-- ===== KONDISI RUANGAN (manual) ===== --}}
     <h6 class="fw-bold">Kondisi Ruangan</h6>
+    <div class="table-responsive">
     <table class="table table-sm table-bordered mb-0">
         <thead>
             <tr>
@@ -176,6 +181,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
     <button type="button" class="btn btn-sm btn-info mt-2 add-manual-row" data-group="kondisi_ruangan_items">
         <i class="fas fa-plus"></i> Tambah Baris Kondisi Ruangan
     </button>

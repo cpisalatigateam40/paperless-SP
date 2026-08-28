@@ -84,6 +84,7 @@ use App\Http\Controllers\ReportSteamerCookingController;
 use App\Http\Controllers\FormNumberController;
 use	App\Http\Controllers\SsoLoginController;
 use App\Http\Controllers\ReportAuditPackingPrimerController;
+use App\Http\Controllers\MasterBoilingTankStandardController;
 
 
 Route::get('/', function () {
@@ -231,6 +232,19 @@ Route::middleware(['auth'])->group(function () {
             // untuk ajax tambah detail berdasarkan produk jika nanti diperlukan
             Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
         });
+
+    Route::prefix('master-boiling-tank-standard')
+    ->name('master_boiling_tank_standards.')
+    ->controller(MasterBoilingTankStandardController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::get('/by-product/{product_uuid}', 'getByProduct')->name('by_product'); // <-- static, sebelum /{uuid}
+        Route::post('/', 'store')->name('store');
+        Route::get('/{master_boiling_tank_standard}/edit', 'edit')->name('edit');
+        Route::put('/{master_boiling_tank_standard}', 'update')->name('update');
+        Route::delete('/{master_boiling_tank_standard}', 'destroy')->name('destroy');
+    });
 
     // STORAGE RM ROUTES
     Route::prefix('storage-rm-cleanliness')

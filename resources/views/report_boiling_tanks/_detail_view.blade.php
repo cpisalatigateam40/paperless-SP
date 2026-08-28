@@ -1,5 +1,9 @@
 @php
     $maxChecks = max($report->details->max(fn ($d) => $d->checks->count()) ?? 0, 3);
+
+    $standard = \App\Models\MasterBoilingTankStandard::where('area_uuid', $report->area_uuid)
+        ->where('product_uuid', $report->product_uuid)
+        ->first();
 @endphp
 
 <div class="mb-3">
@@ -50,11 +54,11 @@
                 <th rowspan="2">Start</th>
                 <th rowspan="2">End</th>
                 <th rowspan="2">Suhu Adonan (°C)<br><small class="text-muted">Std 16 ± 2°C</small></th>
-                <th rowspan="2">Aktual Suhu Air Tangki I (°C)<br><small class="text-muted">Std 75-85°C</small></th>
-                <th rowspan="2">Aktual Suhu Air Tangki II (°C)<br><small class="text-muted">Std 85-95°C</small></th>
-                <th colspan="{{ $maxChecks }}">Berat Mentah (gr)<br><small class="text-muted">Std 11-12 gr</small></th>
-                <th colspan="{{ $maxChecks }}">Actual Core Temp (°C)<br><small class="text-muted">Std 12°C</small></th>
-                <th colspan="{{ $maxChecks }}">Berat Matang (gr)</th>
+                <th rowspan="2">Aktual Suhu Air Tangki I (°C)<br><small class="text-muted">{{ $standard?->suhu_tangki_1_label ? 'Std ' . $standard->suhu_tangki_1_label . '°C' : '-' }}</small></th>
+                <th rowspan="2">Aktual Suhu Air Tangki II (°C)<br><small class="text-muted">{{ $standard?->suhu_tangki_2_label ? 'Std ' . $standard->suhu_tangki_2_label . '°C' : '-' }}</small></th>
+                <th colspan="{{ $maxChecks }}">Berat Mentah (gr)<br><small class="text-muted">{{ $standard?->berat_mentah_label ? 'Std ' . $standard->berat_mentah_label . ' gr' : '-' }}</small></th>
+                <th colspan="{{ $maxChecks }}">Actual Core Temp (°C)<br><small class="text-muted">{{ $standard?->actual_core_temp_label ? 'Std ' . $standard->actual_core_temp_label . '°C' : '-' }}</small></th>
+                <th colspan="{{ $maxChecks }}">Berat Matang (gr)<br><small class="text-muted">{{ $standard?->berat_matang_label ? 'Std ' . $standard->berat_matang_label . ' gr' : '-' }}</small></th>
                 <th colspan="{{ $maxChecks }}">Suhu After Cooling (°C)</th>
                 <th rowspan="2">Bentuk</th>
                 <th rowspan="2">Warna</th>

@@ -101,25 +101,27 @@
             </div>
         </div>
 
-        <table class="table table-bordered table-sm align-middle mt-2">
-            <thead>
-                <tr>
-                    <th style="min-width:150px">Area</th>
-                    <th>Nama Karyawan</th>
-                    <th>Seragam &amp; APD lengkap</th>
-                    <th>Sarung tangan utuh</th>
-                    <th>Sepatu boots bersih</th>
-                    <th>Tidak pakai perhiasan &amp; jam tangan</th>
-                    <th>Kuku &amp; tangan bersih, tanpa luka</th>
-                    <th>Kuku tidak panjang &amp; tidak cat kuku</th>
-                    <th>Perilaku &amp; kebiasaan kerja</th>
-                    <th>Potensi cross contamination</th>
-                    <th>Tindakan Koreksi</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody class="employee-rows"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm align-middle mt-2">
+                <thead>
+                    <tr>
+                        <th style="min-width:150px">Area</th>
+                        <th>Nama Karyawan</th>
+                        <th>Seragam &amp; APD lengkap</th>
+                        <th>Sarung tangan utuh</th>
+                        <th>Sepatu boots bersih</th>
+                        <th>Tidak pakai perhiasan &amp; jam tangan</th>
+                        <th>Kuku &amp; tangan bersih, tanpa luka</th>
+                        <th>Kuku tidak panjang &amp; tidak cat kuku</th>
+                        <th>Perilaku &amp; kebiasaan kerja</th>
+                        <th>Potensi cross contamination</th>
+                        <th>Tindakan Koreksi</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="employee-rows"></tbody>
+            </table>
+        </div>
 
         
 
@@ -144,7 +146,7 @@
                 @endforeach
             </select>
         </td>
-        <td><input type="text" name="__ROW__[employee_name]" class="form-control form-control-sm"></td>
+        <td><input type="text" name="__ROW__[employee_name]" class="form-control form-control-sm" placeholder="mis: Budi"></td>
         @foreach (['seragam_apd_lengkap','sarung_tangan_utuh','sepatu_boots_bersih','tidak_pakai_perhiasan','kuku_tangan_bersih','kuku_tidak_panjang','perilaku_kerja','potensi_cross_contamination'] as $field)
         <td>
             <select name="__ROW__[{{ $field }}]" class="form-control form-control-sm">
@@ -154,7 +156,7 @@
             </select>
         </td>
         @endforeach
-        <td><input type="text" name="__ROW__[tindakan_koreksi]" class="form-control form-control-sm"></td>
+        <td><input type="text" name="__ROW__[tindakan_koreksi]" class="form-control form-control-sm" placeholder="tindakan koreksi"></td>
         <td><button type="button" class="btn btn-sm btn-outline-danger remove-row">&times;</button></td>
     </tr>
 </template>
@@ -174,7 +176,7 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center mb-2 mt-3" style="gap:.5rem">
+        <div class="d-flex align-items-center mb-3 mt-3" style="gap:.5rem">
             <select class="form-control form-control sanitation-area-select" style="max-width:260px">
                 <option value="">-- Pilih Area --</option>
                 @foreach ($sections as $sec)
@@ -184,21 +186,40 @@
             <button type="button" class="btn btn-outline-info add-sanitation-area">+ Tambah Area</button>
         </div>
 
-        <table class="table table-bordered table-sm align-middle mt-2">
-            <thead>
-                <tr>
-                    <th>Area</th>
-                    <th>Item Verifikasi</th>
-                    <th>Std. Klorin</th>
-                    <th>Kadar Klorin (ppm)</th>
-                    <th>Suhu (°C)</th>
-                    <th>Tindakan Koreksi</th>
-                    <th>Keterangan</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody class="sanitation-rows"></tbody>
-        </table>
+        {{-- Info --}}
+        <div class="alert alert-info d-flex align-items-start mb-3" role="alert" style="font-size: .8rem;">
+            <i class="fas fa-info-circle mr-2 mt-1"></i>
+            <div>
+                <div>
+                    Silakan pilih <strong>Area</strong> terlebih dahulu, kemudian klik
+                    <strong>+ Tambah Area</strong> untuk menampilkan tabel item verifikasi di bawah.
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm align-middle mt-2">
+                <thead>
+                    <tr>
+                        <th>Area</th>
+                        <th>Item Verifikasi</th>
+                        <th>Std. Klorin</th>
+                        <th>Kadar Klorin (ppm)</th>
+                        <th>Suhu (°C)</th>
+                        <th>Tindakan Koreksi</th>
+                        <th>Keterangan</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="sanitation-rows">
+                    <tr class="empty-row">
+                        <td colspan="8" class="text-center text-muted">
+                            Belum ada data. Pilih Area terlebih dahulu untuk menambahkan verifikasi sanitasi.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="row mt-3">
             <div class="mb-2 col-md-12">
@@ -214,10 +235,10 @@
         <td class="area-cell"></td>
         <td><input type="text" name="__ROW__[item_verifikasi]" class="form-control form-control-sm" readonly></td>
         <td><input type="number" name="__ROW__[standar_klorin]" class="form-control form-control-sm"></td>
-        <td><input type="number" name="__ROW__[kadar_klorin]" class="form-control form-control-sm"></td>
-        <td><input type="number" name="__ROW__[suhu]" class="form-control form-control-sm"></td>
-        <td><input type="text" name="__ROW__[tindakan_koreksi]" class="form-control form-control-sm"></td>
-        <td><input type="text" name="__ROW__[keterangan]" class="form-control form-control-sm"></td>
+        <td><input type="number" name="__ROW__[kadar_klorin]" class="form-control form-control-sm" placeholder="mis: 12"></td>
+        <td><input type="number" name="__ROW__[suhu]" class="form-control form-control-sm" placeholder="mis: 12"></td>
+        <td><input type="text" name="__ROW__[tindakan_koreksi]" class="form-control form-control-sm" placeholder="tindakan koreksi"></td>
+        <td><input type="text" name="__ROW__[keterangan]" class="form-control form-control-sm" placeholder="keterangan"></td>
         <td class="remove-cell"></td>
     </tr>
 </template>
@@ -386,7 +407,20 @@ function resetAndRender(section) {
     }
 }
 
-sectionSelect.addEventListener('change', (e) => resetAndRender(e.target.value));
+let previousSection = sectionSelect.value;
+
+sectionSelect.addEventListener('change', (e) => {
+    const hasData = container.children.length > 0 && previousSection;
+
+    if (hasData && !confirm('Mengganti Verifikasi akan menghapus semua data yang sudah diisi pada form ini. Lanjutkan?')) {
+        sectionSelect.value = previousSection;
+        return;
+    }
+
+    previousSection = e.target.value;
+    resetAndRender(e.target.value);
+});
+
 document.getElementById('add-waktu').addEventListener('click', () => addWaktuBlock(sectionSelect.value));
 
 if (currentSection) resetAndRender(currentSection);

@@ -152,7 +152,7 @@
                                 </span>
                             </td>
                             <td class="align-middle">{{ $header->created_by }}</td>
-                            <td class="align-middle text-center">
+                            <td class="">
                                 <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $header->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -181,7 +181,10 @@
                                         </button>
                                     </form>
                                     @else
-                                    <span class="badge bg-success">{{ $header->known_by }}</span>
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $header->known_by }}
+                                    </span>
                                     @endif
                                 @endcan
 
@@ -195,11 +198,14 @@
                                         </button>
                                     </form>
                                     @else
-                                    <span class="badge bg-success">{{ $header->approved_by }}</span>
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $header->approved_by }}
+                                    </span>
                                     @endif
                                 @endcan
 
-                                <a href="{{ route('gmp.export', $header) }}" class="btn btn-sm btn-secondary" title="Export PDF" target="_blank">
+                                <a href="{{ route('gmp.export', $header) }}" class="btn btn-sm btn-outline-secondary" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
                             </td>

@@ -4,7 +4,7 @@
 
     $sensoriOptions = ['' => '-- Pilih --', 'OK' => 'OK', 'Tidak OK' => 'Tidak OK'];
 @endphp
-<div class="detail-card border card rounded p-3 mb-3" data-dkey="{{ $dKey }}">
+<div class="detail-card border card rounded p-3 mb-5" data-dkey="{{ $dKey }}">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <span class="fw-bold detail-title" style="font-weight: bold;">Detail Pemeriksaan</span>
         <button type="button" class="btn btn-sm btn-outline-danger remove-detail-btn">Hapus</button>
@@ -35,20 +35,20 @@
 
     <div class="row g-2 mb-2">
         <div class="col-md-4 mb-3">
-            <label class="form-label  mb-1">Suhu Adonan (°C) <small class="text-muted">Std 16±2°C</small></label>
+            <label class="form-label  mb-1">Suhu Adonan (°C) <small class="text-muted" style="color: red !important;">Std 16±2°C</small></label>
             <input type="number" step="0.01" name="details[{{ $dKey }}][suhu_adonan]" class="form-control form-control"
                    placeholder="mis: 12"
                    value="{{ $detail->suhu_adonan ?? '' }}">
         </div>
         <div class="col-md-4 mb-3">
-            <label class="form-label  mb-1">Suhu Air Tangki I (°C) <small class="text-muted">Std 75-85°C</small></label>
-            <input type="number" step="0.01" name="details[{{ $dKey }}][aktual_suhu_tangki_1]" class="form-control form-control"
+            <label class="form-label  mb-1">Suhu Air Tangki I (°C) <small class="text-muted std-suhu-tangki-1" style="color: red !important;"></small></label>
+            <input type="number" step="0.01" name="details[{{ $dKey }}][aktual_suhu_tangki_1]" class="form-control detail-suhu-tangki-1-input"
                    placeholder="mis: 12"
                    value="{{ $detail->aktual_suhu_tangki_1 ?? '' }}">
         </div>
         <div class="col-md-4 mb-3">
-            <label class="form-label  mb-1">Suhu Air Tangki II (°C) <small class="text-muted">Std 85-95°C</small></label>
-            <input type="number" step="0.01" name="details[{{ $dKey }}][aktual_suhu_tangki_2]" class="form-control form-control"
+            <label class="form-label  mb-1">Suhu Air Tangki II (°C) <small class="text-muted std-suhu-tangki-2" style="color: red !important;"></small></label>
+            <input type="number" step="0.01" name="details[{{ $dKey }}][aktual_suhu_tangki_2]" class="form-control detail-suhu-tangki-2-input"
                    placeholder="mis: 12"
                    value="{{ $detail->aktual_suhu_tangki_2 ?? '' }}">
         </div>

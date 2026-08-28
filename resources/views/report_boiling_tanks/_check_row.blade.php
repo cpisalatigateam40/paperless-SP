@@ -16,21 +16,21 @@
         </div>
 
         <div class="col-6 col-lg mb-3">
-            <label class="form-label mb-1">Berat Mentah (gr) <small class="text-muted">Std 11-12 gr</small></label>
+            <label class="form-label mb-1">Berat Mentah (gr) <small class="text-muted std-berat-mentah" style="color: red !important;"></small></label>
             <input type="number" step="0.01" name="details[{{ $dKey }}][checks][{{ $cKey }}][berat_mentah]"
-                   class="form-control" placeholder="mis: 12"
+                   class="form-control check-berat-mentah-input" placeholder="mis: 12"
                    value="{{ $check->berat_mentah ?? '' }}">
         </div>
         <div class="col-6 col-lg mb-3">
-            <label class="form-label mb-1">Actual Core Temp (°C) <small class="text-muted">Std 12°C</small></label>
+            <label class="form-label mb-1">Actual Core Temp (°C) <small class="text-muted std-actual-core-temp" style="color: red !important;"></small></label>
             <input type="number" step="0.01" name="details[{{ $dKey }}][checks][{{ $cKey }}][actual_core_temp]"
-                   class="form-control" placeholder="mis: 12"
+                   class="form-control check-actual-core-temp-input" placeholder="mis: 12"
                    value="{{ $check->actual_core_temp ?? '' }}">
         </div>
         <div class="col-6 col-lg mb-3">
-            <label class="form-label mb-1">Berat Matang (gr)</label>
+            <label class="form-label mb-1">Berat Matang (gr) <small class="text-muted std-berat-matang" style="color: red !important;"></small></label>
             <input type="number" step="0.01" name="details[{{ $dKey }}][checks][{{ $cKey }}][berat_matang]"
-                   class="form-control" placeholder="mis: 12"
+                   class="form-control check-berat-matang-input" placeholder="mis: 12"
                    value="{{ $check->berat_matang ?? '' }}">
         </div>
         <div class="col-6 col-lg mb-3">
