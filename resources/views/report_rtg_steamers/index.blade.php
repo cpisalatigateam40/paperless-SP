@@ -93,9 +93,9 @@
                     :route="route('report_rtg_steamers.export')" 
                     title="Verifikasi Pemasakan Dengan Steamer" />
 
-                @can('create report')
+                <!-- @can('create report')
                 <a href="{{ route('report_rtg_steamers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
-                @endcan
+                @endcan -->
             </div>
         </div>
         <div class="card-body">

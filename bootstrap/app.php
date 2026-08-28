@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'shift.selected' => \App\Http\Middleware\EnsureShiftSelected::class,
         ]);
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckForceLogout::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

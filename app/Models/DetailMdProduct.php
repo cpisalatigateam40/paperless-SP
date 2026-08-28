@@ -24,6 +24,7 @@ class DetailMdProduct extends Model implements Auditable
         'corrective_action',
         'verification',
         'process_type',
+        'status'
     ];
 
     protected $auditEvents = [
@@ -32,7 +33,7 @@ class DetailMdProduct extends Model implements Auditable
 
     protected $casts = [
         'time' => 'datetime:H:i',
-        'verification' => 'boolean',
+        'status' => 'boolean',
     ];
 
     public function report()

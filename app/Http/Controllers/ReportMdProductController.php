@@ -7,6 +7,7 @@ use App\Models\DetailMdProduct;
 use App\Models\PositionMdProduct;
 use App\Models\Area;
 use App\Models\Product;
+use App\Models\MetalDetector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -69,17 +70,9 @@ class ReportMdProductController extends Controller
 
     public function index(Request $request)
     {
-        // 🔹 Ambil semua process_type yang tersedia untuk tab
-        $processTypes = \App\Models\DetailMdProduct::distinct()
-            ->orderBy('process_type')
-            ->pluck('process_type')
-            ->filter()
-            ->values();
-
-        $activeTab = $request->input('process_type'); // null = semua
-
         $query = ReportMdProduct::with([
             'area',
+            'metalDetector',
             'details.product',
             'details.positions'
         ]);
@@ -91,14 +84,7 @@ class ReportMdProductController extends Controller
             $query->where('area_uuid', $request->area);
         }
 
-        // 🔹 FILTER BY PROCESS TYPE (TAB)
-        if ($activeTab) {
-            $query->whereHas('details', function ($d) use ($activeTab) {
-                $d->where('process_type', $activeTab);
-            });
-        }
-
-        // 🔍 GLOBAL SEARCH (existing code unchanged)
+        // 🔍 GLOBAL SEARCH
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -112,21 +98,19 @@ class ReportMdProductController extends Controller
                     $a->where('name', 'like', "%{$search}%");
                 });
 
+                $q->orWhereHas('metalDetector', function ($m) use ($search) {
+                    $m->where('merk', 'like', "%{$search}%")
+                        ->orWhere('type_model', 'like', "%{$search}%")
+                        ->orWhere('no_series', 'like', "%{$search}%");
+                });
+
                 $q->orWhereHas('details', function ($d) use ($search) {
                     $d->where('production_code', 'like', "%{$search}%")
-                        ->orWhere('program_number', 'like', "%{$search}%")
-                        ->orWhere('process_type', 'like', "%{$search}%")
                         ->orWhere('corrective_action', 'like', "%{$search}%")
+                        ->orWhere('verification', 'like', "%{$search}%")
                         ->orWhere('gramase', 'like', "%{$search}%")
                         ->orWhere('best_before', 'like', "%{$search}%")
                         ->orWhere('time', 'like', "%{$search}%");
-
-                    if (strtolower($search) === 'ok') {
-                        $d->orWhere('verification', true);
-                    }
-                    if (strtolower($search) === 'tidak ok') {
-                        $d->orWhere('verification', false);
-                    }
 
                     $d->orWhereHas('product', function ($p) use ($search) {
                         $p->where('product_name', 'like', "%{$search}%")
@@ -136,10 +120,10 @@ class ReportMdProductController extends Controller
                     $d->orWhereHas('positions', function ($pos) use ($search) {
                         $pos->where('specimen', 'like', "%{$search}%")
                             ->orWhere('position', 'like', "%{$search}%");
-                        if (strtolower($search) === 'ok') {
+                        if (in_array(strtolower($search), ['ok'])) {
                             $pos->orWhere('status', true);
                         }
-                        if (strtolower($search) === 'tidak ok') {
+                        if (in_array(strtolower($search), ['tidak ok', 'ng'])) {
                             $pos->orWhere('status', false);
                         }
                     });
@@ -163,14 +147,10 @@ class ReportMdProductController extends Controller
 
         $reports = $query->paginate(10)->withQueryString();
 
-        // 🔥 HITUNG KETIDAKSESUAIAN (unchanged)
+        // 🔥 HITUNG KETIDAKSESUAIAN — berdasarkan status specimen saja
         foreach ($reports as $report) {
             $totalNonConform = 0;
             foreach ($report->details as $detail) {
-                if ($detail->verification === false) {
-                    $totalNonConform++;
-                    continue;
-                }
                 if ($detail->positions->contains('status', false)) {
                     $totalNonConform++;
                 }
@@ -178,16 +158,11 @@ class ReportMdProductController extends Controller
             $report->ketidaksesuaian = $totalNonConform;
         }
 
-        if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
 
-            $areas = Area::orderBy('name')->get();
-
-        } else {
-
-            $areas = collect();
-        }
-
-        return view('report_md_products.index', compact('reports', 'processTypes', 'activeTab', 'areas'));
+        return view('report_md_products.index', compact('reports', 'areas'));
     }
 
     public function create()
@@ -195,32 +170,34 @@ class ReportMdProductController extends Controller
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
             ->get();
-        return view('report_md_products.create', compact('products'));
+
+        $metalDetectors = MetalDetector::where('is_active', true)->get();
+
+        return view('report_md_products.create', compact('products', 'metalDetectors'));
     }
 
     public function store(Request $request)
     {
-        // Validasi minimal header, sesuaikan sesuai kebutuhan
         $request->validate([
             'date' => 'required|date',
+            'metal_detector_uuid' => 'required|exists:metal_detectors,uuid',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
-        ? session('shift_number') . '-' . session('shift_group')
-        : ($request->shift ?? 'NON-SHIFT');
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
 
-        // Simpan header report
         $report = ReportMdProduct::create([
             'uuid' => Str::uuid(),
             'area_uuid' => Auth::user()->area_uuid,
+            'metal_detector_uuid' => $request->metal_detector_uuid,
             'date' => $request->date,
             'shift' => $shift,
             'created_by' => Auth::user()->name,
+            'notes' => $request->notes,
         ]);
 
-        // Simpan detail jika ada
         if ($request->has('details')) {
-
             foreach ($request->details as $detail) {
                 $detailModel = DetailMdProduct::create([
                     'uuid' => Str::uuid(),
@@ -230,14 +207,11 @@ class ReportMdProductController extends Controller
                     'gramase' => $detail['gramase'] ?? null,
                     'best_before' => $detail['best_before'] ?? null,
                     'time' => $detail['time'] ?? null,
-                    'program_number' => $detail['program_number'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
-                    'verification' => isset($detail['verification']) ? (bool) $detail['verification'] : false,
-                    'process_type' => $detail['process_type'] ?? null,
+                    'verification' => $detail['verification'] ?? null,
+                    'status' => isset($detail['status']) ? (bool) $detail['status'] : true,
                 ]);
 
-
-                // Simpan posisi jika ada
                 if (!empty($detail['positions'])) {
                     foreach ($detail['positions'] as $position) {
                         PositionMdProduct::create([
@@ -273,11 +247,11 @@ class ReportMdProductController extends Controller
             ->get();
         return view('report_md_products.add-detail', compact('report', 'products'));
     }
-
+ 
     public function storeDetail(Request $request, $uuid)
     {
         $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
-
+ 
         if ($request->details) {
             foreach ($request->details as $detail) {
                 $detailModel = DetailMdProduct::create([
@@ -290,10 +264,11 @@ class ReportMdProductController extends Controller
                     'time' => $detail['time'] ?? null,
                     'program_number' => $detail['program_number'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
-                    'verification' => isset($detail['verification']) ? (bool) $detail['verification'] : false,
+                    'verification' => $detail['verification'] ?? null,
+                    'status' => isset($detail['status']) ? (bool) $detail['status'] : true,
                     'process_type' => $detail['process_type'] ?? null,
                 ]);
-
+ 
                 if (!empty($detail['positions'])) {
                     foreach ($detail['positions'] as $position) {
                         \App\Models\PositionMdProduct::create([
@@ -307,7 +282,7 @@ class ReportMdProductController extends Controller
                 }
             }
         }
-
+ 
         return redirect()->route('report_md_products.index')
             ->with('success', 'Detail berhasil ditambahkan.');
     }
@@ -346,7 +321,7 @@ class ReportMdProductController extends Controller
     public function exportPdf($uuid)
     {
         $report = ReportMdProduct::where('uuid', $uuid)
-            ->with(['details.positions', 'details.product'])
+            ->with(['area', 'metalDetector', 'details.positions', 'details.product'])
             ->firstOrFail();
 
         // Generate QR untuk created_by
@@ -370,14 +345,19 @@ class ReportMdProductController extends Controller
 
         $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_md_products');
 
-        $pdf = PDF::loadView('report_md_products.pdf', [
+        $view = $report->metal_detector_uuid
+            ? 'report_md_products.pdf'
+            : 'report_md_products.export-pdf-legacy';
+
+        $pdf = Pdf::loadView($view, [
             'report' => $report,
             'createdQr' => $createdQrBase64,
-            'approvedQr' => $approvedQrBase64,
             'knownQr' => $knownQrBase64,
+            'approvedQr' => $approvedQrBase64,
             'formNumber' => $formNumber,
         ]);
-        return $pdf->stream('Report-Metal-Detector-' . $report->date . '.pdf');
+
+        return $pdf->stream('verifikasi-md-product-' . $report->uuid . '.pdf');
     }
 
     public function edit($uuid)
@@ -385,29 +365,30 @@ class ReportMdProductController extends Controller
         $report = ReportMdProduct::with(['details.positions', 'details.product'])
             ->where('uuid', $uuid)
             ->firstOrFail();
-
+ 
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
         ->groupBy('product_name')
         ->get();
         return view('report_md_products.edit', compact('report', 'products'));
     }
-
+ 
     public function update(Request $request, $uuid)
     {
         $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
-
+ 
         // Update header
         $report->update([
             'date' => $request->date,
             'shift' => $request->shift,
+            'notes' => $request->notes,
         ]);
-
+ 
         // Hapus detail lama sebelum menulis ulang
         foreach ($report->details as $oldDetail) {
             $oldDetail->positions()->delete();
             $oldDetail->delete();
         }
-
+ 
         // Simpan detail baru dari form edit
         if ($request->has('details')) {
             foreach ($request->details as $detail) {
@@ -421,10 +402,11 @@ class ReportMdProductController extends Controller
                     'time' => $detail['time'] ?? null,
                     'program_number' => $detail['program_number'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
-                    'verification' => isset($detail['verification']) ? (bool) $detail['verification'] : false,
+                    'verification' => $detail['verification'] ?? null,
+                    'status' => isset($detail['status']) ? (bool) $detail['status'] : true,
                     'process_type' => $detail['process_type'] ?? null,
                 ]);
-
+ 
                 // Simpan ulang posisi
                 if (!empty($detail['positions'])) {
                     foreach ($detail['positions'] as $position) {
@@ -439,7 +421,7 @@ class ReportMdProductController extends Controller
                 }
             }
         }
-
+ 
         return redirect()->route('report_md_products.index')
             ->with('success', 'Report berhasil diperbarui.');
     }

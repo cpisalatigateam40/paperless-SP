@@ -6,6 +6,8 @@ use App\Models\DetailChangeoverCleaning;
 use App\Models\MasterChecklistItem;
 use App\Models\Product;
 use App\Models\Area;
+use App\Models\Section;
+use App\Support\ChangeoverCriteria;
 use App\Models\ReportChangeoverCleaning;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,7 +40,16 @@ class ReportChangeoverCleaningController extends Controller
 
     protected function getBulkExportEagerLoad(): array
     {
-        return ['area', 'details.item', 'details.product'];
+        return ['area', 'details.item.section', 'details.product'];
+    }
+
+    protected function resolveBulkExportView($report): string
+    {
+        if ($report->details->whereNotNull('result')->isNotEmpty()) {
+            return 'report_changeover_cleanings.pdf_legacy';
+        }
+
+        return 'report_changeover_cleanings.pdf';
     }
 
     protected function getBulkExportExtraData($report): array
@@ -54,11 +65,59 @@ class ReportChangeoverCleaningController extends Controller
         $knownInfo = $report->known_by ? "Diketahui oleh: {$report->known_by}" : "Belum disetujui";
         $knownQr = QrCode::format('png')->size(150)->generate($knownInfo);
 
-        return [
+        $extra = [
             'createdQr'  => 'data:image/png;base64,' . base64_encode($createdQr),
             'approvedQr' => 'data:image/png;base64,' . base64_encode($approvedQr),
             'knownQr'    => 'data:image/png;base64,' . base64_encode($knownQr),
+            'formNumber' => \App\Models\FormNumber::get($report->area->uuid, 'report_changeover_cleanings'),
         ];
+
+        $isLegacy = $report->details->whereNotNull('result')->isNotEmpty();
+
+        if ($isLegacy) {
+            return $extra; // pdf_legacy.blade.php tidak butuh 'pages'
+        }
+
+        // Susun 'pages' persis seperti exportPdf() single
+        $pages = [];
+
+        foreach ($report->details as $d) {
+            $batchKey = $d->product_uuid . '|' . $d->time;
+
+            if (!isset($pages[$batchKey])) {
+                $pages[$batchKey] = [
+                    'product'         => $d->product,
+                    'time'            => $d->time ? \Illuminate\Support\Str::substr($d->time, 0, 5) : '-',
+                    'production_code' => $d->production_code ?? '-',
+                    'sisa_bahan'      => [],
+                    'mesin_peralatan' => [],
+                    'kondisi_ruangan' => [],
+                ];
+            }
+
+            $pages[$batchKey][$d->group][] = [
+                'name'              => $d->item_name ?? ($d->item->name ?? '-'),
+                'score'             => $d->score,
+                'notes'             => $d->notes,
+                'corrective_action' => $d->corrective_action,
+            ];
+        }
+
+        foreach ($pages as $key => $data) {
+            $sectionNames = $report->details
+                ->where('group', 'mesin_peralatan')
+                ->filter(fn ($d) => ($d->product_uuid . '|' . $d->time) === $key)
+                ->pluck('item.section.section_name')
+                ->filter()
+                ->unique()
+                ->implode(', ');
+
+            $pages[$key]['section_names'] = $sectionNames ?: null;
+        }
+
+        $extra['pages'] = array_values($pages);
+
+        return $extra;
     }
 
     protected function getBulkExportFileName(): string
@@ -72,9 +131,7 @@ class ReportChangeoverCleaningController extends Controller
     public function index(Request $request)
     {
         $query = ReportChangeoverCleaning::with([
-            'area',
-            'details.product',
-            'details.item',
+            'area', 'details.item.section', 'details.product'
         ]);
 
         if (
@@ -164,16 +221,16 @@ class ReportChangeoverCleaningController extends Controller
      */
     public function create()
     {
-        $items = MasterChecklistItem::where('area_uuid', auth()->user()->area_uuid)
-            ->orderBy('category')
-            ->orderBy('name')
-            ->get();
+        $sections = Section::orderBy('section_name')->get(); // sudah difilter UserAreaScope
 
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
             ->groupBy('product_name')
             ->get();
 
-        return view('report_changeover_cleanings.form', compact('items', 'products'));
+        $criteria = ChangeoverCriteria::options();
+        $criteriaPairs = ChangeoverCriteria::pairs();
+
+        return view('report_changeover_cleanings.form', compact('sections', 'products', 'criteria', 'criteriaPairs'));
     }
 
     /**
@@ -182,22 +239,38 @@ class ReportChangeoverCleaningController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'date'                                   => 'required|date',
-            'batches'                                => 'required|array|min:1',
-            'batches.*.product_uuid'                 => 'required|exists:products,uuid',
-            'batches.*.time'                         => 'nullable',
-            'batches.*.items'                        => 'required|array|min:1',
-            'batches.*.items.*.result'               => 'nullable|string|max:255',
-            'batches.*.items.*.explanation'          => 'nullable|string',
-            'batches.*.items.*.notes'                => 'nullable|string',
-            'batches.*.items.*.corrective_action'    => 'nullable|string',
+            'date'                                        => 'required|date',
+            'batches'                                      => 'required|array|min:1',
+            'batches.*.product_uuid'                        => 'required|exists:products,uuid',
+            'batches.*.time'                                => 'nullable',
+            'batches.*.section_uuid'                        => 'nullable|uuid|exists:sections,uuid',
+
+            'batches.*.machine_items'                       => 'nullable|array',
+            'batches.*.machine_items.*.score'               => 'nullable|integer|min:1|max:8',
+            'batches.*.machine_items.*.explanation'         => 'nullable|string',
+            'batches.*.machine_items.*.notes'               => 'nullable|string',
+            'batches.*.machine_items.*.corrective_action'   => 'nullable|string',
+            'batches.*.production_code' => 'nullable|string|max:255',
+
+            'batches.*.sisa_bahan_items'                    => 'nullable|array',
+            'batches.*.sisa_bahan_items.*.name'             => 'required_with:batches.*.sisa_bahan_items|string|max:255',
+            'batches.*.sisa_bahan_items.*.score'            => 'nullable|integer|min:1|max:8',
+            'batches.*.sisa_bahan_items.*.explanation'      => 'nullable|string',
+            'batches.*.sisa_bahan_items.*.notes'            => 'nullable|string',
+            'batches.*.sisa_bahan_items.*.corrective_action'=> 'nullable|string',
+
+            'batches.*.kondisi_ruangan_items'                    => 'nullable|array',
+            'batches.*.kondisi_ruangan_items.*.name'             => 'required_with:batches.*.kondisi_ruangan_items|string|max:255',
+            'batches.*.kondisi_ruangan_items.*.score'            => 'nullable|integer|min:1|max:8',
+            'batches.*.kondisi_ruangan_items.*.explanation'      => 'nullable|string',
+            'batches.*.kondisi_ruangan_items.*.notes'            => 'nullable|string',
+            'batches.*.kondisi_ruangan_items.*.corrective_action'=> 'nullable|string',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
             ? session('shift_number') . '-' . session('shift_group')
             : ($request->shift ?? 'NON-SHIFT');
 
-        // Simpan header laporan
         $report = ReportChangeoverCleaning::create([
             'uuid'        => Str::uuid(),
             'area_uuid'   => Auth::user()->area_uuid,
@@ -208,26 +281,63 @@ class ReportChangeoverCleaningController extends Controller
             'approved_by' => $request->approved_by,
         ]);
 
-        // Setiap batch = 1 produk yang dicek ke semua item di dalamnya
         foreach ($request->batches as $batch) {
-            foreach ($batch['items'] as $itemUuid => $itemResult) {
-                DetailChangeoverCleaning::create([
-                    'uuid'               => Str::uuid(),
-                    'report_uuid'        => $report->uuid,
-                    'item_uuid'          => $itemUuid,
-                    'product_uuid'       => $batch['product_uuid'],
-                    'time'               => $batch['time'] ?? null,
-                    'result'             => $itemResult['result'] ?? null,
-                    'explanation'        => $itemResult['explanation'] ?? null,
-                    'notes'              => $itemResult['notes'] ?? null,
-                    'corrective_action'  => $itemResult['corrective_action'] ?? null,
-                ]);
-            }
+            $this->storeGroup($report->uuid, $batch, 'machine_items', 'mesin_peralatan', useItemUuid: true);
+            $this->storeGroup($report->uuid, $batch, 'sisa_bahan_items', 'sisa_bahan', useItemUuid: false);
+            $this->storeGroup($report->uuid, $batch, 'kondisi_ruangan_items', 'kondisi_ruangan', useItemUuid: false);
         }
 
         return redirect()
             ->route('report_changeover_cleanings.index')
             ->with('success', 'Laporan berhasil disimpan.');
+    }
+
+    /**
+     * Simpan satu kelompok detail (mesin_peralatan / sisa_bahan / kondisi_ruangan)
+     */
+    private function storeGroup(string $reportUuid, array $batch, string $sourceKey, string $group, bool $useItemUuid): void
+    {
+        $rows = $batch[$sourceKey] ?? [];
+
+        if ($useItemUuid) {
+            foreach ($rows as $itemUuid => $data) {
+                DetailChangeoverCleaning::create([
+                    'uuid'               => Str::uuid(),
+                    'report_uuid'        => $reportUuid,
+                    'group'              => $group,
+                    'item_uuid'          => $itemUuid,
+                    'item_name'          => null,
+                    'product_uuid'       => $batch['product_uuid'],
+                    'time'               => $batch['time'] ?? null,
+                    'production_code'    => $batch['production_code'] ?? null,
+                    'score'              => $data['score'] ?? null,
+                    'explanation'        => $data['explanation'] ?? null,
+                    'notes'              => $data['notes'] ?? null,
+                    'corrective_action'  => $data['corrective_action'] ?? null,
+                ]);
+            }
+        } else {
+            foreach ($rows as $data) {
+                if (empty($data['name'])) {
+                    continue;
+                }
+
+                DetailChangeoverCleaning::create([
+                    'uuid'               => Str::uuid(),
+                    'report_uuid'        => $reportUuid,
+                    'group'              => $group,
+                    'item_uuid'          => null,
+                    'item_name'          => $data['name'],
+                    'product_uuid'       => $batch['product_uuid'],
+                    'time'               => $batch['time'] ?? null,
+                    'production_code'    => $batch['production_code'] ?? null,
+                    'score'              => $data['score'] ?? null,
+                    'explanation'        => $data['explanation'] ?? null,
+                    'notes'              => $data['notes'] ?? null,
+                    'corrective_action'  => $data['corrective_action'] ?? null,
+                ]);
+            }
+        }
     }
 
     /**
@@ -247,67 +357,62 @@ class ReportChangeoverCleaningController extends Controller
      */
     public function edit(string $uuid)
     {
-        $report = ReportChangeoverCleaning::with('details')
-            ->where('uuid', $uuid)
-            ->firstOrFail();
+        $report = ReportChangeoverCleaning::with('details')->where('uuid', $uuid)->firstOrFail();
+        $sections = Section::orderBy('section_name')->get();
+        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')->groupBy('product_name')->get();
+        $criteria = ChangeoverCriteria::options();
+        $criteriaPairs = ChangeoverCriteria::pairs();
 
-        $items = MasterChecklistItem::orderBy('category')->orderBy('name')->get();
-        $products = Product::selectRaw(
-                'MIN(uuid) as uuid, product_name'
-            )
-            ->groupBy('product_name')
-            ->get();
-
-        return view('report_changeover_cleanings.form', compact('report', 'items', 'products'));
+        return view('report_changeover_cleanings.form', compact('report', 'sections', 'products', 'criteria', 'criteriaPairs'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $uuid)
     {
         $report = ReportChangeoverCleaning::where('uuid', $uuid)->firstOrFail();
 
-        $validated = $request->validate([
-            'date'                                   => 'required|date',
-            'shift'                                  => 'nullable|string|max:255',
+        $request->validate([
+            'date'                                        => 'required|date',
+            'batches'                                      => 'required|array|min:1',
+            'batches.*.product_uuid'                        => 'required|exists:products,uuid',
+            'batches.*.time'                                => 'nullable',
+            'batches.*.section_uuid'                        => 'nullable|uuid|exists:sections,uuid',
 
-            'batches'                                => 'required|array|min:1',
-            'batches.*.product_uuid'                 => 'required|exists:products,uuid',
-            'batches.*.time'                         => 'nullable',
-            'batches.*.items'                        => 'required|array|min:1',
-            'batches.*.items.*.result'               => 'nullable|string|max:255',
-            'batches.*.items.*.explanation'          => 'nullable|string',
-            'batches.*.items.*.notes'                => 'nullable|string',
-            'batches.*.items.*.corrective_action'    => 'nullable|string',
+            'batches.*.machine_items'                       => 'nullable|array',
+            'batches.*.machine_items.*.score'               => 'nullable|integer|min:1|max:8',
+            'batches.*.machine_items.*.explanation'         => 'nullable|string',
+            'batches.*.machine_items.*.notes'               => 'nullable|string',
+            'batches.*.machine_items.*.corrective_action'   => 'nullable|string',
+            'batches.*.production_code' => 'nullable|string|max:255',
+
+            'batches.*.sisa_bahan_items'                    => 'nullable|array',
+            'batches.*.sisa_bahan_items.*.name'             => 'required_with:batches.*.sisa_bahan_items|string|max:255',
+            'batches.*.sisa_bahan_items.*.score'            => 'nullable|integer|min:1|max:8',
+            'batches.*.sisa_bahan_items.*.explanation'      => 'nullable|string',
+            'batches.*.sisa_bahan_items.*.notes'            => 'nullable|string',
+            'batches.*.sisa_bahan_items.*.corrective_action'=> 'nullable|string',
+
+            'batches.*.kondisi_ruangan_items'                    => 'nullable|array',
+            'batches.*.kondisi_ruangan_items.*.name'             => 'required_with:batches.*.kondisi_ruangan_items|string|max:255',
+            'batches.*.kondisi_ruangan_items.*.score'            => 'nullable|integer|min:1|max:8',
+            'batches.*.kondisi_ruangan_items.*.explanation'      => 'nullable|string',
+            'batches.*.kondisi_ruangan_items.*.notes'            => 'nullable|string',
+            'batches.*.kondisi_ruangan_items.*.corrective_action'=> 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($validated, $report) {
-            // Hanya update tanggal & shift. area_uuid, created_by, known_by,
-            // approved_by TIDAK disentuh karena form ini tidak mengirim input
-            // untuk field-field tersebut.
-            $report->update([
-                'date'  => $validated['date'],
-                'shift' => $validated['shift'] ?? $report->shift,
-            ]);
+        $report->update([
+            'date'  => $request->date,
+            'shift' => $request->shift ?? $report->shift,
+            'known_by'    => $request->known_by,
+            'approved_by' => $request->approved_by,
+        ]);
 
-            // Cara simpel: hapus semua detail lama, lalu simpan ulang sesuai input
-            $report->details()->delete();
+        $report->details()->delete();
 
-            foreach ($validated['batches'] as $batch) {
-                foreach ($batch['items'] as $itemUuid => $itemResult) {
-                    $report->details()->create([
-                        'item_uuid'          => $itemUuid,
-                        'product_uuid'       => $batch['product_uuid'],
-                        'time'               => $batch['time'] ?? null,
-                        'result'             => $itemResult['result'] ?? null,
-                        'explanation'        => $itemResult['explanation'] ?? null,
-                        'notes'              => $itemResult['notes'] ?? null,
-                        'corrective_action'  => $itemResult['corrective_action'] ?? null,
-                    ]);
-                }
-            }
-        });
+        foreach ($request->batches as $batch) {
+            $this->storeGroup($report->uuid, $batch, 'machine_items', 'mesin_peralatan', useItemUuid: true);
+            $this->storeGroup($report->uuid, $batch, 'sisa_bahan_items', 'sisa_bahan', useItemUuid: false);
+            $this->storeGroup($report->uuid, $batch, 'kondisi_ruangan_items', 'kondisi_ruangan', useItemUuid: false);
+        }
 
         return redirect()
             ->route('report_changeover_cleanings.index')
@@ -329,39 +434,90 @@ class ReportChangeoverCleaningController extends Controller
 
     public function exportPdf($uuid)
     {
-        $report = ReportChangeoverCleaning::with(['area', 'details.item', 'details.product'])
+        $report = ReportChangeoverCleaning::with(['area', 'details.item.section', 'details.product'])
             ->where('uuid', $uuid)
             ->firstOrFail();
- 
-        // Generate QR untuk created_by
+
+        // QR tetap sama, dipakai kedua versi PDF
         $createdInfo = "Dilaporkan oleh: {$report->created_by}\nTanggal: " . $report->created_at->format('Y-m-d H:i');
         $createdQrImage = QrCode::format('png')->size(150)->generate($createdInfo);
         $createdQrBase64 = 'data:image/png;base64,' . base64_encode($createdQrImage);
- 
-        // Generate QR untuk known_by
-        $knownInfo = $report->known_by
-            ? "Diketahui oleh: {$report->known_by}"
-            : "Belum diketahui";
+
+        $knownInfo = $report->known_by ? "Diketahui oleh: {$report->known_by}" : "Belum diketahui";
         $knownQrImage = QrCode::format('png')->size(150)->generate($knownInfo);
         $knownQrBase64 = 'data:image/png;base64,' . base64_encode($knownQrImage);
- 
-        // Generate QR untuk approved_by
-        $approvedInfo = $report->approved_by
-            ? "Diperiksa oleh: {$report->approved_by}"
-            : "Belum diperiksa";
+
+        $approvedInfo = $report->approved_by ? "Diperiksa oleh: {$report->approved_by}" : "Belum diperiksa";
         $approvedQrImage = QrCode::format('png')->size(150)->generate($approvedInfo);
         $approvedQrBase64 = 'data:image/png;base64,' . base64_encode($approvedQrImage);
 
         $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_changeover_cleanings');
- 
+
+        // Deteksi laporan lama: form baru tidak pernah menulis kolom 'result' lagi,
+        // jadi kalau ada detail dengan 'result' terisi, ini pasti data sebelum perombakan.
+        $isLegacy = $report->details->whereNotNull('result')->isNotEmpty();
+
+        if ($isLegacy) {
+            $pdf = Pdf::loadView('report_changeover_cleanings.pdf_legacy', [
+                'report'     => $report,
+                'createdQr'  => $createdQrBase64,
+                'knownQr'    => $knownQrBase64,
+                'approvedQr' => $approvedQrBase64,
+                'formNumber' => $formNumber,
+            ])->setPaper('F4', 'landscape');
+
+            return $pdf->stream('laporan_kebersihan_pergantian_produk_' . $report->date->format('Ymd') . '.pdf');
+        }
+
+        // ===== Laporan baru: susun per-batch (1 batch = 1 halaman) =====
+        $pages = [];
+
+        foreach ($report->details as $d) {
+            $batchKey = $d->product_uuid . '|' . $d->time;
+
+            if (!isset($pages[$batchKey])) {
+                $pages[$batchKey] = [
+                    'product'         => $d->product,
+                    'time'            => $d->time ? \Illuminate\Support\Str::substr($d->time, 0, 5) : '-',
+                    'production_code' => $d->production_code ?? '-',
+                    'sisa_bahan'      => [],
+                    'mesin_peralatan' => [],
+                    'kondisi_ruangan' => [],
+                ];
+            }
+
+            $pages[$batchKey][$d->group][] = [
+                'name'              => $d->item_name ?? ($d->item->name ?? '-'),
+                'score'             => $d->score,
+                'notes'             => $d->notes,
+                'corrective_action' => $d->corrective_action,
+            ];
+        }
+
+        // Ambil nama section unik per batch, dari item-item grup Mesin & Peralatan
+        foreach ($pages as $key => $data) {
+            $sectionNames = $report->details
+                ->where('group', 'mesin_peralatan')
+                ->filter(fn ($d) => ($d->product_uuid . '|' . $d->time) === $key)
+                ->pluck('item.section.section_name')
+                ->filter()
+                ->unique()
+                ->implode(', ');
+
+            $pages[$key]['section_names'] = $sectionNames ?: null;
+        }
+
+        $pages = array_values($pages);
+
         $pdf = Pdf::loadView('report_changeover_cleanings.pdf', [
             'report'     => $report,
+            'pages'      => $pages,
             'createdQr'  => $createdQrBase64,
             'knownQr'    => $knownQrBase64,
             'approvedQr' => $approvedQrBase64,
             'formNumber' => $formNumber,
-        ])->setPaper('F4', 'landscape');
- 
+        ])->setPaper('A4', 'portrait');
+
         return $pdf->stream('laporan_kebersihan_pergantian_produk_' . $report->date->format('Ymd') . '.pdf');
     }
 
@@ -454,21 +610,15 @@ class ReportChangeoverCleaningController extends Controller
         }
 
         $reports = ReportChangeoverCleaning::with([
-                'details.item',
-                'details.product',
-                'area'
-            ])
-            ->where('area_uuid', auth()->user()->area_uuid)
-            ->whereBetween(
-                'date',
-                [
-                    $dateFrom->toDateString(),
-                    $dateTo->toDateString()
-                ]
-            )
-            ->orderBy('date')
-            ->orderBy('shift')
-            ->get();
+            'details.item.section',
+            'details.product',
+            'area'
+        ])
+        ->where('area_uuid', auth()->user()->area_uuid)
+        ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+        ->orderBy('date')
+        ->orderBy('shift')
+        ->get();
 
         return Excel::download(
             new ChangeoverCleaningExport(

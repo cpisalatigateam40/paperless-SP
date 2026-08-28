@@ -12,8 +12,8 @@
     }
 
     @page {
-        size: F4 landscape;
-        margin: 55px 25px 25px 25px;
+        size: A4 portrait;
+        margin: 60px 25px 25px 25px;
     }
 
     body {
@@ -25,35 +25,22 @@
     table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
     }
 
-    th,
-    td {
+    th, td {
         border: 1px solid #000;
         padding: 2px 3px;
         vertical-align: middle;
     }
 
-    th {
-        font-weight: bold;
-    }
-
-    .text-start {
-        text-align: left;
-    }
-
-    .no-border {
-        border: none !important;
-    }
-
-    .mb-2 {
-        margin-bottom: 0.5rem;
-    }
+    th { font-weight: bold; }
+    .text-start { text-align: left; }
+    .no-border { border: none !important; }
 
     .header {
         position: fixed;
-        top: -45px;
+        top: -60px;
         left: 0;
         width: 100%;
         border: none;
@@ -65,36 +52,49 @@
     }
 
     h3 {
-        margin: 0 0 5px 0;
+        margin: 0 0 8px 0;
         padding: 0;
-        font-size: 11px;
+        font-size: 12px;
         text-align: center;
     }
+
+    .section-title {
+        font-weight: bold;
+        margin: 8px 0 3px 0;
+        font-size: 9.5px;
+    }
+
+    .info-table td { border: none; text-align: left; padding: 1px 3px; }
+    .info-label { width: 140px; }
+
+    .group-header td {
+        font-weight: bold;
+        background: #e6e6e6;
+        text-align: left;
+    }
+
+    .keterangan-box {
+        font-size: 8px;
+        margin-top: 6px;
+    }
+    .keterangan-box p { margin: 2px 0; }
 
     .signature-table {
         width: 100%;
         border: none;
-        margin-top: 5px;
+        margin-top: 10px;
         page-break-inside: avoid;
     }
+    .signature-table td { border: none; text-align: center; }
+    .signature-table img { width: 55px; }
 
-    .signature-table td {
-        border: none;
-        text-align: center;
-    }
-
-    .signature-table img {
-        width: 55px;
-    }
-
-    .no-page-break {
-        page-break-inside: avoid;
-    }
+    .page-break { page-break-after: always; }
+    .no-page-break { page-break-inside: avoid; }
     </style>
 </head>
 
 <body>
-    {{-- HEADER --}}
+    {{-- header --}}
     <div class="header">
         <table class="header-table">
             <tr>
@@ -122,200 +122,174 @@
                         </tr>
                     </table>
                 </td>
+                <td class="no-border" style="width: 40%; text-align: right; vertical-align: middle; font-size: 9px;">
+                    {{ $formNumber ?? '-' }}
+                </td>
             </tr>
         </table>
     </div>
 
-    <h3 style="text-align: center;">PEMERIKSAAN KEBERSIHAN SETELAH CHANGE-OVER</h3>
+    @foreach($pages as $index => $page)
 
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td class="text-start" style="border: none;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
-            </td>
-            <td class="text-start" style="border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
-            <td class="text-start" style="border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->area->name ?? '-' }} </span>
-            </td>
-        </tr>
-    </table>
+        <h3 style="margin-top: 2rem;">PEMERIKSAAN KEBERSIHAN SETELAH CHANGE-OVER</h3>
 
-    @php
-        // Susun matriks: kolom = batch (produk+jam unik), baris = item
-        $batches = [];
-        $matrix  = [];
-
-        foreach ($report->details as $d) {
-            $batchKey = $d->product_uuid . '|' . $d->time;
-
-            if (!isset($batches[$batchKey])) {
-                $batches[$batchKey] = [
-                    'product_name' => $d->product->product_name ?? '-',
-                    'time'         => $d->time ? \Illuminate\Support\Str::substr($d->time, 0, 5) : '-',
-                ];
-            }
-
-            $matrix[$d->item_uuid][$batchKey] = $d;
-        }
-
-        $reportItems = $report->details
-            ->groupBy('item_uuid')
-            ->map(fn ($group) => $group->first()->item)
-            ->filter()
-            ->sortBy([['category', 'asc'], ['name', 'asc']])
-            ->values();
-
-        $colCount = 2 + (count($batches) * 2) + 2;
-    @endphp
-
-    <table>
-        <thead>
+        {{-- A. INFORMASI PRODUK --}}
+        <div class="section-title">A. Informasi Produk</div>
+        <table class="info-table">
             <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Item</th>
-                @foreach($batches as $batch)
-                <th colspan="2">
-                    {{ $batch['product_name'] }}<br>
-                    Jam: {{ $batch['time'] }}
-                </th>
-                @endforeach
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
+                <td class="info-label">Hari, Tanggal</td>
+                <td>: {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d F Y') }}</td>
             </tr>
             <tr>
-                @foreach($batches as $batch)
-                <th>X/✓</th>
-                <th>Penjelasan</th>
-                @endforeach
+                <td class="info-label">Shift</td>
+                <td>: {{ $report->shift }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @php
-                $groupedItems = $reportItems->groupBy('category');
-                $no = 1;
-            @endphp
+            <tr>
+                <td class="info-label">Produk yang akan diproduksi</td>
+                <td>: {{ $page['product']->product_name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Kode produksi</td>
+                <td>: {{ $page['production_code'] ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Area</td>
+                <td>: {{ $report->area->name ?? '-' }}{{ $page['section_names'] ? ' (' . $page['section_names'] . ')' : '' }}</td>
+            </tr>
+        </table>
 
-            @forelse($groupedItems as $category => $itemsByCategory)
+        {{-- B. HASIL VERIFIKASI --}}
+        <div class="section-title">B. Hasil Verifikasi Kebersihan Setelah Change-Over</div>
+        <table class="info-table" style="margin-bottom: 3px;">
+            <tr>
+                <td class="info-label">Waktu Pemeriksaan</td>
+                <td>: {{ $page['time'] }} WIB</td>
+            </tr>
+        </table>
 
+        @php
+            $criteriaPairs = [[1, 2], [3, 4], [5, 6], [7, 8]];
+
+            $groups = [
+                'sisa_bahan'      => ['label' => 'SISA BAHAN DAN KEMASAN', 'rows' => $page['sisa_bahan']],
+                'mesin_peralatan' => ['label' => 'MESIN DAN PERALATAN (menyesuaikan dengan area yang dipilih)', 'rows' => $page['mesin_peralatan']],
+                'kondisi_ruangan' => ['label' => 'KONDISI RUANGAN', 'rows' => $page['kondisi_ruangan']],
+            ];
+        @endphp
+
+        <table>
+            <thead>
                 <tr>
-                    <td colspan="{{ $colCount }}"
-                        style="font-weight:bold; background:#d9d9d9; text-align:left;">
-                        {{ $category }}
-                    </td>
+                    <th rowspan="2" style="width:22px;">No</th>
+                    <th rowspan="2" style="width:150px;">Item</th>
+                    <th colspan="4">Penilaian Kondisi Bahan/Peralatan</th>
+                    <th rowspan="2" style="width:100px;">Tindakan koreksi</th>
+                    <th rowspan="2" style="width:100px;">Keterangan</th>
                 </tr>
-
-                @foreach($itemsByCategory as $item)
-                @php
-                    $rowKeterangan = [];
-                    $rowTindakan = [];
-                @endphp
-
                 <tr>
-                    <td>{{ $no++ }}</td>
-
-                    <td class="text-start">
-                        &nbsp;&nbsp;&nbsp;{{ $item->name }}
-                    </td>
-
-                    @foreach($batches as $batchKey => $batch)
-
-                        @php
-                            $cell = $matrix[$item->uuid][$batchKey] ?? null;
-                        @endphp
-
-                        <td>
-                            {{ $cell->result ?? '-' }}
-                        </td>
-
-                        <td class="text-start">
-                            {{ $cell->explanation ?? '-' }}
-                        </td>
-
-                        @php
-                            if ($cell) {
-                                if ($cell->notes) {
-                                    $rowKeterangan[] = $cell->notes;
-                                }
-
-                                if ($cell->corrective_action) {
-                                    $rowTindakan[] = $cell->corrective_action;
-                                }
-                            }
-                        @endphp
-
+                    @foreach($criteriaPairs as $pair)
+                    <th style="width:32px;">{{ $pair[0] }}/{{ $pair[1] }}</th>
                     @endforeach
-
-                    <td class="text-start">
-                        {{ $rowKeterangan ? implode('; ', $rowKeterangan) : '-' }}
-                    </td>
-
-                    <td class="text-start">
-                        {{ $rowTindakan ? implode('; ', $rowTindakan) : '-' }}
-                    </td>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach($groups as $group)
+                    <tr class="group-header">
+                        <td colspan="8">{{ $group['label'] }}</td>
+                    </tr>
 
+                    @forelse($group['rows'] as $i => $row)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td class="text-start">{{ $row['name'] }}</td>
+
+                        @foreach($criteriaPairs as $pair)
+                        <td>
+                            @if($row['score'] && in_array($row['score'], $pair))
+                                v
+                            @endif
+                        </td>
+                        @endforeach
+
+                        <td class="text-start">{{ $row['corrective_action'] ?? '-' }}</td>
+                        <td class="text-start">{{ $row['notes'] ?? '-' }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8">-</td>
+                    </tr>
+                    @endforelse
                 @endforeach
+            </tbody>
+        </table>
 
-            @empty
+        <div class="keterangan-box no-page-break">
+            <strong>Keterangan Pengecekan :</strong>
+            <p>- Pengecekan Kondisi Sisa Bahan/Kemasan: nomor 1-8</p>
+            <p>- Pengecekan Kondisi Mesin dan Peralatan: nomor 3-8</p>
+            <p>- Pengecekan Kondisi Ruangan: nomor 3-8</p>
 
+            <strong>Kriteria Penilaian :</strong>
+            <table style="border: none; margin-top: 3px;">
                 <tr>
-                    <td colspan="{{ $colCount }}">
-                        Belum ada detail
-                    </td>
+                    <td class="no-border text-start" style="width:50%;">1. Bersih, tidak ada sisa bahan/kemasan sebelumnya;</td>
+                    <td class="no-border text-start">2. Ada sisa bahan/kemasan sebelumnya</td>
                 </tr>
+                <tr>
+                    <td class="no-border text-start">3. Bebas dari kontaminasi dan bahan sebelumnya;</td>
+                    <td class="no-border text-start">4. Ada kontaminasi atau sisa bahan sebelumnya</td>
+                </tr>
+                <tr>
+                    <td class="no-border text-start">5. Bebas dari potensi kontaminasi allergen;</td>
+                    <td class="no-border text-start">6. Ada potensi kontaminasi allergen</td>
+                </tr>
+                <tr>
+                    <td class="no-border text-start">7. Bersih, tidak ada kontaminan/kotoran, tidak tercium bau menyimpang;</td>
+                    <td class="no-border text-start">8. Tidak bersih, ada kontaminan/kotoran</td>
+                </tr>
+            </table>
+        </div>
 
-            @endforelse
-        </tbody>
-    </table>
+        <table class="signature-table no-page-break" style="margin-top: 3rem;">
+            <tr>
+                <td style="width:33%;">
+                    Diperiksa oleh,<br><br>
+                    <img src="{{ $createdQr }}" width="55"><br><br>
+                    <strong>{{ $report->created_by }}</strong><br>
+                    <small>QC Inspector</small>
+                </td>
 
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
-        </tr>
-    </table>
+                <td style="width:33%;">
+                    Diketahui oleh,<br><br>
+                    @if($report->known_by)
+                        <img src="{{ $knownQr }}" width="55"><br><br>
+                        <strong>{{ $report->known_by }}</strong>
+                    @else
+                        <br><br><br><br><br>
+                        <strong>-</strong>
+                    @endif
+                    <br><small>Foreman/SPV Produksi</small>
+                </td>
 
-    <table class="signature-table no-page-break">
-        <tr>
-            <td style="width:33%;">
-                Dilaporkan Oleh:<br><br>
+                <td style="width:33%;">
+                    Disetujui oleh,<br><br>
+                    @if($report->approved_by)
+                        <img src="{{ $approvedQr }}" width="55"><br><br>
+                        <strong>{{ $report->approved_by }}</strong>
+                    @else
+                        <br><br><br><br><br>
+                        <strong>-</strong>
+                    @endif
+                    <br><small>Supervisor QC</small>
+                </td>
+            </tr>
+        </table>
 
-                <img src="{{ $createdQr }}" width="55"><br><br>
+        @if(!$loop->last)
+            <div class="page-break"></div>
+        @endif
 
-                <strong>{{ $report->created_by }}</strong>
-            </td>
-
-            <td style="width:33%;">
-                Diketahui Oleh:<br><br>
-
-                @if($report->known_by)
-                <img src="{{ $knownQr }}" width="55"><br><br>
-
-                <strong>{{ $report->known_by }}</strong>
-                @else
-                <br><br><br><br><br>
-                <strong>-</strong>
-                @endif
-            </td>
-
-            <td style="width:33%;">
-                Disetujui Oleh:<br><br>
-
-                @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="55"><br><br>
-
-                <strong>{{ $report->approved_by }}</strong>
-                @else
-                <br><br><br><br><br>
-                <strong>-</strong>
-                @endif
-            </td>
-        </tr>
-    </table>
+    @endforeach
 </body>
 
 </html>

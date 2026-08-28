@@ -114,9 +114,9 @@
                     <i class="fas fa-file-excel me-1"></i> Export Excel
                 </button>
 
-                @can('create report')
+                <!-- @can('create report')
                 <a href="{{ route('gmp-employee.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
-                @endcan
+                @endcan -->
             </div>
         </div>
 

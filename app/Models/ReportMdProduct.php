@@ -21,6 +21,8 @@ class ReportMdProduct extends Model implements Auditable
         'known_by',
         'approved_by',
         'approved_at',
+        'metal_detector_uuid',
+        'notes'
     ];
 
     protected $auditEvents = [
@@ -45,5 +47,10 @@ class ReportMdProduct extends Model implements Auditable
     protected static function booted()
     {
         static::addGlobalScope(new UserAreaScope);
+    }
+
+    public function metalDetector()
+    {
+        return $this->belongsTo(MetalDetector::class, 'metal_detector_uuid', 'uuid');
     }
 }

@@ -212,7 +212,7 @@
                 <td class="text-center">{{ $i + 1 }}</td>
                 <td class="text-left">
                     @if ($rm->material_type === 'premix')
-                        {{ $rm->premix?->name ?? '-' }} (Premix)
+                        {{ $rm->premix?->name ?? '-' }}
                     @else
                         {{ $rm->rawMaterial?->material_name ?? '-' }}
                     @endif

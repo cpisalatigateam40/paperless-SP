@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\Section;
 use App\Models\MasterChecklistItem;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class MasterChecklistItemController extends Controller
      */
 public function index(Request $request)
 {
-    $query = MasterChecklistItem::with('area');
+    $query = MasterChecklistItem::with(['area', 'section']);
 
     // Filter Area (khusus admin & superadmin)
     if (
@@ -23,13 +24,17 @@ public function index(Request $request)
         $query->where('area_uuid', $request->area);
     }
 
+    // Filter Section
+    if ($request->filled('section')) {
+        $query->where('section_uuid', $request->section);
+    }
+
     // Search
     $query->when($request->search, function ($q, $search) {
         $q->where('name', 'like', "%{$search}%");
     });
 
     $items = $query
-        ->orderBy('category')
         ->orderBy('name')
         ->paginate(20)
         ->withQueryString();
@@ -38,7 +43,11 @@ public function index(Request $request)
         ? Area::orderBy('name')->get()
         : collect();
 
-    return view('master_checklist_items.index', compact('items', 'areas'));
+    $sections = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+        ? Section::orderBy('section_name')->get()
+        : Section::orderBy('section_name')->get(); // UserAreaScope otomatis batasi non-admin
+
+    return view('master_checklist_items.index', compact('items', 'areas', 'sections'));
 }
 
     /**
@@ -47,8 +56,9 @@ public function index(Request $request)
     public function create()
     {
         $areas = Area::all();
+        $sections = Section::all();
 
-        return view('master_checklist_items.form', compact('areas'));
+        return view('master_checklist_items.form', compact('areas', 'sections'));
     }
 
     /**
@@ -57,20 +67,25 @@ public function index(Request $request)
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'area_uuid' => 'nullable|uuid|exists:areas,uuid',
-            'category'  => 'nullable|string|max:255',
-            'name'      => 'required|string|max:255',
+            'area_uuid'    => 'nullable|uuid|exists:areas,uuid',
+            'section_uuid' => 'nullable|uuid|exists:sections,uuid',
+            'names'        => 'required|array|min:1',
+            'names.*'      => 'required|string|max:255',
         ]);
 
-        MasterChecklistItem::create([
-            'area_uuid' => $validated['area_uuid'] ?? null,
-            'category'  => $validated['category'] ?? null,
-            'name'      => $validated['name'],
-        ]);
+        foreach ($validated['names'] as $name) {
+            MasterChecklistItem::create([
+                'area_uuid'    => $validated['area_uuid'] ?? null,
+                'section_uuid' => $validated['section_uuid'] ?? null,
+                'name'         => $name,
+            ]);
+        }
+
+        $count = count($validated['names']);
 
         return redirect()
             ->route('master_checklist_items.index')
-            ->with('success', 'Item checklist berhasil ditambahkan.');
+            ->with('success', $count > 1 ? "{$count} item checklist berhasil ditambahkan." : 'Item checklist berhasil ditambahkan.');
     }
 
     /**
@@ -92,8 +107,9 @@ public function index(Request $request)
     {
         $item = MasterChecklistItem::where('uuid', $uuid)->firstOrFail();
         $areas = Area::all();
+        $sections = Section::all();
 
-        return view('master_checklist_items.form', compact('item', 'areas'));
+        return view('master_checklist_items.form', compact('item', 'areas', 'sections'));
     }
 
     /**
@@ -104,15 +120,18 @@ public function index(Request $request)
         $item = MasterChecklistItem::where('uuid', $uuid)->firstOrFail();
 
         $validated = $request->validate([
-            'area_uuid' => 'nullable|uuid|exists:areas,uuid',
-            'category'  => 'nullable|string|max:255',
-            'name'      => 'required|string|max:255',
+            'area_uuid'    => 'nullable|uuid|exists:areas,uuid',
+            'section_uuid' => 'nullable|uuid|exists:sections,uuid',
+            'names'        => 'required|array|min:1',
+            'names.0'      => 'required|string|max:255',
+            'is_active'    => 'nullable|boolean',
         ]);
 
         $item->update([
-            'area_uuid' => $validated['area_uuid'] ?? null,
-            'category'  => $validated['category'] ?? null,
-            'name'      => $validated['name'],
+            'area_uuid'    => $validated['area_uuid'] ?? null,
+            'section_uuid' => $validated['section_uuid'] ?? null,
+            'name'         => $validated['names'][0],
+            'is_active'    => $request->boolean('is_active'),
         ]);
 
         return redirect()
@@ -126,10 +145,39 @@ public function index(Request $request)
     public function destroy(string $uuid)
     {
         $item = MasterChecklistItem::where('uuid', $uuid)->firstOrFail();
+
+        if ($item->detailChangeoverCleanings()->exists()) {
+            return redirect()
+                ->route('master_checklist_items.index')
+                ->with('error', 'Item ini tidak bisa dihapus karena sudah dipakai di laporan Changeover Cleaning.');
+        }
+
         $item->delete();
 
         return redirect()
             ->route('master_checklist_items.index')
             ->with('success', 'Item checklist berhasil dihapus.');
+    }
+
+    public function bySection(string $sectionUuid)
+    {
+        $items = MasterChecklistItem::where('section_uuid', $sectionUuid)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['uuid', 'name']);
+
+        return response()->json($items);
+    }
+
+    public function toggleActive(string $uuid)
+    {
+        $item = MasterChecklistItem::where('uuid', $uuid)->firstOrFail();
+        $item->update(['is_active' => !$item->is_active]);
+
+        return redirect()
+            ->route('master_checklist_items.index', request()->query())
+            ->with('success', $item->is_active
+                ? 'Item checklist diaktifkan kembali.'
+                : 'Item checklist dinonaktifkan.');
     }
 }

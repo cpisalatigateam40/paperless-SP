@@ -5,12 +5,11 @@
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
             <h5>Verifikasi Kinerja Metal Detector Produk</h5>
-            
+
             <div class="d-flex gap-2" style="gap: .4rem;">
 
                 @hasanyrole('admin|superadmin')
                 <form method="GET" action="{{ route('report_md_products.index') }}">
-                    <input type="hidden" name="section" value="{{ request('section') }}">
                     <input type="hidden" name="search" value="{{ request('search') }}">
 
                     <select name="area"
@@ -34,10 +33,6 @@
                     class="d-flex align-items-center"
                     style="gap: .4rem;">
 
-                    {{-- pertahankan filter section --}}
-                    <input type="hidden" name="process_type" value="{{ $activeTab }}">
-                    <input type="hidden" name="section" value="{{ request('section') }}">
-
                     <input
                         type="text"
                         name="search"
@@ -52,7 +47,7 @@
                     </button>
 
                     {{-- 🔄 RESET --}}
-                    @if(request('search') || request('section'))
+                    @if(request('search'))
                         <a href="{{ route('report_md_products.index') }}"
                         class="btn btn-danger"
                         title="Reset Filter">
@@ -111,26 +106,8 @@
                 />
                 @endrole
 
-                <!-- @can('import report')
-                <form action="{{ route('report_md_products.import') }}" method="POST"
-                    enctype="multipart/form-data" class="d-flex align-items-center gap-1">
-                    @csrf
-                    <label class="btn btn-sm btn-outline-secondary mb-0" style="cursor:pointer;">
-                        <i class="bi bi-upload"></i> Import
-                        <input type="file" name="file" required hidden
-                            onchange="this.closest('form').querySelector('#btnImport').click()">
-                    </label>
-                    <button id="btnImport" type="submit" class="d-none"></button>
-                </form>
-
-                {{-- DOWNLOAD TEMPLATE --}}
-                <a href="{{ route('report_md_products.template') }}" class="btn btn-sm btn-outline-success">
-                    <i class="bi bi-download"></i> Template
-                </a>
-                @endcan -->
-
-                <x-export-excel-modal 
-                    :route="route('report_md_products.export')" 
+                <x-export-excel-modal
+                    :route="route('report_md_products.export')"
                     title="Verifikasi Metal Detector Produk" />
 
                 @can('create report')
@@ -165,23 +142,6 @@
                 :with-date-filter="true"
             />
 
-            <ul class="nav nav-tabs mb-3">
-                <li class="nav-item">
-                    <a class="nav-link {{ is_null($activeTab) ? 'active' : '' }}"
-                    href="{{ route('report_md_products.index', array_merge(request()->except(['process_type', 'page']), [])) }}">
-                        Semua
-                    </a>
-                </li>
-                @foreach ($processTypes as $type)
-                <li class="nav-item">
-                    <a class="nav-link {{ $activeTab === $type ? 'active' : '' }}"
-                    href="{{ route('report_md_products.index', array_merge(request()->except(['process_type', 'page']), ['process_type' => $type])) }}">
-                        {{ $type }}
-                    </a>
-                </li>
-                @endforeach
-            </ul>
-
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
@@ -191,6 +151,7 @@
                             <th>Shift</th>
                             <th>Waktu</th>
                             <th>Area</th>
+                            <th>Metal Detector</th>
                             <th>Kode Produksi</th>
                             <th>Ketidaksesuaian</th>
                             <th>Dibuat Oleh</th>
@@ -205,6 +166,14 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name }}</td>
+                            <td>
+                                @if ($report->metalDetector)
+                                    {{ $report->metalDetector->merk }} - {{ $report->metalDetector->type_model }}
+                                    <br><small class="text-muted">{{ $report->metalDetector->no_series }}</small>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             @php
                                 $codes = $report->details->pluck('production_code')->filter()->implode(', ');
                                 $collapseId = 'codes-' . $report->uuid;
@@ -237,23 +206,18 @@
                                 @endif
                             </td>
                             <td>{{ $report->created_by }}</td>
-                            <td class="d-flex" style="gap: .2rem;">
+                            <td>
+                                <div class="d-flex" style="gap: .2rem;">
+                                
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                <!-- @can('edit report')
-                                <a href="{{ route('report_md_products.edit', $report->uuid) }}"
-                                    class="btn btn-sm btn-warning" title="Edit Laporan">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @endcan -->
-
                                 @php
                                     $user = auth()->user();
-                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(8));
                                 @endphp
 
                                 @if($canEdit)
@@ -333,27 +297,28 @@
                                     class="btn btn-sm btn-outline-secondary" target="_blank" title="Cetak PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                </div>
                             </td>
 
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="9">
+                            <td colspan="10">
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered mb-0 text-center">
                                         <thead>
                                             <tr>
-                                                <th rowspan="2" class="align-middle">Waktu Pengecekan</th>
+                                                <th rowspan="2" class="align-middle">No</th>
+                                                <th rowspan="2" class="align-middle">Waktu Verifikasi</th>
                                                 <th rowspan="2" class="align-middle">Nama Produk</th>
-                                                <th rowspan="2" class="align-middle">Gramase</th>
+                                                <th rowspan="2" class="align-middle">Gramase (gr)</th>
                                                 <th rowspan="2" class="align-middle">Kode Produksi</th>
-                                                <th rowspan="2" class="align-middle">Best Before</th>
-                                                <th rowspan="2" class="align-middle">No. Program</th>
-                                                <th rowspan="2" class="align-middle">Tipe</th>
                                                 <th colspan="3" class="align-middle">Fe 1.5 mm</th>
-                                                <th colspan="3" class="align-middle">Non Fe 2 mm</th>
+                                                <th colspan="3" class="align-middle">Non-Fe 2.0 mm</th>
                                                 <th colspan="3" class="align-middle">SUS 2.5 mm</th>
-                                                <th rowspan="2" class="align-middle">Tindakan Perbaikan</th>
-                                                <th rowspan="2" class="align-middle">Verifikasi setelah perbaikan</th>
+                                                <th rowspan="2" class="align-middle">Status (OK/NG)</th>
+                                                <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
+                                                <th rowspan="2" class="align-middle">Keterangan</th>
                                             </tr>
                                             <tr>
                                                 <th>D</th>
@@ -369,44 +334,44 @@
                                         </thead>
                                         <tbody>
                                             @forelse ($report->details as $detail)
-                                            <tr>
-                                                <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
-                                                <td>{{ $detail->product->product_name ?? '-' }}</td>
-                                                <td>{{ !empty($detail->gramase) 
-                                                        ? $detail->gramase 
-                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
-                                                <td>{{ $detail->production_code }}</td>
-                                                <td>{{ $detail->best_before }}</td>
-                                                <td>{{ $detail->program_number }}</td>
-                                                <td>{{ $detail->process_type }}</td>
-
-                                                {{-- Verifikasi Specimen --}}
-                                                @php
+                                            @php
                                                 $specimens = ['fe_1_5mm', 'non_fe_2mm', 'sus_2_5mm'];
                                                 $positions = ['d', 't', 'b'];
-                                                @endphp
+                                                $rowOk = !$detail->positions->contains('status', false);
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
+                                                <td>{{ $detail->product->product_name ?? '-' }}</td>
+                                                <td>{{ $detail->gramase ?? '-' }}</td>
+                                                <td>{{ $detail->production_code ?? '-' }}</td>
                                                 @foreach ($specimens as $specimen)
-                                                @foreach ($positions as $pos)
-                                                @php
-                                                $posDetail = $detail->positions
-                                                ->where('specimen', $specimen)
-                                                ->where('position', $pos)
-                                                ->first();
-                                                @endphp
-                                                <td>{{ $posDetail ? ($posDetail->status ? '✓' : '×') : '-' }}</td>
+                                                    @foreach ($positions as $pos)
+                                                    @php
+                                                        $posDetail = $detail->positions
+                                                            ->where('specimen', $specimen)
+                                                            ->where('position', $pos)
+                                                            ->first();
+                                                    @endphp
+                                                    <td>{{ $posDetail ? ($posDetail->status ? '✓' : '×') : '-' }}</td>
+                                                    @endforeach
                                                 @endforeach
-                                                @endforeach
-
-                                                <td>{{ $detail->corrective_action }}</td>
-                                                <td>{{ $detail->verification ? 'OK' : 'Tidak OK' }}</td>
+                                                <td>
+                                                    <span class="badge {{ $detail->status ? 'bg-success' : 'bg-danger' }}">
+                                                        {{ $detail->status ? 'OK' : 'NG' }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ $detail->corrective_action ?: '-' }}</td>
+                                                <td>{{ $detail->verification ?: '-' }}</td>
                                             </tr>
                                             @empty
                                             <tr>
-                                                <td colspan="21" class="text-center">Tidak ada detail</td>
+                                                <td colspan="17" class="text-center">Tidak ada detail</td>
                                             </tr>
                                             @endforelse
                                         </tbody>
                                     </table>
+                                    <p class="mt-2">Catatan: {{ $report->notes ?: '-' }}</p>
                                     @can('create report')
                                     <div class="mt-2 d-flex justify-content-end">
                                         <a href="{{ route('report_md_products.add-detail', $report->uuid) }}"
@@ -418,13 +383,15 @@
                                 </div>
                             </td>
                         </tr>
+                        
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center">Belum ada report</td>
+                            <td colspan="10" class="text-center">Belum ada report</td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
+                
 
                 <div class="mt-3">
                     {{ $reports->links('pagination::bootstrap-5') }}

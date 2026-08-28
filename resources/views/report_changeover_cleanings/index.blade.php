@@ -149,17 +149,35 @@
                             <th class="">Tanggal</th>
                             <th class="">Shift</th>
                             <th class="">Area</th>
+                            <th class="">Produk</th>
+                            <th class="">Section</th>
                             <th class="">Dibuat Oleh</th>
                             <th class="">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($reports as $i => $report)
+                        @php
+                            $productNames = $report->details
+                                ->pluck('product.product_name')
+                                ->filter()
+                                ->unique()
+                                ->implode(', ');
+
+                            $sectionNames = $report->details
+                                ->where('group', 'mesin_peralatan')
+                                ->pluck('item.section.section_name')
+                                ->filter()
+                                ->unique()
+                                ->implode(', ');
+                        @endphp
                         <tr>
                             <td class="">{{ $i + $reports->firstItem() }}</td>
                             <td class="">{{ $report->date ? $report->date->format('d-m-Y') : '-' }}</td>
                             <td class="">{{ $report->shift ?? '-' }}</td>
                             <td class="">{{ $report->area->name ?? '-' }}</td>
+                            <td class="">{{ $productNames ?: '-' }}</td>
+                            <td class="">{{ $sectionNames ?: '-' }}</td>
                             <td class="">{{ $report->created_by ?? '-' }}</td>
                             <td class=" ">
                                 {{-- Toggle Detail --}}
@@ -168,12 +186,17 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                @can('edit report')
-                                <a href="{{ route('report_changeover_cleanings.edit', $report->uuid) }}"
-                                    class="btn btn-sm btn-warning" title="Edit Laporan">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @endcan
+                                @php
+                                    $user = auth()->user();
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(8));
+                                @endphp
+
+                                @if($canEdit)
+                                    <a href="{{ route('report_changeover_cleanings.edit', $report->uuid) }}"
+                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endif
 
                                 @can('delete report')
                                 <form action="{{ route('report_changeover_cleanings.destroy', $report->uuid) }}" method="POST"
@@ -205,8 +228,9 @@
 
                                     @else
 
-                                    <span class="badge bg-success">
-                                        {{ $report->known_by }}
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $report->known_by }}
                                     </span>
 
                                     @endif
@@ -232,8 +256,9 @@
 
                                     @else
 
-                                    <span class="badge bg-success">
-                                        {{ $report->approved_by }}
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $report->approved_by }}
                                     </span>
 
                                     @endif
@@ -250,130 +275,104 @@
                         <tr id="detail-{{ $report->id }}" class="d-none">
                             <td colspan="8">
                                 @php
-                                    // Susun matriks: kolom = batch (produk+jam unik), baris = item
-                                    $batches = [];
-                                    $matrix  = [];
+                                    $batchesData = [];
 
                                     foreach ($report->details as $d) {
                                         $batchKey = $d->product_uuid . '|' . $d->time;
 
-                                        if (!isset($batches[$batchKey])) {
-                                            $batches[$batchKey] = [
-                                                'product_name' => $d->product->product_name ?? '-',
-                                                'time'         => $d->time ? \Illuminate\Support\Str::substr($d->time, 0, 5) : '-',
+                                        if (!isset($batchesData[$batchKey])) {
+                                            $batchesData[$batchKey] = [
+                                                'product_name'     => $d->product->product_name ?? '-',
+                                                'time'             => $d->time ? \Illuminate\Support\Str::substr($d->time, 0, 5) : '-',
+                                                'production_code'  => $d->production_code ?? '-',
+                                                'sisa_bahan'       => [],
+                                                'mesin_peralatan'  => [],
+                                                'kondisi_ruangan'  => [],
                                             ];
                                         }
 
-                                        $matrix[$d->item_uuid][$batchKey] = $d;
+                                        $batchesData[$batchKey][$d->group][] = [
+                                            'name'              => $d->item_name ?? ($d->item->name ?? '-'),
+                                            'score'             => $d->score,
+                                            'notes'             => $d->notes,
+                                            'corrective_action' => $d->corrective_action,
+                                        ];
                                     }
 
-                                    // Daftar item unik yang muncul di laporan ini
-                                    $reportItems = $report->details
-                                        ->groupBy('item_uuid')
-                                        ->map(fn ($group) => $group->first()->item)
-                                        ->filter()
-                                        ->sortBy([['category', 'asc'], ['name', 'asc']])
-                                        ->values();
+                                    // Ambil nama section unik dari item-item di grup Mesin & Peralatan, per batch
+                                    foreach ($batchesData as $key => $data) {
+                                        $sectionNames = $report->details
+                                            ->where('group', 'mesin_peralatan')
+                                            ->filter(fn ($d) => ($d->product_uuid . '|' . $d->time) === $key)
+                                            ->pluck('item.section.section_name')
+                                            ->filter()
+                                            ->unique()
+                                            ->implode(', ');
 
-                                    $colCount = 2 + (count($batches) * 2) + 2;
+                                        $batchesData[$key]['section_names'] = $sectionNames ?: '-';
+                                    }
+
+                                    $groupLabels = [
+                                        'sisa_bahan'      => 'Sisa Bahan dan Kemasan',
+                                        'mesin_peralatan' => 'Mesin dan Peralatan',
+                                        'kondisi_ruangan' => 'Kondisi Ruangan',
+                                    ];
                                 @endphp
 
-                                <table class="table table-sm table-bordered mb-0 ">
-                                    <thead>
-                                        <tr>
-                                            <th rowspan="2" class="">No</th>
-                                            <th rowspan="2" class="">Item</th>
-                                            @foreach($batches as $batch)
-                                            <th colspan="2" class="">
-                                                {{ $batch['product_name'] }}<br>
-                                                <small>Jam: {{ $batch['time'] }}</small>
-                                            </th>
-                                            @endforeach
-                                            <th rowspan="2" class="">Keterangan</th>
-                                            <th rowspan="2" class="">Tindakan Koreksi</th>
-                                        </tr>
-                                        <tr>
-                                            @foreach($batches as $batch)
-                                            <th class="">Hasil</th>
-                                            <th class="">Penjelasan</th>
-                                            @endforeach
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php
-                                            $groupedItems = $reportItems->groupBy('category');
-                                            $no = 1;
-                                        @endphp
-
-                                        @forelse($groupedItems as $category => $itemsByCategory)
-
-                                            <tr class="table-secondary">
-                                                <td colspan="{{ $colCount }}" class="fw-bold text-start">
-                                                    {{ $category }}
-                                                </td>
-                                            </tr>
-
-                                            @foreach($itemsByCategory as $item)
-                                            @php
-                                                $rowKeterangan = [];
-                                                $rowTindakan = [];
-                                            @endphp
-
+                                @forelse($batchesData as $batch)
+                                    <div class="border rounded p-2 mb-3">
+                                        <table class="table table-sm table-borderless mb-2" style="width: auto;">
                                             <tr>
-                                                <td class="">{{ $no++ }}</td>
-
-                                                <td class=" text-start">
-                                                    <span class="ms-3">
-                                                        {{ $item->name }}
-                                                    </span>
-                                                </td>
-
-                                                @foreach($batches as $batchKey => $batch)
-                                                    @php
-                                                        $cell = $matrix[$item->uuid][$batchKey] ?? null;
-                                                    @endphp
-
-                                                    <td class="">
-                                                        {{ $cell->result ?? '-' }}
-                                                    </td>
-
-                                                    <td class="">
-                                                        {{ $cell->explanation ?? '-' }}
-                                                    </td>
-
-                                                    @php
-                                                        if ($cell) {
-                                                            if ($cell->notes) {
-                                                                $rowKeterangan[] = $cell->notes;
-                                                            }
-
-                                                            if ($cell->corrective_action) {
-                                                                $rowTindakan[] = $cell->corrective_action;
-                                                            }
-                                                        }
-                                                    @endphp
-                                                @endforeach
-
-                                                <td class=" text-start">
-                                                    {{ $rowKeterangan ? implode('; ', $rowKeterangan) : '-' }}
-                                                </td>
-
-                                                <td class=" text-start">
-                                                    {{ $rowTindakan ? implode('; ', $rowTindakan) : '-' }}
-                                                </td>
+                                                <td class="fw-bold" style="width:140px;">Produk</td>
+                                                <td>: {{ $batch['product_name'] }}</td>
                                             </tr>
-
-                                            @endforeach
-
-                                        @empty
                                             <tr>
-                                                <td colspan="{{ $colCount }}" class="">
-                                                    Belum ada detail
-                                                </td>
+                                                <td class="fw-bold">Kode Produksi</td>
+                                                <td>: {{ $batch['production_code'] }}</td>
                                             </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                            <tr>
+                                                <td class="fw-bold">Jam</td>
+                                                <td>: {{ $batch['time'] }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold">Section</td>
+                                                <td>: {{ $batch['section_names'] }}</td>
+                                            </tr>
+                                        </table>
+
+                                        @foreach($groupLabels as $groupKey => $groupLabel)
+                                            <h6 class="fw-bold mt-2">{{ $groupLabel }}</h6>
+                                            <table class="table table-sm table-bordered mb-2">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:40px;">No</th>
+                                                        <th style="width:360px;">Item</th>
+                                                        <th style="width:80px;">Kriteria</th>
+                                                        <th style="width:460px;">Tindakan Koreksi</th>
+                                                        <th style="width:460px;">Keterangan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse($batch[$groupKey] as $i => $row)
+                                                    <tr>
+                                                        <td>{{ $i + 1 }}</td>
+                                                        <td class="text-start">{{ $row['name'] }}</td>
+                                                        <td>{{ $row['score'] ?? '-' }}</td>
+                                                        <td class="text-start">{{ $row['corrective_action'] ?? '-' }}</td>
+                                                        <td class="text-start">{{ $row['notes'] ?? '-' }}</td>
+                                                    </tr>
+                                                    @empty
+                                                    <tr>
+                                                        <td colspan="5">Belum ada data {{ strtolower($groupLabel) }}</td>
+                                                    </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        @endforeach
+                                    </div>
+                                @empty
+                                    <p class="text-muted mb-0">Belum ada detail</p>
+                                @endforelse
                             </td>
                         </tr>
                         @empty

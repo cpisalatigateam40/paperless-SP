@@ -12,6 +12,11 @@ trait HasBulkPdfExport
     abstract protected function getBulkExportModelClass(): string;
     abstract protected function getBulkExportView(): string;
 
+    protected function resolveBulkExportView($report): string
+    {
+        return $this->getBulkExportView();
+    }
+
     protected function getBulkExportEagerLoad(): array
     {
         return [];
@@ -105,9 +110,9 @@ trait HasBulkPdfExport
                     $this->getBulkExportExtraData($report)
                 );
 
-                $pdfContent = PDF::loadView($this->getBulkExportView(), $viewData)
-                    ->setPaper($format, $orientation)
-                    ->output();
+                $pdfContent = PDF::loadView($this->resolveBulkExportView($report), $viewData)
+                ->setPaper($format, $orientation)
+                ->output();
 
                 $tmpFile = tempnam(sys_get_temp_dir(), 'bulk_pdf_') . '.pdf';
                 file_put_contents($tmpFile, $pdfContent);

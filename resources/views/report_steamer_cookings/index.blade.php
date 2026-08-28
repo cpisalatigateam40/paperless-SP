@@ -201,7 +201,10 @@
                                     @endif
                                 </td>
                                 <td>{{ $report->created_by ?? '-' }}</td>
-                                <td class="d-flex" style="gap: .4rem;">
+                                <td >
+                                    <div class="d-flex" style="gap: .4rem;">
+
+                                    
                                     <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                         data-bs-target="#detail-{{ $report->uuid }}" title="Lihat Detail">
                                         <i class="fas fa-eye"></i>
@@ -274,6 +277,7 @@
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
                                 </td>
+                                </div>
                             </tr>
                             <tr>
                                 <td colspan="10" class="p-0 border-0">

@@ -11,6 +11,8 @@ use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\StorageRmCleanlinessController;
 use App\Http\Controllers\ProcessAreaCleanlinessController;
 use App\Http\Controllers\GmpController;
+use App\Http\Controllers\MetalDetectorController;
+use App\Http\Controllers\ReportBoilingTankController;
 use App\Http\Controllers\FragileItemController;
 use App\Http\Controllers\ReportFragileItemController;
 use App\Http\Controllers\QcEquipmentController;
@@ -51,6 +53,7 @@ use App\Http\Controllers\ReportFreezPackagingController;
 use App\Http\Controllers\ReportCheckweigherBoxController;
 use App\Http\Controllers\ReportRetainSampleController;
 use App\Http\Controllers\ReportProductVerifController;
+use App\Http\Controllers\GmpKaryawanSanitasiController;
 use App\Http\Controllers\ReportTofuVerifController;
 use App\Http\Controllers\ReportProdLossVacumController;
 use App\Http\Controllers\ReportWeightStufferController;
@@ -81,6 +84,7 @@ use App\Http\Controllers\ReportSteamerCookingController;
 use App\Http\Controllers\FormNumberController;
 use	App\Http\Controllers\SsoLoginController;
 use App\Http\Controllers\ReportAuditPackingPrimerController;
+use App\Http\Controllers\MasterBoilingTankStandardController;
 
 
 Route::get('/', function () {
@@ -92,6 +96,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/sso/login',	[SsoLoginController::class,	'login'])->name('sso.login');
+Route::post('/sso/logout', [\App\Http\Controllers\SsoLoginController::class, 'ssoLogout']);
 
 Route::middleware(['auth'])->group(function () {
     
@@ -197,6 +202,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/import', 'import')->name('import');
         });
 
+    Route::resource('metal_detectors', MetalDetectorController::class)
+    ->parameters(['metal_detectors' => 'metal_detector:uuid']);
+
     Route::prefix('master-checklist-items')
         ->name('master_checklist_items.')
         ->controller(MasterChecklistItemController::class)
@@ -224,6 +232,19 @@ Route::middleware(['auth'])->group(function () {
             // untuk ajax tambah detail berdasarkan produk jika nanti diperlukan
             Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
         });
+
+    Route::prefix('master-boiling-tank-standard')
+    ->name('master_boiling_tank_standards.')
+    ->controller(MasterBoilingTankStandardController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::get('/by-product/{product_uuid}', 'getByProduct')->name('by_product'); // <-- static, sebelum /{uuid}
+        Route::post('/', 'store')->name('store');
+        Route::get('/{master_boiling_tank_standard}/edit', 'edit')->name('edit');
+        Route::put('/{master_boiling_tank_standard}', 'update')->name('update');
+        Route::delete('/{master_boiling_tank_standard}', 'destroy')->name('destroy');
+    });
 
     // STORAGE RM ROUTES
     Route::prefix('storage-rm-cleanliness')
@@ -302,6 +323,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('gmp-employee/bulk-approve-count', [GmpController::class, 'bulkApproveCount'])->name('gmp-employee.bulk-approve-count');
     Route::get('gmp-employee/export-pdf-bulk', [GmpController::class, 'exportPdfBulk'])
         ->name('gmp-employee.export_pdf_bulk');
+
+
+    Route::post('gmp/bulk-known', [GmpKaryawanSanitasiController::class, 'bulkKnown'])->name('gmp.bulk-known');
+    Route::post('gmp/bulk-approve', [GmpKaryawanSanitasiController::class, 'bulkApprove'])->name('gmp.bulk-approve');
+    Route::get('gmp/bulk-known-count', [GmpKaryawanSanitasiController::class, 'bulkKnownCount'])->name('gmp.bulk-known-count');
+    Route::get('gmp/bulk-approve-count', [GmpKaryawanSanitasiController::class, 'bulkApproveCount'])->name('gmp.bulk-approve-count');
+    Route::get('gmp/export-pdf-bulk', [GmpKaryawanSanitasiController::class, 'exportPdfBulk'])
+        ->name('gmp.export_pdf_bulk');
+    Route::prefix('gmp')
+    ->name('gmp.')
+    ->controller(GmpKaryawanSanitasiController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{gmpHeader}/edit', 'edit')->name('edit');
+        Route::put('/{gmpHeader}', 'update')->name('update');
+        Route::delete('/{gmpHeader}', 'destroy')->name('destroy');
+        Route::get('/{gmpHeader}/export', 'exportPdf')->name('export');
+        Route::post('/{id}/known', 'known')->name('known');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::post('/export-excel', 'exportExcel')->name('export_excel');
+    });
 
     // FRAGILE ITEM MD ROUTES
     Route::prefix('fragile-item')
@@ -791,6 +835,28 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{report_uuid}/add-detail', 'createDetail')->name('details.create');
             Route::post('/{report_uuid}/add-detail', 'storeDetail')->name('details.store');
         });
+
+    Route::get('report_boiling_tanks/export-pdf-bulk', [ReportBoilingTankController::class, 'exportPdfBulk'])
+        ->name('report_boiling_tanks.export_pdf_bulk');
+    Route::post('report_boiling_tanks/bulk-known', [ReportBoilingTankController::class, 'bulkKnown'])->name('report_boiling_tanks.bulk-known');
+    Route::post('report_boiling_tanks/bulk-approve', [ReportBoilingTankController::class, 'bulkApprove'])->name('report_boiling_tanks.bulk-approve');
+    Route::get('report_boiling_tanks/bulk-known-count', [ReportBoilingTankController::class, 'bulkKnownCount'])->name('report_boiling_tanks.bulk-known-count');
+    Route::get('report_boiling_tanks/bulk-approve-count', [ReportBoilingTankController::class, 'bulkApproveCount'])->name('report_boiling_tanks.bulk-approve-count');
+    Route::prefix('report-boiling-tank')
+    ->name('report_boiling_tanks.')
+    ->controller(ReportBoilingTankController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{report_boiling_tank}/edit', 'edit')->name('edit');
+        Route::put('/{report_boiling_tank}', 'update')->name('update');
+        Route::delete('/{report_boiling_tank}', 'destroy')->name('destroy');
+        Route::get('/{report_boiling_tank}/export-pdf', 'exportPdf')->name('export_pdf');
+        Route::post('/{id}/known', 'known')->name('known');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::post('/export-excel', 'exportExcel')->name('export');
+    });
 
     Route::prefix('report-lab-samples')
         ->name('report_lab_samples.')
@@ -1582,6 +1648,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/production-codes', [ReportRmArrivalController::class, 'productionCodes'])
     ->name('production-codes');
+
+    Route::get('/master-checklist-items/by-section/{sectionUuid}', [MasterChecklistItemController::class, 'bySection'])
+    ->name('master_checklist_items.by_section');
+
+    Route::patch('/master-checklist-items/{uuid}/toggle-active', [MasterChecklistItemController::class, 'toggleActive'])
+    ->name('master_checklist_items.toggle_active');
+
 
     Route::get('/formulas/{uuid}/edit', [FormulaController::class, 'editDetail'])
     ->name('formulas.editDetail');

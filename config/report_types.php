@@ -23,7 +23,7 @@ return [
     // Cooking
     'report_smoke_houses' => 'Verifikasi Proses Pemasakan di Smoke House',
     'report_steamer_cookings' => 'Verifikasi Proses Pemasakan di Steamer',
-    'report_baso_cookings' => 'Verifikasi Proses Pemasakan di Boiling Tank',
+    'report_boiling_tanks' => 'Verifikasi Proses Pemasakan di Boiling Tank',
     'report_sauces' => 'Verifikasi Proses Pemasakan di Steam Kettle',
 
     // Packing
@@ -43,7 +43,7 @@ return [
     // Verifikasi Non Proses
     'storage_rm_cleanliness' => 'Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang',
     'process_area_cleanliness' => 'Verifikasi Kesesuaian Area Proses Produksi',
-    'gmp_employee' => 'Verifikasi Penerapan GMP Karyawan & Sanitasi Area',
+    'gmp' => 'Verifikasi Penerapan GMP Karyawan & Sanitasi Area',
     'report_fragile_item' => 'Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)',
     'report_re_cleanliness' => 'Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan',
     'report-alat-verifications' => 'Verifikasi Alat Ukur',

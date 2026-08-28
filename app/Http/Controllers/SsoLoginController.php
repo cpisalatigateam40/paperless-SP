@@ -53,4 +53,18 @@ class SsoLoginController extends Controller
 
         return redirect()->intended('/');
     }
+
+    public function ssoLogout(Request $request)
+    {
+    $token = $request->bearerToken();
+    $expected = config('services.employee_api.sso_secret');
+    if (! $token || ! $expected || ! hash_equals($expected, $token)) {
+    return response()->json(['message' => 'Unauthorized'], 401);
+    }
+    $request->validate(['user_uuid' => 'required|uuid']);
+    User::where('uuid', $request->user_uuid)
+    ->update(['force_logout_after' => now()]);
+    return response()->json(['status' => 'ok']);
+    }
+
 }

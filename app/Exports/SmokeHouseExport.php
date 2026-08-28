@@ -72,6 +72,12 @@ class SmokeHouseExport implements WithEvents, WithTitle
                         ->setHorizontal('center')->setWrapText(true);
                 }
 
+                $joinClean = function ($collection, string $key): string {
+                    return $collection->pluck($key)
+                        ->filter(fn ($v) => $v !== null && $v !== '')
+                        ->implode(', ');
+                };
+
                 $row = 5;
                 $no  = 1;
 
@@ -81,15 +87,15 @@ class SmokeHouseExport implements WithEvents, WithTitle
                         $cookingSteps = $detail->steps->where('process_name', '!=', self::SHOWERING_PROCESS);
                         $showeringSteps = $detail->steps->where('process_name', '==', self::SHOWERING_PROCESS);
 
-                        $processList  = $cookingSteps->pluck('process_name')->implode(', ');
-                        $settingTemp  = $cookingSteps->pluck('setting_temp')->implode(', ');
-                        $actualTemp   = $cookingSteps->pluck('actual_temp')->implode(', ');
-                        $settingTime  = $cookingSteps->pluck('setting_time')->implode(', ');
-                        $actualTime   = $cookingSteps->pluck('actual_time')->implode(', ');
-                        $settingRh    = $cookingSteps->pluck('setting_rh')->implode(', ');
-                        $actualRh     = $cookingSteps->pluck('actual_rh')->implode(', ');
-                        $settingCt    = $cookingSteps->pluck('setting_ct')->implode(', ');
-                        $actualCt     = $cookingSteps->pluck('actual_ct')->implode(', ');
+                        $processList  = $joinClean($cookingSteps, 'process_name');
+                        $settingTemp  = $joinClean($cookingSteps, 'setting_temp');
+                        $actualTemp   = $joinClean($cookingSteps, 'actual_temp');
+                        $settingTime  = $joinClean($cookingSteps, 'setting_time');
+                        $actualTime   = $joinClean($cookingSteps, 'actual_time');
+                        $settingRh    = $joinClean($cookingSteps, 'setting_rh');
+                        $actualRh     = $joinClean($cookingSteps, 'actual_rh');
+                        $settingCt    = $joinClean($cookingSteps, 'setting_ct');
+                        $actualCt     = $joinClean($cookingSteps, 'actual_ct');
 
                         $waktuProses = (optional($detail->start_process)->format('H:i') ?? '-')
                             . ' - ' . (optional($detail->end_process)->format('H:i') ?? '-');
