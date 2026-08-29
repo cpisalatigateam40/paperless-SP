@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use App\Scopes\UserAreaScope;
 
 class GmpHeader extends Model implements AuditableContract
 {
@@ -30,6 +31,13 @@ class GmpHeader extends Model implements AuditableContract
         'date' => 'date',
         'approved_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new UserAreaScope);
+    }
 
     public function getRouteKeyName()
     {
