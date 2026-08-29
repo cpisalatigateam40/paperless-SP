@@ -171,7 +171,7 @@ class ReportMdProductController extends Controller
             ->groupBy('product_name')
             ->get();
 
-        $metalDetectors = MetalDetector::where('is_active', true)->get();
+        $metalDetectors = MetalDetector::get();
 
         return view('report_md_products.create', compact('products', 'metalDetectors'));
     }
