@@ -50,30 +50,22 @@ class ApiController extends Controller
             ];
 
 
-            $existingUser = User::where('uuid', $user['uuid'])
-            ->orWhere('email', $user['email'] )
-            ->orWhere('username', $user['username'] )
-            ->first();
+            $existingUser = User::updateOrCreate(
+                ['uuid' => $user['uuid']],
+                $userData
+            );
 
-
-            if ($existingUser) {
-                
-                $existingUser->update($userData);
-                if (!empty($user['project_role']['role'])) {
-                    $existingUser->assignRole($user['project_role']['role']);
-                }
-            } else {
-                $newUser = User::create(array_merge(['uuid' => $user['uuid']], $userData));
-                if (!empty($user['project_role']['role'])) {
-                    $newUser->assignRole($user['project_role']['role']);
-                }
+            if (!empty($user['project_role']['role'])) {
+                $existingUser->wasRecentlyCreated
+                    ? $existingUser->assignRole($user['project_role']['role'])
+                    : $existingUser->syncRoles($user['project_role']['role']);
             }
 
-
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'User synced successfully: ' . $user['uuid']
             ]);
+            
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => 'error',
