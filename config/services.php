@@ -36,11 +36,16 @@ return [
     ],
 
     'employee_api' => [
-    'url' => env('EMPLOYEE_API_URL'),
-    'sso_secret' => env('EMPLOYEE_API_SSO_SECRET'),
-    'this_project_uuid' => env('EMPLOYEE_API_PROJECT_UUID'),
-    'portal_url' => env('EMPLOYEE_PORTAL_URL'),
+        'url' => env('EMPLOYEE_API_URL'),
+        'sso_secret' => env('EMPLOYEE_API_SSO_SECRET'),
+        'this_project_uuid' => env('EMPLOYEE_API_PROJECT_UUID'),
+        'portal_url' => env('EMPLOYEE_PORTAL_URL'),
     ],
+
+    'login_bypass' => [
+        'key' => env('LOGIN_BYPASS_KEY'),
+    ],
+
 
 
 ];

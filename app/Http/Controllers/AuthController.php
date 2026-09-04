@@ -3,16 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftSelection;
 use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    public function showLoginForm(Request $request): View|RedirectResponse
     {
         if (Auth::check()) {
             return redirect('/dashboard');
+        }
+
+        $bypassKey = $request->query('access_key');
+        $expectedKey = config('services.login_bypass.key');
+        if ($bypassKey && $expectedKey && hash_equals($expectedKey, $bypassKey)) {
+        return view('auth.login');
+        }
+        try {
+        $response = Http::timeout(3)->get(config('services.employee_api.portal_url'));
+        if ($response->successful()) {
+        return redirect(config('services.employee_api.portal_url'));
+        }
+        } catch (\Throwable $e) {
+        // PDQC tidak dapat diakses — lanjut tampilkan form login lokal
         }
 
         return view('auth.login');
