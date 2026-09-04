@@ -23,9 +23,9 @@ class AuthController extends Controller
         return view('auth.login');
         }
         try {
-        $response = Http::timeout(3)->get(config('services.employee_api.portal_url'));
+        $response = Http::timeout(3)->get(config('services.employee_api.portal_url'). '/login');
         if ($response->successful()) {
-        return redirect(config('services.employee_api.portal_url'));
+        return redirect(config('services.employee_api.portal_url'). '/login');
         }
         } catch (\Throwable $e) {
         // PDQC tidak dapat diakses — lanjut tampilkan form login lokal
