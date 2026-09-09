@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\ReportBoilingTank;
 use App\Models\DetailBoilingTank;
 use App\Models\BoilingTankCheck;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
