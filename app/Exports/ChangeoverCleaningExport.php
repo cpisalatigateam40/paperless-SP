@@ -231,6 +231,8 @@ class ChangeoverCleaningExport implements WithEvents, WithTitle
             'kondisi_ruangan' => 'Kondisi Ruangan',
         ];
 
+        $criteriaPairs = [[1, 2], [3, 4], [5, 6], [7, 8]];
+
         $pages = [];
 
         foreach ($report->details as $d) {
@@ -257,8 +259,9 @@ class ChangeoverCleaningExport implements WithEvents, WithTitle
 
         $row = $currentRow;
 
-        // Kolom tetap: A=No, B=Item, C=Kriteria, D=Tindakan Koreksi, E=Keterangan
-        $lastCol = 'E';
+        // Kolom: A=No, B=Item, C-F=kriteria (1/2,3/4,5/6,7/8), G=Tindakan Koreksi, H=Keterangan
+        $criteriaCols = ['C', 'D', 'E', 'F'];
+        $lastCol = 'H';
 
         foreach ($pages as $page) {
 
@@ -266,8 +269,8 @@ class ChangeoverCleaningExport implements WithEvents, WithTitle
             $sheet->setCellValue("A{$row}", 'Produk');
             $sheet->setCellValue("B{$row}", $page['product_name']);
             $sheet->setCellValue("C{$row}", 'Kode Produksi');
-            $sheet->setCellValue("D{$row}", $page['production_code']);
-            $sheet->setCellValue("E{$row}", 'Jam : ' . $page['time']);
+            $sheet->setCellValue("E{$row}", $page['production_code']);
+            $sheet->setCellValue("G{$row}", 'Jam : ' . $page['time']);
             $sheet->getStyle("A{$row}:{$lastCol}{$row}")->getFont()->setBold(true);
 
             $row += 2;
@@ -282,9 +285,11 @@ class ChangeoverCleaningExport implements WithEvents, WithTitle
                 $headerRow = $row;
                 $sheet->setCellValue("A{$headerRow}", 'No');
                 $sheet->setCellValue("B{$headerRow}", 'Item');
-                $sheet->setCellValue("C{$headerRow}", 'Kriteria');
-                $sheet->setCellValue("D{$headerRow}", 'Tindakan Koreksi');
-                $sheet->setCellValue("E{$headerRow}", 'Keterangan');
+                foreach ($criteriaPairs as $idx => $pair) {
+                    $sheet->setCellValue("{$criteriaCols[$idx]}{$headerRow}", $pair[0] . '/' . $pair[1]);
+                }
+                $sheet->setCellValue("G{$headerRow}", 'Tindakan Koreksi');
+                $sheet->setCellValue("H{$headerRow}", 'Keterangan');
                 $sheet->getStyle("A{$headerRow}:{$lastCol}{$headerRow}")->getFont()->setBold(true);
                 $sheet->getStyle("A{$headerRow}:{$lastCol}{$headerRow}")->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -299,11 +304,18 @@ class ChangeoverCleaningExport implements WithEvents, WithTitle
                     $row++;
                 } else {
                     foreach ($rows as $i => $itemRow) {
+                        $rowScores = array_map('strval', (array) ($itemRow['score'] ?? []));
+
                         $sheet->setCellValue("A{$row}", $i + 1);
                         $sheet->setCellValue("B{$row}", $itemRow['name']);
-                        $sheet->setCellValue("C{$row}", $itemRow['score'] ?? '-');
-                        $sheet->setCellValue("D{$row}", $itemRow['corrective_action'] ?? '-');
-                        $sheet->setCellValue("E{$row}", $itemRow['notes'] ?? '-');
+
+                        foreach ($criteriaPairs as $idx => $pair) {
+                            $matched = collect($pair)->first(fn($num) => in_array((string) $num, $rowScores));
+                            $sheet->setCellValue("{$criteriaCols[$idx]}{$row}", $matched ?? '');
+                        }
+
+                        $sheet->setCellValue("G{$row}", $itemRow['corrective_action'] ?? '-');
+                        $sheet->setCellValue("H{$row}", $itemRow['notes'] ?? '-');
                         $row++;
                     }
                 }

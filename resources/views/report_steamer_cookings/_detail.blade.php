@@ -49,6 +49,7 @@
                             <th rowspan="2" class="align-middle">End Process</th>
                             <th rowspan="2" class="align-middle">Setup Time</th>
                             <th rowspan="2" class="align-middle">Suhu Ruang (°C)</th>
+                            <th rowspan="2" class="align-middle">Standard CT (°C)</th>
                             <th colspan="{{ max(1, $batch->details->max(fn($d) => $d->coreTemps->count()) ?: 1) }}">Actual Core Temp (°C)</th>
                             <th rowspan="2" class="align-middle">Bentuk</th>
                             <th rowspan="2" class="align-middle">Warna</th>
@@ -71,6 +72,15 @@
                                 <td>{{ $detail->end_process ?? '-' }}</td>
                                 <td>{{ $detail->setup_time ?? '-' }}</td>
                                 <td>{{ $detail->room_temp ?? '-' }}</td>
+                                <td>
+                                    @if ($report->standard)
+                                        {{ $report->standard->core_temp_min ?? '-' }}
+                                        -
+                                        {{ $report->standard->core_temp_max ?? '-' }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 @for ($i = 0; $i < $maxTemp; $i++)
                                     <td>{{ $detail->coreTemps[$i]->temp_value ?? '-' }}</td>
                                 @endfor

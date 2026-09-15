@@ -309,7 +309,7 @@
                                         <tr>
                                             <th rowspan="2">Durasi Proses</th>
                                             <th colspan="5">Bahan Baku</th>
-                                            <th colspan="6">Parameter Pemasakan</th>
+                                            <th colspan="8">Parameter Pemasakan</th>
                                             <th colspan="4">Produk Organoleptik</th>
                                             <th rowspan="2">Status Produk</th>
                                             <th rowspan="2">Tindakan Perbaikan</th>
@@ -325,6 +325,8 @@
                                             
                                             <th>Mixing Paddle On</th>
                                             <th>Mixing Paddle Off</th>
+                                            <th>Brix (%)</th>
+                                            <th>Salinity (%)</th>
                                             <th>Pressure (Bar)</th>
                                             <th>Target Temp (°C)</th>
                                             <th>Actual Temp (°C)</th>
@@ -365,6 +367,8 @@
 
                                             <td>{{ $d->mixing_paddle_on ? '✔' : '-' }}</td>
                                             <td>{{ $d->mixing_paddle_off ? '✔' : '-' }}</td>
+                                            <td>{{ $d->brix }}</td>
+                                            <td>{{ $d->salinity }}</td>
                                             <td>{{ $d->pressure }}</td>
                                             <td>{{ $d->target_temperature }}</td>
                                             <td>{{ $d->actual_temperature }}</td>

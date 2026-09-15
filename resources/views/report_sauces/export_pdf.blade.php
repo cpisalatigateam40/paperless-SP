@@ -249,6 +249,16 @@
             <td>{{ $mainDetail && $mainDetail->mixing_paddle_on ? 'On' : ($mainDetail && $mainDetail->mixing_paddle_off ? 'Off' : '-') }}</td>
         </tr>
         <tr>
+            <td>Brix (%)</td>
+            <td>:</td>
+            <td>{{ $mainDetail->brix ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Salinity (%)</td>
+            <td>:</td>
+            <td>{{ $mainDetail->salinity ?? '-' }}</td>
+        </tr>
+        <tr>
             <td>Pressure (bar)</td>
             <td>:</td>
             <td>{{ $mainDetail->pressure ?? '-' }}</td>

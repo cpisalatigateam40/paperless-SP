@@ -74,6 +74,13 @@
                             <input type="date" name="details[{{ $i }}][best_before]" class="form-control best-before"
                                 value="{{ $detail->best_before }}">
                         </div>
+                        <div class="mb-3">
+                            <label>No Program</label>
+                            <input type="text"
+                                name="details[{{ $i }}][program_number]"
+                                class="form-control program-number"
+                                value="{{ $detail->program_number }}">
+                        </div>
                     </div>
 
                     <h6 class="mt-4">Hasil Pemeriksaan Verifikasi Specimen</h6>

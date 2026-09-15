@@ -32,6 +32,8 @@ class DetailSauce extends Model implements Auditable
         'appearance',
         'product_status',
         'corrective_action',
+        'brix',
+        'salinity'
     ];
 
     protected $auditEvents = [

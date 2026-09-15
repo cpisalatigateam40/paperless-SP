@@ -117,12 +117,17 @@
                         <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control avg-weight" placeholder="terisi otomatis" readonly>
                     </div>
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="details[0][weight_status]" class="form-control">
-                            <option value="">-- Pilih Status --</option>
-                            <option value="OK">OK</option>
-                            <option value="NOT OK">NOT OK</option>
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][weight_status]" value="OK"
+                                class="form-check-input" id="weight_status_ok_0" checked>
+                            <label class="form-check-label" for="weight_status_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][weight_status]" value="NOT OK"
+                                class="form-check-input" id="weight_status_x_0">
+                            <label class="form-check-label" for="weight_status_x_0">NOT OK</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
@@ -162,12 +167,17 @@
                         <input type="number" step="0.01" name="details[0][avg_long]" class="form-control avg-long" placeholder="terisi otomatis" readonly>
                     </div>
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="details[0][long_status]" class="form-control">
-                            <option value="">-- Pilih Status --</option>
-                            <option value="OK">OK</option>
-                            <option value="NOT OK">NOT OK</option>
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][long_status]" value="OK"
+                                class="form-check-input" id="long_status_ok_0" checked>
+                            <label class="form-check-label" for="long_status_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][long_status]" value="NOT OK"
+                                class="form-check-input" id="long_status_x_0">
+                            <label class="form-check-label" for="long_status_x_0">NOT OK</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
@@ -207,12 +217,17 @@
                         <input type="number" step="0.01" name="details[0][avg_fla]" class="form-control avg-fla" placeholder="terisi otomatis" readonly>
                     </div>
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="details[0][fla_status]" class="form-control">
-                            <option value="">-- Pilih Status --</option>
-                            <option value="OK">OK</option>
-                            <option value="NOT OK">NOT OK</option>
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][fla_status]" value="OK"
+                                class="form-check-input" id="fla_status_ok_0" checked>
+                            <label class="form-check-label" for="fla_status_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][fla_status]" value="NOT OK"
+                                class="form-check-input" id="fla_status_x_0">
+                            <label class="form-check-label" for="fla_status_x_0">NOT OK</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>

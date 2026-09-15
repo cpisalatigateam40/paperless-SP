@@ -161,7 +161,7 @@
             <th colspan="3">Panjang Produk Per Pcs</th>
             <th colspan="3">Berat Produk Per Pcs</th>
             <th colspan="3">Berat Produk Per Pack (gr)</th>
-            <th rowspan="2">Verifikasi MD</th>
+            <!-- <th rowspan="2">Verifikasi MD</th> -->
             <th rowspan="2">Keterangan</th>
         </tr>
         <tr>
@@ -346,9 +346,9 @@
             <td rowspan="5">{{ $checklist?->avg_weight ?? '-' }}</td>
             @endif
 
-            @if($i == 1)
+            <!-- @if($i == 1)
             <td rowspan="5">{{ $checklist?->verif_md ?? '-' }}</td>
-            @endif
+            @endif -->
             @if($i == 1)
             <td rowspan="5">{{ $checklist?->notes ?? '-' }}</td>
             @endif
@@ -357,7 +357,7 @@
             @endforeach
 
             <tr>
-                <td colspan="26" class="text-end" style="border: none;">{{ $formNumber ?? '-' }}</td>
+                <td colspan="23" class="text-end" style="border: none;">{{ $formNumber ?? '-' }}</td>
             </tr>
 
     </table>

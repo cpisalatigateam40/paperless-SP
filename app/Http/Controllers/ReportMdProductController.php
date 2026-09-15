@@ -207,6 +207,7 @@ class ReportMdProductController extends Controller
                     'gramase' => $detail['gramase'] ?? null,
                     'best_before' => $detail['best_before'] ?? null,
                     'time' => $detail['time'] ?? null,
+                    'program_number' => $detail['program_number'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
                     'verification' => $detail['verification'] ?? null,
                     'status' => isset($detail['status']) ? (bool) $detail['status'] : true,

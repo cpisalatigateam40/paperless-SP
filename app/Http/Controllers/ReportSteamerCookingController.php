@@ -151,6 +151,12 @@ class ReportSteamerCookingController extends Controller
 
         $reports = $query->paginate(10);
 
+        foreach ($reports as $report) {
+            $report->standard = SteamerStandard::where('product_uuid', $report->product_uuid)
+                ->where('area_uuid', $report->area_uuid)
+                ->first();
+        }
+
         if (auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
 
             $areas = Area::orderBy('name')->get();
@@ -160,17 +166,28 @@ class ReportSteamerCookingController extends Controller
             $areas = collect();
         }
 
+        
         return view('report_steamer_cookings.index', compact('reports', 'areas'));
     }
 
     public function create()
     {
+        $areaUuid = auth()->user()->area_uuid;
+
+        $productUuids = SteamerStandard::where('area_uuid', $areaUuid)
+            ->pluck('product_uuid')
+            ->unique();
+
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->whereIn('uuid', $productUuids)
             ->groupBy('product_name')
             ->orderBy('product_name')
             ->get();
 
-        return view('report_steamer_cookings.create', compact('products'));
+        return view(
+            'report_steamer_cookings.create',
+            compact('products')
+        );
     }
 
     public function getStandard($product_uuid)
@@ -300,13 +317,28 @@ class ReportSteamerCookingController extends Controller
     public function edit(ReportSteamerCooking $report_steamer_cooking)
     {
         $report_steamer_cooking->load('batches.details.coreTemps');
+
+        $productUuids = SteamerStandard::where(
+                'area_uuid',
+                $report_steamer_cooking->area_uuid
+            )
+            ->pluck('product_uuid')
+            ->unique()
+            ->toArray();
+
+        // Pastikan produk yang sedang dipakai report tetap masuk dropdown
+        if ($report_steamer_cooking->product_uuid) {
+            $productUuids[] = $report_steamer_cooking->product_uuid;
+        }
+
         $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
+            ->whereIn('uuid', array_unique($productUuids))
             ->groupBy('product_name')
             ->orderBy('product_name')
             ->get();
 
         return view('report_steamer_cookings.edit', [
-            'report' => $report_steamer_cooking,
+            'report'   => $report_steamer_cooking,
             'products' => $products,
         ]);
     }
@@ -420,48 +452,48 @@ class ReportSteamerCookingController extends Controller
             ->with('success', 'Report berhasil dihapus.');
     }
 
-public function exportPdf($uuid)
-{
-    $report = ReportSteamerCooking::with([
-        'creator',
-        'product',
-        'area',
-        'batches.details.coreTemps',
-    ])->where('uuid', $uuid)->firstOrFail();
+    public function exportPdf($uuid)
+    {
+        $report = ReportSteamerCooking::with([
+            'creator',
+            'product',
+            'area',
+            'batches.details.coreTemps',
+        ])->where('uuid', $uuid)->firstOrFail();
 
-    $standard = SteamerStandard::where('product_uuid', $report->product_uuid)
-        ->where('area_uuid', $report->area_uuid)
-        ->first();
+        $standard = SteamerStandard::where('product_uuid', $report->product_uuid)
+            ->where('area_uuid', $report->area_uuid)
+            ->first();
 
-    // QR Diperiksa (created_by)
-    $createdInfo = "Diperiksa oleh: " . ($report->creator->name ?? $report->created_by ?? '-') . "\nTanggal: " . $report->created_at->format('Y-m-d H:i');
-    $createdQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($createdInfo));
+        // QR Diperiksa (created_by)
+        $createdInfo = "Diperiksa oleh: " . ($report->creator->name ?? $report->created_by ?? '-') . "\nTanggal: " . $report->created_at->format('Y-m-d H:i');
+        $createdQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($createdInfo));
 
-    // QR Diketahui (known_by)
-    $knownInfo = $report->known_by
-        ? "Diketahui oleh: {$report->known_by}"
-        : "Belum diketahui";
-    $knownQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($knownInfo));
+        // QR Diketahui (known_by)
+        $knownInfo = $report->known_by
+            ? "Diketahui oleh: {$report->known_by}"
+            : "Belum diketahui";
+        $knownQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($knownInfo));
 
-    // QR Disetujui (approved_by)
-    $approvedInfo = $report->approved_by
-        ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . optional($report->approved_at)->format('Y-m-d H:i')
-        : "Belum disetujui";
-    $approvedQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($approvedInfo));
+        // QR Disetujui (approved_by)
+        $approvedInfo = $report->approved_by
+            ? "Disetujui oleh: {$report->approved_by}\nTanggal: " . optional($report->approved_at)->format('Y-m-d H:i')
+            : "Belum disetujui";
+        $approvedQr = 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(150)->generate($approvedInfo));
 
-    $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_steamer_cookings');
+        $formNumber = \App\Models\FormNumber::get($report->area->uuid, 'report_steamer_cookings');
 
-    $pdf = Pdf::loadView('report_steamer_cookings.export_pdf', [
-        'report' => $report,
-        'standard' => $standard,
-        'createdQr' => $createdQr,
-        'knownQr' => $knownQr,
-        'approvedQr' => $approvedQr,
-        'formNumber' => $formNumber,
-    ])->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('report_steamer_cookings.export_pdf', [
+            'report' => $report,
+            'standard' => $standard,
+            'createdQr' => $createdQr,
+            'knownQr' => $knownQr,
+            'approvedQr' => $approvedQr,
+            'formNumber' => $formNumber,
+        ])->setPaper('a4', 'portrait');
 
-    return $pdf->stream('report_steamer_cooking_' . $report->uuid . '.pdf');
-}
+        return $pdf->stream('report_steamer_cooking_' . $report->uuid . '.pdf');
+    }
 
     public function known($uuid)
     {
@@ -492,40 +524,103 @@ public function exportPdf($uuid)
         return back()->with('success', 'Laporan berhasil disetujui.');
     }
 
-    public function exportExcel(Request $request)
-    {
-        $request->validate([
-            'filter_type' => 'required|in:range,month',
-            'date_from'   => 'required_if:filter_type,range|nullable|date',
-            'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
-            'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
-        ]);
+public function exportExcel(Request $request)
+{
+    $request->validate([
+        'filter_type' => 'required|in:range,month',
+        'date_from'   => 'required_if:filter_type,range|nullable|date',
+        'date_to'     => 'required_if:filter_type,range|nullable|date|after_or_equal:date_from',
+        'month'       => 'required_if:filter_type,month|nullable|date_format:Y-m',
+    ]);
 
-        if ($request->filter_type === 'month') {
-            $dateFrom    = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
-            $dateTo      = $dateFrom->copy()->endOfMonth();
-            $periodLabel = $dateFrom->translatedFormat('F Y');
-        } else {
-            $dateFrom    = Carbon::parse($request->date_from)->startOfDay();
-            $dateTo      = Carbon::parse($request->date_to)->endOfDay();
-            $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
-        }
+    if ($request->filter_type === 'month') {
 
-        $reports = ReportSteamerCooking::with([
-                'creator',
-                'product',
-                'batches.details.coreTemps',
-            ])
-            ->where('area_uuid', auth()->user()->area_uuid)
-            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
-            ->orderBy('date')
-            ->orderBy('shift')
-            ->get();
+        $dateFrom = Carbon::createFromFormat(
+            'Y-m',
+            $request->month
+        )->startOfMonth();
 
-        $filename = 'SteamerCooking_'
-            . $dateFrom->format('Ymd') . '_'
-            . $dateTo->format('Ymd') . '.xlsx';
+        $dateTo = $dateFrom->copy()->endOfMonth();
 
-        return Excel::download(new SteamerCookingExport($reports, $periodLabel), $filename);
+        $periodLabel = $dateFrom->translatedFormat('F Y');
+
+    } else {
+
+        $dateFrom = Carbon::parse(
+            $request->date_from
+        )->startOfDay();
+
+        $dateTo = Carbon::parse(
+            $request->date_to
+        )->endOfDay();
+
+        $periodLabel =
+            $dateFrom->format('d/m/Y') .
+            ' – ' .
+            $dateTo->format('d/m/Y');
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET REPORT
+    |--------------------------------------------------------------------------
+    */
+
+    $reports = ReportSteamerCooking::with([
+            'creator',
+            'product',
+            'batches.details.coreTemps',
+        ])
+        ->where('area_uuid', auth()->user()->area_uuid)
+        ->whereBetween('date', [
+            $dateFrom->toDateString(),
+            $dateTo->toDateString()
+        ])
+        ->orderBy('date')
+        ->orderBy('shift')
+        ->get();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET STANDARD CT
+    |--------------------------------------------------------------------------
+    */
+
+    foreach ($reports as $report) {
+
+        $report->standard = SteamerStandard::where(
+                'product_uuid',
+                $report->product_uuid
+            )
+            ->where(
+                'area_uuid',
+                $report->area_uuid
+            )
+            ->first();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILE NAME
+    |--------------------------------------------------------------------------
+    */
+
+    $filename = 'SteamerCooking_'
+        . $dateFrom->format('Ymd')
+        . '_'
+        . $dateTo->format('Ymd')
+        . '.xlsx';
+
+
+    return Excel::download(
+        new SteamerCookingExport(
+            $reports,
+            $periodLabel
+        ),
+        $filename
+    );
+}
 }

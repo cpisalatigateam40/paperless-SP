@@ -71,8 +71,14 @@
     </div>
     <div class="col-md-6 mb-3">
         <label>Nama Produk</label>
-        <select name="product_uuid" id="product_uuid" class="form-control select2-product" required>
+
+        <select name="product_uuid"
+                id="product_uuid"
+                class="form-control select2-product"
+                required>
+
             <option value="">-- pilih produk --</option>
+
             @foreach($products as $product)
                 <option value="{{ $product->uuid }}"
                     {{ old('product_uuid', $isEdit ? $report->product_uuid : '') == $product->uuid ? 'selected' : '' }}>
@@ -80,6 +86,11 @@
                 </option>
             @endforeach
         </select>
+
+        <small class="text-muted">
+            <i class="fas fa-info-circle"></i>
+            Produk yang ditampilkan hanya produk yang sudah diinput pada Master Data Master Steamer.
+        </small>
     </div>
     <div class="col-md-6">
         <label>Gramasi</label>

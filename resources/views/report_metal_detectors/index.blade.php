@@ -326,7 +326,7 @@
                                                 <th>Gramase</th>
                                                 <th>Kode Produksi</th>
                                                 <th>Fe 1.5 mm</th>
-                                                <th>Non Fe 1.5 mm</th>
+                                                <th>Non Fe 2 mm</th>
                                                 <th>SUS 316 2.5 mm</th>
                                                 <th>Status</th>
                                                 <th>Tindakan Koreksi</th>

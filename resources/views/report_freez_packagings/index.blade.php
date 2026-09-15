@@ -218,6 +218,13 @@
                                 </a>
                                 @endcan
 
+                                @can('create report')
+                                <a href="{{ route('report_freez_packagings.add-detail', $report->uuid) }}"
+                                    class="btn btn-sm btn-success" title="Tambah Detail">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                                @endcan
+
                                 <!-- @php
                                     $user = auth()->user();
                                     $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
@@ -452,14 +459,14 @@
                                         </tbody>
                                     </table>
 
-                                    @can('create report')
+                                    <!-- @can('create report')
                                     <div class="d-flex justify-content-end">
                                         <a href="{{ route('report_freez_packagings.add-detail', $report->uuid) }}"
                                             class="btn btn-sm btn-secondary mt-2">
                                             Tambah Detail
                                         </a>
                                     </div>
-                                    @endcan
+                                    @endcan -->
                                 </div>
                             </td>
                         </tr>

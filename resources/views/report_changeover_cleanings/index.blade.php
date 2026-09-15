@@ -342,22 +342,36 @@
 
                                         @foreach($groupLabels as $groupKey => $groupLabel)
                                             <h6 class="fw-bold mt-2">{{ $groupLabel }}</h6>
+                                            @php
+                                                // pastikan $criteriaPairs tersedia; kalau controller index() belum mengirim, fallback manual
+                                                $criteriaPairs = $criteriaPairs ?? [[1,2],[3,4],[5,6],[7,8]];
+                                            @endphp
                                             <table class="table table-sm table-bordered mb-2">
                                                 <thead>
                                                     <tr>
                                                         <th style="width:40px;">No</th>
-                                                        <th style="width:360px;">Item</th>
-                                                        <th style="width:80px;">Kriteria</th>
-                                                        <th style="width:460px;">Tindakan Koreksi</th>
-                                                        <th style="width:460px;">Keterangan</th>
+                                                        <th style="width:280px;">Item</th>
+                                                        @foreach($criteriaPairs as $pair)
+                                                            <th class="text-center" style="width:60px;">{{ implode('/', $pair) }}</th>
+                                                        @endforeach
+                                                        <th style="width:400px;">Tindakan Koreksi</th>
+                                                        <th style="width:400px;">Keterangan</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @forelse($batch[$groupKey] as $i => $row)
+                                                    @php
+                                                        $rowScores = array_map('strval', (array) ($row['score'] ?? []));
+                                                    @endphp
                                                     <tr>
                                                         <td>{{ $i + 1 }}</td>
                                                         <td class="text-start">{{ $row['name'] }}</td>
-                                                        <td>{{ $row['score'] ?? '-' }}</td>
+                                                        @foreach($criteriaPairs as $pair)
+                                                            @php
+                                                                $matched = collect($pair)->first(fn($num) => in_array((string) $num, $rowScores));
+                                                            @endphp
+                                                            <td class="text-center">{{ $matched ?? '' }}</td>
+                                                        @endforeach
                                                         <td class="text-start">{{ $row['corrective_action'] ?? '-' }}</td>
                                                         <td class="text-start">{{ $row['notes'] ?? '-' }}</td>
                                                     </tr>

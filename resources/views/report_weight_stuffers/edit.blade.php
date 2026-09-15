@@ -146,13 +146,19 @@
                             value="{{ $stuffer?->avg_weight }}" readonly>
                     </div>
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="details[{{ $idx }}][weight_status]" class="form-control">
-                            <option value="">-- Pilih Status --</option>
-                            @foreach(['OK', 'NOT OK'] as $s)
-                                <option value="{{ $s }}" {{ $d->weight_status === $s ? 'selected' : '' }}>{{ $s }}</option>
-                            @endforeach
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[{{ $idx }}][weight_status]" value="OK"
+                                class="form-check-input" id="weight_status_ok_{{ $idx }}"
+                                {{ $d->weight_status === 'OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="weight_status_ok_{{ $idx }}">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[{{ $idx }}][weight_status]" value="NOT OK"
+                                class="form-check-input" id="weight_status_x_{{ $idx }}"
+                                {{ $d->weight_status === 'NOT OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="weight_status_x_{{ $idx }}">NOT OK</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
@@ -204,13 +210,19 @@
                             value="{{ $stuffer?->avg_long }}" readonly>
                     </div>
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="details[{{ $idx }}][long_status]" class="form-control">
-                            <option value="">-- Pilih Status --</option>
-                            @foreach(['OK', 'NOT OK'] as $s)
-                                <option value="{{ $s }}" {{ $d->long_status === $s ? 'selected' : '' }}>{{ $s }}</option>
-                            @endforeach
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[{{ $idx }}][long_status]" value="OK"
+                                class="form-check-input" id="long_status_ok_{{ $idx }}"
+                                {{ $d->long_status === 'OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="long_status_ok_{{ $idx }}">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[{{ $idx }}][long_status]" value="NOT OK"
+                                class="form-check-input" id="long_status_x_{{ $idx }}"
+                                {{ $d->long_status === 'NOT OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="long_status_x_{{ $idx }}">NOT OK</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>
@@ -262,13 +274,19 @@
                             value="{{ $stuffer?->avg_fla }}" readonly>
                     </div>
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="details[{{ $idx }}][fla_status]" class="form-control">
-                            <option value="">-- Pilih Status --</option>
-                            @foreach(['OK', 'NOT OK'] as $s)
-                                <option value="{{ $s }}" {{ $d->fla_status === $s ? 'selected' : '' }}>{{ $s }}</option>
-                            @endforeach
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[{{ $idx }}][fla_status]" value="OK"
+                                class="form-check-input" id="fla_status_ok_{{ $idx }}"
+                                {{ $d->fla_status === 'OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="fla_status_ok_{{ $idx }}">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[{{ $idx }}][fla_status]" value="NOT OK"
+                                class="form-check-input" id="fla_status_x_{{ $idx }}"
+                                {{ $d->fla_status === 'NOT OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="fla_status_x_{{ $idx }}">NOT OK</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>

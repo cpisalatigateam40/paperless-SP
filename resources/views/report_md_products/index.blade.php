@@ -313,6 +313,7 @@
                                                 <th rowspan="2" class="align-middle">Nama Produk</th>
                                                 <th rowspan="2" class="align-middle">Gramase (gr)</th>
                                                 <th rowspan="2" class="align-middle">Kode Produksi</th>
+                                                <th rowspan="2" class="align-middle">No Program</th>
                                                 <th colspan="3" class="align-middle">Fe 1.5 mm</th>
                                                 <th colspan="3" class="align-middle">Non-Fe 2.0 mm</th>
                                                 <th colspan="3" class="align-middle">SUS 2.5 mm</th>
@@ -345,6 +346,7 @@
                                                 <td>{{ $detail->product->product_name ?? '-' }}</td>
                                                 <td>{{ $detail->gramase ?? '-' }}</td>
                                                 <td>{{ $detail->production_code ?? '-' }}</td>
+                                                <td>{{ $detail->program_number ?? '-' }}</td>
                                                 @foreach ($specimens as $specimen)
                                                     @foreach ($positions as $pos)
                                                     @php

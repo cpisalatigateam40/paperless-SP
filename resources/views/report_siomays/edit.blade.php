@@ -74,142 +74,178 @@
 
                 <h6 class="mt-4">Detail Proses</h6>
 
-                @php
-                $detail = $report->details->first();
-                @endphp
+                @foreach($report->details as $idx => $detail)
+                <div class="border rounded p-3 mb-4">
+                    <h6 class="text-muted">Detail Proses #{{ $idx + 1 }}</h6>
 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label">Pukul</label>
-                        <input type="time" name="details[0][time]" class="form-control"
-                            value="{{ old('details.0.time', $detail->time) }}">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Tahapan Proses</label>
-                        <input type="text" name="details[0][process_step]" class="form-control"
-                            value="{{ old('details.0.process_step', $detail->process_step) }}">
-                    </div>
-                </div>
-
-                {{-- RAW MATERIALS --}}
-                <div id="raw-materials-wrapper">
-                    @foreach($detail->rawMaterials as $i => $rmDetail)
-                    <div class="row mb-2 raw-material-item">
-                        <div class="col-md-4">
-                            <label class="form-label">Bahan Baku</label>
-                            <select name="details[0][raw_materials][{{ $i }}][raw_material_uuid]" class="form-control"
-                                required>
-                                <option value="">-- pilih bahan baku --</option>
-                                @foreach($rawMaterials as $rm)
-                                <option value="{{ $rm->uuid }}"
-                                    {{ $rmDetail->raw_material_uuid == $rm->uuid ? 'selected' : '' }}>
-                                    {{ $rm->material_name }}
-                                </option>
-                                @endforeach
-                            </select>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Pukul</label>
+                            <input type="time" name="details[{{ $idx }}][time]" class="form-control"
+                                value="{{ old("details.$idx.time", $detail->time) }}">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Berat (kg)</label>
-                            <input type="number" step="0.01" name="details[0][raw_materials][{{ $i }}][amount]"
-                                value="{{ old("details.0.raw_materials.$i.amount", $rmDetail->amount) }}"
-                                class="form-control" placeholder="Berat (kg)">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Sensory</label>
-                            <select name="details[0][raw_materials][{{ $i }}][sensory]" class="form-control" required>
-                                <option value="OK" {{ $rmDetail->sensory == 'OK' ? 'selected' : '' }}>OK</option>
-                                <option value="Tidak OK" {{ $rmDetail->sensory == 'Tidak OK' ? 'selected' : '' }}>Tidak
-                                    OK</option>
-                            </select>
+                        <div class="col-md-6">
+                            <label class="form-label">Tahapan Proses</label>
+                            <input type="text" name="details[{{ $idx }}][process_step]" class="form-control"
+                                value="{{ old("details.$idx.process_step", $detail->process_step) }}">
                         </div>
                     </div>
-                    @endforeach
-                </div>
 
-                <!-- <button type="button" class="btn btn-sm btn-secondary mb-3" onclick="addRawMaterial()">+ Tambah Bahan
-                    Baku</button> -->
-
-                <div class="row mb-2">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Warna</label>
-                        <select name="details[0][color]" class="form-control" required>
-                            <option value="OK" {{ $detail->color == 'OK' ? 'selected' : '' }}>OK</option>
-                            <option value="Tidak OK" {{ $detail->color == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Aroma</label>
-                        <select name="details[0][aroma]" class="form-control" required>
-                            <option value="OK" {{ $detail->aroma == 'OK' ? 'selected' : '' }}>OK</option>
-                            <option value="Tidak OK" {{ $detail->aroma == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Rasa</label>
-                        <select name="details[0][taste]" class="form-control" required>
-                            <option value="OK" {{ $detail->taste == 'OK' ? 'selected' : '' }}>OK</option>
-                            <option value="Tidak OK" {{ $detail->taste == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tekstur</label>
-                        <select name="details[0][texture]" class="form-control" required>
-                            <option value="OK" {{ $detail->texture == 'OK' ? 'selected' : '' }}>OK</option>
-                            <option value="Tidak OK" {{ $detail->texture == 'Tidak OK' ? 'selected' : '' }}>Tidak OK
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row mb-4 mt-4">
-                    <div class="col-md-6">
-                        <label class="form-label d-block">Mixing Paddle</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="on"
-                                id="mixingOn0" {{ $detail->mixing_paddle_on ? 'checked' : '' }}>
-                            <label class="form-check-label" for="mixingOn0">On</label>
+                    {{-- RAW MATERIALS --}}
+                    <div class="raw-materials-wrapper" data-detail-index="{{ $idx }}">
+                        @foreach($detail->rawMaterials as $i => $rmDetail)
+                        <div class="row mb-2 raw-material-item">
+                            <div class="col-md-4">
+                                <label class="form-label">Bahan Baku</label>
+                                <select name="details[{{ $idx }}][raw_materials][{{ $i }}][raw_material_uuid]" class="form-control" required>
+                                    <option value="">-- pilih bahan baku --</option>
+                                    @foreach($rawMaterials as $rm)
+                                    <option value="{{ $rm->uuid }}"
+                                        {{ $rmDetail->raw_material_uuid == $rm->uuid ? 'selected' : '' }}>
+                                        {{ $rm->material_name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Berat (kg)</label>
+                                <input type="number" step="0.01" name="details[{{ $idx }}][raw_materials][{{ $i }}][amount]"
+                                    value="{{ old("details.$idx.raw_materials.$i.amount", $rmDetail->amount) }}"
+                                    class="form-control" placeholder="Berat (kg)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label d-block">Sensory</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $idx }}][raw_materials][{{ $i }}][sensory]" value="OK"
+                                        class="form-check-input" id="rm_sensory_ok_{{ $idx }}_{{ $i }}" required
+                                        {{ $rmDetail->sensory == 'OK' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="rm_sensory_ok_{{ $idx }}_{{ $i }}">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $idx }}][raw_materials][{{ $i }}][sensory]" value="Tidak OK"
+                                        class="form-check-input" id="rm_sensory_x_{{ $idx }}_{{ $i }}" required
+                                        {{ $rmDetail->sensory == 'Tidak OK' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="rm_sensory_x_{{ $idx }}_{{ $i }}">Tidak OK</label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="details[0][mixing_paddle]" value="off"
-                                id="mixingOff0" {{ $detail->mixing_paddle_off ? 'checked' : '' }}>
-                            <label class="form-check-label" for="mixingOff0">Off</label>
+                        @endforeach
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label d-block">Warna</label>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][color]" value="OK"
+                                    class="form-check-input" id="color_ok_{{ $idx }}" required
+                                    {{ $detail->color == 'OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="color_ok_{{ $idx }}">OK</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][color]" value="Tidak OK"
+                                    class="form-check-input" id="color_x_{{ $idx }}" required
+                                    {{ $detail->color == 'Tidak OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="color_x_{{ $idx }}">Tidak OK</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label d-block">Aroma</label>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][aroma]" value="OK"
+                                    class="form-check-input" id="aroma_ok_{{ $idx }}" required
+                                    {{ $detail->aroma == 'OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="aroma_ok_{{ $idx }}">OK</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][aroma]" value="Tidak OK"
+                                    class="form-check-input" id="aroma_x_{{ $idx }}" required
+                                    {{ $detail->aroma == 'Tidak OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="aroma_x_{{ $idx }}">Tidak OK</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label d-block">Rasa</label>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][taste]" value="OK"
+                                    class="form-check-input" id="taste_ok_{{ $idx }}" required
+                                    {{ $detail->taste == 'OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="taste_ok_{{ $idx }}">OK</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][taste]" value="Tidak OK"
+                                    class="form-check-input" id="taste_x_{{ $idx }}" required
+                                    {{ $detail->taste == 'Tidak OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="taste_x_{{ $idx }}">Tidak OK</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label d-block">Tekstur</label>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][texture]" value="OK"
+                                    class="form-check-input" id="texture_ok_{{ $idx }}" required
+                                    {{ $detail->texture == 'OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="texture_ok_{{ $idx }}">OK</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[{{ $idx }}][texture]" value="Tidak OK"
+                                    class="form-check-input" id="texture_x_{{ $idx }}" required
+                                    {{ $detail->texture == 'Tidak OK' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="texture_x_{{ $idx }}">Tidak OK</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 mt-4">
+                        <div class="col-md-6">
+                            <label class="form-label d-block">Mixing Paddle</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="details[{{ $idx }}][mixing_paddle]" value="on"
+                                    id="mixingOn{{ $idx }}" {{ $detail->mixing_paddle_on ? 'checked' : '' }}>
+                                <label class="form-check-label" for="mixingOn{{ $idx }}">On</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="details[{{ $idx }}][mixing_paddle]" value="off"
+                                    id="mixingOff{{ $idx }}" {{ $detail->mixing_paddle_off ? 'checked' : '' }}>
+                                <label class="form-check-label" for="mixingOff{{ $idx }}">Off</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Lama Proses (menit)</label>
+                            <input type="number" step="0.01" name="details[{{ $idx }}][duration]" class="form-control"
+                                value="{{ old("details.$idx.duration", $detail->duration) }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Pressure (Bar)</label>
+                            <input type="number" step="0.01" name="details[{{ $idx }}][pressure]" class="form-control"
+                                value="{{ old("details.$idx.pressure", $detail->pressure) }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Target Temperature (&deg;C)</label>
+                            <input type="number" step="0.01" name="details[{{ $idx }}][target_temperature]" class="form-control"
+                                value="{{ old("details.$idx.target_temperature", $detail->target_temperature) }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Actual Temperature (&deg;C)</label>
+                            <input type="number" step="0.01" name="details[{{ $idx }}][actual_temperature]" class="form-control"
+                                value="{{ old("details.$idx.actual_temperature", $detail->actual_temperature) }}">
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Catatan</label>
+                            <input type="text" name="details[{{ $idx }}][notes]" class="form-control"
+                                value="{{ old("details.$idx.notes", $detail->notes) }}">
                         </div>
                     </div>
                 </div>
-
-                <div class="row mb-2">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Lama Proses (menit)</label>
-                        <input type="number" step="0.01" name="details[0][duration]" class="form-control"
-                            value="{{ old('details.0.duration', $detail->duration) }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Pressure (Bar)</label>
-                        <input type="number" step="0.01" name="details[0][pressure]" class="form-control"
-                            value="{{ old('details.0.pressure', $detail->pressure) }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Target Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][target_temperature]" class="form-control"
-                            value="{{ old('details.0.target_temperature', $detail->target_temperature) }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Actual Temperature (&deg;C)</label>
-                        <input type="number" step="0.01" name="details[0][actual_temperature]" class="form-control"
-                            value="{{ old('details.0.actual_temperature', $detail->actual_temperature) }}">
-                    </div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-md-6">
-                        <label class="form-label">Catatan</label>
-                        <input type="text" name="details[0][notes]" class="form-control"
-                            value="{{ old('details.0.notes', $detail->notes) }}">
-                    </div>
-                </div>
+                @endforeach
 
                 <div class="mt-3">
                     <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
@@ -221,7 +257,7 @@
 </div>
 
 <script>
-let rmIndex = 1;
+let rmIndex = {{ $detail->rawMaterials->count() }};
 
 function addRawMaterial() {
     let wrapper = document.getElementById('raw-materials-wrapper');
@@ -240,10 +276,17 @@ function addRawMaterial() {
                        placeholder="Berat (kg)">
             </div>
             <div class="col-md-4">
-                <select name="details[0][raw_materials][${rmIndex}][sensory]" class="form-control" required>
-                    <option value="OK">OK</option>
-                    <option value="Tidak OK">Tidak OK</option>
-                </select>
+                <label class="form-label d-block">Sensory</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[0][raw_materials][${rmIndex}][sensory]" value="OK"
+                        class="form-check-input" id="rm_sensory_ok_${rmIndex}" required checked>
+                    <label class="form-check-label" for="rm_sensory_ok_${rmIndex}">OK</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[0][raw_materials][${rmIndex}][sensory]" value="Tidak OK"
+                        class="form-check-input" id="rm_sensory_x_${rmIndex}" required>
+                    <label class="form-check-label" for="rm_sensory_x_${rmIndex}">Tidak OK</label>
+                </div>
             </div>
         </div>
         `;
