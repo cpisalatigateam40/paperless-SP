@@ -64,11 +64,16 @@
     <table class="table table-sm table-bordered mb-3">
         <thead>
             <tr>
-                <th style="min-width:180px;">Item</th>
-                <th style="min-width:110px;">Kriteria (1-8)</th>
-                <th style="min-width:150px;">Keterangan</th>
-                <th style="min-width:150px;">Tindakan Koreksi</th>
-                <th style="width:40px;"></th>
+                <th rowspan="2" class="align-middle" style="min-width:180px;">Item</th>
+                <th colspan="4" class="text-center">Kriteria Penilaian</th>
+                <th rowspan="2" class="align-middle" style="min-width:150px;">Keterangan</th>
+                <th rowspan="2" class="align-middle" style="min-width:150px;">Tindakan Koreksi</th>
+                <th rowspan="2" style="width:40px;"></th>
+            </tr>
+            <tr>
+                @foreach($criteriaPairs as $pair)
+                    <th class="text-center" style="min-width:70px;">{{ implode('/', $pair) }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody class="manual-items-body" data-group="sisa_bahan_items">
@@ -82,15 +87,16 @@
                         @endforeach
                     </select>
                 </td>
-                <td>
-                    @include('report_changeover_cleanings._score_select', [
-                        'name' => "batches[{$batchIndex}][sisa_bahan_items][{$rowIndex}][score]",
-                        'selected' => $row['score'] ?? null,
-                        'criteria' => $criteria,
-                        'criteriaPairs' => $criteriaPairs,
-                    ])
-                </td>
-                
+
+                {{-- 4 kolom kriteria langsung, TANPA dibungkus <td> --}}
+                @include('report_changeover_cleanings._score_select', [
+                    'name' => "batches[{$batchIndex}][sisa_bahan_items][{$rowIndex}][score]",
+                    'selected' => $row['score'] ?? null,
+                    'criteria' => $criteria,
+                    'criteriaPairs' => $criteriaPairs,
+                    'minCriteria' => 1,
+                ])
+
                 <td><input type="text" name="batches[{{ $batchIndex }}][sisa_bahan_items][{{ $rowIndex }}][notes]" class="form-control" value="{{ $row['notes'] ?? '' }}" placeholder="masukkan keterangan"></td>
                 <td><input type="text" name="batches[{{ $batchIndex }}][sisa_bahan_items][{{ $rowIndex }}][corrective_action]" class="form-control" value="{{ $row['corrective_action'] ?? '' }}" placeholder="masukkan tindakan koreksi"></td>
                 <td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-manual-row"><i class="fas fa-times"></i></button></td>
@@ -109,15 +115,20 @@
     <table class="table table-sm table-bordered mb-4">
         <thead>
             <tr>
-                <th style="min-width:180px;">Item</th>
-                <th style="min-width:110px;">Kriteria (3-8)</th>
-                <th style="min-width:150px;">Keterangan</th>
-                <th style="min-width:150px;">Tindakan Koreksi</th>
+                <th rowspan="2" class="align-middle" style="min-width:180px;">Item</th>
+                <th colspan="4" class="text-center">Kriteria Penilaian (3-8)</th>
+                <th rowspan="2" class="align-middle" style="min-width:150px;">Keterangan</th>
+                <th rowspan="2" class="align-middle" style="min-width:150px;">Tindakan Koreksi</th>
+            </tr>
+            <tr>
+                @foreach($criteriaPairs as $pair)
+                    <th class="text-center" style="min-width:70px;">{{ implode('/', $pair) }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody id="machine-items-body-{{ $batchIndex }}">
             @if($machineItems->isEmpty())
-                <tr><td colspan="5" class="text-center text-muted">
+                <tr><td colspan="7" class="text-center text-muted">
                     {{ !empty($batch['section_uuid']) ? 'Tidak ada item untuk Section ini.' : 'Pilih Section terlebih dahulu.' }}
                 </td></tr>
             @else
@@ -125,14 +136,15 @@
                 @php $d = $machineData[$item->uuid] ?? []; @endphp
                 <tr>
                     <td>{{ $item->name }}</td>
-                    <td>
-                        @include('report_changeover_cleanings._score_select', [
-                            'name' => "batches[{$batchIndex}][machine_items][{$item->uuid}][score]",
-                            'selected' => $d['score'] ?? null,
-                            'criteria' => $criteria,
-                            'criteriaPairs' => $criteriaPairs,
-                        ])
-                    </td>
+
+                    @include('report_changeover_cleanings._score_select', [
+                        'name' => "batches[{$batchIndex}][machine_items][{$item->uuid}][score]",
+                        'selected' => $d['score'] ?? null,
+                        'criteria' => $criteria,
+                        'criteriaPairs' => $criteriaPairs,
+                        'minCriteria' => 3,
+                    ])
+
                     <td><input type="text" name="batches[{{ $batchIndex }}][machine_items][{{ $item->uuid }}][notes]" class="form-control" value="{{ $d['notes'] ?? '' }}" placeholder="masukkan keterangan"></td>
                     <td><input type="text" name="batches[{{ $batchIndex }}][machine_items][{{ $item->uuid }}][corrective_action]" class="form-control" value="{{ $d['corrective_action'] ?? '' }}" placeholder="masukkan tindakan koreksi"></td>
                 </tr>
@@ -148,11 +160,16 @@
     <table class="table table-sm table-bordered mb-0">
         <thead>
             <tr>
-                <th style="min-width:180px;">Item</th>
-                <th style="min-width:110px;">Kriteria (3-8)</th>
-                <th style="min-width:150px;">Keterangan</th>
-                <th style="min-width:150px;">Tindakan Koreksi</th>
-                <th style="width:40px;"></th>
+                <th rowspan="2" class="align-middle" style="min-width:180px;">Item</th>
+                <th colspan="4" class="text-center">Kriteria Penilaian (3-8)</th>
+                <th rowspan="2" class="align-middle" style="min-width:150px;">Keterangan</th>
+                <th rowspan="2" class="align-middle" style="min-width:150px;">Tindakan Koreksi</th>
+                <th rowspan="2" style="width:40px;"></th>
+            </tr>
+            <tr>
+                @foreach($criteriaPairs as $pair)
+                    <th class="text-center" style="min-width:70px;">{{ implode('/', $pair) }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody class="manual-items-body" data-group="kondisi_ruangan_items">
@@ -166,14 +183,15 @@
                         @endforeach
                     </select>
                 </td>
-                <td>
-                    @include('report_changeover_cleanings._score_select', [
-                        'name' => "batches[{$batchIndex}][kondisi_ruangan_items][{$rowIndex}][score]",
-                        'selected' => $row['score'] ?? null,
-                        'criteria' => $criteria,
-                        'criteriaPairs' => $criteriaPairs,
-                    ])
-                </td>
+
+                @include('report_changeover_cleanings._score_select', [
+                    'name' => "batches[{$batchIndex}][kondisi_ruangan_items][{$rowIndex}][score]",
+                    'selected' => $row['score'] ?? null,
+                    'criteria' => $criteria,
+                    'criteriaPairs' => $criteriaPairs,
+                    'minCriteria' => 3,
+                ])
+
                 <td><input type="text" name="batches[{{ $batchIndex }}][kondisi_ruangan_items][{{ $rowIndex }}][notes]" class="form-control" value="{{ $row['notes'] ?? '' }}" placeholder="masukkan keterangan"></td>
                 <td><input type="text" name="batches[{{ $batchIndex }}][kondisi_ruangan_items][{{ $rowIndex }}][corrective_action]" class="form-control" value="{{ $row['corrective_action'] ?? '' }}" placeholder="masukkan tindakan koreksi"></td>
                 <td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-manual-row"><i class="fas fa-times"></i></button></td>

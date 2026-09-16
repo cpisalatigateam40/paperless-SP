@@ -242,50 +242,67 @@
                 <h5 class="mt-4 font-weight-bold">Sensorik</h5>
                 <div class="row mb-3">
                     <div class="col-md-3">
-                        <label>Homogenitas</label>
-                        <select name="homogeneous" class="form-control">
-                            <option value="">-- Pilih --</option>
-                            <option value="OK"
-                                {{ old('homogeneous', $detail->sensoric->homogeneous)=='OK' ? 'selected' : '' }}>OK
-                            </option>
-                            <option value="Tidak OK"
-                                {{ old('homogeneous', $detail->sensoric->homogeneous)=='Tidak OK' ? 'selected' : '' }}>
-                                Tidak OK</option>
-                        </select>
+                        <label class="form-label d-block">Homogenitas</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="homogeneous" value="OK"
+                                class="form-check-input" id="homogeneous_ok"
+                                {{ old('homogeneous', $detail->sensoric->homogeneous) == 'OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="homogeneous_ok">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="homogeneous" value="Tidak OK"
+                                class="form-check-input" id="homogeneous_tidak_ok"
+                                {{ old('homogeneous', $detail->sensoric->homogeneous) == 'Tidak OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="homogeneous_tidak_ok">Tidak OK</label>
+                        </div>
                     </div>
+
                     <div class="col-md-3">
-                        <label>Kekentalan</label>
-                        <select name="stiffness" class="form-control">
-                            <option value="">-- Pilih --</option>
-                            <option value="OK"
-                                {{ old('stiffness', $detail->sensoric->stiffness)=='OK' ? 'selected' : '' }}>OK</option>
-                            <option value="Tidak OK"
-                                {{ old('stiffness', $detail->sensoric->stiffness)=='Tidak OK' ? 'selected' : '' }}>Tidak
-                                OK</option>
-                        </select>
+                        <label class="form-label d-block">Kekentalan</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="stiffness" value="OK"
+                                class="form-check-input" id="stiffness_ok"
+                                {{ old('stiffness', $detail->sensoric->stiffness) == 'OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="stiffness_ok">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="stiffness" value="Tidak OK"
+                                class="form-check-input" id="stiffness_tidak_ok"
+                                {{ old('stiffness', $detail->sensoric->stiffness) == 'Tidak OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="stiffness_tidak_ok">Tidak OK</label>
+                        </div>
                     </div>
+
                     <div class="col-md-3">
-                        <label>Aroma</label>
-                        <select name="aroma" class="form-control">
-                            <option value="">-- Pilih --</option>
-                            <option value="OK" {{ old('aroma', $detail->sensoric->aroma)=='OK' ? 'selected' : '' }}>OK
-                            </option>
-                            <option value="Tidak OK"
-                                {{ old('aroma', $detail->sensoric->aroma)=='Tidak OK' ? 'selected' : '' }}>Tidak OK
-                            </option>
-                        </select>
+                        <label class="form-label d-block">Aroma</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="aroma" value="OK"
+                                class="form-check-input" id="aroma_ok"
+                                {{ old('aroma', $detail->sensoric->aroma) == 'OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="aroma_ok">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="aroma" value="Tidak OK"
+                                class="form-check-input" id="aroma_tidak_ok"
+                                {{ old('aroma', $detail->sensoric->aroma) == 'Tidak OK' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="aroma_tidak_ok">Tidak OK</label>
+                        </div>
                     </div>
+
                     <div class="col-md-3">
-                        <label>Benda Asing</label>
-                        <select name="foreign_object" class="form-control">
-                            <option value="">-- Pilih --</option>
-                            <option value="Tidak Terdeteksi"
-                                {{ old('foreign_object', $detail->sensoric->foreign_object)=='Tidak Terdeteksi' ? 'selected' : '' }}>
-                                Tidak Terdeteksi</option>
-                            <option value="Terdeteksi"
-                                {{ old('foreign_object', $detail->sensoric->foreign_object)=='Terdeteksi' ? 'selected' : '' }}>
-                                Terdeteksi</option>
-                        </select>
+                        <label class="form-label d-block">Benda Asing</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="foreign_object" value="Tidak Terdeteksi"
+                                class="form-check-input" id="foreign_object_ok"
+                                {{ old('foreign_object', $detail->sensoric->foreign_object) == 'Tidak Terdeteksi' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="foreign_object_ok">Tidak Terdeteksi</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="foreign_object" value="Terdeteksi"
+                                class="form-check-input" id="foreign_object_x"
+                                {{ old('foreign_object', $detail->sensoric->foreign_object) == 'Terdeteksi' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="foreign_object_x">Terdeteksi</label>
+                        </div>
                     </div>
                 </div>
 

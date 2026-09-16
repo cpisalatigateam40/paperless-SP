@@ -49,6 +49,13 @@
                         <label>Best Before</label>
                         <input type="date" name="details[0][best_before]" class="form-control best-before">
                     </div>
+                    <div class="mb-3">
+                        <label>No Program</label>
+                        <input type="text"
+                            name="details[0][program_number]"
+                            class="form-control program-number"
+                            placeholder="Masukkan program number">
+                    </div>
                 </div>
 
                 <h6 class="mt-4">Hasil Pemeriksaan Verifikasi Specimen</h6>

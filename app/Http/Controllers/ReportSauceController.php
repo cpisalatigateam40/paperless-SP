@@ -299,6 +299,8 @@ class ReportSauceController extends Controller
                         'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
                         'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
                         'no_mesin' => $detail['no_mesin'] ?? null,
+                        'brix' => $detail['brix'] ?? null,
+                        'salinity' => $detail['salinity'] ?? null,
                     ]);
 
                     foreach ($detail['raw_materials'] ?? [] as $rm) {
@@ -558,6 +560,8 @@ public function exportPdf($uuid)
                         'mixing_paddle_on' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'on',
                         'mixing_paddle_off' => isset($detail['mixing_paddle']) && $detail['mixing_paddle'] === 'off',
                         'no_mesin' => $detail['no_mesin'] ?? null,
+                        'brix' => $detail['brix'] ?? null,
+                        'salinity' => $detail['salinity'] ?? null,
                     ]);
 
                     foreach ($detail['raw_materials'] ?? [] as $rm) {

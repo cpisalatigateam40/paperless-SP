@@ -96,11 +96,17 @@
                                 class="form-control" placeholder="Berat (kg)">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Sensory</label>
-                            <select name="details[0][raw_materials][0][sensory]" class="form-control" required>
-                                <option value="OK">OK</option>
-                                <option value="Tidak OK">Tidak OK</option>
-                            </select>
+                            <label class="form-label d-block">Sensory</label>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[0][raw_materials][0][sensory]" value="OK"
+                                    class="form-check-input" id="rm_sensory_ok_0" required checked>
+                                <label class="form-check-label" for="rm_sensory_ok_0">OK</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="details[0][raw_materials][0][sensory]" value="Tidak OK"
+                                    class="form-check-input" id="rm_sensory_x_0" required>
+                                <label class="form-check-label" for="rm_sensory_x_0">Tidak OK</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -117,37 +123,60 @@
 
 
                 <div class="row mb-2">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Warna</label>
-                        <select name="details[0][color]" class="form-control" required>
-
-                            <option value="OK">OK</option>
-                            <option value="Tidak OK">Tidak OK</option>
-                        </select>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label d-block">Warna</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][color]" value="OK"
+                                class="form-check-input" id="color_ok_0" required checked>
+                            <label class="form-check-label" for="color_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][color]" value="Tidak OK"
+                                class="form-check-input" id="color_x_0" required>
+                            <label class="form-check-label" for="color_x_0">Tidak OK</label>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Aroma</label>
-                        <select name="details[0][aroma]" class="form-control" required>
 
-                            <option value="OK">OK</option>
-                            <option value="Tidak OK">Tidak OK</option>
-                        </select>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label d-block">Aroma</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][aroma]" value="OK"
+                                class="form-check-input" id="aroma_ok_0" required checked>
+                            <label class="form-check-label" for="aroma_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][aroma]" value="Tidak OK"
+                                class="form-check-input" id="aroma_x_0" required>
+                            <label class="form-check-label" for="aroma_x_0">Tidak OK</label>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Rasa</label>
-                        <select name="details[0][taste]" class="form-control" required>
 
-                            <option value="OK">OK</option>
-                            <option value="Tidak OK">Tidak OK</option>
-                        </select>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label d-block">Rasa</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][taste]" value="OK"
+                                class="form-check-input" id="taste_ok_0" required checked>
+                            <label class="form-check-label" for="taste_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][taste]" value="Tidak OK"
+                                class="form-check-input" id="taste_x_0" required>
+                            <label class="form-check-label" for="taste_x_0">Tidak OK</label>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tekstur</label>
-                        <select name="details[0][texture]" class="form-control" required>
 
-                            <option value="OK">OK</option>
-                            <option value="Tidak OK">Tidak OK</option>
-                        </select>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label d-block">Tekstur</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][texture]" value="OK"
+                                class="form-check-input" id="texture_ok_0" required checked>
+                            <label class="form-check-label" for="texture_ok_0">OK</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="details[0][texture]" value="Tidak OK"
+                                class="form-check-input" id="texture_x_0" required>
+                            <label class="form-check-label" for="texture_x_0">Tidak OK</label>
+                        </div>
                     </div>
                 </div>
 
@@ -225,10 +254,17 @@ function addRawMaterial() {
                        placeholder="Berat (kg)">
             </div>
             <div class="col-md-4">
-                <select name="details[0][raw_materials][${rmIndex}][sensory]" class="form-control" required>
-                    <option value="OK">OK</option>
-                    <option value="Tidak OK">Tidak OK</option>
-                </select>
+                <label class="form-label d-block">Sensory</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[0][raw_materials][${rmIndex}][sensory]" value="OK"
+                        class="form-check-input" id="rm_sensory_ok_${rmIndex}" required checked>
+                    <label class="form-check-label" for="rm_sensory_ok_${rmIndex}">OK</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[0][raw_materials][${rmIndex}][sensory]" value="Tidak OK"
+                        class="form-check-input" id="rm_sensory_x_${rmIndex}" required>
+                    <label class="form-check-label" for="rm_sensory_x_${rmIndex}">Tidak OK</label>
+                </div>
             </div>
         </div>
         `;

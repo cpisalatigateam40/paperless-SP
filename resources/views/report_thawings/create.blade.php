@@ -57,12 +57,17 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label>Kondisi awal kemasan RM</label>
-                                <select name="details[0][package_condition]" class="form-control">
-                                    <option value="">Pilih</option>
-                                    <option value="utuh">Utuh</option>
-                                    <option value="sobek">Sobek</option>
-                                </select>
+                                <label class="form-label d-block">Kondisi awal kemasan RM</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][package_condition]" value="utuh"
+                                        class="form-check-input" id="package_condition_ok_0" checked>
+                                    <label class="form-check-label" for="package_condition_ok_0">Utuh</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][package_condition]" value="sobek"
+                                        class="form-check-input" id="package_condition_x_0">
+                                    <label class="form-check-label" for="package_condition_x_0">Sobek</label>
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -90,12 +95,17 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label>Kondisi Ruang</label>
-                                <select name="details[0][room_condition]" class="form-control">
-                                    <option value="">Pilih</option>
-                                    <option value="OK">OK</option>
-                                    <option value="Tidak OK">Tidak OK</option>
-                                </select>
+                                <label class="form-label d-block">Kondisi Ruang</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][room_condition]" value="OK"
+                                        class="form-check-input" id="room_condition_ok_0" checked>
+                                    <label class="form-check-label" for="room_condition_ok_0">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][room_condition]" value="Tidak OK"
+                                        class="form-check-input" id="room_condition_x_0">
+                                    <label class="form-check-label" for="room_condition_x_0">Tidak OK</label>
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -120,12 +130,17 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label>Kondisi Produk</label>
-                                <select name="details[0][product_condition]" class="form-control">
-                                    <option value="">Pilih</option>
-                                    <option value="OK">OK</option>
-                                    <option value="Tidak OK">Tidak OK</option>
-                                </select>
+                                <label class="form-label d-block">Kondisi Produk</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][product_condition]" value="OK"
+                                        class="form-check-input" id="product_condition_ok_0" checked>
+                                    <label class="form-check-label" for="product_condition_ok_0">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][product_condition]" value="Tidak OK"
+                                        class="form-check-input" id="product_condition_x_0">
+                                    <label class="form-check-label" for="product_condition_x_0">Tidak OK</label>
+                                </div>
                             </div>
 
                         </div>
@@ -184,12 +199,17 @@ $('#add-row').click(function() {
 </div>
 
 <div class="col-md-6 mb-3">
-<label>Kondisi awal kemasan RM</label>
-<select name="details[${row}][package_condition]" class="form-control">
-<option value="">Pilih</option>
-<option value="utuh">Utuh</option>
-<option value="sobek">Sobek</option>
-</select>
+    <label class="form-label d-block">Kondisi awal kemasan RM</label>
+    <div class="form-check form-check-inline">
+        <input type="radio" name="details[${row}][package_condition]" value="utuh"
+            class="form-check-input" id="package_condition_ok_${row}" checked>
+        <label class="form-check-label" for="package_condition_ok_${row}">Utuh</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input type="radio" name="details[${row}][package_condition]" value="sobek"
+            class="form-check-input" id="package_condition_x_${row}">
+        <label class="form-check-label" for="package_condition_x_${row}">Sobek</label>
+    </div>
 </div>
 
 <div class="col-md-6 mb-3">
@@ -217,12 +237,17 @@ $('#add-row').click(function() {
 </div>
 
 <div class="col-md-6 mb-3">
-<label>Kondisi Ruang</label>
-<select name="details[${row}][room_condition]" class="form-control">
-<option value="">Pilih</option>
-<option value="OK">OK</option>
-<option value="Tidak OK">Tidak OK</option>
-</select>
+    <label class="form-label d-block">Kondisi Ruang</label>
+    <div class="form-check form-check-inline">
+        <input type="radio" name="details[${row}][room_condition]" value="OK"
+            class="form-check-input" id="room_condition_ok_${row}" checked>
+        <label class="form-check-label" for="room_condition_ok_${row}">OK</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input type="radio" name="details[${row}][room_condition]" value="Tidak OK"
+            class="form-check-input" id="room_condition_x_${row}">
+        <label class="form-check-label" for="room_condition_x_${row}">Tidak OK</label>
+    </div>
 </div>
 
 <div class="col-md-6 mb-3">
@@ -246,12 +271,17 @@ $('#add-row').click(function() {
 </div>
 
 <div class="col-md-6 mb-3">
-<label>Kondisi Produk</label>
-<select name="details[${row}][product_condition]" class="form-control">
-<option value="">Pilih</option>
-<option value="OK">OK</option>
-<option value="Tidak OK">Tidak OK</option>
-</select>
+    <label class="form-label d-block">Kondisi Produk</label>
+    <div class="form-check form-check-inline">
+        <input type="radio" name="details[${row}][product_condition]" value="OK"
+            class="form-check-input" id="product_condition_ok_${row}" checked>
+        <label class="form-check-label" for="product_condition_ok_${row}">OK</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input type="radio" name="details[${row}][product_condition]" value="Tidak OK"
+            class="form-check-input" id="product_condition_x_${row}">
+        <label class="form-check-label" for="product_condition_x_${row}">Tidak OK</label>
+    </div>
 </div>
 
 </div>

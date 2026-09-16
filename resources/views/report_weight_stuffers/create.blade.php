@@ -113,12 +113,17 @@
                                 <input type="number" step="0.01" name="details[0][avg_weight]" class="form-control avg-weight" placeholder="terisi otomatis" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label>Status</label>
-                                <select name="details[0][weight_status]" class="form-control">
-                                    <option value="">-- Pilih Status --</option>
-                                    <option value="OK">OK</option>
-                                    <option value="NOT OK">NOT OK</option>
-                                </select>
+                                <label class="form-label d-block">Status</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][weight_status]" value="OK"
+                                        class="form-check-input" id="weight_status_ok_0" checked>
+                                    <label class="form-check-label" for="weight_status_ok_0">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][weight_status]" value="NOT OK"
+                                        class="form-check-input" id="weight_status_x_0">
+                                    <label class="form-check-label" for="weight_status_x_0">NOT OK</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label>Tindakan Koreksi</label>
@@ -159,12 +164,17 @@
                                 <input type="number" step="0.01" name="details[0][avg_long]" class="form-control avg-long" placeholder="terisi otomatis" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label>Status</label>
-                                <select name="details[0][long_status]" class="form-control">
-                                    <option value="">-- Pilih Status --</option>
-                                    <option value="OK">OK</option>
-                                    <option value="NOT OK">NOT OK</option>
-                                </select>
+                                <label class="form-label d-block">Status</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][long_status]" value="OK"
+                                        class="form-check-input" id="long_status_ok_0" checked>
+                                    <label class="form-check-label" for="long_status_ok_0">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][long_status]" value="NOT OK"
+                                        class="form-check-input" id="long_status_x_0">
+                                    <label class="form-check-label" for="long_status_x_0">NOT OK</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label>Tindakan Koreksi</label>
@@ -204,12 +214,17 @@
                                 <input type="number" step="0.01" name="details[0][avg_fla]" class="form-control avg-fla" placeholder="terisi otomatis" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label>Status</label>
-                                <select name="details[0][fla_status]" class="form-control">
-                                    <option value="">-- Pilih Status --</option>
-                                    <option value="OK">OK</option>
-                                    <option value="NOT OK">NOT OK</option>
-                                </select>
+                                <label class="form-label d-block">Status</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][fla_status]" value="OK"
+                                        class="form-check-input" id="fla_status_ok_0" checked>
+                                    <label class="form-check-label" for="fla_status_ok_0">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][fla_status]" value="NOT OK"
+                                        class="form-check-input" id="fla_status_x_0">
+                                    <label class="form-check-label" for="fla_status_x_0">NOT OK</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label>Tindakan Koreksi</label>
@@ -295,8 +310,20 @@ applyHeaderColor(detailsContainer.querySelector('.detail-block'), 0);
 
 function reindexBlock(blockEl, index) {
     blockEl.dataset.index = index;
+
+    // Update name="details[0][...]" -> details[index][...]
     blockEl.querySelectorAll('[name]').forEach(function (el) {
         el.name = el.name.replace(/details\[\d+\]/, 'details[' + index + ']');
+    });
+
+    // Update id agar unik per block (mis. weight_status_ok_0 -> weight_status_ok_2)
+    blockEl.querySelectorAll('[id]').forEach(function (el) {
+        el.id = el.id.replace(/_\d+$/, '_' + index);
+    });
+
+    // Update label[for] biar tetap nyambung ke id yang baru
+    blockEl.querySelectorAll('label[for]').forEach(function (label) {
+        label.htmlFor = label.htmlFor.replace(/_\d+$/, '_' + index);
     });
 }
 
@@ -324,9 +351,9 @@ document.getElementById('addDetailBlock').addEventListener('click', function () 
 
     reindexBlock(newBlock, detailIndex);
 
-    // Kosongkan semua input di block baru
-    newBlock.querySelectorAll('input:not([type=file]), textarea').forEach(function (el) { el.value = ''; });
-    newBlock.querySelectorAll('select').forEach(function (el) { el.value = ''; });
+    // Kosongkan semua input di block baru (kecuali radio & checkbox — value-nya jangan dihapus)
+    newBlock.querySelectorAll('input:not([type=file]):not([type=radio]):not([type=checkbox]), textarea').forEach(function (el) { el.value = ''; });
+    newBlock.querySelectorAll('select').forEach(function (el) { el.value = ''; }); // baris ini sekarang tidak berdampak (sudah tidak ada select untuk status), aman dibiarkan atau dihapus
     newBlock.querySelectorAll('input[type=file]').forEach(function (el) { el.value = ''; });
 
     // Reset ulang grup berat/panjang/fla ke default 3 kolom kosong

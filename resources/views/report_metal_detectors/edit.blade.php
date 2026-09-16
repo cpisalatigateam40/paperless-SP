@@ -78,25 +78,51 @@
 
                         <div class="row">
                             <div class="mb-3 col-md-4">
-                                <label>Hasil Deteksi Fe 1.5 mm</label>
-                                <select name="details[{{ $i }}][result_fe]" class="form-control" required>
-                                    <option value="√" {{ $detail->result_fe == '√' ? 'selected' : '' }}>√</option>
-                                    <option value="x" {{ $detail->result_fe == 'x' ? 'selected' : '' }}>x</option>
-                                </select>
+                                <label class="form-label d-block">Hasil Deteksi Fe 1.5 mm</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][result_fe]" value="√"
+                                        class="form-check-input" id="result_fe_ok_{{ $i }}" required
+                                        {{ $detail->result_fe == '√' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="result_fe_ok_{{ $i }}">√</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][result_fe]" value="x"
+                                        class="form-check-input" id="result_fe_x_{{ $i }}" required
+                                        {{ $detail->result_fe == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="result_fe_x_{{ $i }}">x</label>
+                                </div>
                             </div>
+
                             <div class="mb-3 col-md-4">
-                                <label>Hasil Deteksi Non Fe 1.5 mm</label>
-                                <select name="details[{{ $i }}][result_non_fe]" class="form-control" required>
-                                    <option value="√" {{ $detail->result_non_fe == '√' ? 'selected' : '' }}>√</option>
-                                    <option value="x" {{ $detail->result_non_fe == 'x' ? 'selected' : '' }}>x</option>
-                                </select>
+                                <label class="form-label d-block">Hasil Deteksi Non Fe 2 mm</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][result_non_fe]" value="√"
+                                        class="form-check-input" id="result_non_fe_ok_{{ $i }}" required
+                                        {{ $detail->result_non_fe == '√' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="result_non_fe_ok_{{ $i }}">√</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][result_non_fe]" value="x"
+                                        class="form-check-input" id="result_non_fe_x_{{ $i }}" required
+                                        {{ $detail->result_non_fe == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="result_non_fe_x_{{ $i }}">x</label>
+                                </div>
                             </div>
+
                             <div class="mb-3 col-md-4">
-                                <label>Hasil Deteksi SUS 316 2.5 mm</label>
-                                <select name="details[{{ $i }}][result_sus316]" class="form-control" required>
-                                    <option value="√" {{ $detail->result_sus316 == '√' ? 'selected' : '' }}>√</option>
-                                    <option value="x" {{ $detail->result_sus316 == 'x' ? 'selected' : '' }}>x</option>
-                                </select>
+                                <label class="form-label d-block">Hasil Deteksi SUS 316 2.5 mm</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][result_sus316]" value="√"
+                                        class="form-check-input" id="result_sus316_ok_{{ $i }}" required
+                                        {{ $detail->result_sus316 == '√' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="result_sus316_ok_{{ $i }}">√</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][result_sus316]" value="x"
+                                        class="form-check-input" id="result_sus316_x_{{ $i }}" required
+                                        {{ $detail->result_sus316 == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="result_sus316_x_{{ $i }}">x</label>
+                                </div>
                             </div>
                         </div>
 
@@ -116,13 +142,19 @@
                                     value="{{ $detail->nonconformity }}">
                             </div> -->
                             <div class="col-md-4">
-                                <label>Status</label>
-                                <select name="details[{{ $i }}][verif_after_correct]" class="form-control">
-                                    <option value="√" {{ $detail->verif_after_correct == '√' ? 'selected' : '' }}>√
-                                    </option>
-                                    <option value="x" {{ $detail->verif_after_correct == 'x' ? 'selected' : '' }}>x
-                                    </option>
-                                </select>
+                                <label class="form-label d-block">Status</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][verif_after_correct]" value="√"
+                                        class="form-check-input" id="verif_after_correct_ok_{{ $i }}"
+                                        {{ $detail->verif_after_correct == '√' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="verif_after_correct_ok_{{ $i }}">√</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][verif_after_correct]" value="x"
+                                        class="form-check-input" id="verif_after_correct_x_{{ $i }}"
+                                        {{ $detail->verif_after_correct == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="verif_after_correct_x_{{ $i }}">x</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label>Tindakan Koreksi</label>

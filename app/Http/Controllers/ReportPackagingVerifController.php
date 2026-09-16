@@ -318,7 +318,7 @@ class ReportPackagingVerifController extends Controller
 
 
 
-                'verif_md' => $detail['checklist']['verif_md'],
+                // 'verif_md' => $detail['checklist']['verif_md'],
                 'notes' => $detail['checklist']['notes'],
                 'sampling_amount' => $detail['checklist']['sampling_amount'],
                 'unit' => $detail['checklist']['unit'],
@@ -512,7 +512,7 @@ class ReportPackagingVerifController extends Controller
                 'actual_weight_4' => $detail['checklist']['actual_weight_4'] ?? null,
                 'actual_weight_5' => $detail['checklist']['actual_weight_5'] ?? null,
                 'avg_weight' => $detail['checklist']['avg_weight'],
-                'verif_md' => $detail['checklist']['verif_md'],
+                // 'verif_md' => $detail['checklist']['verif_md'],
                 'notes' => $detail['checklist']['notes'],
                 'sampling_amount' => $detail['checklist']['sampling_amount'],
                 'unit' => $detail['checklist']['unit'],
@@ -691,6 +691,15 @@ class ReportPackagingVerifController extends Controller
                     if ($fileMulti instanceof \Illuminate\Http\UploadedFile) {
                         $filename = time() . '_md_multi_' . $index . '_' . $fileMulti->getClientOriginalName();
                         $uploadMdMulti[] = $fileMulti->storeAs('upload_packaging', $filename, 'public');
+                    }
+                }
+            }
+
+            // Pertahankan file lama yang tidak diganti
+            if (!empty($detail['old_upload_md_multi']) && is_array($detail['old_upload_md_multi'])) {
+                foreach ($detail['old_upload_md_multi'] as $oldPath) {
+                    if (!empty($oldPath)) {
+                        $uploadMdMulti[] = $oldPath;
                     }
                 }
             }

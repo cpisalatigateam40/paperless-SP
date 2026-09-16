@@ -217,6 +217,16 @@
                                 class="form-control" value="{{ $detail->duration }}">
                         </div> -->
                         <div class="col-md-6 mb-3">
+                            <label>Hasil Brix (%)</label>
+                            <input type="number" step="0.01" name="details[{{ $detailIndex }}][brix]"
+                                class="form-control" value="{{ $detail->brix }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Hasil Salinity (%)</label>
+                            <input type="number" step="0.01" name="details[{{ $detailIndex }}][salinity]"
+                                class="form-control" value="{{ $detail->salinity }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label>Pressure (Bar)</label>
                             <input type="number" step="0.01" name="details[{{ $detailIndex }}][pressure]"
                                 class="form-control" value="{{ $detail->pressure }}">

@@ -213,58 +213,106 @@
 
                         <div class="row mt-3">
                             <div class="col-md-4">
-                                <label class="form-label">Kemasan</label>
-                                <select name="details[{{ $i }}][packaging_condition]" class="form-control">
-                                    <option value="✓" {{ $detail->packaging_condition == '✓' ? 'selected' : '' }}>✓
-                                    </option>
-                                    <option value="x" {{ $detail->packaging_condition == 'x' ? 'selected' : '' }}>x
-                                    </option>
-                                </select>
+                                <label class="form-label d-block">Kemasan</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][packaging_condition]" value="✓"
+                                        class="form-check-input" id="packaging_condition_ok_{{ $i }}"
+                                        {{ $detail->packaging_condition == '✓' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="packaging_condition_ok_{{ $i }}">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][packaging_condition]" value="x"
+                                        class="form-check-input" id="packaging_condition_x_{{ $i }}"
+                                        {{ $detail->packaging_condition == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="packaging_condition_x_{{ $i }}">x</label>
+                                </div>
                             </div>
+
                             <div class="col-md-4">
-                                <label class="form-label">Sensory Kenampakan</label>
-                                <select name="details[{{ $i }}][sensory_appearance]" class="form-control">
-                                    <option value="✓" {{ $detail->sensory_appearance == '✓' ? 'selected' : '' }}>✓
-                                    </option>
-                                    <option value="x" {{ $detail->sensory_appearance == 'x' ? 'selected' : '' }}>x
-                                    </option>
-                                </select>
+                                <label class="form-label d-block">Sensory Kenampakan</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][sensory_appearance]" value="✓"
+                                        class="form-check-input" id="sensory_appearance_ok_{{ $i }}"
+                                        {{ $detail->sensory_appearance == '✓' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sensory_appearance_ok_{{ $i }}">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][sensory_appearance]" value="x"
+                                        class="form-check-input" id="sensory_appearance_x_{{ $i }}"
+                                        {{ $detail->sensory_appearance == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sensory_appearance_x_{{ $i }}">x</label>
+                                </div>
                             </div>
+
                             <div class="col-md-4">
-                                <label class="form-label">Sensory Aroma</label>
-                                <select name="details[{{ $i }}][sensory_aroma]" class="form-control">
-                                    <option value="✓" {{ $detail->sensory_aroma == '✓' ? 'selected' : '' }}>✓</option>
-                                    <option value="x" {{ $detail->sensory_aroma == 'x' ? 'selected' : '' }}>x</option>
-                                </select>
+                                <label class="form-label d-block">Sensory Aroma</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][sensory_aroma]" value="✓"
+                                        class="form-check-input" id="sensory_aroma_ok_{{ $i }}"
+                                        {{ $detail->sensory_aroma == '✓' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sensory_aroma_ok_{{ $i }}">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][sensory_aroma]" value="x"
+                                        class="form-check-input" id="sensory_aroma_x_{{ $i }}"
+                                        {{ $detail->sensory_aroma == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sensory_aroma_x_{{ $i }}">x</label>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-md-4">
-                                <label class="form-label">Sensory Warna</label>
-                                <select name="details[{{ $i }}][sensory_color]" class="form-control">
-                                    <option value="✓" {{ $detail->sensory_color == '✓' ? 'selected' : '' }}>✓</option>
-                                    <option value="x" {{ $detail->sensory_color == 'x' ? 'selected' : '' }}>x</option>
-                                </select>
+                                <label class="form-label d-block">Sensory Warna</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][sensory_color]" value="✓"
+                                        class="form-check-input" id="sensory_color_ok_{{ $i }}"
+                                        {{ $detail->sensory_color == '✓' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sensory_color_ok_{{ $i }}">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][sensory_color]" value="x"
+                                        class="form-check-input" id="sensory_color_x_{{ $i }}"
+                                        {{ $detail->sensory_color == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sensory_color_x_{{ $i }}">x</label>
+                                </div>
                             </div>
+
                             <div class="col-md-4">
-                                <label class="form-label">Kontaminasi</label>
-                                <select name="details[{{ $i }}][contamination]" class="form-control">
-                                    <option value="✓" {{ $detail->contamination == '✓' ? 'selected' : '' }}>✓</option>
-                                    <option value="x" {{ $detail->contamination == 'x' ? 'selected' : '' }}>x</option>
-                                </select>
+                                <label class="form-label d-block">Kontaminasi</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][contamination]" value="✓"
+                                        class="form-check-input" id="contamination_ok_{{ $i }}"
+                                        {{ $detail->contamination == '✓' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="contamination_ok_{{ $i }}">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][contamination]" value="x"
+                                        class="form-check-input" id="contamination_x_{{ $i }}"
+                                        {{ $detail->contamination == 'x' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="contamination_x_{{ $i }}">x</label>
+                                </div>
                             </div>
+
                             <div class="col-md-4">
-                                <label class="form-label">Status</label>
-                                <select name="details[{{ $i }}][status]" class="form-control">
-                                    <option value="OK" {{ $detail->status == 'OK' ? 'selected' : '' }}>OK</option>
-                                    <option value="Tidak OK" {{ $detail->status == 'Tidak OK' ? 'selected' : '' }}>Tidak OK</option>
-                                </select>
+                                <label class="form-label d-block">Status</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][status]" value="OK"
+                                        class="form-check-input" id="status_ok_{{ $i }}"
+                                        {{ $detail->status == 'OK' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="status_ok_{{ $i }}">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[{{ $i }}][status]" value="Tidak OK"
+                                        class="form-check-input" id="status_tidak_ok_{{ $i }}"
+                                        {{ $detail->status == 'Tidak OK' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="status_tidak_ok_{{ $i }}">Tidak OK</label>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-md-6">
+                            <div class="col-md-6 tindakan-koreksi-wrapper" style="display:none;">
                                 <label class="form-label">Tindakan Koreksi</label>
                                 <textarea name="details[{{ $i }}][corrective_action]" class="form-control"
                                     rows="2">{{ $detail->corrective_action }}</textarea>
@@ -447,6 +495,58 @@ document.addEventListener('input', function (e) {
         uncheckAllSuppliers(row);
         console.log('Plant code tidak terdeteksi');
     }
+});
+</script>
+
+<script>
+const KOREKSI_FIELDS = [
+    'packaging_condition',
+    'sensory_appearance',
+    'sensory_aroma',
+    'sensory_color',
+    'contamination',
+    'status'
+];
+
+function isRowNeedsKoreksi(row) {
+    return KOREKSI_FIELDS.some(field => {
+        const checked = row.querySelector(`input[name$="[${field}]"]:checked`);
+        if (!checked) return false;
+        return checked.value === 'x' || checked.value === 'Tidak OK';
+    });
+}
+
+function toggleKoreksi(row) {
+    const wrapper = row.querySelector('.tindakan-koreksi-wrapper');
+    if (!wrapper) return;
+
+    if (isRowNeedsKoreksi(row)) {
+        wrapper.style.display = '';
+    } else {
+        wrapper.style.display = 'none';
+        const textarea = wrapper.querySelector('textarea');
+        if (textarea) textarea.value = '';
+    }
+}
+
+function initKoreksiToggle(row) {
+    const radios = row.querySelectorAll(
+        KOREKSI_FIELDS.map(f => `input[name$="[${f}]"]`).join(',')
+    );
+    radios.forEach(radio => {
+        radio.addEventListener('change', () => toggleKoreksi(row));
+    });
+    toggleKoreksi(row);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.detail-row').forEach(row => {
+        try {
+            initKoreksiToggle(row);
+        } catch (e) {
+            console.error('initKoreksiToggle gagal:', e);
+        }
+    });
 });
 </script>
 

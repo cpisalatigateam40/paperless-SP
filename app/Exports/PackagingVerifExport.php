@@ -21,7 +21,7 @@ class PackagingVerifExport implements WithEvents, WithTitle
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastCol = 'X';
+                $lastCol = 'W';
 
                 $sheet->mergeCells("A1:{$lastCol}1");
                 $sheet->setCellValue('A1', 'Verifikasi Proses Pengemasan');
@@ -57,7 +57,6 @@ class PackagingVerifExport implements WithEvents, WithTitle
                     'U' => "Std Berat/pack",
                     'V' => "Aktual Berat/pack\n(1-5)",
                     'W' => "Rata-rata Berat/pack",
-                    'X' => 'Verifikasi MD',
                 ];
 
                 foreach ($headers as $col => $label) {
@@ -144,7 +143,6 @@ class PackagingVerifExport implements WithEvents, WithTitle
                         $sheet->setCellValue("U{$row}", $cl?->standard_weight ?? '-');
                         $sheet->setCellValue("V{$row}", $join('actual_weight') ?: '-');
                         $sheet->setCellValue("W{$row}", $cl?->avg_weight ?? '-');
-                        $sheet->setCellValue("X{$row}", $cl?->verif_md ?? '-');
 
                         $sheet->getStyle("A{$row}:{$lastCol}{$row}")
                             ->getAlignment()->setHorizontal('center');

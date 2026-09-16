@@ -176,6 +176,7 @@
                 <th rowspan="2">Nama Produk</th>
                 <th rowspan="2">Gramase<br>(gr)</th>
                 <th rowspan="2">Kode Produksi</th>
+                <th rowspan="2">No Program</th>
                 <th colspan="3">Fe 1.5 mm</th>
                 <th colspan="3">Non-Fe 2.0 mm</th>
                 <th colspan="3">SUS 2.5 mm</th>
@@ -205,6 +206,7 @@
                                                         ? $detail->gramase
                                                         : ($detail->product->nett_weight ?? '-') }}</td>
                 <td>{{ $detail->production_code ?? '-' }}</td>
+                <td>{{ $detail->program_number ?? '-' }}</td>
                 @php
                 $specimens = ['fe_1_5mm', 'non_fe_2mm', 'sus_2_5mm'];
                 $positions = ['d', 't', 'b'];

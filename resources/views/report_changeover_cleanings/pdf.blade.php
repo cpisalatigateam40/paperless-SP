@@ -199,14 +199,20 @@
                     </tr>
 
                     @forelse($group['rows'] as $i => $row)
+                    @php
+                        $rowScores = array_map('strval', (array) ($row['score'] ?? []));
+                    @endphp
                     <tr>
                         <td>{{ $i + 1 }}</td>
                         <td class="text-start">{{ $row['name'] }}</td>
 
                         @foreach($criteriaPairs as $pair)
                         <td>
-                            @if($row['score'] && in_array($row['score'], $pair))
-                                v
+                            @php
+                                $matched = collect($pair)->first(fn($num) => in_array((string) $num, $rowScores));
+                            @endphp
+                            @if($matched)
+                                {{ $matched }}
                             @endif
                         </td>
                         @endforeach

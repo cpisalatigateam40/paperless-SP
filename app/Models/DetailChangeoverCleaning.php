@@ -28,7 +28,7 @@ class DetailChangeoverCleaning extends Model
     ];
 
     protected $casts = [
-        'score' => 'integer',
+        'score' => 'array',
     ];
 
     protected static function boot()

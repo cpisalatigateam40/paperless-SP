@@ -175,55 +175,90 @@
 
                         <div class="row mt-3">
                             <div class="col-md-4">
-                                <label class="form-label">Kemasan</label>
-                                <select name="details[0][packaging_condition]" class="form-control">
-                                    <option value="✓">✓</option>
-                                    <option value="x">x</option>
-                                </select>
+                                <label class="form-label d-block">Kemasan</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][packaging_condition]" value="✓"
+                                        class="form-check-input" id="packaging_condition_ok_0" checked>
+                                    <label class="form-check-label" for="packaging_condition_ok_0">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][packaging_condition]" value="x"
+                                        class="form-check-input" id="packaging_condition_x_0">
+                                    <label class="form-check-label" for="packaging_condition_x_0">x</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Sensory Kenampakan</label>
-                                <select name="details[0][sensory_appearance]" class="form-control">
-                                    <option value="✓">✓</option>
-                                    <option value="x">x</option>
-                                </select>
+                                <label class="form-label d-block">Sensory Kenampakan</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][sensory_appearance]" value="✓"
+                                        class="form-check-input" id="sensory_appearance_ok_0" checked>
+                                    <label class="form-check-label" for="sensory_appearance_ok_0">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][sensory_appearance]" value="x"
+                                        class="form-check-input" id="sensory_appearance_x_0">
+                                    <label class="form-check-label" for="sensory_appearance_x_0">x</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Sensory Aroma</label>
-                                <select name="details[0][sensory_aroma]" class="form-control">
-                                    <option value="✓">✓</option>
-                                    <option value="x">x</option>
-                                </select>
+                                <label class="form-label d-block">Sensory Aroma</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][sensory_aroma]" value="✓"
+                                        class="form-check-input" id="sensory_aroma_ok_0" checked>
+                                    <label class="form-check-label" for="sensory_aroma_ok_0">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][sensory_aroma]" value="x"
+                                        class="form-check-input" id="sensory_aroma_x_0">
+                                    <label class="form-check-label" for="sensory_aroma_x_0">x</label>
+                                </div>
                             </div>
-
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-md-4">
-                                <label class="form-label">Sensory Color</label>
-                                <select name="details[0][sensory_color]" class="form-control">
-                                    <option value="✓">✓</option>
-                                    <option value="x">x</option>
-                                </select>
+                                <label class="form-label d-block">Sensory Warna</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][sensory_color]" value="✓"
+                                        class="form-check-input" id="sensory_color_ok_0" checked>
+                                    <label class="form-check-label" for="sensory_color_ok_0">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][sensory_color]" value="x"
+                                        class="form-check-input" id="sensory_color_x_0">
+                                    <label class="form-check-label" for="sensory_color_x_0">x</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Kontaminasi</label>
-                                <select name="details[0][contamination]" class="form-control">
-                                    <option value="✓">✓</option>
-                                    <option value="x">x</option>
-                                </select>
+                                <label class="form-label d-block">Kontaminasi</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][contamination]" value="✓"
+                                        class="form-check-input" id="contamination_ok_0" checked>
+                                    <label class="form-check-label" for="contamination_ok_0">✓</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][contamination]" value="x"
+                                        class="form-check-input" id="contamination_x_0">
+                                    <label class="form-check-label" for="contamination_x_0">x</label>
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label>Status</label>
-                                <select name="details[0][status]" class="form-control">
-                                    <option value="OK">OK</option>
-                                    <option value="Tidak OK">Tidak OK</option>
-                                </select>
+                                <label class="form-label d-block">Status</label>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][status]" value="OK"
+                                        class="form-check-input" id="status_ok_0" checked>
+                                    <label class="form-check-label" for="status_ok_0">OK</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="details[0][status]" value="Tidak OK"
+                                        class="form-check-input" id="status_tidak_ok_0">
+                                    <label class="form-check-label" for="status_tidak_ok_0">Tidak OK</label>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-md-6">
+                            <div class="col-md-6 tindakan-koreksi-wrapper" style="display:none;">
                                 <label class="form-label">Tindakan Koreksi</label>
                                 <textarea name="details[0][corrective_action]" class="form-control" rows="2"></textarea>
                             </div>
@@ -399,53 +434,90 @@
         </div>
         <div class="row mt-4">
             <div class="col-md-4">
-                <label class="form-label">Kemasan</label>
-                <select name="details[__index__][packaging_condition]" class="form-control">
-                    <option value="✓">✓</option>
-                    <option value="x">x</option>
-                </select>
+                <label class="form-label d-block">Kemasan</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][packaging_condition]" value="✓"
+                        class="form-check-input" id="packaging_condition_ok___index__" checked>
+                    <label class="form-check-label" for="packaging_condition_ok___index__">✓</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][packaging_condition]" value="x"
+                        class="form-check-input" id="packaging_condition_x___index__">
+                    <label class="form-check-label" for="packaging_condition_x___index__">x</label>
+                </div>
             </div>
             <div class="col-md-4">
-                <label class="form-label">Sensori Kenampakan</label>
-                <select name="details[__index__][sensory_appearance]" class="form-control">
-                    <option value="✓">✓</option>
-                    <option value="x">x</option>
-                </select>
+                <label class="form-label d-block">Sensory Kenampakan</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][sensory_appearance]" value="✓"
+                        class="form-check-input" id="sensory_appearance_ok___index__" checked>
+                    <label class="form-check-label" for="sensory_appearance_ok___index__">✓</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][sensory_appearance]" value="x"
+                        class="form-check-input" id="sensory_appearance_x___index__">
+                    <label class="form-check-label" for="sensory_appearance_x___index__">x</label>
+                </div>
             </div>
             <div class="col-md-4">
-                <label class="form-label">Sensori Aroma</label>
-                <select name="details[__index__][sensory_aroma]" class="form-control">
-                    <option value="✓">✓</option>
-                    <option value="x">x</option>
-                </select>
+                <label class="form-label d-block">Sensory Aroma</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][sensory_aroma]" value="✓"
+                        class="form-check-input" id="sensory_aroma_ok___index__" checked>
+                    <label class="form-check-label" for="sensory_aroma_ok___index__">✓</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][sensory_aroma]" value="x"
+                        class="form-check-input" id="sensory_aroma_x___index__">
+                    <label class="form-check-label" for="sensory_aroma_x___index__">x</label>
+                </div>
             </div>
+        </div>
 
-        </div>
         <div class="row mt-3">
             <div class="col-md-4">
-                <label class="form-label">Sensori Warna</label>
-                <select name="details[__index__][sensory_color]" class="form-control">
-                    <option value="✓">✓</option>
-                    <option value="x">x</option>
-                </select>
+                <label class="form-label d-block">Sensory Warna</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][sensory_color]" value="✓"
+                        class="form-check-input" id="sensory_color_ok___index__" checked>
+                    <label class="form-check-label" for="sensory_color_ok___index__">✓</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][sensory_color]" value="x"
+                        class="form-check-input" id="sensory_color_x___index__">
+                    <label class="form-check-label" for="sensory_color_x___index__">x</label>
+                </div>
             </div>
             <div class="col-md-4">
-                <label class="form-label">Kontaminasi</label>
-                <select name="details[__index__][contamination]" class="form-control">
-                    <option value="✓">✓</option>
-                    <option value="x">x</option>
-                </select>
+                <label class="form-label d-block">Kontaminasi</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][contamination]" value="✓"
+                        class="form-check-input" id="contamination_ok___index__" checked>
+                    <label class="form-check-label" for="contamination_ok___index__">✓</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][contamination]" value="x"
+                        class="form-check-input" id="contamination_x___index__">
+                    <label class="form-check-label" for="contamination_x___index__">x</label>
+                </div>
             </div>
             <div class="col-md-4">
-                <label>Status</label>
-                <select name="details[__index__][status]" class="form-control">
-                    <option value="OK">OK</option>
-                    <option value="Tidak OK">Tidak OK</option>
-                </select>
+                <label class="form-label d-block">Status</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][status]" value="OK"
+                        class="form-check-input" id="status_ok___index__" checked>
+                    <label class="form-check-label" for="status_ok___index__">OK</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" name="details[__index__][status]" value="Tidak OK"
+                        class="form-check-input" id="status_tidak_ok___index__">
+                    <label class="form-check-label" for="status_tidak_ok___index__">Tidak OK</label>
+                </div>
             </div>
         </div>
+
         <div class="row mt-3">
-            <div class="col-md-6">
+            <div class="col-md-6 tindakan-koreksi-wrapper" style="display:none;">
                 <label class="form-label">Tindakan Koreksi</label>
                 <textarea name="details[__index__][corrective_action]" class="form-control" rows="2"></textarea>
             </div>
@@ -473,8 +545,62 @@ function initRawMaterialSelectEvent(context) {
     });
 }
 
+// --- Tindakan Koreksi toggle ---
+const KOREKSI_FIELDS = [
+    'packaging_condition',
+    'sensory_appearance',
+    'sensory_aroma',
+    'sensory_color',
+    'contamination',
+    'status'
+];
+
+function isRowNeedsKoreksi(row) {
+    return KOREKSI_FIELDS.some(field => {
+        const checked = row.querySelector(`input[name$="[${field}]"]:checked`);
+        if (!checked) return false;
+        return checked.value === 'x' || checked.value === 'Tidak OK';
+    });
+}
+
+function toggleKoreksi(row) {
+    const wrapper = row.querySelector('.tindakan-koreksi-wrapper');
+    if (!wrapper) return;
+
+    if (isRowNeedsKoreksi(row)) {
+        wrapper.style.display = '';
+    } else {
+        wrapper.style.display = 'none';
+        const textarea = wrapper.querySelector('textarea');
+        if (textarea) textarea.value = '';
+    }
+}
+
+function initKoreksiToggle(row) {
+    const radios = row.querySelectorAll(
+        KOREKSI_FIELDS.map(f => `input[name$="[${f}]"]`).join(',')
+    );
+    radios.forEach(radio => {
+        radio.addEventListener('change', () => toggleKoreksi(row));
+    });
+    toggleKoreksi(row);
+}
+// --- end toggle ---
+
 document.addEventListener('DOMContentLoaded', function() {
-    initRawMaterialSelectEvent(document);
+    try {
+        initRawMaterialSelectEvent(document);
+    } catch (e) {
+        console.error('initRawMaterialSelectEvent gagal:', e);
+    }
+
+    document.querySelectorAll('.detail-row').forEach(row => {
+        try {
+            initKoreksiToggle(row);
+        } catch (e) {
+            console.error('initKoreksiToggle gagal:', e);
+        }
+    });
 
     document.getElementById('add-detail-btn').addEventListener('click', function() {
         const templateHtml = document.getElementById('detail-template').innerHTML;
@@ -483,7 +609,18 @@ document.addEventListener('DOMContentLoaded', function() {
         wrapper.innerHTML = rendered;
         const newRow = wrapper.firstElementChild;
         document.getElementById('detail-container').appendChild(newRow);
-        initRawMaterialSelectEvent(newRow); // pasang event di row baru
+
+        try {
+            initRawMaterialSelectEvent(newRow);
+        } catch (e) {
+            console.error('initRawMaterialSelectEvent gagal untuk row baru:', e);
+        }
+        try {
+            initKoreksiToggle(newRow);
+        } catch (e) {
+            console.error('initKoreksiToggle gagal untuk row baru:', e);
+        }
+
         detailIndex++;
     });
 });

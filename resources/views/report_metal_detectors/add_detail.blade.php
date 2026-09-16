@@ -43,25 +43,45 @@
                 </div>
                 <div class="row">
                     <div class="mb-2 col-md-4">
-                        <label>Hasil Deteksi Fe 1.5 mm</label>
-                        <select name="result_fe" class="form-control" required>
-                            <option value="√">√ (Terdeteksi)</option>
-                            <option value="x">x (Tidak terdeteksi)</option>
-                        </select>
+                        <label class="form-label d-block">Hasil Deteksi Fe 1.5 mm</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="result_fe" value="√"
+                                class="form-check-input" id="result_fe_ok" required checked>
+                            <label class="form-check-label" for="result_fe_ok">√</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="result_fe" value="x"
+                                class="form-check-input" id="result_fe_x" required >
+                            <label class="form-check-label" for="result_fe_x">x</label>
+                        </div>
                     </div>
+
                     <div class="mb-2 col-md-4">
-                        <label>Hasil Deteksi Non Fe 1.5 mm</label>
-                        <select name="result_non_fe" class="form-control" required>
-                            <option value="√">√ (Terdeteksi)</option>
-                            <option value="x">x (Tidak terdeteksi)</option>
-                        </select>
+                        <label class="form-label d-block">Hasil Deteksi Non Fe 2 mm</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="result_non_fe" value="√"
+                                class="form-check-input" id="result_non_fe_ok" required checked>
+                            <label class="form-check-label" for="result_non_fe_ok">√</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="result_non_fe" value="x"
+                                class="form-check-input" id="result_non_fe_x" required >
+                            <label class="form-check-label" for="result_non_fe_x">x</label>
+                        </div>
                     </div>
+
                     <div class="mb-2 col-md-4">
-                        <label>Hasil Deteksi SUS 316 2.5 mm</label>
-                        <select name="result_sus316" class="form-control" required>
-                            <option value="√">√ (Terdeteksi)</option>
-                            <option value="x">x (Tidak terdeteksi)</option>
-                        </select>
+                        <label class="form-label d-block">Hasil Deteksi SUS 316 2.5 mm</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="result_sus316" value="√"
+                                class="form-check-input" id="result_sus316_ok" required checked>
+                            <label class="form-check-label" for="result_sus316_ok">√</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="result_sus316" value="x"
+                                class="form-check-input" id="result_sus316_x" required >
+                            <label class="form-check-label" for="result_sus316_x">x</label>
+                        </div>
                     </div>
                 </div>
                 <!-- <div class="mb-3">
@@ -78,11 +98,17 @@
                         <input type="text" name="nonconformity" class="form-control">
                     </div> -->
                     <div class="col-md-4">
-                        <label>Status</label>
-                        <select name="verif_after_correct" class="form-control">
-                            <option value="√">√ </option>
-                            <option value="x">x </option>
-                        </select>
+                        <label class="form-label d-block">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="verif_after_correct" value="√"
+                                class="form-check-input" id="verif_after_correct_ok" checked>
+                            <label class="form-check-label" for="verif_after_correct_ok">√</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="verif_after_correct" value="x"
+                                class="form-check-input" id="verif_after_correct_x" >
+                            <label class="form-check-label" for="verif_after_correct_x">x</label>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Tindakan Koreksi</label>

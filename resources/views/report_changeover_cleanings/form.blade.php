@@ -184,15 +184,36 @@ const ITEMS_BY_SECTION_URL = "{{ url('/master-checklist-items/by-section') }}";
 $(document).ready(function() {
     let nextBatchIndex = parseInt($('#next-batch-index').val(), 10);
 
-    function buildScoreSelectHtml(name) {
-        let html = `<select name="${name}" class="form-control form-control-sm">`;
-        html += `<option value="">-</option>`;
+    // ganti dari <select> single ke checkbox matrix 4 kolom
+    function buildScoreCellsHtml(name, minCriteria, selectedValues) {
+        minCriteria = minCriteria || 1;
+        selectedValues = (selectedValues || []).map(String);
+        const safeId = name.replace(/[^A-Za-z0-9_]/g, '_');
+        let html = '';
         CRITERIA_PAIRS.forEach(pair => {
-            pair.forEach(num => {
-                html += `<option value="${num}">${num} - ${CRITERIA_LABELS[num]}</option>`;
-            });
+            const disabled = pair[0] < minCriteria;
+            html += `<td class="text-center align-middle ${disabled ? 'bg-secondary bg-opacity-25' : ''}" style="min-width:70px;">`;
+            if (!disabled) {
+                pair.forEach(num => {
+                    const checked = selectedValues.includes(String(num)) ? 'checked' : '';
+                    html += `
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="checkbox" name="${name}[]" id="${safeId}_${num}" value="${num}" title="${CRITERIA_LABELS[num] ?? ''}" ${checked}>
+                            <label class="form-check-label small" for="${safeId}_${num}">${num}</label>
+                        </div>`;
+                });
+            }
+            html += `</td>`;
         });
-        html += `</select>`;
+        return html;
+    }
+
+    // header 2 baris: "Kriteria Penilaian" + label pair (1/2, 3/4, dst)
+    function buildScoreTheadHtml() {
+        let html = '';
+        CRITERIA_PAIRS.forEach(pair => {
+            html += `<th class="text-center" style="min-width:70px;">${pair.join('/')}</th>`;
+        });
         return html;
     }
 
@@ -227,10 +248,11 @@ $(document).ready(function() {
 
     function buildManualRow(batchIndex, groupKey, rowIndex, rowData) {
         rowData = rowData || {};
+        const minCriteria = groupKey === 'sisa_bahan_items' ? 1 : 3;
         return `
             <tr>
                 <td>${buildNameSelect(`batches[${batchIndex}][${groupKey}][${rowIndex}][name]`, groupKey, rowData.name)}</td>
-                <td>${buildScoreSelectHtml(`batches[${batchIndex}][${groupKey}][${rowIndex}][score]`)}</td>
+                ${buildScoreCellsHtml(`batches[${batchIndex}][${groupKey}][${rowIndex}][score]`, minCriteria, rowData.score)}
                 <td><input type="text" name="batches[${batchIndex}][${groupKey}][${rowIndex}][notes]" class="form-control" value="${rowData.notes ?? ''}" placeholder="masukkan keterangan"></td>
                 <td><input type="text" name="batches[${batchIndex}][${groupKey}][${rowIndex}][corrective_action]" class="form-control" value="${rowData.corrective_action ?? ''}" placeholder="masukkan tindakan koreksi"></td>
                 <td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-manual-row"><i class="fas fa-times"></i></button></td>
@@ -241,16 +263,16 @@ $(document).ready(function() {
     function loadMachineItems(batchIndex, sectionUuid, preselected) {
         preselected = preselected || {};
         const $tbody = $(`#machine-items-body-${batchIndex}`);
-        $tbody.html('<tr><td colspan="5" class="text-center text-muted">Memuat...</td></tr>');
+        $tbody.html('<tr><td colspan="7" class="text-center text-muted">Memuat...</td></tr>');
 
         if (!sectionUuid) {
-            $tbody.html('<tr><td colspan="5" class="text-center text-muted">Pilih Section terlebih dahulu.</td></tr>');
+            $tbody.html('<tr><td colspan="7" class="text-center text-muted">Pilih Section terlebih dahulu.</td></tr>');
             return;
         }
 
         $.get(`${ITEMS_BY_SECTION_URL}/${sectionUuid}`, function(items) {
             if (!items.length) {
-                $tbody.html('<tr><td colspan="5" class="text-center text-muted">Tidak ada item untuk Section ini.</td></tr>');
+                $tbody.html('<tr><td colspan="7" class="text-center text-muted">Tidak ada item untuk Section ini.</td></tr>');
                 return;
             }
 
@@ -260,21 +282,14 @@ $(document).ready(function() {
                 html += `
                     <tr>
                         <td>${item.name}</td>
-                        <td>${buildScoreSelectHtml(`batches[${batchIndex}][machine_items][${item.uuid}][score]`)}</td>
+                        ${buildScoreCellsHtml(`batches[${batchIndex}][machine_items][${item.uuid}][score]`, 3, d.score)}
                         <td><input type="text" name="batches[${batchIndex}][machine_items][${item.uuid}][notes]" class="form-control" value="${d.notes ?? ''}" placeholder="masukkan keterangan"></td>
                         <td><input type="text" name="batches[${batchIndex}][machine_items][${item.uuid}][corrective_action]" class="form-control" value="${d.corrective_action ?? ''}" placeholder="masukkan tindakan koreksi"></td>
                     </tr>
                 `;
             });
             $tbody.html(html);
-
-            // set score terpilih (setelah select ter-render)
-            items.forEach(item => {
-                const d = preselected[item.uuid];
-                if (d && d.score) {
-                    $tbody.find(`select[name="batches[${batchIndex}][machine_items][${item.uuid}][score]"]`).val(d.score);
-                }
-            });
+            // checkbox sudah ter-checked langsung dari buildScoreCellsHtml, ga perlu blok "set score terpilih" lagi
         });
     }
 
@@ -314,12 +329,13 @@ $(document).ready(function() {
                 <table class="table table-sm table-bordered mb-3">
                     <thead>
                         <tr>
-                            <th style="min-width:180px;">Item</th>
-                            <th style="min-width:110px;">Kriteria (1-8)</th>
-                            <th style="min-width:150px;">Keterangan</th>
-                            <th style="min-width:150px;">Tindakan Koreksi</th>
-                            <th style="width:40px;"></th>
+                            <th rowspan="2" class="align-middle" style="min-width:180px;">Item</th>
+                            <th colspan="4" class="text-center">Kriteria Penilaian</th>
+                            <th rowspan="2" class="align-middle" style="min-width:150px;">Keterangan</th>
+                            <th rowspan="2" class="align-middle" style="min-width:150px;">Tindakan Koreksi</th>
+                            <th rowspan="2" style="width:40px;"></th>
                         </tr>
+                        <tr>${buildScoreTheadHtml()}</tr>
                     </thead>
                     <tbody class="manual-items-body" data-group="sisa_bahan_items"></tbody>
                 </table>
@@ -331,14 +347,15 @@ $(document).ready(function() {
                 <table class="table table-sm table-bordered mb-4">
                     <thead>
                         <tr>
-                            <th style="min-width:180px;">Item</th>
-                            <th style="min-width:110px;">Kriteria (1-8)</th>
-                            <th style="min-width:150px;">Keterangan</th>
-                            <th style="min-width:150px;">Tindakan Koreksi</th>
+                            <th rowspan="2" class="align-middle" style="min-width:180px;">Item</th>
+                            <th colspan="4" class="text-center">Kriteria Penilaian (3-8)</th>
+                            <th rowspan="2" class="align-middle" style="min-width:150px;">Keterangan</th>
+                            <th rowspan="2" class="align-middle" style="min-width:150px;">Tindakan Koreksi</th>
                         </tr>
+                        <tr>${buildScoreTheadHtml()}</tr>
                     </thead>
                     <tbody id="machine-items-body-${batchIndex}">
-                        <tr><td colspan="5" class="text-center text-muted">Pilih Section terlebih dahulu.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted">Pilih Section terlebih dahulu.</td></tr>
                     </tbody>
                 </table>
 
@@ -346,12 +363,13 @@ $(document).ready(function() {
                 <table class="table table-sm table-bordered mb-0">
                     <thead>
                         <tr>
-                            <th style="min-width:180px;">Item</th>
-                            <th style="min-width:110px;">Kriteria (1-8)</th>
-                            <th style="min-width:150px;">Keterangan</th>
-                            <th style="min-width:150px;">Tindakan Koreksi</th>
-                            <th style="width:40px;"></th>
+                            <th rowspan="2" class="align-middle" style="min-width:180px;">Item</th>
+                            <th colspan="4" class="text-center">Kriteria Penilaian (3-8)</th>
+                            <th rowspan="2" class="align-middle" style="min-width:150px;">Keterangan</th>
+                            <th rowspan="2" class="align-middle" style="min-width:150px;">Tindakan Koreksi</th>
+                            <th rowspan="2" style="width:40px;"></th>
                         </tr>
+                        <tr>${buildScoreTheadHtml()}</tr>
                     </thead>
                     <tbody class="manual-items-body" data-group="kondisi_ruangan_items"></tbody>
                 </table>
@@ -364,7 +382,6 @@ $(document).ready(function() {
         $wrapper.find(`select[name="batches[${batchIndex}][product_uuid]"]`).val(batch.product_uuid ?? '');
         $wrapper.find(`select[name="batches[${batchIndex}][section_uuid]"]`).val(batch.section_uuid ?? '');
 
-        // isi baris manual dari data existing (edit) atau kosong 1 baris default
         ['sisa_bahan_items', 'kondisi_ruangan_items'].forEach(groupKey => {
             const $tbody = $wrapper.find(`tbody.manual-items-body[data-group="${groupKey}"]`);
             const rows = (batch[groupKey] && batch[groupKey].length) ? batch[groupKey] : [{}];
@@ -381,25 +398,21 @@ $(document).ready(function() {
         }
     }
 
-    // Tambah pergantian produk baru
     $('#add-batch').on('click', function() {
         const $el = buildBatch(nextBatchIndex, {});
         $('#batches-container').append($el);
         nextBatchIndex++;
     });
 
-    // Hapus satu batch
     $(document).on('click', '.remove-batch', function() {
         $(this).closest('.batch-section').remove();
     });
 
-    // Ganti Section -> reload Mesin & Peralatan
     $(document).on('change', '.section-select', function() {
         const batchIndex = $(this).closest('.batch-section').data('batch-index');
         loadMachineItems(batchIndex, $(this).val(), {});
     });
 
-    // Tambah baris manual (Sisa Bahan / Kondisi Ruangan)
     $(document).on('click', '.add-manual-row', function() {
         const $batchEl = $(this).closest('.batch-section');
         const batchIndex = $batchEl.data('batch-index');
@@ -409,9 +422,15 @@ $(document).ready(function() {
         $tbody.append(buildManualRow(batchIndex, groupKey, rowIndex, {}));
     });
 
-    // Hapus baris manual
     $(document).on('click', '.remove-manual-row', function() {
         $(this).closest('tr').remove();
+    });
+
+    // Batasi hanya 1 checkbox terpilih per pair (per <td>)
+    $(document).on('change', 'input[type="checkbox"][name*="[score]"]', function() {
+        if ($(this).is(':checked')) {
+            $(this).closest('td').find('input[type="checkbox"]').not(this).prop('checked', false);
+        }
     });
 });
 </script>

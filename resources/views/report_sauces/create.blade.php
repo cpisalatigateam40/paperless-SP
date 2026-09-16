@@ -158,6 +158,14 @@
                         <input type="number" step="0.01" name="details[0][duration]" class="form-control" placeholder="mis: 6">
                     </div> -->
                     <div class="col-md-6 mb-3">
+                        <label class="form-label">Hasil Brix (%)</label>
+                        <input type="number" step="0.01" name="details[0][brix]" class="form-control" placeholder="mis: 12.5">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Hasil Salinity (%)</label>
+                        <input type="number" step="0.01" name="details[0][salinity]" class="form-control" placeholder="mis: 2.5">
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Pressure (Bar)</label>
                         <input type="number" step="0.01" name="details[0][pressure]" class="form-control" placeholder="mis: 6.5">
                     </div>

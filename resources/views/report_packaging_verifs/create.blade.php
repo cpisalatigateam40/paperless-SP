@@ -76,16 +76,27 @@
                                 <label class="form-label">
                                     Upload MD BPOM, QR Code, Kode Produksi, dan Expire Date
                                 </label>
-                                <input type="file" name="details[0][upload_md_multi][]"
-                                    class="form-control upload-md-multi" multiple accept="image/*">
 
-                                <small class="text-muted d-block mt-1">
+                                <div class="d-flex" style="gap: .5rem;">
+                                    <input type="file" name="details[0][upload_md_multi][]"
+                                        class="form-control upload-md-multi" multiple accept="image/*" id="md-multi-input-0">
+
+                                    <button type="button" class="btn btn-outline-secondary btn-camera-capture"
+                                        data-target="md-multi-input-0" title="Ambil Foto">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                </div>
+
+                                {{-- Input tersembunyi khusus kamera --}}
+                                <input type="file" accept="image/*" capture="environment"
+                                    class="d-none camera-capture-input" data-target="md-multi-input-0">
+
+                                <small class="text-muted d-block mt-3">
                                     <i class="fas fa-info-circle"></i>
-                                    Format: JPG, JPEG, PNG &bull;
+                                    Silahkan pilih upload foto atau langsung buka akses kamera melalui tombol bericon kamera (Format: JPG, JPEG, PNG) &bull;
                                 </small>
 
-                                <div class="invalid-feedback-custom text-danger mt-1"
-                                    style="font-size: 0.85rem; display: none;"></div>
+                                <div class="invalid-feedback-custom text-danger mt-1" style="font-size: 0.85rem; display: none;"></div>
                                 <div class="preview-md-multi mt-2 d-flex flex-wrap" style="gap: 10px;"></div>
                             </div>
                         </div>
@@ -301,14 +312,14 @@
 <div class="card mb-3">
     <div class="card-body p-2">
         <div class="row">
-            <div class="col-md-6">
+            <!-- <div class="col-md-6">
                 <label class="small">Hasil Verifikasi MD</label>
                 <select name="details[0][checklist][verif_md]" class="form-control">
                     <option value="OK">OK</option>
                     <option value="Tidak OK">Tidak OK</option>
                 </select>
-            </div>
-            <div class="col-md-6">
+            </div> -->
+            <div class="col-md-12">
                 <label class="small">Keterangan</label>
                 <input type="text" name="details[0][checklist][notes]" class="form-control">
             </div>
@@ -452,8 +463,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fungsi handle perubahan input file
     async function handleFileChange(input) {
         const files = Array.from(input.files);
-        const errorBox = input.parentElement.querySelector('.invalid-feedback-custom');
-        const preview = input.parentElement.querySelector('.preview-md-multi');
+        // const errorBox = input.parentElement.querySelector('.invalid-feedback-custom');
+        // const preview = input.parentElement.querySelector('.preview-md-multi');
+        const errorBox = input.closest('.col-md-4').querySelector('.invalid-feedback-custom');
+        const preview = input.closest('.col-md-4').querySelector('.preview-md-multi');
 
         errorBox.style.display = 'none';
         errorBox.innerHTML = '';
@@ -536,6 +549,76 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.upload-md-multi').forEach(function(input) {
         input.addEventListener('change', function() {
             handleFileChange(this);
+        });
+    });
+
+    // ===== Ambil Foto via Kamera =====
+    document.querySelectorAll('.btn-camera-capture').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const captureInput = document.querySelector(`.camera-capture-input[data-target="${targetId}"]`);
+            if (captureInput) captureInput.click();
+        });
+    });
+
+    function renderMdMultiPreview(input) {
+        const preview = input.closest('.col-md-4').querySelector('.preview-md-multi');
+        preview.innerHTML = '';
+        Array.from(input.files).forEach(function(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'display: inline-block; text-align: center;';
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.cssText = 'width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6; display: block;';
+
+                const sizeLabel = document.createElement('small');
+                sizeLabel.style.cssText = 'font-size: 10px; color: #6c757d;';
+                sizeLabel.innerText = (file.size / 1024).toFixed(0) + ' KB';
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(sizeLabel);
+                preview.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    document.querySelectorAll('.camera-capture-input').forEach(function(captureInput) {
+        captureInput.addEventListener('change', async function() {
+            if (this.files.length === 0) return;
+
+            const targetId = this.dataset.target;
+            const mainInput = document.getElementById(targetId);
+            if (!mainInput) return;
+
+            const existingFiles = Array.from(mainInput.files);
+
+            if (existingFiles.length >= MAX_FILES) {
+                const errorBox = mainInput.closest('.col-md-4').querySelector('.invalid-feedback-custom');
+                errorBox.classList.remove('text-info');
+                errorBox.classList.add('text-danger');
+                errorBox.innerText = `Maksimal ${MAX_FILES} file yang diizinkan.`;
+                errorBox.style.display = 'block';
+                this.value = '';
+                return;
+            }
+
+            // Kompres hasil jepretan kamera
+            const compressed = await compressImage(this.files[0], COMPRESS_QUALITY);
+
+            // Gabungkan dengan file yang sudah ada di input utama (upload/gallery + jepretan sebelumnya)
+            const dataTransfer = new DataTransfer();
+            existingFiles.forEach(f => dataTransfer.items.add(f));
+            dataTransfer.items.add(compressed);
+            mainInput.files = dataTransfer.files;
+
+            // Reset input kamera supaya bisa dipakai jepret ulang
+            this.value = '';
+
+            renderMdMultiPreview(mainInput);
         });
     });
 

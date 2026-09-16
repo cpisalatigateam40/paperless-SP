@@ -206,18 +206,20 @@ $isAudit = Request::is([
                     href="{{ route('report_rm_arrivals.index') }}">
                     Verifikasi Bahan Baku dan Bahan Penunjang
                 </a>
-                <a class="collapse-item {{ Request::is('report-premixes*') ? 'active' : '' }}"
+                <!-- <a class="collapse-item {{ Request::is('report-premixes*') ? 'active' : '' }}"
                     href="{{ route('report-premixes.index') }}">
                     Pemeriksaan Premix
-                </a>
+                </a> -->
                 <a class="collapse-item {{ Request::is('report-emulsion-makings*') ? 'active' : '' }}"
                     href="{{ route('report_emulsion_makings.index') }}">
                     Verifikasi Proses Pembuatan Emulsi
                 </a>
-                <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
+                @if (!in_array(auth()->user()->area?->name, ['Cikande 1', 'Cikande 2', 'Cikande 3']))
+                    <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
                     href="{{ route('report_metal_detectors.index') }}">
-                    Verifikasi Kinerja Metal Detector Adonan
-                </a>
+                        Verifikasi Kinerja Metal Detector Adonan
+                    </a>
+                @endif
                 <a class="collapse-item {{ Request::is('report-process-productions*') ? 'active' : '' }}"
                     href="{{ route('report_process_productions.index') }}">
                     Verifikasi Proses Mixing, Chopping, dan Emulsifying
@@ -303,10 +305,12 @@ $isAudit = Request::is([
                     Form Pengambilan Sample
                 </a>
 
-                <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
+                @if (auth()->user()->area?->name !== 'Bandung')
+                    <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
                     href="{{ route('report_startup_labels.index') }}">
-                    Verifikasi Labelisasi Start-Up
-                </a>
+                        Verifikasi Labelisasi Start-Up
+                    </a>
+                @endif
             </div>
         </div>
     </li>

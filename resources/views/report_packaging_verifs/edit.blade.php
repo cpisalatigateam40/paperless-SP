@@ -102,18 +102,40 @@
                                 $files = json_decode($detail->upload_md_multi, true);
                                 @endphp
 
-                                <div class="mb-2">
+                                <div class="mb-2 d-flex flex-wrap" style="gap: 10px;">
                                     @foreach($files as $file)
-                                    <a href="{{ asset('storage/' . $file) }}" target="_blank">
-                                        <img src="{{ asset('storage/' . $file) }}" alt="Preview" width="60" height="60"
-                                            style="object-fit: cover; border: 1px solid #ccc; border-radius: 4px; margin-right: 6px;">
-                                    </a>
+                                    <div class="old-photo-item" style="position: relative; display: inline-block;">
+                                        <a href="{{ asset('storage/' . $file) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $file) }}" alt="Preview" width="60" height="60"
+                                                style="object-fit: cover; border: 1px solid #ccc; border-radius: 4px; display: block;">
+                                        </a>
+                                        <button type="button" class="btn-remove-old-photo" title="Hapus foto lama"
+                                            style="position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; line-height: 1; padding: 0; border-radius: 50%; background: #dc3545; color: #fff; border: none; font-size: 10px;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <input type="hidden" name="details[{{ $i }}][old_upload_md_multi][]" value="{{ $file }}">
+                                    </div>
                                     @endforeach
                                 </div>
                                 @endif
 
-                                <input type="file" name="details[{{ $i }}][upload_md_multi][]" class="form-control"
-                                    multiple>
+                                <div class="d-flex" style="gap: .5rem;">
+                                    <input type="file" name="details[{{ $i }}][upload_md_multi][]"
+                                        class="form-control upload-md-multi" multiple accept="image/*"
+                                        id="md-multi-input-{{ $i }}">
+
+                                    <button type="button" class="btn btn-outline-secondary btn-camera-capture"
+                                        data-target="md-multi-input-{{ $i }}" title="Ambil Foto">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                </div>
+
+                                {{-- Input tersembunyi khusus kamera --}}
+                                <input type="file" accept="image/*" capture="environment"
+                                    class="d-none camera-capture-input" data-target="md-multi-input-{{ $i }}">
+
+                                <div class="invalid-feedback-custom text-danger mt-1" style="font-size: 0.85rem; display: none;"></div>
+                                <div class="preview-md-multi mt-2 d-flex flex-wrap" style="gap: 10px;"></div>
                             </div>
 
 
@@ -385,15 +407,15 @@
 
 <div class="card mb-3 mt-3">
     <div class="card-body p-2 row">
-        <div class="col-md-6">
+        <!-- <div class="col-md-6">
             <label class="small">Hasil Verifikasi MD</label>
             <select name="details[{{ $i }}][checklist][verif_md]" class="form-control">
                 <option value="OK" {{ ($detail->checklist->verif_md ?? '') == 'OK' ? 'selected' : '' }}>OK</option>
                 <option value="Tidak OK" {{ ($detail->checklist->verif_md ?? '') == 'Tidak OK' ? 'selected' : '' }}>
                     Tidak OK</option>
             </select>
-        </div>
-        <div class="col-md-6">
+        </div> -->
+        <div class="col-md-12">
             <label class="small">Keterangan</label>
             <input type="text" name="details[{{ $i }}][checklist][notes]" class="form-control"
                 value="{{ $detail->checklist->notes ?? '' }}">
@@ -584,27 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Preview
         if (preview) {
-            compressedFiles.forEach(function(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const wrapper = document.createElement('div');
-                    wrapper.style.cssText = 'display: inline-block; text-align: center;';
-
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.cssText =
-                        'width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6; display: block;';
-
-                    const sizeLabel = document.createElement('small');
-                    sizeLabel.style.cssText = 'font-size: 10px; color: #6c757d;';
-                    sizeLabel.innerText = (file.size / 1024).toFixed(0) + ' KB';
-
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(sizeLabel);
-                    preview.appendChild(wrapper);
-                };
-                reader.readAsDataURL(file);
-            });
+            renderMdMultiPreview(input);
         }
     }
 
@@ -613,6 +615,107 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('upload-md-multi')) {
             handleFileChange(e.target);
         }
+    });
+
+    // ===== Tombol kamera (delegated, otomatis cocok untuk semua row) =====
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-camera-capture');
+        if (!btn) return;
+        const targetId = btn.dataset.target;
+        const captureInput = document.querySelector(`.camera-capture-input[data-target="${targetId}"]`);
+        if (captureInput) captureInput.click();
+    });
+
+    // ===== Render ulang preview tanpa re-compress =====
+function renderMdMultiPreview(input) {
+    const preview = input.closest('.col-md-4').querySelector('.preview-md-multi');
+    if (!preview) return;
+    preview.innerHTML = '';
+
+    const files = Array.from(input.files);
+
+    files.forEach(function(file, idx) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position: relative; display: inline-block; text-align: center;';
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.cssText = 'width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6; display: block;';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.title = 'Hapus foto';
+            removeBtn.style.cssText = 'position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; line-height: 1; padding: 0; border-radius: 50%; background: #dc3545; color: #fff; border: none; font-size: 10px;';
+            removeBtn.addEventListener('click', function() {
+                const remaining = Array.from(input.files).filter((_, i) => i !== idx);
+                const dt = new DataTransfer();
+                remaining.forEach(f => dt.items.add(f));
+                input.files = dt.files;
+                renderMdMultiPreview(input);
+            });
+
+            const sizeLabel = document.createElement('small');
+            sizeLabel.style.cssText = 'font-size: 10px; color: #6c757d; display: block;';
+            sizeLabel.innerText = (file.size / 1024).toFixed(0) + ' KB';
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            wrapper.appendChild(sizeLabel);
+            preview.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
+    });
+
+}
+
+// ===== Hapus foto lama (yang sudah tersimpan di server) =====
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-remove-old-photo');
+        if (!btn) return;
+
+        if (!confirm('Hapus foto ini dari laporan?')) return;
+
+        btn.closest('.old-photo-item').remove();
+    });
+
+    // ===== Hasil jepretan kamera → gabung ke input upload-md-multi yang sesuai row-nya =====
+    document.addEventListener('change', async function(e) {
+        if (!e.target.classList.contains('camera-capture-input')) return;
+
+        const captureInput = e.target;
+        if (captureInput.files.length === 0) return;
+
+        const targetId = captureInput.dataset.target;
+        const mainInput = document.getElementById(targetId);
+        if (!mainInput) return;
+
+        const existingFiles = Array.from(mainInput.files);
+        const errBox = mainInput.closest('.col-md-4').querySelector('.invalid-feedback-custom');
+
+        if (existingFiles.length >= MAX_FILES) {
+            if (errBox) {
+                errBox.classList.remove('text-info');
+                errBox.classList.add('text-danger');
+                errBox.innerText = `Maksimal ${MAX_FILES} file yang diizinkan.`;
+                errBox.style.display = 'block';
+            }
+            captureInput.value = '';
+            return;
+        }
+
+        const compressed = await compressImage(captureInput.files[0], COMPRESS_QUALITY);
+
+        const dataTransfer = new DataTransfer();
+        existingFiles.forEach(f => dataTransfer.items.add(f));
+        dataTransfer.items.add(compressed);
+        mainInput.files = dataTransfer.files;
+
+        captureInput.value = '';
+
+        renderMdMultiPreview(mainInput);
     });
 
     // Blokir submit jika masih ada file > 2MB

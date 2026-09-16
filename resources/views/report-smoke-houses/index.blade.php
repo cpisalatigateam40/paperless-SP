@@ -232,12 +232,24 @@
                                 <i class="fas fa-eye"></i>
                             </button>
 
-                            @can('edit report')
+                            <!-- @can('edit report')
                             <a href="{{ route('report-smoke-houses.edit',$report->uuid) }}"
                                 class="btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            @endcan
+                            @endcan -->
+
+                            @php
+                                $user = auth()->user();
+                                $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(4));
+                            @endphp
+
+                            @if($canEdit)
+                                <a href="{{ route('report-smoke-houses.edit', $report->uuid) }}"
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            @endif
 
                             @can('delete report')
                             <form action="{{ route('report-smoke-houses.destroy',$report->uuid) }}" method="POST"
