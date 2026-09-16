@@ -91,9 +91,9 @@
                                 <input type="file" accept="image/*" capture="environment"
                                     class="d-none camera-capture-input" data-target="md-multi-input-0">
 
-                                <small class="text-muted d-block mt-1">
+                                <small class="text-muted d-block mt-3">
                                     <i class="fas fa-info-circle"></i>
-                                    Format: JPG, JPEG, PNG &bull;
+                                    Silahkan pilih upload foto atau langsung buka akses kamera melalui tombol bericon kamera (Format: JPG, JPEG, PNG) &bull;
                                 </small>
 
                                 <div class="invalid-feedback-custom text-danger mt-1" style="font-size: 0.85rem; display: none;"></div>
