@@ -277,7 +277,7 @@ class ReportPackagingVerifController extends Controller
                 'report_uuid' => $report->uuid,
                 'product_uuid' => $detail['product_uuid'],
                 'time' => $detail['time'],
-                // 'production_code' => $detail['production_code'],
+                'production_code' => $detail['production_code'],
                 // 'expired_date' => $detail['expired_date'],
                 'upload_md' => $uploadMd,
                 'upload_qr' => $uploadQr,
@@ -484,6 +484,7 @@ class ReportPackagingVerifController extends Controller
                 'upload_md_multi' => $uploadMdMulti ? json_encode(array_values($uploadMdMulti)) : null,
                 'time' => $detail['time'],
                 'gramase' => $detail['gramase'] ?? null,
+                'production_code' => $detail['production_code'],
             ]);
 
             $checklistData = [
@@ -715,6 +716,7 @@ class ReportPackagingVerifController extends Controller
                 'upload_md_multi' => !empty($uploadMdMulti) ? json_encode($uploadMdMulti) : null,
                 'time' => $detail['time'],
                 'gramase' => $detail['gramase'] ?? null,
+                'production_code' => $detail['production_code'],
 
             ]);
 

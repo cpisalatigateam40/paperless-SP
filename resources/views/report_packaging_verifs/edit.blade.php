@@ -39,6 +39,7 @@
                             <th>Jam</th>
                             <th>Produk</th>
                             <th>Gramase</th>
+                            <th>Kode Produksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,6 +59,14 @@
                             <td>
                                 <input type="number" step="0.01" name="details[{{ $i }}][gramase]" class="form-control"
                                     placeholder="Masukkan gramase" value="{{ $detail->gramase }}" required>
+                            </td>
+                            <td>
+                                <input type="text"
+                                    name="details[{{ $i }}][production_code]"
+                                    class="form-control"
+                                    placeholder="Masukkan production code"
+                                    value="{{ $detail->production_code }}"
+                                    required>
                             </td>
                         </tr>
                     </tbody>

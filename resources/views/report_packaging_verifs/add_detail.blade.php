@@ -26,6 +26,7 @@
                             <th>Jam</th>
                             <th>Produk</th>
                             <th>Gramase</th>
+                            <th>Kode Produksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,6 +43,10 @@
                             <td>
                                 <input type="number" step="0.01" name="details[0][gramase]" class="form-control"
                                     placeholder="Masukkan gramase" required>
+                            </td>
+                            <td>
+                                <input type="text" name="details[0][production_code]" class="form-control"
+                                    placeholder="Masukkan production code">
                             </td>
                         </tr>
                     </tbody>
