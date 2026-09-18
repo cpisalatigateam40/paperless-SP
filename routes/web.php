@@ -85,6 +85,7 @@ use App\Http\Controllers\FormNumberController;
 use	App\Http\Controllers\SsoLoginController;
 use App\Http\Controllers\ReportAuditPackingPrimerController;
 use App\Http\Controllers\MasterBoilingTankStandardController;
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
@@ -106,9 +107,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['shift.selected'])->group(function () {
     
-    Route::get('/dashboard', function () {
-            return view('dashboard');
-        })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // USER ROUTES
     Route::prefix('users')
