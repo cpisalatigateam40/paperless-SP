@@ -285,6 +285,7 @@
                                             <th rowspan="2">Jam</th>
                                             <th rowspan="2">Produk</th>
                                             <th rowspan="2">Gramase</th>
+                                            <th rowspan="2">Kode Produksi</th>
                                             <th rowspan="2">Upload MD BPOM, QR Code, Kode Produksi, dan Expire Date</th>
                                             <!-- <th rowspan="2">Upload MD BPOM</th>
                                             <th rowspan="2">Upload QR Code</th>
@@ -347,6 +348,9 @@
                                             <td rowspan="5">{{ !empty($d->gramase) 
                                                         ? $d->gramase 
                                                         : ($d->product->nett_weight ?? '-') }} g</td>
+                                            <td rowspan="5">
+                                                {{ $d->production_code ?? '-' }}
+                                            </td>
                                             <td rowspan="5">
                                                 @if(!empty($d->upload_md_multi))
                                                     @php
