@@ -26,23 +26,20 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                 $sheet = $event->sheet->getDelegate();
 
                 // ── Judul ──────────────────────────────────────────────────
-                $sheet->mergeCells('A1:X1');
+                $sheet->mergeCells('A1:W1');
                 $sheet->setCellValue('A1', 'Verifikasi Kondisi Ruang Penyimpanan Bahan Baku dan Bahan Penunjang');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
-                $sheet->mergeCells('A2:X2');
+                $sheet->mergeCells('A2:W2');
                 $sheet->setCellValue('A2', 'Periode: ' . $this->periodLabel);
                 $sheet->getStyle('A2')->getFont()->setSize(10);
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
                 // ── Header (row 4) ─────────────────────────────────────────
-                // Kolom: no, tanggal, shift, time, qc, group,
-                //        suhu ruang, rh ruang,
-                //        [kondisi & penempatan] kondisi, catatan, tindakan koreksi, verifikasi,
-                //        [pelabelan]            kondisi, catatan, tindakan koreksi, verifikasi,
-                //        [kebersihan ruangan]   kondisi, catatan, tindakan koreksi, verifikasi,
-                //        ketidaksesuaian (notes suhu), tindakan koreksi suhu, verifikasi suhu
+                // Kolom mengikuti struktur di form: setiap item punya
+                // Kondisi, Catatan, Tindakan Koreksi, Hasil Verifikasi
+                // (termasuk item "Suhu Ruang (°C)", tanpa split kolom suhu/RH terpisah)
                 $headers = [
                     'A' => 'No',
                     'B' => 'Tanggal',
@@ -50,24 +47,23 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                     'D' => 'Time',
                     'E' => 'QC',
                     'F' => 'Group',
-                    'G' => 'Nama Ruangan',  // ← tambah
-                    'H' => 'Suhu Ruang (°C)',
-                    'I' => 'RH Ruang (%)',
-                    'J' => "Kondisi &\nPenempatan Barang",
-                    'K' => 'Catatan',
-                    'L' => 'Tindakan Koreksi',
-                    'M' => 'Hasil Verifikasi',
-                    'N' => 'Pelabelan',
-                    'O' => 'Catatan',
-                    'P' => 'Tindakan Koreksi',
-                    'Q' => 'Hasil Verifikasi',
-                    'R' => 'Kebersihan Ruangan',
-                    'S' => 'Catatan',
-                    'T' => 'Tindakan Koreksi',
-                    'U' => 'Hasil Verifikasi',
-                    'V' => 'Ketidaksesuaian',
-                    'W' => 'Tindakan Koreksi',
-                    'X' => 'Hasil Verifikasi',
+                    'G' => 'Nama Ruangan',
+                    'H' => "Kondisi &\nPenempatan Barang",
+                    'I' => 'Catatan',
+                    'J' => 'Tindakan Koreksi',
+                    'K' => 'Hasil Verifikasi',
+                    'L' => 'Pelabelan',
+                    'M' => 'Catatan',
+                    'N' => 'Tindakan Koreksi',
+                    'O' => 'Hasil Verifikasi',
+                    'P' => 'Kebersihan Ruangan',
+                    'Q' => 'Catatan',
+                    'R' => 'Tindakan Koreksi',
+                    'S' => 'Hasil Verifikasi',
+                    'T' => 'Suhu Ruang (°C)',
+                    'U' => 'Catatan',
+                    'V' => 'Tindakan Koreksi',
+                    'W' => 'Hasil Verifikasi',
                 ];
 
                 foreach ($headers as $col => $label) {
@@ -90,20 +86,10 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                         // Kelompokkan items berdasarkan nama item
                         $itemsByName = $detail->items->keyBy('item');
 
-                        $kondisi  = $itemsByName->get('Kondisi dan penempatan barang');
-                        $label_   = $itemsByName->get('Pelabelan');
-                        $bersih   = $itemsByName->get('Kebersihan Ruangan');
-                        $suhu     = $itemsByName->get('Suhu ruang (℃) / RH (%)');
-
-                        // Parse suhu & RH dari kondisi (format: "Suhu: X °C, RH: Y %")
-                        $suhuVal = '-';
-                        $rhVal   = '-';
-                        if ($suhu && $suhu->condition) {
-                            preg_match('/Suhu:\s*([\d.]+)/', $suhu->condition, $mS);
-                            preg_match('/RH:\s*([\d.]+)/', $suhu->condition, $mR);
-                            $suhuVal = $mS[1] ?? '-';
-                            $rhVal   = $mR[1] ?? '-';
-                        }
+                        $kondisi = $itemsByName->get('Kondisi dan penempatan barang');
+                        $label_  = $itemsByName->get('Pelabelan');
+                        $bersih  = $itemsByName->get('Kebersihan Ruangan');
+                        $suhu    = $itemsByName->get('Suhu ruang (℃) / RH (%)');
 
                         $verif = fn($item) => match((string)($item?->verification ?? '')) {
                             '1'  => 'OK',
@@ -123,26 +109,26 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                         $sheet->setCellValue("D{$row}", $detail->inspection_hour ?? '-');
                         $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
                         $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $report->room_name ?? '-');  // ← tambah
-                        $sheet->setCellValue("H{$row}", $suhuVal);
-                        $sheet->setCellValue("I{$row}", $rhVal);
-                        $sheet->setCellValue("J{$row}", $kondisi?->condition ?? '-');
-                        $sheet->setCellValue("K{$row}", $notes($kondisi));
-                        $sheet->setCellValue("L{$row}", $kondisi?->corrective_action ?? '-');
-                        $sheet->setCellValue("M{$row}", $verif($kondisi));
-                        $sheet->setCellValue("N{$row}", $label_?->condition ?? '-');
-                        $sheet->setCellValue("O{$row}", $notes($label_));
-                        $sheet->setCellValue("P{$row}", $label_?->corrective_action ?? '-');
-                        $sheet->setCellValue("Q{$row}", $verif($label_));
-                        $sheet->setCellValue("R{$row}", $bersih?->condition ?? '-');
-                        $sheet->setCellValue("S{$row}", $notes($bersih));
-                        $sheet->setCellValue("T{$row}", $bersih?->corrective_action ?? '-');
-                        $sheet->setCellValue("U{$row}", $verif($bersih));
-                        $sheet->setCellValue("V{$row}", $suhu?->notes ?? '-');
-                        $sheet->setCellValue("W{$row}", $suhu?->corrective_action ?? '-');
-                        $sheet->setCellValue("X{$row}", $verif($suhu));
+                        $sheet->setCellValue("G{$row}", $report->room_name ?? '-');
+                        $sheet->setCellValue("H{$row}", $kondisi?->condition ?? '-');
+                        $sheet->setCellValue("I{$row}", $notes($kondisi));
+                        $sheet->setCellValue("J{$row}", $kondisi?->corrective_action ?? '-');
+                        $sheet->setCellValue("K{$row}", $verif($kondisi));
+                        $sheet->setCellValue("L{$row}", $label_?->condition ?? '-');
+                        $sheet->setCellValue("M{$row}", $notes($label_));
+                        $sheet->setCellValue("N{$row}", $label_?->corrective_action ?? '-');
+                        $sheet->setCellValue("O{$row}", $verif($label_));
+                        $sheet->setCellValue("P{$row}", $bersih?->condition ?? '-');
+                        $sheet->setCellValue("Q{$row}", $notes($bersih));
+                        $sheet->setCellValue("R{$row}", $bersih?->corrective_action ?? '-');
+                        $sheet->setCellValue("S{$row}", $verif($bersih));
+                        // Suhu ruang: tampilkan apa adanya (mendukung nilai negatif, mis. "Suhu: -1.2 °C")
+                        $sheet->setCellValue("T{$row}", $suhu?->condition ?? '-');
+                        $sheet->setCellValue("U{$row}", $notes($suhu));
+                        $sheet->setCellValue("V{$row}", $suhu?->corrective_action ?? '-');
+                        $sheet->setCellValue("W{$row}", $verif($suhu));
 
-                        $sheet->getStyle("A{$row}:X{$row}")
+                        $sheet->getStyle("A{$row}:W{$row}")
                             ->getAlignment()->setHorizontal('center')->setWrapText(true);
 
                         $row++;
@@ -151,7 +137,7 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                 }
 
                 if ($no === 1) {
-                    $sheet->mergeCells('A5:X5');
+                    $sheet->mergeCells('A5:W5');
                     $sheet->setCellValue('A5', 'Tidak ada data untuk periode yang dipilih.');
                     $sheet->getStyle('A5')->getFont()->setItalic(true);
                     $sheet->getStyle('A5')->getAlignment()->setHorizontal('center');
@@ -159,7 +145,7 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                 }
 
                 // ── Border & auto width ────────────────────────────────────
-                $sheet->getStyle("A4:X" . ($row - 1))->getBorders()
+                $sheet->getStyle("A4:W" . ($row - 1))->getBorders()
                     ->getAllBorders()->setBorderStyle('thin');
 
                 foreach (array_keys($headers) as $col) {
