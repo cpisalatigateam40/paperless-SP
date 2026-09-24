@@ -251,7 +251,7 @@
                             </div>
 
                             <div class="incoming-ng">
-                                <i class="bi bi-arrow-right"></i> NG {{ $incomingRmNgPercent }}%
+                                <i class="bi bi-caret-right-fill"></i> NG {{ $incomingRmNgPercent }}%
                             </div>
                         </div>
                         </div>
@@ -273,7 +273,7 @@
                                 </div>
 
                                 <div class="incoming-ng">
-                                    <i class="bi bi-arrow-right"></i> NG {{ $sensoryNgPercent }}%
+                                    <i class="bi bi-caret-right-fill"></i> NG {{ $sensoryNgPercent }}%
                                 </div>
                             </div>
                         </div>
@@ -698,6 +698,531 @@
         </div>
     </div> -->
 
+    
+    @hasanyrole([ 'SPV QC'])
+    <div class="process-status-container mb-5">
+        <div class="process-status-banner">
+            <span class="process-status-number">1</span>
+            <span class="process-status-title">PROCESS PRODUCTION STATUS</span>
+            <span class="process-status-subtitle">Real-time production flow and QC verification status</span>
+        </div>
+
+        <div class="process-status-body">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="spv-mixing-card">
+                        <div class="pipeline-header pipeline-header-blue">
+                            <div>
+                                <i class="bi bi-egg-fried"></i> MEAT PREPARATION
+                            </div>
+                            <span class="pipeline-next-chip">
+                                Next: Stuffing <i class="bi bi-caret-right-fill"></i>
+                            </span>
+                        </div>
+
+                        <div class="spv-mixing-body">
+                            @if($mixingLatest)
+                                <div class="spv-mixing-label">Current Product</div>
+                                <div class="spv-mixing-product">{{ $mixingLatest->product->product_name ?? '-' }}</div>
+                                <div class="spv-mixing-batch">Batch No. {{ $mixingLatest->production_code ?? '-' }}</div>
+
+                                <div class="spv-mixing-status-row">
+                                    <span class="spv-mixing-status-label">Status</span>
+                                    @if($mixingStageStatus === 'running')
+                                        <span class="status-badge-running"><span class="pulse-dot"></span> RUNNING</span>
+                                    @elseif($mixingStageStatus === 'completed')
+                                        <span class="status-badge-completed">COMPLETED</span>
+                                    @else
+                                        <span class="status-badge-waiting">WAITING</span>
+                                    @endif
+                                </div>
+
+                                <div class="spv-mixing-time">
+                                    @if($mixingLatest)
+                                        Start {{ $mixingLatest->created_at->format('H:i') }}
+                                        | Last QC {{ $mixingLatest->updated_at->format('H:i') }}
+                                    @else
+                                        Belum ada data
+                                    @endif
+                                </div>
+
+                                <hr>
+
+                                <div class="spv-mixing-label mb-2">QC Verification</div>
+
+                                <div class="spv-qc-item">
+                                    @if($mixingForeignOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($mixingForeignOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Visual / Foreign Material
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($mixingTemperatureOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($mixingTemperatureOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Temperature
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($mixingWeighingOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($mixingWeighingOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Weighing
+                                </div>
+                            @else
+                                <p class="processing-empty">
+                                    <i class="bi bi-moon-stars"></i> Belum ada data mixing
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="spv-mixing-card">
+                        <div class="pipeline-header pipeline-header-teal">
+                            <div>
+                                <i class="bi bi-egg-fried"></i> STUFFING
+                            </div>
+                            <span class="pipeline-next-chip">
+                                Next: Cooking <i class="bi bi-caret-right-fill"></i>
+                            </span>
+                        </div>
+
+                        <div class="spv-mixing-body">
+                            @if($mixingLatest)
+                                <div class="spv-mixing-label">Current Product</div>
+                                <div class="spv-mixing-product">{{ $mixingLatest->product->product_name ?? '-' }}</div>
+                                <div class="spv-mixing-batch">Batch No. {{ $mixingLatest->production_code }}</div>
+
+                                <div class="spv-mixing-status-row">
+                                    <span class="spv-mixing-status-label">Status</span>
+                                    @if($stuffingStageStatus === 'running')
+                                        <span class="status-badge-running"><span class="pulse-dot"></span> RUNNING</span>
+                                    @elseif($stuffingStageStatus === 'completed')
+                                        <span class="status-badge-completed">COMPLETED</span>
+                                    @else
+                                        <span class="status-badge-waiting">WAITING</span>
+                                    @endif
+                                </div>
+
+                                <div class="spv-mixing-time">
+                                    @if($stuffingLatest)
+                                        Start {{ $stuffingLatest->created_at->format('H:i') }}
+                                        | Last QC {{ $stuffingLatest->updated_at->format('H:i') }}
+                                    @else
+                                        Belum ada data
+                                    @endif
+                                </div>
+
+                                <hr>
+
+                                <div class="spv-mixing-label mb-2">QC Verification</div>
+
+                                <div class="spv-qc-item">
+                                    @if($stuffingWeighingOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($stuffingWeighingOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Weight
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($stuffingLengthOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($stuffingLengthOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Length
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($stuffingDiameterOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($stuffingDiameterOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Diameter
+                                </div>
+                            @else
+                                <p class="processing-empty">
+                                    <i class="bi bi-moon-stars"></i> Belum ada data mixing
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="spv-mixing-card">
+                        <div class="pipeline-header pipeline-header-orange">
+                            <div>
+                                <i class="bi bi-fire"></i> COOKING
+                            </div>
+                            <span class="pipeline-next-chip">
+                                Next: Pasteurization <i class="bi bi-caret-right-fill"></i>
+                            </span>
+                        </div>
+
+                        <div class="spv-mixing-body">
+                            @if($mixingLatest)
+                                <div class="spv-mixing-label">Current Product</div>
+                                <div class="spv-mixing-product">{{ $mixingLatest->product->product_name ?? '-' }}</div>
+                                <div class="spv-mixing-batch">Batch No. {{ $mixingLatest->production_code }}</div>
+
+                                <div class="spv-mixing-status-row">
+                                    <span class="spv-mixing-status-label">Status</span>
+                                    @if($cookingStageStatus === 'running')
+                                        <span class="status-badge-running"><span class="pulse-dot"></span> RUNNING</span>
+                                    @elseif($cookingStageStatus === 'completed')
+                                        <span class="status-badge-completed">COMPLETED</span>
+                                    @else
+                                        <span class="status-badge-waiting">WAITING</span>
+                                    @endif
+                                </div>
+
+                                <div class="spv-mixing-time">
+                                    @if($cookingLatest)
+                                        Start {{ $cookingLatest->created_at->format('H:i') }}
+                                        | Last QC {{ $cookingLatest->updated_at->format('H:i') }}
+                                    @else
+                                        Belum ada data
+                                    @endif
+                                </div>
+
+                                <hr>
+
+                                <div class="spv-mixing-label mb-2">QC Verification</div>
+
+                                <div class="spv-qc-item">
+                                    @if($cookingCoreTempOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($cookingCoreTempOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Core Temp
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($cookingSensoryOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($cookingSensoryOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Sensory
+                                </div>
+                            @else
+                                <p class="processing-empty">
+                                    <i class="bi bi-moon-stars"></i> Belum ada data mixing
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="spv-mixing-card">
+                        <div class="pipeline-header pipeline-header-purple">
+                            <div>
+                                <i class="bi bi-droplet-half"></i> PASTEURIZATION
+                            </div>
+                            <span class="pipeline-next-chip">
+                                Next: Packing <i class="bi bi-caret-right-fill"></i>
+                            </span>
+                        </div>
+
+                        <div class="spv-mixing-body">
+                            @if($mixingLatest)
+                                <div class="spv-mixing-label">Current Product</div>
+                                <div class="spv-mixing-product">{{ $mixingLatest->product->product_name ?? '-' }}</div>
+                                <div class="spv-mixing-batch">Batch No. {{ $mixingLatest->production_code }}</div>
+
+                                <div class="spv-mixing-status-row">
+                                    <span class="spv-mixing-status-label">Status</span>
+                                    @if($pasteurizingStageStatus === 'running')
+                                        <span class="status-badge-running"><span class="pulse-dot"></span> RUNNING</span>
+                                    @elseif($pasteurizingStageStatus === 'completed')
+                                        <span class="status-badge-completed">COMPLETED</span>
+                                    @else
+                                        <span class="status-badge-waiting">WAITING</span>
+                                    @endif
+                                </div>
+
+                                <div class="spv-mixing-time">
+                                    @if($pasteurizingLatest)
+                                        Start {{ $pasteurizingLatest->created_at->format('H:i') }}
+                                        | Last QC {{ $pasteurizingLatest->updated_at->format('H:i') }}
+                                    @else
+                                        Belum ada data
+                                    @endif
+                                </div>
+
+                                <hr>
+
+                                <div class="spv-mixing-label mb-2">QC Verification</div>
+
+                                <div class="spv-qc-item">
+                                    @if($pasteurizingTemperatureOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($pasteurizingTemperatureOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Temperature
+                                </div>
+                            @else
+                                <p class="processing-empty">
+                                    <i class="bi bi-moon-stars"></i> Belum ada data mixing
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="spv-mixing-card">
+                        <div class="pipeline-header pipeline-header-teal">
+                            <div>
+                                <i class="bi bi-box-seam-fill"></i> PACKING
+                            </div>
+                            <span class="pipeline-next-chip">
+                                Next: Cartoning <i class="bi bi-caret-right-fill"></i>
+                            </span>
+                        </div>
+
+                        <div class="spv-mixing-body">
+                            @if($mixingLatest)
+                                <div class="spv-mixing-label">Current Product</div>
+                                <div class="spv-mixing-product">{{ $mixingLatest->product->product_name ?? '-' }}</div>
+                                <div class="spv-mixing-batch">Batch No. {{ $mixingLatest->production_code }}</div>
+
+                                <div class="spv-mixing-status-row">
+                                    <span class="spv-mixing-status-label">Status</span>
+                                    @if($packingStageStatus === 'running')
+                                        <span class="status-badge-running"><span class="pulse-dot"></span> RUNNING</span>
+                                    @elseif($packingStageStatus === 'completed')
+                                        <span class="status-badge-completed">COMPLETED</span>
+                                    @else
+                                        <span class="status-badge-waiting">WAITING</span>
+                                    @endif
+                                </div>
+
+                                <div class="spv-mixing-time">
+                                    @if($packingLatest)
+                                        Start {{ $packingLatest->created_at->format('H:i') }}
+                                        | Last QC {{ $packingLatest->updated_at->format('H:i') }}
+                                    @else
+                                        Belum ada data
+                                    @endif
+                                </div>
+
+                                <hr>
+
+                                <div class="spv-mixing-label mb-2">QC Verification</div>
+
+                                <div class="spv-qc-item">
+                                    @if($packingWeightOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($packingWeightOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Weight
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($packingLengthOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($packingLengthOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Length
+                                </div>
+                            @else
+                                <p class="processing-empty">
+                                    <i class="bi bi-moon-stars"></i> Belum ada data mixing
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="spv-mixing-card">
+                        <div class="pipeline-header pipeline-header-blue">
+                            <div>
+                                <i class="bi bi-box2-fill"></i> CARTONING
+                            </div>
+                        </div>
+
+                        <div class="spv-mixing-body">
+                            @if($mixingLatest)
+                                <div class="spv-mixing-label">Current Product</div>
+                                <div class="spv-mixing-product">{{ $mixingLatest->product->product_name ?? '-' }}</div>
+                                <div class="spv-mixing-batch">Batch No. {{ $mixingLatest->production_code }}</div>
+
+                                <div class="spv-mixing-status-row">
+                                    <span class="spv-mixing-status-label">Status</span>
+                                    @if($cartoningStageStatus === 'running')
+                                        <span class="status-badge-running"><span class="pulse-dot"></span> RUNNING</span>
+                                    @elseif($cartoningStageStatus === 'completed')
+                                        <span class="status-badge-completed">COMPLETED</span>
+                                    @else
+                                        <span class="status-badge-waiting">WAITING</span>
+                                    @endif
+                                </div>
+
+                                <div class="spv-mixing-time">
+                                    @if($cartoningLatest)
+                                        Start {{ $cartoningLatest->created_at->format('H:i') }}
+                                        | Last QC {{ $cartoningLatest->updated_at->format('H:i') }}
+                                    @else
+                                        Belum ada data
+                                    @endif
+                                </div>
+
+                                <hr>
+
+                                <div class="spv-mixing-label mb-2">QC Verification</div>
+
+                                <div class="spv-qc-item">
+                                    @if($cartoningCartonOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($cartoningCartonOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Carton Condition
+                                </div>
+
+                                <div class="spv-qc-item">
+                                    @if($cartoningLabelOk === true)
+                                        <i class="bi bi-check-circle-fill spv-qc-ok"></i>
+                                    @elseif($cartoningLabelOk === false)
+                                        <i class="bi bi-x-circle-fill spv-qc-ng"></i>
+                                    @else
+                                        <i class="bi bi-dash-circle text-muted"></i>
+                                    @endif
+                                    Label Condition
+                                </div>
+                            @else
+                                <p class="processing-empty">
+                                    <i class="bi bi-moon-stars"></i> Belum ada data mixing
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="journey-container">
+                <div class="journey-flex">
+
+                    {{-- Kiri: Tabel Batch Tracking --}}
+                    <div class="tracking-wrapper">
+                        <div class="tracking-header">
+                            <strong>PRODUCT JOURNEY</strong> <span class="tracking-subtitle">(Batch Tracking)</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="tracking-table">
+                                <thead>
+                                    <tr>
+                                        <th>Batch No.</th>
+                                        <th>Product</th>
+                                        <th><i class="bi bi-egg-fried"></i> Meat Preparation</th>
+                                        <th><i class="bi bi-egg-fried"></i> Stuffing</th>
+                                        <th><i class="bi bi-fire"></i> Cooking</th>
+                                        <th><i class="bi bi-droplet-half"></i> Pasteurization</th>
+                                        <th><i class="bi bi-box-seam-fill"></i> Packing</th>
+                                        <th><i class="bi bi-box2-fill"></i> Cartoning</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($batchTracking as $row)
+                                        <tr>
+                                            <td class="tracking-batch">{{ $row->batch_no }}</td>
+                                            <td class="tracking-product">{{ $row->product_name }}</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->meat_preparation, 'time' => $row->meat_preparation_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->stuffing, 'time' => $row->stuffing_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->cooking, 'time' => $row->cooking_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->pasteurization, 'time' => $row->pasteurization_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->packing, 'time' => $row->packing_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->cartoning, 'time' => $row->cartoning_time])</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">Belum ada data batch</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {{-- Kanan: Production at a Glance --}}
+                    <div class="overall-status-wrapper">
+                        <div class="glance-card">
+                            <div class="glance-header">Production at a Glance</div>
+
+                            <div class="glance-body">
+                                <div class="glance-item">
+                                    <i class="bi bi-calendar3 glance-icon"></i>
+                                    <div class="glance-label">Total Products Running</div>
+                                    <div class="glance-value">{{ $totalProductsRunning }}</div>
+                                </div>
+
+                                <div class="glance-item">
+                                    <i class="bi bi-clipboard-data glance-icon"></i>
+                                    <div class="glance-label">Total Batches Today</div>
+                                    <div class="glance-value">{{ $totalBatchesToday }}</div>
+                                </div>
+
+                                <!-- <div class="glance-item">
+                                    <i class="bi bi-box-seam glance-icon"></i>
+                                    <div class="glance-label">Total Output (est.)</div>
+                                    <div class="glance-value">-</div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    @endhasanyrole
+    
+    @hasanyrole(['superadmin', 'QC Inspector'])
     <div class="process-status-container mb-5">
         <div class="process-status-banner">
             <span class="process-status-number">1</span>
@@ -714,7 +1239,7 @@
                                 <i class="bi bi-egg-fried"></i> MEAT PREPARATION
                             </div>
                             <span class="pipeline-next-chip">
-                                Next: Stuffing <i class="bi bi-arrow-right"></i>
+                                Next: Stuffing <i class="bi bi-caret-right-fill"></i>
                             </span>
                         </div>
 
@@ -741,7 +1266,7 @@
                             @if($mixingLastCheck)
                                 <div class="pipeline-footer">
                                     <span>Last QC Check {{ $mixingLastCheck->format('H.i') }}</span>
-                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-arrow-right"></i></a>
+                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-caret-right-fill"></i></a>
                                 </div>
                             @endif
                         </div>
@@ -755,7 +1280,7 @@
                                 <i class="bi bi-egg-fried"></i> STUFFING
                             </div>
                             <span class="pipeline-next-chip">
-                                Next: Cooking <i class="bi bi-arrow-right"></i>
+                                Next: Cooking <i class="bi bi-caret-right-fill"></i>
                             </span>
                         </div>
 
@@ -782,7 +1307,7 @@
                             @if($stuffingLastCheck)
                                 <div class="pipeline-footer">
                                     <span>Last QC Check {{ $stuffingLastCheck->format('H.i') }}</span>
-                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-arrow-right"></i></a>
+                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-caret-right-fill"></i></a>
                                 </div>
                             @endif
                         </div>
@@ -796,7 +1321,7 @@
                                 <i class="bi bi-fire"></i> COOKING
                             </div>
                             <span class="pipeline-next-chip">
-                                Next: Pasteurization <i class="bi bi-arrow-right"></i>
+                                Next: Pasteurization <i class="bi bi-caret-right-fill"></i>
                             </span>
                         </div>
 
@@ -823,7 +1348,7 @@
                             @if($cookingLastCheck)
                                 <div class="pipeline-footer">
                                     <span>Last QC Check {{ $cookingLastCheck->format('H.i') }}</span>
-                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-arrow-right"></i></a>
+                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-caret-right-fill"></i></a>
                                 </div>
                             @endif
                         </div>
@@ -837,7 +1362,7 @@
                                 <i class="bi bi-droplet-half"></i> PASTEURIZATION
                             </div>
                             <span class="pipeline-next-chip">
-                                Next: Packing <i class="bi bi-arrow-right"></i>
+                                Next: Packing <i class="bi bi-caret-right-fill"></i>
                             </span>
                         </div>
 
@@ -864,7 +1389,7 @@
                             @if($pasteurizingLastCheck)
                                 <div class="pipeline-footer">
                                     <span>Last QC Check {{ $pasteurizingLastCheck->format('H.i') }}</span>
-                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-arrow-right"></i></a>
+                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-caret-right-fill"></i></a>
                                 </div>
                             @endif
                         </div>
@@ -878,7 +1403,7 @@
                                 <i class="bi bi-box-seam-fill"></i> PACKING
                             </div>
                             <span class="pipeline-next-chip">
-                                Next: Cartoning <i class="bi bi-arrow-right"></i>
+                                Next: Cartoning <i class="bi bi-caret-right-fill"></i>
                             </span>
                         </div>
 
@@ -905,7 +1430,7 @@
                             @if($packingLastCheck)
                                 <div class="pipeline-footer">
                                     <span>Last QC Check {{ $packingLastCheck->format('H.i') }}</span>
-                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-arrow-right"></i></a>
+                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-caret-right-fill"></i></a>
                                 </div>
                             @endif
                         </div>
@@ -943,7 +1468,7 @@
                             @if($cartoningLastCheck)
                                 <div class="pipeline-footer">
                                     <span>Last QC Check {{ $cartoningLastCheck->format('H.i') }}</span>
-                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-arrow-right"></i></a>
+                                    <a href="#" class="pipeline-view-link">View Details <i class="bi bi-caret-right-fill"></i></a>
                                 </div>
                             @endif
                         </div>
@@ -979,12 +1504,12 @@
                                         <tr>
                                             <td class="tracking-batch">{{ $row->batch_no }}</td>
                                             <td class="tracking-product">{{ $row->product_name }}</td>
-                                            <td>@include('partials.tracking-status', ['status' => $row->meat_preparation])</td>
-                                            <td>@include('partials.tracking-status', ['status' => $row->stuffing])</td>
-                                            <td>@include('partials.tracking-status', ['status' => $row->cooking])</td>
-                                            <td>@include('partials.tracking-status', ['status' => $row->pasteurization])</td>
-                                            <td>@include('partials.tracking-status', ['status' => $row->packing])</td>
-                                            <td>@include('partials.tracking-status', ['status' => $row->cartoning])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->meat_preparation, 'time' => $row->meat_preparation_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->stuffing, 'time' => $row->stuffing_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->cooking, 'time' => $row->cooking_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->pasteurization, 'time' => $row->pasteurization_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->packing, 'time' => $row->packing_time])</td>
+                                            <td>@include('partials.tracking-status', ['status' => $row->cartoning, 'time' => $row->cartoning_time])</td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -1008,6 +1533,7 @@
             </div>
         </div>
     </div>
+    @endhasanyrole
 
     <div class="process-status-container mb-5">
         <div class="process-status-banner">
@@ -1154,6 +1680,8 @@
 
     </div>
 
+    
+
 
 </div>
 
@@ -1216,7 +1744,7 @@
                 <span class="incoming-notok">${data.not_ok} Tidak OK</span>
             </div>
             <div class="incoming-ng">
-                <i class="bi bi-arrow-right"></i> NG ${data.ng_percent}%
+                <i class="bi bi-caret-right-fill"></i> NG ${data.ng_percent}%
             </div>
         `;
     }

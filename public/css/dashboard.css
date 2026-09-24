@@ -541,7 +541,7 @@ input[type="date"].filter-input {
 .pipeline-next-chip {
     font-size: 0.62rem;
     font-weight: 600;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.171);
     padding: 3px 8px;
     border-radius: 999px;
     display: inline-flex;
@@ -977,4 +977,180 @@ input[type="date"].filter-input {
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 999px;
+}
+
+.spv-mixing-card {
+    background-color: #fff;
+    border-radius: 14px;
+    border: 1px solid #f0f1f3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    height: 100%;
+}
+
+.spv-mixing-header {
+    background-color: #1971c2;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.4px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spv-mixing-body {
+    padding: 16px 18px;
+}
+
+.spv-mixing-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #868e96;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.spv-mixing-product {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #212529;
+    margin: 4px 0 4px;
+}
+
+.spv-mixing-batch {
+    font-size: 0.8rem;
+    color: #868e96;
+    margin-bottom: 14px;
+}
+
+.spv-mixing-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.spv-mixing-status-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.spv-mixing-time {
+    font-size: 0.75rem;
+    color: #868e96;
+    margin-bottom: 4px;
+}
+
+.spv-mixing-body hr {
+    margin: 14px 0;
+    border-color: #f1f3f5;
+}
+
+.spv-qc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #343a40;
+    padding: 6px 0;
+}
+
+.spv-qc-ok {
+    color: #2f9e44;
+    font-size: 1rem;
+}
+
+.spv-qc-ng {
+    color: #e03131;
+    font-size: 1rem;
+}
+
+.spv-qc-item .bi-dash-circle {
+    font-size: 1rem;
+}
+
+.overall-status-wrapper .glance-card {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 16px 0 24px 0;
+    width: 100%;
+}
+
+.glance-header {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #212529;
+    margin-bottom: 16px;
+}
+
+.glance-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.glance-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+}
+
+.glance-icon {
+    font-size: 1.3rem;
+    color: #1971c2;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #eef6ff;
+    border-radius: 8px;
+}
+
+.glance-label {
+    font-size: 0.75rem;
+    color: #495057;
+    margin-bottom: 2px;
+}
+
+.glance-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1864ab;
+    line-height: 1;
+}
+
+@media (max-width: 576px) {
+    .pipeline-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .pipeline-next-chip {
+        align-self: flex-start;
+    }
+}
+
+.tracking-time-sep {
+    color: #dee2e6;
+    margin: 0 4px;
+}
+
+.tracking-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #868e96;
+    font-size: 0.78rem;
+}
+
+.tracking-time i {
+    font-size: 0.7rem;
 }

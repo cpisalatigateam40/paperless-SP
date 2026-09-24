@@ -65,46 +65,88 @@ class DashboardController extends Controller
             ->get();
         $product  = $request->input('product');
 
-        $mixingLatest = \App\Models\DetailProcessProd::whereHas('report', function ($q) use ($plant) {
-            $q->where('area_uuid', $plant);
+        $isCtOk = function ($settingCt, $actualCt) {
+            if ($settingCt === null || $actualCt === null || $settingCt === '' || $actualCt === '') {
+                return null;
+            }
+
+            $actual = (float) $actualCt;
+
+            if (str_contains($settingCt, '-')) {
+                [$min, $max] = array_map('trim', explode('-', $settingCt, 2));
+                return $actual >= (float) $min && $actual <= (float) $max;
+            }
+
+            return $actual == (float) $settingCt;
+        };
+
+        $mixingLatest = \App\Models\DetailProcessProd::whereHas('report', function ($q) use ($plant, $date) {
+            $q->where('area_uuid', $plant)
+              ->whereDate('date', $date);
         })
-        ->with('product')
+        ->when($product, function ($q) use ($product) {
+            $q->where('product_uuid', $product);
+        })
+        ->with(['product', 'sensoric', 'items'])
         ->latest('created_at')
         ->first();
 
         $mixingIsCurrent = $mixingLatest && $mixingLatest->created_at->gt(now()->subHours(8));
+        
 
-        $stuffingLatest = \App\Models\DetailWeightStuffer::whereHas('report', function ($q) use ($plant) {
-            $q->where('area_uuid', $plant);
-        })
-        ->with('product')
-        ->latest('created_at')
-        ->first();
+        $currentProductionCode = $mixingLatest->production_code ?? null;
+        $currentProductUuid = $mixingLatest->product_uuid ?? null;
+
+        $stuffingLatest = $currentProductionCode
+        ? \App\Models\DetailWeightStuffer::whereHas('report', function ($q) use ($plant, $date) {
+                $q->where('area_uuid', $plant)
+                ->whereDate('date', $date);
+            })
+            ->where('production_code', $currentProductionCode)
+            ->where('product_uuid', $currentProductUuid)
+            ->with('product')
+            ->latest('created_at')
+            ->first()
+        : null;
 
         $stuffingIsCurrent = $stuffingLatest && $stuffingLatest->created_at->gt(now()->subHours(8));
 
-        $cookingLatest = \App\Models\DetailSmokeHouse::whereHas('report', function ($q) use ($plant) {
-            $q->where('area_uuid', $plant);
-        })
-        ->with('product')
-        ->latest('created_at')
-        ->first();
+
+        $cookingLatest = $currentProductionCode
+        ? \App\Models\DetailSmokeHouse::whereHas('report', function ($q) use ($plant, $date) {
+                $q->where('area_uuid', $plant)
+                ->whereDate('date', $date);
+            })
+            ->where('production_code', $currentProductionCode)
+            ->where('product_uuid', $currentProductUuid)
+            ->with(['product', 'steps', 'sensories'])
+            ->latest('created_at')
+            ->first()
+        : null;
 
         $cookingIsCurrent = $cookingLatest && $cookingLatest->created_at->gt(now()->subHours(8));
 
-        $pasteurLatest = \App\Models\DetailPasteur::whereHas('report', function ($q) use ($plant) {
-                $q->where('area_uuid', $plant);
-            })
-            ->with('product')
-            ->latest('created_at')
-            ->first();
+        $pasteurLatest = $currentProductionCode
+            ? \App\Models\DetailPasteur::whereHas('report', function ($q) use ($plant, $date) {
+                    $q->where('area_uuid', $plant)->whereDate('date', $date);
+                })
+                ->where('product_code', $currentProductionCode)
+                ->where('product_uuid', $currentProductUuid)
+                ->with('product')
+                ->latest('created_at')
+                ->first()
+            : null;
 
-        $waterbathLatest = \App\Models\DetailWaterbath::whereHas('report', function ($q) use ($plant) {
-                $q->where('area_uuid', $plant);
-            })
-            ->with('product')
-            ->latest('created_at')
-            ->first();
+        $waterbathLatest = $currentProductionCode
+            ? \App\Models\DetailWaterbath::whereHas('report', function ($q) use ($plant, $date) {
+                    $q->where('area_uuid', $plant)->whereDate('date', $date);
+                })
+                ->where('batch_code', $currentProductionCode)
+                ->where('product_uuid', $currentProductUuid)
+                ->with('product')
+                ->latest('created_at')
+                ->first()
+            : null;
 
         // Bandingkan mana yang lebih baru antara 2 sumber, ambil satu yang paling baru
         if ($pasteurLatest && $waterbathLatest) {
@@ -122,23 +164,58 @@ class DashboardController extends Controller
             ? $pasteurizingLatest->product_code
             : ($pasteurizingLatest->batch_code ?? null);
 
-        $packingLatest = \App\Models\DetailPackagingVerif::whereHas('report', function ($q) use ($plant) {
-                $q->where('area_uuid', $plant);
+        $pasteurizingTemperatureOk = $pasteurizingLatest ? true : null;
+
+        $packingLatest = $currentProductionCode
+        ? \App\Models\DetailPackagingVerif::whereHas('report', function ($q) use ($plant, $date) {
+                $q->where('area_uuid', $plant)->whereDate('date', $date);
             })
-            ->with('product')
+            ->where('production_code', $currentProductionCode)
+            ->where('product_uuid', $currentProductUuid)
+            ->with(['product', 'checklist'])
             ->latest('created_at')
-            ->first();
+            ->first()
+        : null;
 
         $packingIsCurrent = $packingLatest && $packingLatest->created_at->gt(now()->subHours(8));
 
-        $cartoningLatest = \App\Models\DetailFreezPackaging::whereHas('report', function ($q) use ($plant) {
-                $q->where('area_uuid', $plant);
+        $packingWeightOk = null;
+        $packingLengthOk = null;
+
+        if ($packingLatest && $packingLatest->checklist) {
+            $checklist = $packingLatest->checklist;
+
+            $packingWeightOk = $isCtOk($checklist->standard_weight_pcs, $checklist->avg_weight_pcs);
+            $packingLengthOk = $isCtOk($checklist->standard_long_pcs, $checklist->avg_long_pcs);
+        }
+
+        $cartoningLatest = $currentProductionCode
+        ? \App\Models\DetailFreezPackaging::whereHas('report', function ($q) use ($plant, $date) {
+                $q->where('area_uuid', $plant)->whereDate('date', $date);
             })
-            ->with('product')
+            ->where('production_code', $currentProductionCode)
+            ->where('product_uuid', $currentProductUuid)
+            ->with(['product', 'kartoning'])
             ->latest('created_at')
-            ->first();
+            ->first()
+        : null;
 
         $cartoningIsCurrent = $cartoningLatest && $cartoningLatest->created_at->gt(now()->subHours(8));
+
+        $cartoningCartonOk = null;
+        $cartoningLabelOk = null;
+
+        if ($cartoningLatest && $cartoningLatest->kartoning) {
+            $kartoning = $cartoningLatest->kartoning;
+
+            $cartoningCartonOk = $kartoning->carton_condition !== null
+                ? $kartoning->carton_condition === '✓'
+                : null;
+
+            $cartoningLabelOk = $kartoning->label_condition !== null
+                ? $kartoning->label_condition === 'OK'
+                : null;
+        }
 
         $mixingPrevious = \App\Models\DetailProcessProd::whereHas('report', function ($q) use ($plant) {
             $q->where('area_uuid', $plant);
@@ -259,20 +336,7 @@ class DashboardController extends Controller
 
         $machines = ['Fessmann', 'Maurer', 'Bastra', 'Vemag'];
 
-        $isCtOk = function ($settingCt, $actualCt) {
-            if ($settingCt === null || $actualCt === null || $settingCt === '' || $actualCt === '') {
-                return null;
-            }
-
-            $actual = (float) $actualCt;
-
-            if (str_contains($settingCt, '-')) {
-                [$min, $max] = array_map('trim', explode('-', $settingCt, 2));
-                return $actual >= (float) $min && $actual <= (float) $max;
-            }
-
-            return $actual == (float) $settingCt;
-        };
+        
 
         $coreTempSteps = \App\Models\DetailSmokeHouseStep::whereHas('detail.report', function ($q) use ($plant, $date) {
                 $q->where('area_uuid', $plant)
@@ -334,6 +398,19 @@ class DashboardController extends Controller
         ->latest('created_at')
         ->take(3)
         ->get();
+
+        $mixingToday = \App\Models\DetailProcessProd::whereHas('report', function ($q) use ($plant, $date) {
+                $q->where('area_uuid', $plant)
+                ->whereDate('date', $date);
+            })
+            ->when($product, function ($q) use ($product) {
+                $q->where('product_uuid', $product);
+            })
+            ->get();
+
+        $totalBatchesToday = $mixingToday->count();
+
+        
 
         $mixingLastCheck = $mixingBatches->first()?->created_at;
 
@@ -495,7 +572,15 @@ class DashboardController extends Controller
             $cartoning = $cartoningStatuses[$index]->is_running ?? false;
 
             $hasData = [true, $stuffing, $cooking, $pasteurizing, $packing, $cartoning];
-            $lastIndex = count($hasData) - 1; // index Cartoning
+            $times = [
+                $batch->created_at,
+                $stuffingStatuses[$index]->created_at ?? null,
+                $cookingStatuses[$index]->created_at ?? null,
+                $pasteurizingStatuses[$index]->created_at ?? null,
+                $packingStatuses[$index]->created_at ?? null,
+                $cartoningStatuses[$index]->created_at ?? null,
+            ];
+            $lastIndex = count($hasData) - 1;
 
             $statuses = [];
             foreach ($hasData as $i => $current) {
@@ -504,7 +589,6 @@ class DashboardController extends Controller
                     continue;
                 }
 
-                // Stage terakhir (Cartoning): selesai berarti langsung Completed, bukan Running
                 if ($i === $lastIndex) {
                     $statuses[$i] = 'completed';
                     continue;
@@ -518,13 +602,34 @@ class DashboardController extends Controller
                 'batch_no' => $batch->production_code,
                 'product_name' => $batch->product->product_name ?? '-',
                 'meat_preparation' => $statuses[0],
+                'meat_preparation_time' => $times[0],
                 'stuffing' => $statuses[1],
+                'stuffing_time' => $times[1],
                 'cooking' => $statuses[2],
+                'cooking_time' => $times[2],
                 'pasteurization' => $statuses[3],
+                'pasteurization_time' => $times[3],
                 'packing' => $statuses[4],
+                'packing_time' => $times[4],
                 'cartoning' => $statuses[5],
+                'cartoning_time' => $times[5],
             ];
         });
+
+        $totalProductsRunning = $batchTracking
+            ->filter(function ($row) {
+                return in_array('running', [
+                    $row->meat_preparation,
+                    $row->stuffing,
+                    $row->cooking,
+                    $row->pasteurization,
+                    $row->packing,
+                    $row->cartoning,
+                ]);
+            })
+            ->pluck('product_name')
+            ->unique()
+            ->count();
 
         $temperatureSchedule = [7, 9, 11, 13, 15];
 
@@ -776,11 +881,67 @@ class DashboardController extends Controller
             ];
         }
 
+        // QC Verification status untuk card SPV
+        $mixingForeignOk = $mixingLatest && $mixingLatest->sensoric
+            ? $mixingLatest->sensoric->foreign_object === 'Tidak Terdeteksi'
+            : null;
+
+        $mixingWeighingOk = $mixingLatest && $mixingLatest->items->isNotEmpty()
+            ? $mixingLatest->items->every(fn($item) => $item->sensory !== 'Tidak OK')
+            : null;
+        $mixingTemperatureOk = $mixingLatest ? true : null;
+
+        
+
+        $stuffingWeighingOk = $stuffingLatest ? $stuffingLatest->weight_status === 'OK' : null;
+        $stuffingLengthOk = $stuffingLatest ? $stuffingLatest->long_status === 'OK' : null;
+        $stuffingDiameterOk = $stuffingLatest ? true : null;
+
+        $cookingCoreTempOk = null;
+        if ($cookingLatest && $cookingLatest->steps->isNotEmpty()) {
+            $cookingCoreTempOk = $cookingLatest->steps->every(function ($step) use ($isCtOk) {
+                return $isCtOk($step->setting_ct, $step->actual_ct) !== false;
+            });
+        }
+
+        $cookingSensoryOk = null;
+        if ($cookingLatest && $cookingLatest->sensories) {
+            $cookingSensoryOk = collect(['appearance', 'color', 'aroma', 'taste', 'texture'])
+                ->every(fn($field) => $cookingLatest->sensories->{$field} !== 'Fail');
+        }
+
+
+        $mixingStageStatus = $mixingLatest
+        ? ($stuffingLatest ? 'completed' : 'running')
+        : 'waiting';
+        // setelah $cookingLatest dihitung
+        $stuffingStageStatus = $stuffingLatest
+            ? ($cookingLatest ? 'completed' : 'running')
+            : 'waiting';
+
+        // setelah $pasteurizingLatest dihitung
+        $cookingStageStatus = $cookingLatest
+            ? ($pasteurizingLatest ? 'completed' : 'running')
+            : 'waiting';
+
+        // setelah $packingLatest dihitung
+        $pasteurizingStageStatus = $pasteurizingLatest
+            ? ($packingLatest ? 'completed' : 'running')
+            : 'waiting';
+
+        // setelah $cartoningLatest dihitung
+        $packingStageStatus = $packingLatest
+            ? ($cartoningLatest ? 'completed' : 'running')
+            : 'waiting';
+
+        // cartoning: tidak ada next stage, jadi completed kalau sudah ada data
+        $cartoningStageStatus = $cartoningLatest ? 'completed' : 'waiting';
+
         return view('dashboard', compact(
             'percentage', 'okPoints', 'totalPoints',
             'plants', 'hourOptions',
             'plant', 'date', 'jam',
-            'isSuperadmin', 'products', 'product', 'mixingLatest', 'mixingIsCurrent', 'stuffingLatest', 'stuffingIsCurrent', 'cookingLatest', 'cookingIsCurrent', 'pasteurizingLatest', 'pasteurizingIsCurrent', 'pasteurizingCode', 'packingLatest', 'packingIsCurrent', 'cartoningLatest', 'cartoningIsCurrent', 'mixingPrevious', 'stuffingPrevious', 'cookingPrevious', 'pasteurizingPrevious', 'pasteurizingPreviousCode', 'packingPrevious', 'cartoningPrevious', 'incomingRmTotal', 'incomingRmOk', 'incomingRmNotOk', 'incomingRmNgPercent', 'sensoryTotal', 'sensoryOk', 'sensoryNotOk', 'sensoryNgPercent', 'coreTempByMachineStep', 'processes', 'machines', 'mixingBatches', 'mixingLastCheck', 'stuffingStatuses', 'stuffingLastCheck', 'cookingStatuses', 'cookingLastCheck', 'pasteurizingStatuses', 'pasteurizingLastCheck', 'packingStatuses', 'packingLastCheck', 'cartoningStatuses', 'cartoningLastCheck', 'batchTracking', 'areaConditions', 'checklistColumns', 'checklistData', 'checklistOkCount', 'checklistNgCount', 'checklistTotalAreas', 'trendRoomConfig', 'trendFrom', 'trendTo'
+            'isSuperadmin', 'products', 'product', 'mixingLatest', 'mixingIsCurrent', 'stuffingLatest', 'stuffingIsCurrent', 'cookingLatest', 'cookingIsCurrent', 'pasteurizingLatest', 'pasteurizingIsCurrent', 'pasteurizingCode', 'packingLatest', 'packingIsCurrent', 'cartoningLatest', 'cartoningIsCurrent', 'mixingPrevious', 'stuffingPrevious', 'cookingPrevious', 'pasteurizingPrevious', 'pasteurizingPreviousCode', 'packingPrevious', 'cartoningPrevious', 'incomingRmTotal', 'incomingRmOk', 'incomingRmNotOk', 'incomingRmNgPercent', 'sensoryTotal', 'sensoryOk', 'sensoryNotOk', 'sensoryNgPercent', 'coreTempByMachineStep', 'processes', 'machines', 'mixingBatches', 'mixingLastCheck', 'stuffingStatuses', 'stuffingLastCheck', 'cookingStatuses', 'cookingLastCheck', 'pasteurizingStatuses', 'pasteurizingLastCheck', 'packingStatuses', 'packingLastCheck', 'cartoningStatuses', 'cartoningLastCheck', 'batchTracking', 'areaConditions', 'checklistColumns', 'checklistData', 'checklistOkCount', 'checklistNgCount', 'checklistTotalAreas', 'trendRoomConfig', 'trendFrom', 'trendTo', 'mixingForeignOk', 'mixingWeighingOk', 'mixingTemperatureOk', 'stuffingWeighingOk', 'stuffingLengthOk', 'stuffingDiameterOk', 'cookingCoreTempOk', 'cookingSensoryOk', 'mixingStageStatus', 'currentProductionCode', 'currentProductUuid', 'stuffingStageStatus', 'cookingStageStatus', 'pasteurizingStageStatus', 'pasteurizingTemperatureOk', 'packingStageStatus', 'packingWeightOk', 'packingLengthOk', 'cartoningStageStatus', 'cartoningCartonOk', 'cartoningLabelOk', 'totalBatchesToday', 'totalProductsRunning'
         ));
     }
 }
