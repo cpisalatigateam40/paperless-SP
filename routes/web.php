@@ -1255,6 +1255,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
+            Route::get('/{uuid}/edit-name', 'edit')->name('editName');
+            Route::put('/{uuid}', 'update')->name('updateName');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/detail', 'detail')->name('detail');
             Route::post('/{uuid}/add-detail', 'addDetail')->name('addDetail');
