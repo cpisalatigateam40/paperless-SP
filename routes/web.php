@@ -610,6 +610,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('report_rm_arrivals.')
         ->controller(ReportRmArrivalController::class)
         ->group(function () {
+            Route::get('/audit-data', 'auditIndex')->name('audit');
+            Route::get('/audit-search', 'auditSearchAjax')->name('audit-search');
+            Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');

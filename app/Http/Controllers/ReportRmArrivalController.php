@@ -21,11 +21,49 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportRmArrivalController extends Controller
 {
 
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string
+    {
+        return ReportRmArrival::class;
+    }
+    protected function auditRoutePrefix(): string
+    {
+        return 'report-rm-arrivals';
+    }
+    protected function auditViewPrefix(): string
+    {
+        return 'report_rm_arrivals';
+    }
+    protected function auditSearchColumns(): array
+    {
+        return ['notes', 'shift'];
+    }
+
+    protected function auditRelations(): array
+    {
+        return ['area', 'section'];
+    }
+
+    protected function auditDateColumn(): string
+    {
+        return 'date';
+    }
+
+    protected function auditTimeColumn(): string
+    {
+        return 'created_at';
+    }
+
+    protected function auditPlanColumn(): string
+    {
+        return 'area_uuid';
+    }
     
     protected string $bulkModel = ReportRmArrival::class;
 
