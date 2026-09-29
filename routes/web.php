@@ -86,6 +86,7 @@ use	App\Http\Controllers\SsoLoginController;
 use App\Http\Controllers\ReportAuditPackingPrimerController;
 use App\Http\Controllers\MasterBoilingTankStandardController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TraceabilityController;
 
 
 Route::get('/', function () {
@@ -1641,6 +1642,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-thawings/bulk-approve-count', [ReportThawingController::class, 'bulkApproveCount'])->name('report-thawings.bulk-approve-count');
     Route::get('report-thawings/export-pdf-bulk', [ReportThawingController::class, 'exportPdfBulk'])
     ->name('report_thawings.export_pdf_bulk');
+
+    Route::prefix('traceability')->name('traceability.')->group(function () {
+        Route::get('/', [TraceabilityController::class, 'index'])->name('index');
+        Route::get('/search', [TraceabilityController::class, 'search'])->name('search');
+        Route::get('/form-details', [TraceabilityController::class, 'formDetails'])->name('formDetails');
+    });
 
     Route::post('user-sync', [ApiController::class, 'syncUser']);
     Route::post('user-desync', [ApiController::class, 'desyncUser']);

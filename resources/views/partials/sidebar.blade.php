@@ -1,8 +1,28 @@
 @php
 $isMasterData =
-Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
-'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*',
-'steamer-standards*', 'form-numbers*', 'metal_detectors*', 'master-boiling-tank-standard*');
+Request::is(
+'users*',
+'area*',
+'section*',
+'rooms*',
+'fragile-item*',
+'sharp-tools*',
+'scales*',
+'thermometers*',
+'products*',
+'raw-material*',
+'premixes*',
+'formulas*',
+'standard-stuffers*',
+'maurer-standards*',
+'fessman-standards*',
+'master-checklist-items*',
+'master-smoke-houses*',
+'steamer-standards*',
+'form-numbers*',
+'metal_detectors*',
+'master-boiling-tank-standard*'
+);
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -215,10 +235,10 @@ $isAudit = Request::is([
                     Verifikasi Proses Pembuatan Emulsi
                 </a>
                 @if (!in_array(auth()->user()->area?->name, ['Cikande 1', 'Cikande 2', 'Cikande 3']))
-                    <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
+                <a class="collapse-item {{ Request::is('report-metal-detectors*') ? 'active' : '' }}"
                     href="{{ route('report_metal_detectors.index') }}">
-                        Verifikasi Kinerja Metal Detector Adonan
-                    </a>
+                    Verifikasi Kinerja Metal Detector Adonan
+                </a>
                 @endif
                 <a class="collapse-item {{ Request::is('report-process-productions*') ? 'active' : '' }}"
                     href="{{ route('report_process_productions.index') }}">
@@ -238,7 +258,7 @@ $isAudit = Request::is([
                     href="{{ route('report_thawings.index') }}">
                     Verifikasi Proses Thawing
                 </a>
-                
+
             </div>
         </div>
     </li>
@@ -306,10 +326,10 @@ $isAudit = Request::is([
                 </a>
 
                 @if (auth()->user()->area?->name !== 'Bandung')
-                    <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
+                <a class="collapse-item {{ Request::is('report-startup-labels*') ? 'active' : '' }}"
                     href="{{ route('report_startup_labels.index') }}">
-                        Verifikasi Labelisasi Start-Up
-                    </a>
+                    Verifikasi Labelisasi Start-Up
+                </a>
                 @endif
             </div>
         </div>
@@ -379,8 +399,7 @@ $isAudit = Request::is([
                     Verifikasi Penerapan GMP Karyawan & Sanitasi Area
                 </a> -->
 
-                <a class="collapse-item {{ Request::is('gmp*') ? 'active' : '' }}"
-                    href="{{ route('gmp.index') }}">
+                <a class="collapse-item {{ Request::is('gmp*') ? 'active' : '' }}" href="{{ route('gmp.index') }}">
                     Verifikasi Penerapan GMP Karyawan & Sanitasi Area
                 </a>
 
@@ -410,7 +429,7 @@ $isAudit = Request::is([
                     href="{{ route('report_mt_cleans.index') }}">
                     Pemeriksaan Kebersihan Magnet Trap
                 </a>
-                
+
             </div>
         </div>
     </li>
@@ -444,8 +463,8 @@ $isAudit = Request::is([
             <i class="fas fa-clipboard-check"></i>
             <span>Audit</span>
         </a>
-        <div id="collapsePagesaudit" class="collapse {{ $isAudit ? 'show' : '' }}"
-            aria-labelledby="headingPages" data-parent="#accordionSidebar">
+        <div id="collapsePagesaudit" class="collapse {{ $isAudit ? 'show' : '' }}" aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-audit-packing-primers*') ? 'active' : '' }}"
                     href="{{ route('report_audit_packing_primers.index') }}">
@@ -455,6 +474,12 @@ $isAudit = Request::is([
         </div>
     </li>
     @endhasanyrole
+
+    <li class="nav-item {{ Request::is('traceability*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('traceability.index') }}">
+            <i class="fas fa-fw fa-search-location"></i>
+            <span>Traceability</span></a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
