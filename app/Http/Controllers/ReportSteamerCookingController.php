@@ -21,10 +21,27 @@ use Carbon\Carbon;
 use App\Exports\SteamerCookingExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportSteamerCookingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportSteamerCooking::class; }
+    protected function auditRoutePrefix(): string { return 'report_steamer_cookings'; }
+    protected function auditViewPrefix(): string { return 'report_steamer_cookings'; }
+    protected function auditRelations(): array
+    {
+        return ['product', 'area', 'batches.details.coreTemps'];
+    }
+    protected function auditSearchColumns(): array
+    {
+        return ['shift', 'product_code_range', 'notes', 'created_by'];
+    }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportSteamerCooking::class;
 
     protected function getBulkExportModelClass(): string
@@ -72,8 +89,9 @@ class ReportSteamerCookingController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportSteamerCooking::with(['product', 'area', 'batches.details.coreTemps'])
-            ->withCount('batches');
+        $query = ReportSteamerCooking::operasional()
+        ->with(['product', 'area', 'batches.details.coreTemps'])
+        ->withCount('batches');
 
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&

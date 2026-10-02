@@ -122,6 +122,12 @@
 
                 </a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report-smoke-houses.audit') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
 
 
@@ -318,6 +324,10 @@
                                 class="btn btn-sm btn-outline-secondary" target="_blank" title="Cetak PDF">
                                 <i class="fas fa-file-pdf"></i>
                             </a>
+
+                            @hasanyrole('admin|superadmin|SPV QC')
+                            <x-audit-dropdown :item="$report" route-prefix="report-smoke-houses" />
+                            @endhasanyrole
 
                         </td>
 

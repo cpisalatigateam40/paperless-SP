@@ -114,6 +114,9 @@
                     class="btn btn-sm btn-outline-secondary" title="Cetak PDF">
                     <i class="fas fa-file-pdf"></i>
                 </a>
+                @hasanyrole('admin|superadmin|SPV QC')
+                <x-audit-dropdown :item="$report" route-prefix="process-area-cleanliness" />
+                @endhasanyrole
             </td>
 
         </tr>

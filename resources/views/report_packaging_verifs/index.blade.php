@@ -116,6 +116,12 @@
                 @can('create report')
                 <a href="{{ route('report_packaging_verifs.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_packaging_verifs.audit') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
         </div>
 
@@ -271,6 +277,10 @@
                                     target="_blank" class="btn btn-outline-secondary btn-sm" title="Cetak PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$report" route-prefix="report_packaging_verifs" />
+                                @endhasanyrole
                             </td>
 
                         </tr>

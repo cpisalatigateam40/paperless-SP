@@ -117,6 +117,12 @@
                 @can('create report')
                 <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_siomays.audit') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
         </div>
         <div class="card-body" style="padding-top: 1rem !important;">
@@ -158,8 +164,7 @@
                             <td>{{ $r->created_at->format('H:i') }}</td>
                             <td>{{ $r->area->name ?? '-' }}</td>
                             @php
-                                $codes = $r->pluck('production_code')->filter()->implode(', ');
-                                $collapseId = 'codes-' . $r->uuid;
+                                $codes = $r->production_code;
                             @endphp
 
                             <td>
@@ -275,6 +280,10 @@
                                     class="btn btn-outline-secondary btn-sm" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$r" route-prefix="report_siomays" />
+                                @endhasanyrole
                             </td>
                         </tr>
                         {{-- Detail Collapse --}}

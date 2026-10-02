@@ -20,10 +20,46 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
+
 
 class ReportEmulsionMakingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string
+    {
+        return ReportEmulsionMaking::class;
+    }
+    protected function auditRoutePrefix(): string
+    {
+        return 'report_emulsion_makings';
+    }
+    protected function auditViewPrefix(): string
+    {
+        return 'report_emulsion_makings';
+    }
+    protected function auditRelations(): array
+    {
+        return ['area', 'header.details.rawMaterial', 'header.details.premix', 'header.agings'];
+    }
+    protected function auditSearchColumns(): array
+    {
+        return ['shift', 'created_by'];
+    }
+    protected function auditDateColumn(): string
+    {
+        return 'date';
+    }
+    protected function auditTimeColumn(): string
+    {
+        return 'created_at';
+    }
+    protected function auditPlanColumn(): ?string
+    {
+        return null;
+    }
+
     protected string $bulkModel = ReportEmulsionMaking::class;
 
     protected function getBulkExportModelClass(): string
@@ -68,11 +104,11 @@ class ReportEmulsionMakingController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportEmulsionMaking::with([
+        $query = ReportEmulsionMaking::operasional()->with([
             'area',
             'header.details.rawMaterial',
             'header.details.premix',
-            'header.agings'
+            'header.agings',
         ]);
 
         // FILTER AREA (hanya admin & superadmin)

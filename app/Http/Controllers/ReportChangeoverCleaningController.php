@@ -21,10 +21,24 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ChangeoverCleaningExport;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportChangeoverCleaningController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportChangeoverCleaning::class; }
+    protected function auditRoutePrefix(): string { return 'report_changeover_cleanings'; }
+    protected function auditViewPrefix(): string { return 'report_changeover_cleanings'; }
+    protected function auditRelations(): array
+    {
+        return ['area', 'details.item.section', 'details.product'];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
 
     protected string $bulkModel = ReportChangeoverCleaning::class;
 
@@ -130,7 +144,7 @@ class ReportChangeoverCleaningController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ReportChangeoverCleaning::with([
+        $query = ReportChangeoverCleaning::operasional()->with([
             'area', 'details.item.section', 'details.product'
         ]);
 

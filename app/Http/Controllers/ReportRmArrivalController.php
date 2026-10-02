@@ -34,7 +34,7 @@ class ReportRmArrivalController extends Controller
     }
     protected function auditRoutePrefix(): string
     {
-        return 'report-rm-arrivals';
+        return 'report_rm_arrivals';
     }
     protected function auditViewPrefix(): string
     {
@@ -60,9 +60,9 @@ class ReportRmArrivalController extends Controller
         return 'created_at';
     }
 
-    protected function auditPlanColumn(): string
+    protected function auditPlanColumn(): ?string
     {
-        return 'area_uuid';
+        return null; // filter area sudah ditangani UserAreaScope
     }
     
     protected string $bulkModel = ReportRmArrival::class;
@@ -109,7 +109,8 @@ class ReportRmArrivalController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportRmArrival::with('area', 'details.rawMaterial', 'section');
+        $query = ReportRmArrival::operasional()
+            ->with('area', 'details.rawMaterial', 'section');
 
         // 🔥 FILTER SECTION
         if ($request->filled('section')) {

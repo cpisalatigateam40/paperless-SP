@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportProcessAreaCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_process_area_cleanliness';
@@ -23,11 +28,41 @@ class ReportProcessAreaCleanliness extends Model implements Auditable
         'created_by',
         'known_by',
         'approved_by',
+        'is_audit', 'source_uuid'
     ];
 
     protected $auditEvents = [
         'updated',
     ];
+
+    protected $casts = ['is_audit' => 'boolean'];
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'details' => [
+                    'items' => [
+                        'followups' => [],
+                    ],
+                ],
+            ]);
+
+            return $clone;
+        });
+    }
 
     public function area()
     {

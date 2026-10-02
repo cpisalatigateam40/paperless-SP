@@ -118,6 +118,12 @@
                 @can('create report')
                 <a href="{{ route('report_weight_stuffers.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_weight_stuffers.audit') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
         </div>
         <div class="card-body" style="padding-top: 1rem !important;">
@@ -304,6 +310,10 @@
                                     data-bs-target="#modalPilihProduk">
                                     <i class="fas fa-file-pdf"></i>
                                 </button>
+
+                                @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$report" route-prefix="report_weight_stuffers" />
+                                @endhasanyrole
                                 </div>
                             </td>
 

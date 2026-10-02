@@ -28,10 +28,29 @@ use App\Traits\HasBulkApproval;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportWeightStufferController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportWeightStuffer::class; }
+    protected function auditRoutePrefix(): string { return 'report_weight_stuffers'; }
+    protected function auditViewPrefix(): string { return 'report_weight_stuffers'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'area',
+            'details.product', 'details.townsend', 'details.hitech',
+            'details.vemag', 'details.vemag2', 'details.handtmann',
+            'details.cases', 'details.weights', 'details.documentations',
+        ];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportWeightStuffer::class;
 
     protected function getBulkExportModelClass(): string
@@ -84,7 +103,7 @@ class ReportWeightStufferController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportWeightStuffer::with([
+        $query = ReportWeightStuffer::operasional()->with([
             'area',
             'details.product',
             'details.townsend',

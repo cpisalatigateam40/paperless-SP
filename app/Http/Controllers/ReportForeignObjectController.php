@@ -20,10 +20,21 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportForeignObjectController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportForeignObject::class; }
+    protected function auditRoutePrefix(): string { return 'report-foreign-objects'; }
+    protected function auditViewPrefix(): string { return 'report_foreign_objects'; }
+    protected function auditRelations(): array { return ['area', 'section', 'details.product']; }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportForeignObject::class;
 
     protected function getBulkExportModelClass(): string
@@ -68,7 +79,7 @@ class ReportForeignObjectController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportForeignObject::with([
+        $query = ReportForeignObject::operasional()->with([
             'area',
             'section',
             'details.product',

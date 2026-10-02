@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportAlatVerification extends Model
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
 
     protected $table = 'report_alat_verifications';
     protected $primaryKey = 'uuid';
@@ -26,6 +31,7 @@ class ReportAlatVerification extends Model
         'known_by',
         'approved_by',
         'approved_at',
+        'is_audit', 'source_uuid'
     ];
 
     protected $auditEvents = [
@@ -35,14 +41,40 @@ class ReportAlatVerification extends Model
     protected $casts = [
         'date' => 'date',
         'approved_at' => 'datetime',
+        'is_audit' => 'boolean'
     ];
 
     protected static function booted()
     {
         static::creating(function ($report) {
-            $report->uuid = (string) Str::uuid();
+            if (empty($report->uuid)) {
+                $report->uuid = (string) Str::uuid();
+            }
         });
         static::addGlobalScope(new UserAreaScope);
+    }
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'details' => [],
+            ]);
+
+            return $clone;
+        });
     }
 
     public function area()

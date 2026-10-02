@@ -19,11 +19,25 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 
 class ReportFragileItemController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportFragileItem::class; }
+    protected function auditRoutePrefix(): string { return 'report-fragile-item'; }
+    protected function auditViewPrefix(): string { return 'report_fragile_item'; }
+    protected function auditRelations(): array
+    {
+        return ['area', 'details.item', 'detailManuals.section'];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportFragileItem::class;
 
     protected function getBulkExportModelClass(): string
@@ -68,7 +82,7 @@ class ReportFragileItemController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportFragileItem::with([
+        $query = ReportFragileItem::operasional()->with([
             'area',
             'details.item',
             'detailManuals.section'

@@ -19,10 +19,21 @@ use App\Traits\HasBulkPdfExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AlatVerificationExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportAlatVerificationController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportAlatVerification::class; }
+    protected function auditRoutePrefix(): string { return 'report-alat-verifications'; }
+    protected function auditViewPrefix(): string { return 'report_alat_verifications'; }
+    protected function auditRelations(): array { return ['area', 'details.alat']; }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportAlatVerification::class;
 
     protected function getBulkExportModelClass(): string
@@ -68,7 +79,7 @@ class ReportAlatVerificationController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportAlatVerification::with('details.alat');
+        $query = ReportAlatVerification::operasional()->with('details.alat');
 
         // Filter Area (khusus admin & superadmin)
         if (

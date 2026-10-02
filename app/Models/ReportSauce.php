@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportSauce extends Model implements Auditable
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_sauces';
@@ -29,7 +34,9 @@ class ReportSauce extends Model implements Auditable
         'approved_by',
         'approved_at',
         'gramase',
-        'documentation_notes'
+        'documentation_notes',
+        'is_audit',
+        'source_uuid',
     ];
 
     protected $auditEvents = [
@@ -37,11 +44,44 @@ class ReportSauce extends Model implements Auditable
     ];
 
 
+    protected $casts = [
+        'is_audit' => 'boolean',
+    ];
+
     protected static function boot()
     {
         parent::boot();
-        static::creating(fn($model) => $model->uuid = Str::uuid());
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
         static::addGlobalScope(new UserAreaScope);
+    }
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'details' => [
+                    'rawMaterials' => [],
+                ],
+            ]);
+
+            return $clone;
+        });
     }
 
     // Relasi ke Area

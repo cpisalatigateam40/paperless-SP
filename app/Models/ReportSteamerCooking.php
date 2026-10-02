@@ -6,10 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
+
 
 class ReportSteamerCooking extends Model
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
 
     protected $table = 'report_steamer_cookings';
 
@@ -31,14 +37,53 @@ class ReportSteamerCooking extends Model
         'known_by',
         'approved_by',
         'approved_at',
+        'is_audit',
+        'source_uuid',
     ];
 
+
+     protected $casts = [
+        'is_audit' => 'boolean',
+    ];
 
     protected static function boot()
     {
         parent::boot();
-        static::creating(fn($model) => $model->uuid = Str::uuid());
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+
         static::addGlobalScope(new UserAreaScope);
+    }
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'batches' => [
+                    'details' => [
+                        'coreTemps' => [],
+                    ],
+                ],
+            ]);
+
+            return $clone;
+        });
     }
 
     public function area()

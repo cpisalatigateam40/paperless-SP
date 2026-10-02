@@ -45,6 +45,29 @@ trait HasAudit
         $clone->save();
         return $clone;
     }
+    protected function copyChildren(\Illuminate\Database\Eloquent\Model $oldParent, \Illuminate\Database\Eloquent\Model $newParent, array $tree): void
+    {
+        foreach ($tree as $relation => $subTree) {
+            $rel = $oldParent->{$relation}();
+            $fk = $rel->getForeignKeyName();
+            $localKey = $rel->getLocalKeyName();
+
+            foreach ($rel->withoutGlobalScopes()->get() as $row) {
+                $copy = $row->replicate();
+                $copy->{$fk} = $newParent->{$localKey};
+
+                if (array_key_exists('uuid', $row->getAttributes())) {
+                    $copy->uuid = (string) Str::uuid();
+                }
+
+                $copy->save();
+
+                if (!empty($subTree)) {
+                    $this->copyChildren($row, $copy, $subTree);
+                }
+            }
+        }
+    }
     public function scopeOperasional($query)
     {
         return $query->where('is_audit', false);

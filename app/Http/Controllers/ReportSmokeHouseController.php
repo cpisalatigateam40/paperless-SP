@@ -25,10 +25,28 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SmokeHouseExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportSmokeHouseController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportSmokeHouse::class; }
+    protected function auditRoutePrefix(): string { return 'report-smoke-houses'; }
+    protected function auditViewPrefix(): string { return 'report-smoke-houses'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'area', 'creator',
+            'details.product', 'details.steps',
+            'details.reworks.steps', 'details.sensories',
+        ];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'notes']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportSmokeHouse::class;
 
     protected function getBulkExportModelClass(): string
@@ -77,7 +95,7 @@ class ReportSmokeHouseController extends Controller
     
     public function index(Request $request)
     {
-        $query = ReportSmokeHouse::with([
+        $query = ReportSmokeHouse::operasional()->with([
             'area',
             'creator',
             'details' => function ($q) {

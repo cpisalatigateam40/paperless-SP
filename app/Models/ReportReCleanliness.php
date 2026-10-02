@@ -8,10 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportReCleanliness extends Model implements Auditable
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_re_cleanliness';
@@ -23,19 +28,52 @@ class ReportReCleanliness extends Model implements Auditable
         'created_by',
         'known_by',
         'approved_by',
-        'approved_at'
+        'approved_at',
+        'is_audit', 'source_uuid'
     ];
 
     protected $auditEvents = [
         'updated',
     ];
 
+    protected $casts = ['is_audit' => 'boolean'];
+
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->uuid = (string) Str::uuid();
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
         });
         static::addGlobalScope(new UserAreaScope);
+    }
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'roomDetails' => [
+                    'followups' => [],
+                ],
+                'equipmentDetails' => [
+                    'followups' => [],
+                ],
+            ]);
+
+            return $clone;
+        });
     }
 
     public function roomDetails(): HasMany

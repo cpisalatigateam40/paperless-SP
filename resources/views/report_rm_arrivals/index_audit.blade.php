@@ -17,8 +17,8 @@
                             <input type="text" name="search" class="form-control form-control-sm mr-2"
                                 placeholder="Cari catatan, shift..." value="{{ request('search') }}">
                             <select name="per_page" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
-                                @foreach([5, 10, 25] as $n)
-                                    <option value="{{ $n }}" {{ request('per_page', 5) == $n ? 'selected' : '' }}>
+                                @foreach([10, 25] as $n)
+                                    <option value="{{ $n }}" {{ request('per_page', 10) == $n ? 'selected' : '' }}>
                                         {{ $n }} / halaman
                                     </option>
                                 @endforeach
@@ -32,9 +32,11 @@
 
                     <div class="vr"></div>
 
+                    @hasanyrole('admin|superadmin|SPV QC')
                     <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Data Operasional
                     </a>
+                    @endhasanyrole
                 </div>
             </div>
 
@@ -53,10 +55,6 @@
                         </ul>
                     </div>
                 @endif
-
-                <p class="text-muted small">
-                    Daftar gabungan salinan data audit dan data operasional yang belum di-copy.
-                </p>
 
                 <div class="table-responsive">
                     <table class="table table-bordered">
@@ -88,9 +86,7 @@
                                     <td>{{ $report->area->name ?? '-' }}</td>
                                     <td>
                                         {{ $report->section->section_name ?? '-' }}
-                                        @if($report->is_audit)
-                                            <span class="badge bg-secondary">Audit</span>
-                                        @endif
+                                        
                                     </td>
                                     <td>
                                         @if($codes)
@@ -113,83 +109,113 @@
                                         @endif
                                     </td>
                                     <td>{{ $report->ketidaksesuaian > 0 ? 'Ada' : '-' }}</td>
-                                    <td>{{ $report->created_by }}</td>
+                                    <td>{{ $report->created_by }}
+                                        @if($report->is_audit)
+                                            <span class="badge bg-info" style="color: white;">Audit</span>
+                                        @endif
+                                    </td>
                                     <td>
+                                        @php
+                                            $user = auth()->user();
+                                            $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                        @endphp
+
                                         {{-- Toggle Detail --}}
                                         <button class="btn btn-sm btn-info toggle-detail"
                                             data-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                             <i class="fas fa-eye"></i>
                                         </button>
 
-                                        @if($report->is_audit)
-                                            {{-- Edit data audit --}}
-                                            <a href="{{ route('report_rm_arrivals.edit', $report->uuid) }}"
-                                                class="btn btn-sm btn-warning" title="Edit Data Audit">
+                                        {{-- Edit: baris audit langsung edit, baris operasional disalin dulu --}}
+                                        @if($canEdit)
+                                            <a href="{{ $report->is_audit
+                                                    ? route('report_rm_arrivals.edit', $report->uuid)
+                                                    : route('report_rm_arrivals.copy-to-audit', $report->uuid) }}"
+                                                class="btn btn-sm btn-warning"
+                                                title="{{ $report->is_audit ? 'Edit Data Audit' : 'Salin & Edit Data Audit' }}">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                        @endif
 
-                                            {{-- Known --}}
-                                            @can('known report')
-                                                @if(!$report->known_by)
-                                                    <form action="{{ route('report_rm_arrivals.known', $report->id) }}" method="POST"
-                                                        class="d-inline" onsubmit="return confirm('Ketahui laporan ini?')">
+                                        {{-- Hapus: hanya salinan audit --}}
+                                        @if($report->is_audit)
+                                            @can('delete report')
+                                            <form action="{{ route('report_rm_arrivals.destroy', $report->uuid) }}"
+                                                method="POST" class="d-inline"
+                                                onsubmit="return confirm('Yakin ingin menghapus data audit ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-danger" title="Hapus">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            @endcan
+                                        @endif
+
+                                        {{-- Known --}}
+                                        @can('known report')
+                                            @if(!$report->known_by)
+                                                @if($report->is_audit)
+                                                    <form action="{{ route('report_rm_arrivals.known', $report->id) }}"
+                                                        method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Ketahui laporan ini?')">
                                                         @csrf
                                                         <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
                                                             <i class="fas fa-check-double"></i>
                                                         </button>
                                                     </form>
-                                                @else
-                                                    <span class="badge bg-success"
-                                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                        ✔ {{ $report->known_by }}
-                                                    </span>
                                                 @endif
                                             @else
-                                                @if($report->known_by)
-                                                    <span class="badge bg-success"
-                                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                        ✔ {{ $report->known_by }}
-                                                    </span>
-                                                @endif
-                                            @endcan
+                                                <span class="badge bg-success"
+                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                    ✔ {{ $report->known_by }}
+                                                </span>
+                                            @endif
+                                        @else
+                                            @if($report->known_by)
+                                                <span class="badge bg-success"
+                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                    ✔ {{ $report->known_by }}
+                                                </span>
+                                            @endif
+                                        @endcan
 
-                                            {{-- Approve --}}
-                                            @can('approve report')
-                                                @if(!$report->approved_by)
-                                                    <form action="{{ route('report_rm_arrivals.approve', $report->id) }}" method="POST"
-                                                        class="d-inline" onsubmit="return confirm('Setujui laporan ini?')">
+                                        {{-- Approve --}}
+                                        @can('approve report')
+                                            @if(!$report->approved_by)
+                                                @if($report->is_audit)
+                                                    <form action="{{ route('report_rm_arrivals.approve', $report->id) }}"
+                                                        method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Setujui laporan ini?')">
                                                         @csrf
                                                         <button type="submit" class="btn btn-sm btn-success" title="Approve">
                                                             <i class="fas fa-thumbs-up"></i>
                                                         </button>
                                                     </form>
-                                                @else
-                                                    <span class="badge bg-success"
-                                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                        ✔ {{ $report->approved_by }}
-                                                    </span>
                                                 @endif
                                             @else
-                                                @if($report->approved_by)
-                                                    <span class="badge bg-success"
-                                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                        ✔ {{ $report->approved_by }}
-                                                    </span>
-                                                @endif
-                                            @endcan
+                                                <span class="badge bg-success"
+                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                    ✔ {{ $report->approved_by }}
+                                                </span>
+                                            @endif
                                         @else
-                                            {{-- Belum ada salinan audit: buat salinan lalu buka form edit --}}
-                                            <a href="{{ route('report_rm_arrivals.copy-to-audit', $report->uuid) }}"
-                                                class="btn btn-sm btn-outline-primary" title="Salin & Edit Data Audit">
-                                                <i class="fas fa-user-shield"></i>
-                                            </a>
-                                        @endif
+                                            @if($report->approved_by)
+                                                <span class="badge bg-success"
+                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                                    ✔ {{ $report->approved_by }}
+                                                </span>
+                                            @endif
+                                        @endcan
 
                                         {{-- Export PDF --}}
-                                        <a href="{{ route('report_rm_arrivals.export-pdf', $report->uuid) }}" target="_blank"
-                                            class="btn btn-sm btn-outline-secondary" title="Export PDF">
+                                        <a href="{{ route('report_rm_arrivals.export-pdf', $report->uuid) }}"
+                                            target="_blank" class="btn btn-sm btn-outline-secondary" title="Export PDF">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
+
+                                        {{-- Dropdown audit (gear) --}}
+                                        <x-audit-dropdown :item="$report" route-prefix="report_rm_arrivals" />
                                     </td>
                                 </tr>
 

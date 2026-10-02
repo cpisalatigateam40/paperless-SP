@@ -22,10 +22,24 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportWaterbathController extends Controller
 {
-    use HasBulkApproval,HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval,HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportWaterbath::class; }
+    protected function auditRoutePrefix(): string { return 'report_waterbaths'; }
+    protected function auditViewPrefix(): string { return 'report_waterbaths'; }
+    protected function auditRelations(): array
+    {
+        return ['area', 'details.product', 'pasteurisasi', 'coolingShocks', 'drippings'];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportWaterbath::class;
 
     protected function getBulkExportModelClass(): string
@@ -72,14 +86,13 @@ class ReportWaterbathController extends Controller
     {
         $search = $request->search;
 
-        $query = ReportWaterbath::with([
+        $query = ReportWaterbath::operasional()->with([
             'area',
             'details.product',
             'pasteurisasi',
             'coolingShocks',
             'drippings'
         ]);
-
         // Filter Area (khusus admin & superadmin)
         if (
             auth()->user()->hasAnyRole(['admin', 'superadmin']) &&

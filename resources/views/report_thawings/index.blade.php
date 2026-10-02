@@ -106,6 +106,12 @@
                 </a>
                 @endcan
 
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_thawings.audit') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
+
             </div>
         </div>
 
@@ -142,7 +148,7 @@
                             <th>Area</th>
                             <th>Kode Produksi</th>
                             <th>Dibuat Oleh</th>
-                            <th width="400" class="text-center">Aksi</th>
+                            <th width="400">Aksi</th>
                         </tr>
                     </thead>
 
@@ -199,7 +205,7 @@
                                 {{ $report->created_by }}
                             </td>
 
-                            <td class="text-center">
+                            <td>
 
                                 <button class="btn btn-sm btn-info toggle-detail"
                                     data-target="#detail-{{ $report->uuid }}">
@@ -287,6 +293,10 @@
                                     class="btn btn-sm btn-outline-secondary" target="_blank" title="Cetak PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$report" route-prefix="report_thawings" />
+                                @endhasanyrole
 
                             </td>
 

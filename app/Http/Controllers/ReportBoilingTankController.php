@@ -19,10 +19,27 @@ use App\Traits\HasSortableReport;
 use App\Exports\BoilingTankExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportBoilingTankController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportBoilingTank::class; }
+    protected function auditRoutePrefix(): string { return 'report_boiling_tanks'; }
+    protected function auditViewPrefix(): string { return 'report_boiling_tanks'; }
+    protected function auditRelations(): array
+    {
+        return ['area', 'product', 'details.checks'];
+    }
+    protected function auditSearchColumns(): array
+    {
+        return ['shift', 'product_code', 'line_boiling_tank', 'status', 'created_by'];
+    }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
 
     protected string $bulkModel = ReportBoilingTank::class;
 
@@ -105,7 +122,7 @@ class ReportBoilingTankController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportBoilingTank::with([
+        $query = ReportBoilingTank::operasional()->with([
             'area',
             'product',
             'details.checks',

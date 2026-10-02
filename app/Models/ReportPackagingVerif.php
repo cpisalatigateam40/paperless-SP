@@ -5,9 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportPackagingVerif extends Model implements Auditable
 {
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
     use \OwenIt\Auditing\Auditable;
     
     protected $table = 'report_packaging_verifs';
@@ -22,11 +27,42 @@ class ReportPackagingVerif extends Model implements Auditable
         'known_by',
         'approved_by',
         'approved_at',
+        'is_audit',
+        'source_uuid',
     ];
 
     protected $auditEvents = [
         'updated',
     ];
+
+    protected $casts = [
+        'is_audit' => 'boolean',
+    ];
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'details' => [
+                    'checklist' => [],
+                ],
+            ]);
+
+            return $clone;
+        });
+    }
 
     public function details()
     {

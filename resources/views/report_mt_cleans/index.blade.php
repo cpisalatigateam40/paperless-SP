@@ -114,6 +114,12 @@
                 </a>
                 @endcan
 
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_mt_cleans.audit') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
+
             </div>
         </div>
 
@@ -292,6 +298,10 @@
                                     class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$report" route-prefix="report_mt_cleans" />
+                                @endhasanyrole
 
                             </td>
                         </tr>

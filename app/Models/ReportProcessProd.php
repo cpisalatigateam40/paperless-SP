@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportProcessProd extends Model implements Auditable
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'report_process_prods';
@@ -26,16 +31,53 @@ class ReportProcessProd extends Model implements Auditable
         'approved_by',
         'approved_at',
         'notes',
+        'is_audit',
+        'source_uuid',
     ];
 
     protected $auditEvents = [
         'updated',
     ];
 
+    protected $casts = [
+        'is_audit' => 'boolean',
+    ];
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'detail' => [
+                    'items'       => [],
+                    'emulsifying' => [],
+                    'sensoric'    => [],
+                    'tumbling'    => [],
+                    'aging'       => [],
+                ],
+            ]);
+
+            return $clone;
+        });
+    }
+
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->uuid = (string) Str::uuid();
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
         });
         static::addGlobalScope(new UserAreaScope);
     }

@@ -297,6 +297,10 @@
                                         target="_blank" class="btn btn-sm btn-outline-secondary" title="Export PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
+
+                                    @hasanyrole('admin|superadmin|SPV QC')
+                                    <x-audit-dropdown :item="$report" route-prefix="report_rm_arrivals" />
+                                    @endhasanyrole
                                 </td>
                             </tr>
 
