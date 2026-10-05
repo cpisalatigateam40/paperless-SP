@@ -214,7 +214,7 @@
                 @endforeach
             </tr>
             <tr>
-                <td>Temp. Air (°C)</td>
+                <td>Temp. Air (&deg;C)</td>
                 @foreach($report->details as $detail)
                 @php $step = $detail->steps->firstWhere('step_order', $order); @endphp
                 <td>{{ $step->standardStep?->water_temp ?? '-' }}</td>
@@ -324,7 +324,7 @@
                 </td>
                 @endforeach
             </tr>
-            <td colspan="3" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+            <td colspan="2" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
         </tbody>
     </table>
 
