@@ -314,9 +314,9 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
 
-                                @hasanyrole('admin|superadmin|SPV QC')
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
                                 <x-audit-dropdown :item="$report" route-prefix="report_freez_packagings" />
-                                @endhasanyrole
+                                @endhasanyrole -->
                             </td>
 
                         </tr>

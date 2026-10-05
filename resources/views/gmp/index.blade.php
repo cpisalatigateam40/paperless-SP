@@ -215,9 +215,9 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
 
-                                @hasanyrole('admin|superadmin|SPV QC')
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
                                 <x-audit-dropdown :item="$header" route-prefix="gmp" />
-                                @endhasanyrole
+                                @endhasanyrole -->
                             </td>
                         </tr>
 

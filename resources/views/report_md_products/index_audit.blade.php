@@ -2,11 +2,12 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-audit-banner />
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between">
-            <h5>
+            <h5 style="color: #552f93;">
                 <i class="fas fa-user-shield mr-1"></i>
-                Verifikasi Kinerja Metal Detector Produk (Data Audit)
+                Verifikasi Kinerja Metal Detector Produk
             </h5>
 
             <div class="d-flex gap-2" style="gap: .4rem;">

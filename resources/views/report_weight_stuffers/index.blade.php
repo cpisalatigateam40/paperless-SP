@@ -311,9 +311,9 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </button>
 
-                                @hasanyrole('admin|superadmin|SPV QC')
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
                                 <x-audit-dropdown :item="$report" route-prefix="report_weight_stuffers" />
-                                @endhasanyrole
+                                @endhasanyrole -->
                                 </div>
                             </td>
 

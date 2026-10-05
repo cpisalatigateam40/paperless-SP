@@ -85,6 +85,20 @@ class ReportEmulsionMaking extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'header.details' => [
+                'conformity' => ['bad' => ['x'], 'ok' => '✓'],
+            ],
+            'header.agings' => [
+                'sensory_color'   => ['bad' => ['x'], 'ok' => '✓'],
+                'sensory_texture' => ['bad' => ['x'], 'ok' => '✓'],
+                'emulsion_result' => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+            ],
+        ];
+    }
+
     protected $auditEvents = [
         'updated',
     ];

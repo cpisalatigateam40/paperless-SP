@@ -126,4 +126,29 @@ trait HasAuditController
             ->orderBy($this->auditDateColumn(), 'desc')
             ->orderBy($this->auditTimeColumn(), 'desc');
     }
+
+    public function autoNormalizeAudit($uuid)
+    {
+        $model = $this->auditModel();
+        $item = $model::where('uuid', $uuid)->firstOrFail();
+
+        abort_unless($item->hasAuditNormalizeRules(), 404);
+
+        $audit = $item->is_audit
+            ? $item
+            : ($item->auditVersion ?: $item->copyToAudit());
+
+        // data audit yang sudah di-approve tidak diubah lagi
+        if ($audit->approved_by) {
+            return redirect()->route("{$this->auditRoutePrefix()}.audit")
+                ->with('error', 'Data audit sudah di-approve, tidak bisa diubah otomatis.');
+        }
+
+        $changed = \Illuminate\Support\Facades\DB::transaction(fn () => $audit->normalizeAudit());
+
+        return redirect()->route("{$this->auditRoutePrefix()}.audit")
+            ->with('success', $changed > 0
+                ? "Data audit diperbarui otomatis ({$changed} baris diubah menjadi OK)."
+                : 'Tidak ada ketidaksesuaian yang perlu diubah.');
+    }
 }

@@ -229,6 +229,8 @@
 
 
     @yield('style')
+
+    @stack('styles')
 </head>
 
 <body>

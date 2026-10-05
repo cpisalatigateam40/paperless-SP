@@ -6,6 +6,7 @@
 
 @section('content')
 <div class="container-fluid">
+
     <x-breadcrumb :items="[
         ['label' => 'Verifikasi Alat Ukur', 'url' => route('report-alat-verifications.index')],
         ['label' => 'Tambah/Edit Data', 'url' => null],

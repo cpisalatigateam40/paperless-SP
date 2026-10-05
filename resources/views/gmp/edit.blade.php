@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="container-fluid">
+    @if ($gmpHeader->is_audit)
+        <x-audit-banner />
+    @endif
+
     <x-breadcrumb :items="[
         ['label' => 'Verifikasi Penerapan GMP Karyawan & Sanitasi Area', 'url' => route('gmp.index')],
         ['label' => 'Edit Data', 'url' => null],

@@ -5,6 +5,10 @@
 @section('content')
 
 <div class="container-fluid">
+    @if ($report->is_audit)
+        <x-audit-banner />
+    @endif
+    
     <x-breadcrumb :items="[
         ['label' => 'Verifikasi Proses Pemasakan di Smoke House', 'url' => route('report-smoke-houses.index')],
         ['label' => 'Edit Data', 'url' => null],

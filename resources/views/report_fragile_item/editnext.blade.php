@@ -2,6 +2,9 @@
 
 @section('content')
 <div class="container-fluid">
+    @if ($report->is_audit)
+        <x-audit-banner />
+    @endif
     <x-breadcrumb :items="[
         ['label' => 'Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)', 'url' => route('report-fragile-item.index')],
         ['label' => 'Edit Data', 'url' => null],
@@ -262,7 +265,13 @@
                 </template>
 
                 <a href="{{ url()->previous() }}" class="btn btn-secondary mt-4">Kembali</a>
-                <button class="btn btn-success mt-4">Edit Laporan</button>
+                <button type="submit" class="btn {{ $report->is_audit ? 'btn-audit' : 'btn-success' }} mt-4">
+                        @if ($report->is_audit)
+                            <i class="fas fa-user-shield"></i> Update Data Audit
+                        @else
+                            Update
+                        @endif
+                    </button>
             </form>
         </div>
     </div>

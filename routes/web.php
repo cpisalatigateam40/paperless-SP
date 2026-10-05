@@ -634,6 +634,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/audit-search', 'auditSearchAjax')->name('audit-search');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
@@ -1330,6 +1331,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');

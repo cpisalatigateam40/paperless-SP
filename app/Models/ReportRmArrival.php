@@ -42,6 +42,20 @@ class ReportRmArrival extends Model implements Auditable
         'is_audit' => 'boolean',
     ];
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'packaging_condition' => ['bad' => ['x'], 'ok' => '✓'],
+                'sensory_appearance'  => ['bad' => ['x'], 'ok' => '✓'],
+                'sensory_aroma'       => ['bad' => ['x'], 'ok' => '✓'],
+                'sensory_color'       => ['bad' => ['x'], 'ok' => '✓'],
+                'contamination'       => ['bad' => ['x'], 'ok' => '✓'],
+                'status'              => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+            ],
+        ];
+    }
+
     public function copyToAudit(): self
     {
         return DB::transaction(function () {
@@ -53,7 +67,6 @@ class ReportRmArrival extends Model implements Auditable
                 $copy->report_uuid = $clone->uuid;
                 $copy->save();
             }
-
             return $clone;
         });
     }

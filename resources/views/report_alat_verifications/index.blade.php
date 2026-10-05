@@ -258,9 +258,9 @@
                                     <a href="{{ route('report-alat-verifications.export-pdf', $report->uuid) }}"
                                     class="btn btn-sm btn-outline-secondary" target="_blank"><i class="fas fa-file-pdf"></i></a>
 
-                                    @hasanyrole('admin|superadmin|SPV QC')
+                                    <!-- @hasanyrole('admin|superadmin|SPV QC')
                                     <x-audit-dropdown :item="$report" route-prefix="report-alat-verifications" />
-                                    @endhasanyrole
+                                    @endhasanyrole -->
                                 </td>
                             </tr>
                             <tr class="collapse" id="detail-{{ $report->uuid }}">

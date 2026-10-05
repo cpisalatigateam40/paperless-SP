@@ -2,11 +2,12 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-audit-banner />
     <div class="card shadow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>
+            <h5 style="color: #552f93;">
                 <i class="fas fa-user-shield mr-1"></i>
-                Verifikasi Proses Pemasakan di Steam Kettle (Data Audit)
+                Verifikasi Proses Pemasakan di Steam Kettle
             </h5>
 
             <div class="d-flex gap-2" style="gap: .4rem;">

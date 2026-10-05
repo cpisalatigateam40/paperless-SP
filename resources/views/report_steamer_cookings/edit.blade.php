@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="container-fluid">
+    @if ($report->is_audit)
+        <x-audit-banner />
+    @endif
+    
     <x-breadcrumb :items="[
         ['label' => 'Verifikasi Proses Pemasakan di Steamer', 'url' => route('report_steamer_cookings.index')],
         ['label' => 'Edit Data', 'url' => null],

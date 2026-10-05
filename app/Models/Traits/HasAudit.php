@@ -76,4 +76,54 @@ trait HasAudit
     {
         return $query->where('is_audit', true);
     }
+
+    protected function auditNormalizeRules(): array
+    {
+        return [];
+    }
+
+    public function hasAuditNormalizeRules(): bool
+    {
+        return !empty($this->auditNormalizeRules());
+    }
+
+    public function normalizeAudit(): int
+    {
+        $count = 0;
+
+        foreach ($this->auditNormalizeRules() as $path => $fields) {
+            foreach ($this->resolveAuditRows($this, explode('.', $path)) as $row) {
+                $changed = false;
+
+                foreach ($fields as $field => $rule) {
+                    if (in_array($row->{$field}, $rule['bad'], true)) {
+                        $row->{$field} = $rule['ok'];
+                        $changed = true;
+                    }
+                }
+
+                if ($changed) {
+                    $row->save();
+                    $count++;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Ambil baris pada path relasi bersarang, mis. "header.details".
+     */
+    protected function resolveAuditRows(\Illuminate\Database\Eloquent\Model $model, array $segments)
+    {
+        $relation = array_shift($segments);
+        $rows = $model->{$relation}()->withoutGlobalScopes()->get();
+
+        if (empty($segments)) {
+            return $rows;
+        }
+
+        return $rows->flatMap(fn ($row) => $this->resolveAuditRows($row, $segments));
+    }
 }

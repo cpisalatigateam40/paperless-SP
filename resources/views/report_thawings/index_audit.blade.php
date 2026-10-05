@@ -2,11 +2,12 @@
 
 @section('content')
 <div class="container-fluid">
+    <x-audit-banner />
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>
+            <h5 style="color: #552f93;">
                 <i class="fas fa-user-shield mr-1"></i>
-                Verifikasi Proses Thawing (Data Audit)
+                Verifikasi Proses Thawing
             </h5>
 
             <div class="d-flex align-items-center" style="gap:.4rem;">
