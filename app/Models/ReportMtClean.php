@@ -74,6 +74,15 @@ class ReportMtClean extends Model
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'condition' => ['bad' => ['Tidak Bersih'], 'ok' => 'Bersih'],
+            ],
+        ];
+    }
+
     public function area()
     {
         return $this->belongsTo(

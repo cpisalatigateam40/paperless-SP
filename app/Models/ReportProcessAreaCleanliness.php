@@ -64,6 +64,19 @@ class ReportProcessAreaCleanliness extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details.items' => [
+                'condition'    => ['bad' => ['Kotor', 'kotor'], 'ok' => 'Bersih'],
+                'verification' => ['bad' => [0, '0', false], 'ok' => 1],
+            ],
+            'details.items.followups' => [
+                'verification' => ['bad' => [0, '0', false], 'ok' => 1],
+            ],
+        ];
+    }
+
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');

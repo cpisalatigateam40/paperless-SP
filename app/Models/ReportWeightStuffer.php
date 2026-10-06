@@ -66,6 +66,17 @@ class ReportWeightStuffer extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'weight_status' => ['bad' => ['NOT OK'], 'ok' => 'OK'],
+                'long_status'   => ['bad' => ['NOT OK'], 'ok' => 'OK'],
+                'fla_status'    => ['bad' => ['NOT OK'], 'ok' => 'OK'],
+            ],
+        ];
+    }
+
     protected $auditEvents = [
         'updated',
     ];

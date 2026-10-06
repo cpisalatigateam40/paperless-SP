@@ -67,6 +67,18 @@ class ReportMetalDetector extends Model implements Auditable
             return $clone;
         });
     }
+
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'result_fe'           => ['bad' => ['x'], 'ok' => '√'],
+                'result_non_fe'       => ['bad' => ['x'], 'ok' => '√'],
+                'result_sus316'       => ['bad' => ['x'], 'ok' => '√'],
+                'verif_after_correct' => ['bad' => ['x'], 'ok' => '√'],
+            ],
+        ];
+    }
     
 
     public function details()

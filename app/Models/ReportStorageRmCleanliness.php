@@ -62,6 +62,36 @@ class ReportStorageRmCleanliness extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        // nilai tidak OK => nilai OK pasangannya (berbeda per item)
+        $conditionMap = [
+            'Tidak tertata rapi'            => 'Tertata rapi',
+            'Penempatan tidak sesuai'       => 'Sesuai tagging dan jenis alergen',
+            'Tidak bersih / ada kontaminan' => 'Bersih dan bebas kontaminan',
+        ];
+
+        $conditionBad = fn ($row) => isset($conditionMap[$row->condition]);
+
+        return [
+            'details.items' => [
+                'condition' => [
+                    'when' => $conditionBad,
+                    'ok'   => fn ($row) => $conditionMap[$row->condition],
+                ],
+                // catatan hanya diganti untuk item yang kondisinya tidak OK (item 1-3)
+                'notes' => [
+                    'when' => $conditionBad,
+                    'ok'   => json_encode(['Sesuai']),
+                ],
+                'verification' => ['bad' => [0, '0', false], 'ok' => 1],
+            ],
+            'details.items.followups' => [
+                'verification' => ['bad' => [0, '0', false], 'ok' => 1],
+            ],
+        ];
+    }
+
     public function details()
     {
         return $this->hasMany(DetailStorageRmCleanliness::class, 'report_uuid', 'uuid');

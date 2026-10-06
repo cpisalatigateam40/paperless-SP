@@ -59,6 +59,27 @@ class ReportWaterbath extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        // suhu air aktual harus sama dengan suhu air setting; hanya jika keduanya terisi
+        $actualDiffers = fn ($row) =>
+            is_numeric($row->water_temp_setting)
+            && is_numeric($row->water_temp_actual)
+            && abs((float) $row->water_temp_actual - (float) $row->water_temp_setting) > 0.0001;
+
+        $rule = [
+            'water_temp_actual' => [
+                'when' => $actualDiffers,
+                'ok'   => fn ($row) => $row->water_temp_setting,
+            ],
+        ];
+
+        return [
+            'pasteurisasi'  => $rule,
+            'coolingShocks' => $rule,
+        ];
+    }
+
     // Relasi ke Area
     public function area()
     {

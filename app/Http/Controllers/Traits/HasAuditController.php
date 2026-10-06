@@ -138,12 +138,6 @@ trait HasAuditController
             ? $item
             : ($item->auditVersion ?: $item->copyToAudit());
 
-        // data audit yang sudah di-approve tidak diubah lagi
-        if ($audit->approved_by) {
-            return redirect()->route("{$this->auditRoutePrefix()}.audit")
-                ->with('error', 'Data audit sudah di-approve, tidak bisa diubah otomatis.');
-        }
-
         $changed = \Illuminate\Support\Facades\DB::transaction(fn () => $audit->normalizeAudit());
 
         return redirect()->route("{$this->auditRoutePrefix()}.audit")

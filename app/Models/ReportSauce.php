@@ -84,6 +84,45 @@ class ReportSauce extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        $okRule = ['bad' => ['Tidak OK'], 'ok' => 'OK'];
+
+        // aktual harus sama dengan target; hanya jika keduanya terisi
+        $tempDiffers = fn ($row) =>
+            is_numeric($row->target_temperature)
+            && is_numeric($row->actual_temperature)
+            && abs((float) $row->actual_temperature - (float) $row->target_temperature) > 0.0001;
+
+        // berat aktual bahan harus sama dengan standar di formulasi
+        $amountDiffers = fn ($row) =>
+            is_numeric(optional($row->formulation)->weight)
+            && is_numeric($row->amount)
+            && abs((float) $row->amount - (float) $row->formulation->weight) > 0.0001;
+
+        return [
+            'details' => [
+                'appearance' => $okRule,
+                'color'      => $okRule,
+                'aroma'      => $okRule,
+                'taste'      => $okRule,
+                'texture'    => $okRule,
+                'actual_temperature' => [
+                    'when' => $tempDiffers,
+                    'ok'   => fn ($row) => $row->target_temperature,
+                ],
+                'product_status' => ['bad' => ['Reject'], 'ok' => 'Release'],
+            ],
+            'details.rawMaterials' => [
+                'sensory' => $okRule,
+                'amount'  => [
+                    'when' => $amountDiffers,
+                    'ok'   => fn ($row) => $row->formulation->weight,
+                ],
+            ],
+        ];
+    }
+
     // Relasi ke Area
     public function area()
     {

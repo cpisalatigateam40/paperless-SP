@@ -76,6 +76,25 @@ class ReportReCleanliness extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        $detailRules = [
+            'condition'    => ['bad' => ['dirty'], 'ok' => 'clean'],
+            'verification' => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+        ];
+
+        $followupRules = [
+            'verification' => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+        ];
+
+        return [
+            'roomDetails'                => $detailRules,
+            'roomDetails.followups'      => $followupRules,
+            'equipmentDetails'           => $detailRules,
+            'equipmentDetails.followups' => $followupRules,
+        ];
+    }
+
     public function roomDetails(): HasMany
     {
         return $this->hasMany(DetailRoomCleanliness::class, 'report_re_uuid', 'uuid');

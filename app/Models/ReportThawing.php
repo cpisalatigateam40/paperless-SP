@@ -63,6 +63,17 @@ class ReportThawing extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'package_condition' => ['bad' => ['sobek'], 'ok' => 'utuh'],
+                'room_condition'    => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+                'product_condition' => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+            ],
+        ];
+    }
+
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');

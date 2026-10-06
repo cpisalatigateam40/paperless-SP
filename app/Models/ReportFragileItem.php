@@ -59,6 +59,18 @@ class ReportFragileItem extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'time_start' => ['bad' => [0, '0', false], 'ok' => 1],
+                // time_end dinonaktifkan saat create (baru diisi saat edit), jadi bisa tersimpan null
+                'time_end'   => ['bad' => [0, '0', false, null], 'ok' => 1],
+                'notes'      => ['bad' => [0, '0', false], 'ok' => 1],
+            ],
+        ];
+    }
+
     public function area()
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');

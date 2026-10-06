@@ -248,6 +248,8 @@ Route::middleware(['auth'])->group(function () {
     // STORAGE RM ROUTES
     Route::get('cleanliness/audit-data', [StorageRmCleanlinessController::class, 'auditIndex'])->name('cleanliness.audit');
     Route::get('cleanliness/copy-to-audit/{uuid}', [StorageRmCleanlinessController::class, 'copyToAudit'])->name('cleanliness.copy-to-audit');
+    Route::post('cleanliness/auto-audit/{uuid}', [StorageRmCleanlinessController::class, 'autoNormalizeAudit'])
+    ->name('cleanliness.auto-audit');
     Route::prefix('storage-rm-cleanliness')
         ->name('cleanliness.')
         ->controller(StorageRmCleanlinessController::class)
@@ -277,6 +279,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('process-area-cleanliness.audit');
     Route::get('process-area-cleanliness/copy-to-audit/{uuid}', [ProcessAreaCleanlinessController::class, 'copyToAudit'])
         ->name('process-area-cleanliness.copy-to-audit');
+    Route::post('process-area-cleanliness/auto-audit/{uuid}', [ProcessAreaCleanlinessController::class, 'autoNormalizeAudit'])
+    ->name('process-area-cleanliness.auto-audit');
     Route::prefix('process-area-cleanliness')
         ->name('process-area-cleanliness.')
         ->controller(ProcessAreaCleanlinessController::class)
@@ -338,6 +342,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('gmp.export_pdf_bulk');
     Route::get('gmp/audit-data', [GmpKaryawanSanitasiController::class, 'auditIndex'])->name('gmp.audit');
     Route::get('gmp/copy-to-audit/{uuid}', [GmpKaryawanSanitasiController::class, 'copyToAudit'])->name('gmp.copy-to-audit');
+    Route::post('gmp/auto-audit/{uuid}', [GmpKaryawanSanitasiController::class, 'autoNormalizeAudit'])
+    ->name('gmp.auto-audit');
     Route::prefix('gmp')
     ->name('gmp.')
     ->controller(GmpKaryawanSanitasiController::class)
@@ -374,6 +380,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('report-fragile-item.audit');
     Route::get('report-fragile-item/copy-to-audit/{uuid}', [ReportFragileItemController::class, 'copyToAudit'])
         ->name('report-fragile-item.copy-to-audit');
+    Route::post('report-fragile-item/auto-audit/{uuid}', [ReportFragileItemController::class, 'autoNormalizeAudit'])
+    ->name('report-fragile-item.auto-audit');
     Route::prefix('report-fragile-item')
         ->name('report-fragile-item.')
         ->controller(ReportFragileItemController::class)
@@ -508,6 +516,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('report-re-cleanliness.audit');
     Route::get('report-re-cleanliness/copy-to-audit/{uuid}', [ReportReCleanlinessController::class, 'copyToAudit'])
         ->name('report-re-cleanliness.copy-to-audit');
+    Route::post('report-re-cleanliness/auto-audit/{uuid}', [ReportReCleanlinessController::class, 'autoNormalizeAudit'])
+    ->name('report-re-cleanliness.auto-audit');
     Route::prefix('report-re-cleanliness')
         ->name('report-re-cleanliness.')
         ->controller(ReportReCleanlinessController::class)
@@ -591,6 +601,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('report_steamer_cookings.audit');
     Route::get('report_steamer_cookings/copy-to-audit/{uuid}', [ReportSteamerCookingController::class, 'copyToAudit'])
         ->name('report_steamer_cookings.copy-to-audit');
+    Route::post('report_steamer_cookings/auto-audit/{uuid}', [ReportSteamerCookingController::class, 'autoNormalizeAudit'])
+    ->name('report_steamer_cookings.auto-audit');
         
     Route::resource('report_steamer_cookings', ReportSteamerCookingController::class)
         ->parameters(['report_steamer_cookings' => 'report_steamer_cooking:uuid'])
@@ -889,6 +901,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
+        Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
         Route::get('/{report_boiling_tank}/edit', 'edit')->name('edit');
         Route::put('/{report_boiling_tank}', 'update')->name('update');
         Route::delete('/{report_boiling_tank}', 'destroy')->name('destroy');
@@ -949,6 +962,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::get('/{report_uuid}/add-detail', 'addDetail')->name('add_detail');
             Route::post('/{report_uuid}/store-detail', 'storeDetail')->name('store_detail');
@@ -1022,6 +1036,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -1122,6 +1137,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -1163,6 +1179,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'store')->name('store');
         Route::get('/audit-data', 'auditIndex')->name('audit');
         Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+        Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
         Route::get('/{uuid}/edit', 'edit')->name('edit');
         Route::put('/{uuid}', 'update')->name('update');
         Route::delete('/{uuid}', 'destroy')->name('destroy');
@@ -1261,6 +1278,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -1289,6 +1307,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/{uuid}/add-detail', 'addDetailForm')->name('add-detail');
             Route::post('/{uuid}/add-detail', 'storeDetail')->name('store-detail');
@@ -1360,6 +1379,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export_excel');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::get('/add-detail/{reportUuid}', 'addDetail')->name('add_detail');
             Route::post('/add-detail/{reportUuid}', 'storeDetail')->name('store_detail');
@@ -1505,6 +1525,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
@@ -1534,6 +1555,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
@@ -1588,6 +1610,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('report_mt_cleans.copy-to-audit');
     Route::get('report-mt-cleans/export-pdf-bulk', [ReportMtCleanController::class, 'exportPdfBulk'])
         ->name('report_mt_cleans.export_pdf_bulk');
+    Route::post('report_mt_cleans/auto-audit/{uuid}', [ReportMtCleanController::class, 'autoNormalizeAudit'])
+    ->name('report_mt_cleans.auto-audit');
     Route::prefix('report-mt-cleans')
         ->name('report_mt_cleans.')
         ->controller(ReportMtCleanController::class)
@@ -1640,6 +1664,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
             Route::delete('/{uuid}', 'destroy')->name('destroy');
             Route::post('/{id}/approve', 'approve')->name('approve');
             Route::post('/{id}/known', 'known')->name('known');
@@ -1662,6 +1687,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('report_changeover_cleanings.copy-to-audit');
     Route::get('report-changeover-cleanings/export-pdf-bulk', [ReportChangeoverCleaningController::class, 'exportPdfBulk'])
         ->name('report-changeover-cleanings.export_pdf_bulk');
+    Route::post('report_changeover_cleanings/auto-audit/{uuid}', [ReportChangeoverCleaningController::class, 'autoNormalizeAudit'])
+    ->name('report_changeover_cleanings.auto-audit');
     Route::prefix('report-changeover-cleanings')
     ->name('report_changeover_cleanings.')
     ->controller(ReportChangeoverCleaningController::class)
@@ -1698,6 +1725,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export-excel', 'exportExcel')->name('export');
             Route::get('/audit-data', 'auditIndex')->name('audit');
             Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+            Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
 
             Route::get('/{uuid}/edit', 'edit')->name('edit');
             Route::put('/{uuid}', 'update')->name('update');

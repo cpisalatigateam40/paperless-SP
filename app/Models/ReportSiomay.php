@@ -81,6 +81,31 @@ class ReportSiomay extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        // aktual harus sama dengan target; hanya jika keduanya terisi
+        $tempDiffers = fn ($row) =>
+            $row->target_temperature !== null && $row->target_temperature !== ''
+            && $row->actual_temperature !== null && $row->actual_temperature !== ''
+            && abs((float) $row->actual_temperature - (float) $row->target_temperature) > 0.0001;
+
+        return [
+            'details' => [
+                'color'   => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+                'aroma'   => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+                'taste'   => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+                'texture' => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+                'actual_temperature' => [
+                    'when' => $tempDiffers,
+                    'ok'   => fn ($row) => $row->target_temperature,
+                ],
+            ],
+            'details.rawMaterials' => [
+                'sensory' => ['bad' => ['Tidak OK'], 'ok' => 'OK'],
+            ],
+        ];
+    }
+
     // Relasi ke Area
     public function area()
     {

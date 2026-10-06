@@ -10,7 +10,6 @@
     $canAuto = Route::has($autoRoute)
         && method_exists($item, 'hasAuditNormalizeRules')
         && $item->hasAuditNormalizeRules();
-    $auditApproved = $isAudit ? (bool) $item->approved_by : (bool) optional($auditVer)->approved_by;
 @endphp
 
 
@@ -43,19 +42,13 @@
                     <div class="dropdown-divider"></div>
                 @endif
 
-                @if($auditApproved)
-                    <span class="dropdown-item text-muted disabled">
-                        <i class="fas fa-lock mr-2"></i> Sudah di-approve
-                    </span>
-                @else
-                    <form action="{{ route($autoRoute, $isAudit ? $item->uuid : $item->uuid) }}" method="POST"
-                        onsubmit="return confirm('Ubah semua ketidaksesuaian di data audit menjadi OK secara otomatis?')">
-                        @csrf
-                        <button type="submit" class="dropdown-item">
-                            <i class="fas fa-magic text-purple mr-2"></i> Edit Otomatis (jadikan OK)
-                        </button>
-                    </form>
-                @endif
+                <form action="{{ route($autoRoute, $item->uuid) }}" method="POST"
+                    onsubmit="return confirm('Ubah semua ketidaksesuaian di data audit menjadi OK secara otomatis?')">
+                    @csrf
+                    <button type="submit" class="dropdown-item">
+                        <i class="fas fa-magic text-purple mr-2"></i> Edit Otomatis (jadikan OK)
+                    </button>
+                </form>
             @endif
         </div>
     </div>

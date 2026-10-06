@@ -67,6 +67,18 @@ class ReportMdProduct extends Model implements Auditable
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        return [
+            'details' => [
+                'status' => ['bad' => [false, 0, '0'], 'ok' => true],
+            ],
+            'details.positions' => [
+                'status' => ['bad' => [false, 0, '0'], 'ok' => true],
+            ],
+        ];
+    }
+
     public function details()
     {
         return $this->hasMany(DetailMdProduct::class, 'report_uuid', 'uuid');

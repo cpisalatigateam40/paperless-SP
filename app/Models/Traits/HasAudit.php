@@ -93,16 +93,24 @@ trait HasAudit
 
         foreach ($this->auditNormalizeRules() as $path => $fields) {
             foreach ($this->resolveAuditRows($this, explode('.', $path)) as $row) {
-                $changed = false;
+                $updates = [];
 
+                // Tentukan dulu semua perubahan berdasarkan nilai asli, baru diterapkan,
+                // supaya aturan yang saling bergantung (mis. catatan tergantung kondisi) tidak saling menimpa.
                 foreach ($fields as $field => $rule) {
-                    if (in_array($row->{$field}, $rule['bad'], true)) {
-                        $row->{$field} = $rule['ok'];
-                        $changed = true;
+                    $isBad = isset($rule['when'])
+                        ? (bool) $rule['when']($row)
+                        : in_array($row->{$field}, $rule['bad'] ?? [], true);
+
+                    if ($isBad) {
+                        $updates[$field] = $rule['ok'] instanceof \Closure ? ($rule['ok'])($row) : $rule['ok'];
                     }
                 }
 
-                if ($changed) {
+                if ($updates) {
+                    foreach ($updates as $field => $value) {
+                        $row->{$field} = $value;
+                    }
                     $row->save();
                     $count++;
                 }

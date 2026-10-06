@@ -20,7 +20,7 @@
                     : [],
             ];
         })->values()->all();
-    }
+    } 
 @endphp
 
 @if ($errors->any())

@@ -72,6 +72,54 @@ class GmpHeader extends Model implements AuditableContract
         });
     }
 
+    protected function auditNormalizeRules(): array
+    {
+        // GMP Karyawan: nilai boolean, 1 = OK, 0 = Tidak OK
+        $employeeFields = [
+            'seragam_apd_lengkap', 'sarung_tangan_utuh', 'sepatu_boots_bersih',
+            'tidak_pakai_perhiasan', 'kuku_tangan_bersih', 'kuku_tidak_panjang',
+            'perilaku_kerja', 'potensi_cross_contamination',
+        ];
+
+        $employeeRules = [];
+        foreach ($employeeFields as $field) {
+            $employeeRules[$field] = ['bad' => [0, '0', false], 'ok' => 1];
+        }
+
+        // Standar dari nama item dulu (foot basin 200, hand basin 50), baru kolom standar_klorin
+        $standard = function ($row) {
+            $item = strtolower($row->item_verifikasi ?? '');
+
+            if (str_contains($item, 'foot')) return 200.0;
+            if (str_contains($item, 'hand')) return 50.0;
+
+            if ($row->standar_klorin !== null && $row->standar_klorin !== '') {
+                return (float) $row->standar_klorin;
+            }
+
+            return null;
+        };
+
+        // Tidak sesuai = kadar terisi dan berbeda dari standar (di atas maupun di bawah)
+        $deviates = function ($row) use ($standard) {
+            $std = $standard($row);
+
+            return $std !== null
+                && $row->kadar_klorin !== null
+                && $row->kadar_klorin !== ''
+                && abs((float) $row->kadar_klorin - $std) > 0.0001;
+        };
+
+        return [
+            'waktuPemeriksaans.employeeChecks' => $employeeRules,
+            'waktuPemeriksaans.sanitationChecks' => [
+                'kadar_klorin'  => ['when' => $deviates, 'ok' => $standard],
+                // kolom standar ikut dibetulkan kalau salah tersimpan (mis. 300)
+                'standar_klorin' => ['when' => $deviates, 'ok' => $standard],
+            ],
+        ];
+    }
+
     public function getRouteKeyName()
     {
         return 'uuid';
