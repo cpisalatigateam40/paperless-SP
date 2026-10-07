@@ -32,6 +32,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="report_mt_cleans" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('report_mt_cleans.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Data Operasional
@@ -67,7 +69,7 @@
                             <th class="align-middle">Shift</th>
                             <th class="align-middle">Area</th>
                             <th class="align-middle">Dibuat Oleh</th>
-                            <th class="align-middle text-center">Aksi</th>
+                            <th class="align-middle">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,7 +84,7 @@
                                     <span class="badge bg-info" style="color: white;">Audit</span>
                                 @endif
                             </td>
-                            <td class="align-middle text-center">
+                            <td class="align-middle">
                                 {{-- DETAIL --}}
                                 <button class="btn btn-sm btn-info toggle-detail"
                                     data-target="#detail-{{ $report->id }}" title="Lihat Detail">

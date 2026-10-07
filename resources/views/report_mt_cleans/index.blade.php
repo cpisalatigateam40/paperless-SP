@@ -115,7 +115,7 @@
                 @endcan
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('report_mt_cleans.audit') }}" class="btn btn-outline-secondary btn-sm">
+                <a href="{{ route('report_mt_cleans.audit') }}" class="btn btn-audit btn-sm">
                     <i class="fas fa-user-shield"></i> Data Audit
                 </a>
                 @endhasanyrole
@@ -161,7 +161,7 @@
                             <th class="align-middle">Shift</th>
                             <th class="align-middle">Area</th>
                             <th class="align-middle">Dibuat Oleh</th>
-                            <th class="align-middle text-center">Aksi</th>
+                            <th class="align-middle">Aksi</th>
                         </tr>
                     </thead>
 
@@ -190,7 +190,7 @@
                                 {{ $report->created_by ?? '-' }}
                             </td>
 
-                            <td class="align-middle text-center">
+                            <td class="align-middle">
 
                                 {{-- DETAIL --}}
                                 <button class="btn btn-sm btn-info toggle-detail"

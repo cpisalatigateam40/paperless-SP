@@ -33,6 +33,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="report_steamer_cookings" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('report_steamer_cookings.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Data Operasional

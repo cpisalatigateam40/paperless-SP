@@ -32,6 +32,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="report_boiling_tanks" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('report_boiling_tanks.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Data Operasional

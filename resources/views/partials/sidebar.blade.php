@@ -62,8 +62,19 @@ $isAudit = Request::is([
 // Auditor: link report diarahkan ke halaman audit (xxx.audit) kalau route-nya ada
 $isAuditor = auth()->user()?->hasRole('auditor') ?? false;
 
-$reportLink = function (string $indexRoute) use ($isAuditor) {
-    if ($isAuditor) {
+// Mode audit: halaman index audit, edit dengan ?audit=1, atau halaman yang menampilkan <x-audit-banner>
+// Role auditor tidak memakai tema ungu
+$auditMode = ! $isAuditor && (
+    \Illuminate\Support\Str::endsWith((string) Route::currentRouteName(), '.audit')
+    || request()->boolean('audit')
+    || (bool) \Illuminate\Support\Facades\View::shared('auditMode', false)
+);
+
+// Link report ke halaman audit jika user auditor ATAU sedang di mode audit
+$goAudit = $isAuditor || $auditMode;
+
+$reportLink = function (string $indexRoute) use ($goAudit) {
+    if ($goAudit) {
         $auditRoute = \Illuminate\Support\Str::replaceLast('.index', '.audit', $indexRoute);
         if (Route::has($auditRoute)) {
             return route($auditRoute);
@@ -94,13 +105,70 @@ $reportLink = function (string $indexRoute) use ($isAuditor) {
     border: 1px solid #ddd;
     border-radius: 0.25rem;
 }
+
+/* ===== Mode audit: sidebar ungu ===== */
+#accordionSidebar.audit-mode {
+    background: linear-gradient(180deg, #6f42c1 0%, #4c2882 100%) !important;
+}
+#accordionSidebar.audit-mode .collapse-inner {
+    background: #F9F7FC !important;
+}
+#accordionSidebar.audit-mode .collapse-item {
+    color: #4c2882 !important;
+}
+#accordionSidebar.audit-mode .collapse-item:hover {
+    background: #e4d6f7 !important;
+}
+#accordionSidebar.audit-mode .collapse-item.active {
+    color: #fff !important;
+    background: #6f42c1 !important;
+}
+#accordionSidebar.audit-mode .sidebar-divider {
+    border-top-color: rgba(255, 255, 255, .2);
+}
+#accordionSidebar.audit-mode .nav-item.active > .nav-link {
+    font-weight: 700;
+}
+#accordionSidebar.audit-mode #sidebarToggle {
+    background-color: rgba(255, 255, 255, .2);
+}
+
+/* ===== Mode audit: latar halaman putih keunguan ===== */
+body.audit-mode-page,
+body.audit-mode-page #content-wrapper,
+body.audit-mode-page #content {
+    background: #F9F7FC !important;
+}
+body.audit-mode-page .card {
+    background: #fff;
+    border: 1px solid #e9ddf8;
+    box-shadow: 0 4px 18px rgba(111, 66, 193, .10) !important;
+}
+/* body.audit-mode-page .card-header {
+    background: #f3ecfc !important;
+    border-bottom: 1px solid #e4d6f7;
+} */
+body.audit-mode-page .table thead th {
+    background: #efe6fb;
+    border-color: #e1d2f5;
+}
+body.audit-mode-page .table-bordered td,
+body.audit-mode-page .table-bordered th {
+    border-color: #ebe1f8;
+}
 </style>
 
 <!-- Sidebar -->
-<ul class="navbar-nav bg-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+<ul class="navbar-nav bg-primary sidebar sidebar-dark accordion {{ $auditMode ? 'audit-mode' : '' }}" id="accordionSidebar">
 
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard">
-        <div class="sidebar-brand-text mx-3">Paperless SP</div>
+        <div class="sidebar-brand-text mx-3">
+            @if ($auditMode)
+                <i class="fas fa-user-shield mr-1"></i> Mode Audit
+            @else
+                Paperless SP
+            @endif
+        </div>
     </a>
 
     <hr class="sidebar-divider my-0">
@@ -521,5 +589,9 @@ document.addEventListener('DOMContentLoaded', function() {
             suggestionsBox.style.display = 'none';
         }
     });
+
+    @if ($auditMode)
+        document.body.classList.add('audit-mode-page');
+    @endif
 });
 </script>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 trait HasAuditController
 {
@@ -144,5 +145,104 @@ trait HasAuditController
             ->with('success', $changed > 0
                 ? "Data audit diperbarui otomatis ({$changed} baris diubah menjadi OK)."
                 : 'Tidak ada ketidaksesuaian yang perlu diubah.');
+    }
+
+    public function bulkAutoNormalizeAudit(Request $request)
+    {
+        $data = $request->validate([
+            'start_date' => ['required', 'date'],
+            'end_date'   => ['required', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        // batasi rentang supaya request tidak terlalu berat
+        if (\Carbon\Carbon::parse($data['start_date'])->diffInDays($data['end_date']) > 92) {
+            return back()->withInput()->with('error', 'Rentang tanggal maksimal 92 hari.');
+        }
+
+        $model = $this->auditModel();
+        abort_unless((new $model)->hasAuditNormalizeRules(), 404);
+
+        set_time_limit(0);
+
+        $user       = Auth::user();
+        $planColumn = $this->auditPlanColumn();
+        $dateColumn = $this->auditDateColumn();
+
+        $base = $model::query()
+            ->whereDate($dateColumn, '>=', $data['start_date'])
+            ->whereDate($dateColumn, '<=', $data['end_date'])
+            ->when($user->role !== 'superadmin' && $planColumn, fn ($q) => $q->where($planColumn, $user->id_plan));
+
+        // 1) data audit yang sudah ada di rentang tanggal
+        $auditUuids = (clone $base)->where('is_audit', true)->pluck('uuid');
+
+        // 2) data operasional yang belum punya salinan audit
+        //    (yang sudah punya salinan tercakup di poin 1 karena tanggalnya sama)
+        $sourceUuids = (clone $base)->where('is_audit', false)
+            ->whereDoesntHave('auditVersion')
+            ->pluck('uuid');
+
+        $checked = $changedReports = $changedRows = $failed = 0;
+
+        foreach ($auditUuids as $uuid) {
+            $record = $model::where('uuid', $uuid)->first();
+            if (!$record) {
+                continue;
+            }
+
+            $checked++;
+
+            try {
+                $n = DB::transaction(fn () => $record->normalizeAudit());
+
+                if ($n > 0) {
+                    $changedReports++;
+                    $changedRows += $n;
+                }
+            } catch (\Throwable $e) {
+                $failed++;
+                report($e);
+            }
+        }
+
+        foreach ($sourceUuids as $uuid) {
+            $record = $model::where('uuid', $uuid)->first();
+            if (!$record) {
+                continue;
+            }
+
+            $checked++;
+
+            // salin dulu, normalisasi, lalu rollback kalau tidak ada yang berubah
+            // supaya tidak tercipta salinan audit yang tidak perlu
+            DB::beginTransaction();
+
+            try {
+                $clone = $record->copyToAudit();
+                $n     = $clone->normalizeAudit();
+
+                if ($n > 0) {
+                    DB::commit();
+                    $changedReports++;
+                    $changedRows += $n;
+                } else {
+                    DB::rollBack();
+                }
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                $failed++;
+                report($e);
+            }
+        }
+
+        $message = "Edit otomatis selesai: {$checked} laporan diperiksa, "
+            . "{$changedReports} laporan diubah ({$changedRows} baris).";
+
+        if ($failed > 0) {
+            $message .= " {$failed} laporan gagal diproses, cek laravel.log.";
+        }
+
+        return redirect()->route("{$this->auditRoutePrefix()}.audit")
+            ->with($failed > 0 ? 'error' : 'success', $message);
     }
 }

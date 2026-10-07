@@ -38,7 +38,7 @@
                 @endhasanyrole
 
                 <button type="button"
-                    class="btn btn-outline-secondary"
+                    class="btn btn-sm btn-outline-secondary"
                     data-bs-toggle="modal"
                     data-bs-target="#oldReportModal">
 
@@ -71,7 +71,7 @@
                     {{-- 🔄 RESET --}}
                     @if(request('search') || request('area'))
                         <a href="{{ route('report-smoke-houses.index') }}"
-                        class="btn btn-danger"
+                        class="btn btn-sm btn-danger"
                         title="Reset Filter">
                             Reset
                         </a>
@@ -115,7 +115,7 @@
                     title="Verifikasi Pemasakan Smoke House" />
 
                 @can('create report')
-                <a href="{{ route('report-smoke-houses.create') }}" class="btn btn-primary">
+                <a href="{{ route('report-smoke-houses.create') }}" class="btn btn-sm btn-primary">
 
                     <i class="bx bx-plus"></i>
                     Tambah Report
@@ -124,7 +124,7 @@
                 @endcan
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('report-smoke-houses.audit') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('report-smoke-houses.audit') }}" class="btn btn-sm btn-audit">
                     <i class="fas fa-user-shield"></i> Data Audit
                 </a>
                 @endhasanyrole

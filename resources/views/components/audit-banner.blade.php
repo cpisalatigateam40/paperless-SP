@@ -7,6 +7,8 @@
     ],
 ])
 
+@php(view()->share('auditMode', true))
+
 @once
     @push('styles')
     <style>

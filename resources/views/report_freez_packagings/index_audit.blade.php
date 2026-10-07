@@ -32,6 +32,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="report_freez_packagings" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('report_freez_packagings.index') }}" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Data Operasional

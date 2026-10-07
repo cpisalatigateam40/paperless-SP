@@ -111,7 +111,7 @@
                 @endcan
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('report_steamer_cookings.audit') }}" class="btn btn-outline-secondary btn-sm">
+                <a href="{{ route('report_steamer_cookings.audit') }}" class="btn btn-audit btn-sm">
                     <i class="fas fa-user-shield"></i> Data Audit
                 </a>
                 @endhasanyrole

@@ -119,7 +119,7 @@
                 @endcan
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('report_waterbaths.audit') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('report_waterbaths.audit') }}" class="btn btn-audit">
                     <i class="fas fa-user-shield"></i> Data Audit
                 </a>
                 @endhasanyrole

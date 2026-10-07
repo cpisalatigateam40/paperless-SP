@@ -224,6 +224,23 @@
             width: 100%;
         }
     }
+
+    .btn-audit {
+        color: #fff;
+        background: linear-gradient(135deg, #6f42c1 0%, #4c2882 100%);
+        border: 0;
+        box-shadow: 0 2px 8px rgba(111, 66, 193, .35);
+    }
+    .btn-audit:hover,
+    .btn-audit:focus {
+        color: #fff;
+        filter: brightness(1.12);
+        box-shadow: 0 4px 12px rgba(111, 66, 193, .45);
+    }
+    .btn-audit:disabled,
+    .btn-audit.disabled {
+        opacity: .65;
+    }
     </style>
 
 

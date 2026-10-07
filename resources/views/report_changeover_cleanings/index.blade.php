@@ -114,7 +114,7 @@
                 @endcan
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('report_changeover_cleanings.audit') }}" class="btn btn-outline-secondary btn-sm">
+                <a href="{{ route('report_changeover_cleanings.audit') }}" class="btn btn-audit btn-sm">
                     <i class="fas fa-user-shield"></i> Data Audit
                 </a>
                 @endhasanyrole

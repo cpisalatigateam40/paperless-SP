@@ -32,6 +32,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="report_changeover_cleanings" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('report_changeover_cleanings.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Data Operasional
@@ -89,7 +91,8 @@
                                 ->implode(', ');
 
                             $user = auth()->user();
-                            $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(8));
+                            $canEdit = ! $user->hasRole('auditor')
+                                && ($user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(8)));
                         @endphp
                         <tr>
                             <td>{{ $records->firstItem() + $loop->index }}</td>

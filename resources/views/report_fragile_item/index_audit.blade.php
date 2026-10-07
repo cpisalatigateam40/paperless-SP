@@ -33,6 +33,8 @@
                         @endif
                     </form>
 
+                    <x-audit-bulk-auto route-prefix="report-fragile-item" />
+
                     @hasanyrole('admin|superadmin|SPV QC')
                     <a href="{{ route('report-fragile-item.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Data Operasional

@@ -32,6 +32,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="gmp" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('gmp.index') }}" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Data Operasional

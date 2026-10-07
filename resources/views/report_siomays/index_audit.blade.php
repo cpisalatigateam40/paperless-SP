@@ -36,6 +36,8 @@
                     @endif
                 </form>
 
+                <x-audit-bulk-auto route-prefix="report_siomays" />
+
                 @hasanyrole('admin|superadmin|SPV QC')
                 <a href="{{ route('report_siomays.index') }}" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Data Operasional
@@ -98,7 +100,8 @@
                             }
 
                             $user = auth()->user();
-                            $canEdit = $user->hasRole(['admin', 'SPV QC']) || $r->created_at->gt(now()->subHours(2));
+                            $canEdit = ! $user->hasRole('auditor')
+                                && ($user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2)));
                         @endphp
                         <tr>
                             <td>{{ $records->firstItem() + $loop->index }}</td>

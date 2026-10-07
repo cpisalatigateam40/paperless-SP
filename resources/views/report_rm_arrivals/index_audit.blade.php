@@ -34,6 +34,8 @@
 
                     <div class="vr"></div>
 
+                    <x-audit-bulk-auto route-prefix="report_rm_arrivals" />
+
                     @hasanyrole('admin|superadmin|SPV QC')
                     <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Data Operasional
@@ -119,7 +121,8 @@
                                     <td>
                                         @php
                                             $user = auth()->user();
-                                            $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                            $canEdit = ! $user->hasRole('auditor')
+                                                && ($user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2)));
                                         @endphp
 
                                         {{-- Toggle Detail --}}
