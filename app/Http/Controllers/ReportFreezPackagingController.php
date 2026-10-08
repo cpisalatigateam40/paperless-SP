@@ -902,8 +902,10 @@ class ReportFreezPackagingController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('report_freez_packagings.index')
-                ->with('success', 'Data berhasil diperbarui');
+        ->route($report->is_audit ? 'report_freez_packagings.audit' : 'report_freez_packagings.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
 
         } catch (\Throwable $e) {
 

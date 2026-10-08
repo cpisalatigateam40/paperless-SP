@@ -90,83 +90,50 @@
                                 @endif
                             </td>
                             <td>
+                                @php
+                                    $user = auth()->user();
+                                    $canManage = $user->hasAnyRole(['admin', 'superadmin', 'SPV QC']);
+                                    $hasRules = method_exists($header, 'hasAuditNormalizeRules') && $header->hasAuditNormalizeRules();
+
+                                    // ungu: masih ada ketidaksesuaian yang bisa diubah otomatis
+                                    $showAuto = $canManage && $hasRules && $header->wouldNormalizeAudit();
+
+                                    // kuning: sudah tidak ada yang perlu diubah otomatis
+                                    $showEdit = ! $showAuto
+                                        && ! $user->hasRole('auditor')
+                                        && ($user->hasRole(['admin', 'SPV QC']) || $header->created_at->gt(now()->subHours(2)));
+                                @endphp
+
+                                {{-- Toggle Detail --}}
                                 <button class="btn btn-sm btn-info toggle-detail"
                                     data-target="#detail-{{ $header->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                {{-- Edit: baris audit langsung edit, baris operasional disalin dulu --}}
-                                @can('edit report')
-                                <a href="{{ $header->is_audit
-                                        ? route('gmp.edit', $header)
-                                        : route('gmp.copy-to-audit', $header->uuid) }}"
-                                    class="btn btn-sm btn-warning"
-                                    title="{{ $header->is_audit ? 'Edit Data Audit' : 'Salin & Edit Data Audit' }}">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @endcan
-
-                                {{-- Hapus: hanya salinan audit --}}
-                                @if($header->is_audit)
-                                    @can('delete report')
-                                    <form action="{{ route('gmp.destroy', $header) }}" method="POST" class="d-inline"
-                                        onsubmit="return confirm('Yakin hapus data audit ini?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-danger" title="Hapus">
-                                            <i class="fas fa-trash"></i>
+                                @if($showAuto)
+                                    <form action="{{ route('gmp.auto-audit', $header->uuid) }}" method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Ubah semua ketidaksesuaian menjadi OK secara otomatis di data audit?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-audit-solid" title="Edit Otomatis (jadikan OK)">
+                                            <i class="fas fa-magic"></i>
                                         </button>
                                     </form>
-                                    @endcan
+                                @elseif($showEdit)
+                                    <a href="{{ $header->is_audit
+                                            ? route('gmp.edit', $header)
+                                            : route('gmp.copy-to-audit', $header->uuid) }}"
+                                        class="btn btn-sm btn-warning"
+                                        title="{{ $header->is_audit ? 'Edit Data Audit' : 'Salin & Edit Data Audit' }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 @endif
-
-                                {{-- KNOWN --}}
-                                @can('known report')
-                                    @if(!$header->known_by)
-                                        @if($header->is_audit)
-                                        <form action="{{ route('gmp.known', $header->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-outline-success" title="Diketahui">
-                                                <i class="fas fa-check-double"></i>
-                                            </button>
-                                        </form>
-                                        @endif
-                                    @else
-                                        <span class="badge bg-success"
-                                            style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            <i class="fas fa-check"></i> {{ $header->known_by }}
-                                        </span>
-                                    @endif
-                                @endcan
-
-                                {{-- APPROVE --}}
-                                @can('approve report')
-                                    @if(!$header->approved_by)
-                                        @if($header->is_audit)
-                                        <form action="{{ route('gmp.approve', $header->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-success" title="Approve">
-                                                <i class="fas fa-thumbs-up"></i>
-                                            </button>
-                                        </form>
-                                        @endif
-                                    @else
-                                        <span class="badge bg-success"
-                                            style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            <i class="fas fa-check"></i> {{ $header->approved_by }}
-                                        </span>
-                                    @endif
-                                @endcan
 
                                 {{-- Export PDF --}}
                                 <a href="{{ route('gmp.export', $header) }}" class="btn btn-sm btn-outline-secondary"
                                     title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
-
-                                {{-- Dropdown audit (gear) --}}
-                                @hasanyrole('admin|superadmin|SPV QC')
-                                <x-audit-dropdown :item="$header" route-prefix="gmp" />
-                                @endhasanyrole
                             </td>
                         </tr>
 

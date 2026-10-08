@@ -497,7 +497,11 @@ class ReportSiomayController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('report_siomays.index')->with('success', 'Laporan berhasil diperbarui.');
+            return redirect()
+            ->route($report->is_audit ? 'report_siomays.audit' : 'report_siomays.index')
+            ->with('success', $report->is_audit
+                ? 'Data audit berhasil diperbarui.'
+                : 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

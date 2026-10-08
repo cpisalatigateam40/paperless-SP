@@ -437,8 +437,11 @@ class ReportMdProductController extends Controller
             }
         }
  
-        return redirect()->route('report_md_products.index')
-            ->with('success', 'Report berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report_md_products.audit' : 'report_md_products.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function downloadTemplate()

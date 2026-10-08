@@ -259,7 +259,11 @@ class ReportFragileItemController extends Controller
             ]);
         }
 
-        return redirect()->route('report-fragile-item.index')->with('success', 'Laporan berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report-fragile-item.audit' : 'report-fragile-item.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function destroy($uuid)
@@ -401,7 +405,11 @@ class ReportFragileItemController extends Controller
             }
         }
 
-        return redirect()->route('report-fragile-item.index')->with('success', 'Laporan tahap 2 berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report-fragile-item.audit' : 'report-fragile-item.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

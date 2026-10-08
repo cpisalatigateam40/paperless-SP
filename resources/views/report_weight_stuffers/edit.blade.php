@@ -1,12 +1,20 @@
 @extends('layouts.app')
 
+@php
+    $auditMode = $report->is_audit || request()->boolean('audit');
+@endphp
+
+
 @section('content')
 <div class="container-fluid">
     @if ($report->is_audit)
         <x-audit-banner />
     @endif
     <x-breadcrumb :items="[
-        ['label' => 'Verifikasi Proses Stuffing', 'url' => route('report_weight_stuffers.index')],
+        [
+            'label' => $auditMode ? 'Verifikasi Proses Stuffing (Audit)' : 'Verifikasi Proses Stuffing',
+            'url'   => $auditMode ? route('report_weight_stuffers.audit') : route('report_weight_stuffers.index'),
+        ],
         ['label' => 'Edit Data', 'url' => null],
     ]" />
 

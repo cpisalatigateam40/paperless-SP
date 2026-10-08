@@ -558,8 +558,11 @@ public function exportPdf($uuid)
         }
 
 
-        return redirect()->route('report-re-cleanliness.index')
-            ->with('success', 'Laporan berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report-re-cleanliness.audit' : 'report-re-cleanliness.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

@@ -429,8 +429,10 @@ class ReportChangeoverCleaningController extends Controller
         }
 
         return redirect()
-            ->route('report_changeover_cleanings.index')
-            ->with('success', 'Laporan berhasil diperbarui.');
+        ->route($report->is_audit ? 'report_changeover_cleanings.audit' : 'report_changeover_cleanings.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     /**

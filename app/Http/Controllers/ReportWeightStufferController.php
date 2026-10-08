@@ -814,8 +814,10 @@ public function exportPdf($uuid, $detail_uuid)
         });
 
         return redirect()
-            ->route('report_weight_stuffers.index')
-            ->with('success', 'Laporan berhasil diperbarui.');
+        ->route($report->is_audit ? 'report_weight_stuffers.audit' : 'report_weight_stuffers.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

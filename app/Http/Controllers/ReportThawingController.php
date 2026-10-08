@@ -472,8 +472,10 @@ class ReportThawingController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('report_thawings.index')
-                ->with('success', 'Report thawing berhasil diperbarui');
+            ->route($report->is_audit ? 'report_thawings.audit' : 'report_thawings.index')
+            ->with('success', $report->is_audit
+                ? 'Data audit berhasil diperbarui.'
+                : 'Data berhasil diperbarui.');
 
         } catch (\Exception $e) {
 

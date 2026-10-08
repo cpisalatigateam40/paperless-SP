@@ -545,7 +545,11 @@ class ReportEmulsionMakingController extends Controller
             }
         }
 
-        return redirect()->route('report_emulsion_makings.index')->with('success', 'Data berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report_emulsion_makings.audit' : 'report_emulsion_makings.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function downloadTemplate()

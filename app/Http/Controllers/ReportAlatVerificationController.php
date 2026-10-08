@@ -277,8 +277,10 @@ class ReportAlatVerificationController extends Controller
         });
 
         return redirect()
-            ->route('report-alat-verifications.index')
-            ->with('success', 'Laporan verifikasi alat berhasil diperbarui.');
+        ->route($report->is_audit ? 'report-alat-verifications.audit' : 'report-alat-verifications.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function show(string $uuid)

@@ -537,9 +537,12 @@ class ReportRmArrivalController extends Controller
         }
 
         // 5️⃣ Redirect dengan notifikasi sukses
-        return redirect()->route('report_rm_arrivals.index')
-            ->with('success', 'Laporan kedatangan bahan baku berhasil diperbarui.');
-    }
+        return redirect()
+        ->route($report->is_audit ? 'report_rm_arrivals.audit' : 'report_rm_arrivals.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
+        }
 
     public function productionCodes(Request $request)
     {

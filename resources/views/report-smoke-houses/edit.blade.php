@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@php
+    $auditMode = $report->is_audit || request()->boolean('audit');
+@endphp
+
 @section('title', 'Edit Report Smoke House')
 
 @section('content')
@@ -10,7 +14,10 @@
     @endif
     
     <x-breadcrumb :items="[
-        ['label' => 'Verifikasi Proses Pemasakan di Smoke House', 'url' => route('report-smoke-houses.index')],
+        [
+            'label' => $auditMode ? 'Verifikasi Proses Pemasakan di Smoke House (Audit)' : 'Verifikasi Proses Pemasakan di Smoke House',
+            'url'   => $auditMode ? route('report-smoke-houses.audit') : route('report-smoke-houses.index'),
+        ],
         ['label' => 'Edit Data', 'url' => null],
     ]" />
 

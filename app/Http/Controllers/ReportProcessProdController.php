@@ -744,7 +744,11 @@ public function update(Request $request, $uuid)
             }
         }
 
-        return redirect()->route('report_process_productions.index')->with('success', 'Data berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report_process_productions.audit' : 'report_process_productions.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function getFormulasByName(Request $request)

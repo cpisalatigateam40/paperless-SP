@@ -141,10 +141,10 @@ trait HasAuditController
 
         $changed = \Illuminate\Support\Facades\DB::transaction(fn () => $audit->normalizeAudit());
 
-        return redirect()->route("{$this->auditRoutePrefix()}.audit")
+        return redirect()->route("{$this->auditRoutePrefix()}.edit", $audit->uuid)
             ->with('success', $changed > 0
-                ? "Data audit diperbarui otomatis ({$changed} baris diubah menjadi OK)."
-                : 'Tidak ada ketidaksesuaian yang perlu diubah.');
+                ? "Data audit diperbarui otomatis ({$changed} baris diubah menjadi OK). Silakan cek dan sesuaikan jika perlu."
+                : 'Tidak ada ketidaksesuaian yang perlu diubah. Silakan cek data audit.');
     }
 
     public function bulkAutoNormalizeAudit(Request $request)

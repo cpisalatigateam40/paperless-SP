@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@php
+    $auditMode = $report->is_audit || request()->boolean('audit');
+@endphp
+
 @section('content')
 <div class="container-fluid">
     @if ($report->is_audit)
@@ -7,7 +11,10 @@
     @endif
 
     <x-breadcrumb :items="[
-        ['label' => 'Verifikasi Kinerja Metal Detector Produk', 'url' => route('report_md_products.index')],
+        [
+            'label' => $auditMode ? 'Verifikasi Kinerja Metal Detector Produk (Audit)' : 'Verifikasi Kinerja Metal Detector Produk',
+            'url'   => $auditMode ? route('report_md_products.audit') : route('report_md_products.index'),
+        ],
         ['label' => 'Edit Data', 'url' => null],
     ]" />
 
@@ -166,7 +173,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('report_md_products.index') }}" class="btn btn-secondary">Kembali</a>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
                 <button type="submit" class="btn {{ $report->is_audit ? 'btn-audit' : 'btn-success' }}">
                     @if ($report->is_audit)
                         <i class="fas fa-user-shield"></i> Update Data Audit

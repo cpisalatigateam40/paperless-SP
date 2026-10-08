@@ -607,7 +607,11 @@ public function exportPdf($uuid)
             }
 
             DB::commit();
-            return redirect()->route('report_sauces.index')->with('success', 'Laporan berhasil diperbarui.');
+            return redirect()
+        ->route($report->is_audit ? 'report_sauces.audit' : 'report_sauces.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

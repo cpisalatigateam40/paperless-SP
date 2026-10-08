@@ -437,12 +437,12 @@ class ReportSmokeHouseController extends Controller
             'details.*.sensories.notes' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($validated, $uuid) {
-
-            $report = ReportSmokeHouse::with('details.steps', 'details.reworks.steps', 'details.sensories')
+        $report = ReportSmokeHouse::with('details.steps', 'details.reworks.steps', 'details.sensories')
                 ->firstWhere('uuid', $uuid);
 
             abort_if(!$report, 404);
+
+        DB::transaction(function () use ($validated, $report) {
 
             $shift = auth()->user()->hasRole('QC Inspector')
                 ? session('shift_number') . '-' . session('shift_group')
@@ -559,9 +559,12 @@ class ReportSmokeHouseController extends Controller
             }
         });
 
+        
         return redirect()
-            ->route('report-smoke-houses.index')
-            ->with('success', 'Report Smoke House berhasil diperbarui.');
+        ->route($report->is_audit ? 'report-smoke-houses.audit' : 'report-smoke-houses.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function destroy($uuid)

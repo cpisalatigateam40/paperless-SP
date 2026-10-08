@@ -451,7 +451,11 @@ class ProcessAreaCleanlinessController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('process-area-cleanliness.index')->with('success', 'Data berhasil diperbarui.');
+            return redirect()
+        ->route($report->is_audit ? 'process-area-cleanliness.audit' : 'process-area-cleanliness.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal update: ' . $e->getMessage());

@@ -305,7 +305,11 @@ class GmpKaryawanSanitasiController extends Controller
             }
         });
 
-        return redirect()->route('gmp.index')->with('success', 'Data berhasil diperbarui.');
+        return redirect()
+        ->route($gmpHeader->is_audit ? 'gmp.audit' : 'gmp.index')
+        ->with('success', $gmpHeader->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function destroy(GmpHeader $gmpHeader)

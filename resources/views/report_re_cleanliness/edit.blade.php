@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@php
+    $auditMode = $report->is_audit || request()->boolean('audit');
+@endphp
+
 @section('content')
 <div class="container-fluid">
     @if ($report->is_audit)
@@ -7,7 +11,10 @@
     @endif
 
     <x-breadcrumb :items="[
-        ['label' => 'Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan', 'url' => route('report-re-cleanliness.index')],
+        [
+            'label' => $auditMode ? 'Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan (Audit)' : 'Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan',
+            'url'   => $auditMode ? route('report-re-cleanliness.audit') : route('report-re-cleanliness.index'),
+        ],
         ['label' => 'Edit Data', 'url' => null],
     ]" />
 

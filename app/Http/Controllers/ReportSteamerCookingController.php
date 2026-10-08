@@ -458,8 +458,11 @@ class ReportSteamerCookingController extends Controller
             return back()->withInput()->with('error', 'Gagal memperbarui laporan: ' . $e->getMessage());
         }
 
-        return redirect()->route('report_steamer_cookings.index')
-            ->with('success', 'Report berhasil diperbarui.');
+        return redirect()
+        ->route($report_steamer_cooking->is_audit ? 'report_steamer_cookings.audit' : 'report_steamer_cookings.index')
+        ->with('success', $report_steamer_cooking->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function destroy(ReportSteamerCooking $report_steamer_cooking)

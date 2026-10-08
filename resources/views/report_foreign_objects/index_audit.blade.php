@@ -114,14 +114,37 @@
                                 @endif
                             </td>
                             <td class="d-flex align-items-center" style="gap: .2rem;">
+                                @php
+                                    $user = auth()->user();
+                                    $canManage = $user->hasAnyRole(['admin', 'superadmin', 'SPV QC']);
+                                    $hasRules = method_exists($report, 'hasAuditNormalizeRules') && $report->hasAuditNormalizeRules();
+
+                                    // ungu: masih ada ketidaksesuaian yang bisa diubah otomatis
+                                    $showAuto = $canManage && $hasRules && $report->wouldNormalizeAudit();
+
+                                    // kuning: sudah tidak ada yang perlu diubah otomatis
+                                    $showEdit = ! $showAuto
+                                        && $canEdit
+                                        && ! $user->hasRole('auditor');
+                                @endphp
+
                                 {{-- Toggle Detail --}}
                                 <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
                                     data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                {{-- Edit: baris audit langsung edit, baris operasional disalin dulu --}}
-                                @if($canEdit)
+                                @if($showAuto)
+                                    {{-- Edit Otomatis (ungu solid, ikon saja) --}}
+                                    <form action="{{ route('report-foreign-objects.auto-audit', $report->uuid) }}" method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Ubah semua ketidaksesuaian menjadi OK secara otomatis di data audit?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-audit-solid" title="Edit Otomatis (jadikan OK)">
+                                            <i class="fas fa-magic"></i>
+                                        </button>
+                                    </form>
+                                @elseif($showEdit)
                                     <a href="{{ $report->is_audit
                                             ? route('report-foreign-objects.edit', $report->uuid)
                                             : route('report-foreign-objects.copy-to-audit', $report->uuid) }}"
@@ -131,85 +154,11 @@
                                     </a>
                                 @endif
 
-                                {{-- Hapus: hanya salinan audit --}}
-                                @if($report->is_audit)
-                                    @can('delete report')
-                                    <form action="{{ route('report-foreign-objects.destroy', $report->uuid) }}"
-                                        method="POST" class="d-inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus data audit ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                    @endcan
-                                @endif
-
-                                {{-- Known --}}
-                                @can('known report')
-                                    @if(!$report->known_by)
-                                        @if($report->is_audit)
-                                        <form action="{{ route('report-foreign-objects.known', $report->id) }}" method="POST"
-                                            style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                                <i class="fas fa-check-double"></i>
-                                            </button>
-                                        </form>
-                                        @endif
-                                    @else
-                                        <span class="badge bg-success"
-                                            style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            <i class="fas fa-check"></i> {{ $report->known_by }}
-                                        </span>
-                                    @endif
-                                @else
-                                    @if($report->known_by)
-                                        <span class="badge bg-success"
-                                            style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            <i class="fas fa-check"></i> {{ $report->known_by }}
-                                        </span>
-                                    @endif
-                                @endcan
-
-                                {{-- Approve --}}
-                                @can('approve report')
-                                    @if(!$report->approved_by)
-                                        @if($report->is_audit)
-                                        <form action="{{ route('report-foreign-objects.approve', $report->id) }}" method="POST"
-                                            style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-success" title="Approve">
-                                                <i class="fas fa-thumbs-up"></i>
-                                            </button>
-                                        </form>
-                                        @endif
-                                    @else
-                                        <span class="badge bg-success"
-                                            style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            <i class="fas fa-check"></i> {{ $report->approved_by }}
-                                        </span>
-                                    @endif
-                                @else
-                                    @if($report->approved_by)
-                                        <span class="badge bg-success"
-                                            style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                            <i class="fas fa-check"></i> {{ $report->approved_by }}
-                                        </span>
-                                    @endif
-                                @endcan
-
                                 {{-- Export PDF --}}
                                 <a href="{{ route('report-foreign-objects.export-pdf', $report->uuid) }}"
                                     class="btn btn-outline-secondary btn-sm" target="_blank" title="Cetak PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
-
-                                {{-- Dropdown audit (gear) --}}
-                                @hasanyrole('admin|superadmin|SPV QC')
-                                <x-audit-dropdown :item="$report" route-prefix="report-foreign-objects" />
-                                @endhasanyrole
                             </td>
                         </tr>
 

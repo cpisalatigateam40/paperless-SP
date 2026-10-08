@@ -329,8 +329,8 @@ class ReportLabSampleController extends Controller
 
     public function update(Request $request, $uuid)
     {
-        DB::transaction(function () use ($request, $uuid) {
-            $report = ReportLabSample::where('uuid', $uuid)->firstOrFail();
+        $report = ReportLabSample::where('uuid', $uuid)->firstOrFail();
+        DB::transaction(function () use ($request, $report) {
 
             // Update header
             $report->update([
@@ -359,7 +359,11 @@ class ReportLabSampleController extends Controller
             }
         });
 
-        return redirect()->route('report_lab_samples.index')->with('success', 'Data berhasil diperbarui');
+        return redirect()
+        ->route($report->is_audit ? 'report_lab_samples.audit' : 'report_lab_samples.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

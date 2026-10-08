@@ -764,7 +764,11 @@ class ReportPackagingVerifController extends Controller
             ChecklistPackagingDetail::create($checklistData);
         }
 
-        return redirect()->route('report_packaging_verifs.index')->with('success', 'Laporan berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report_packaging_verifs.audit' : 'report_packaging_verifs.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

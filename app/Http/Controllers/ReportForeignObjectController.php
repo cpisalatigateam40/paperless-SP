@@ -534,7 +534,11 @@ class ReportForeignObjectController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('report-foreign-objects.index')->with('success', 'Laporan berhasil diupdate');
+            return redirect()
+        ->route($report->is_audit ? 'report-foreign-objects.audit' : 'report-foreign-objects.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch(\Throwable $e){
             DB::rollBack();
             return back()->with('error', 'Gagal mengupdate: '.$e->getMessage());

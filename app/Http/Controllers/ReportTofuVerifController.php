@@ -295,7 +295,11 @@ class ReportTofuVerifController extends Controller
             }
         }
 
-        return redirect()->route('report_tofu_verifs.index')->with('success', 'Report updated.');
+        return redirect()
+        ->route($report->is_audit ? 'report_tofu_verifs.audit' : 'report_tofu_verifs.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function approve($id)

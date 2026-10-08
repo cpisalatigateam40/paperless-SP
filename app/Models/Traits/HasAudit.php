@@ -87,27 +87,49 @@ trait HasAudit
         return !empty($this->auditNormalizeRules());
     }
 
+    /**
+     * Hitung perubahan untuk satu baris berdasarkan nilai aslinya (tidak menyimpan).
+     */
+    protected function auditRowUpdates($row, array $fields): array
+    {
+        $updates = [];
+
+        foreach ($fields as $field => $rule) {
+            $isBad = isset($rule['when'])
+                ? (bool) $rule['when']($row)
+                : in_array($row->{$field}, $rule['bad'] ?? [], true);
+
+            if ($isBad) {
+                $updates[$field] = $rule['ok'] instanceof \Closure ? ($rule['ok'])($row) : $rule['ok'];
+            }
+        }
+
+        return $updates;
+    }
+
+    /**
+     * true kalau masih ada nilai yang akan diubah (hanya membaca, tidak menyimpan).
+     */
+    public function wouldNormalizeAudit(): bool
+    {
+        foreach ($this->auditNormalizeRules() as $path => $fields) {
+            foreach ($this->resolveAuditRows($this, explode('.', $path)) as $row) {
+                if ($this->auditRowUpdates($row, $fields)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function normalizeAudit(): int
     {
         $count = 0;
 
         foreach ($this->auditNormalizeRules() as $path => $fields) {
             foreach ($this->resolveAuditRows($this, explode('.', $path)) as $row) {
-                $updates = [];
-
-                // Tentukan dulu semua perubahan berdasarkan nilai asli, baru diterapkan,
-                // supaya aturan yang saling bergantung (mis. catatan tergantung kondisi) tidak saling menimpa.
-                foreach ($fields as $field => $rule) {
-                    $isBad = isset($rule['when'])
-                        ? (bool) $rule['when']($row)
-                        : in_array($row->{$field}, $rule['bad'] ?? [], true);
-
-                    if ($isBad) {
-                        $updates[$field] = $rule['ok'] instanceof \Closure ? ($rule['ok'])($row) : $rule['ok'];
-                    }
-                }
-
-                if ($updates) {
+                if ($updates = $this->auditRowUpdates($row, $fields)) {
                     foreach ($updates as $field => $value) {
                         $row->{$field} = $value;
                     }

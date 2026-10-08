@@ -385,8 +385,10 @@ class ReportMtCleanController extends Controller
         });
 
         return redirect()
-            ->route('report_mt_cleans.index')
-            ->with('success', 'Laporan berhasil diperbarui.');
+        ->route($report->is_audit ? 'report_mt_cleans.audit' : 'report_mt_cleans.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     /**

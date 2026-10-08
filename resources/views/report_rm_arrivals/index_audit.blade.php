@@ -121,7 +121,15 @@
                                     <td>
                                         @php
                                             $user = auth()->user();
-                                            $canEdit = ! $user->hasRole('auditor')
+                                            $canManage = $user->hasAnyRole(['admin', 'superadmin', 'SPV QC']);
+                                            $hasRules = method_exists($report, 'hasAuditNormalizeRules') && $report->hasAuditNormalizeRules();
+
+                                            // ungu: masih ada ketidaksesuaian yang bisa diubah otomatis
+                                            $showAuto = $canManage && $hasRules && $report->wouldNormalizeAudit();
+
+                                            // kuning: sudah tidak ada yang perlu diubah otomatis
+                                            $showEdit = ! $showAuto
+                                                && ! $user->hasRole('auditor')
                                                 && ($user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2)));
                                         @endphp
 
@@ -131,8 +139,16 @@
                                             <i class="fas fa-eye"></i>
                                         </button>
 
-                                        {{-- Edit: baris audit langsung edit, baris operasional disalin dulu --}}
-                                        @if($canEdit)
+                                        @if($showAuto)
+                                            <form action="{{ route('report_rm_arrivals.auto-audit', $report->uuid) }}" method="POST"
+                                                class="d-inline"
+                                                onsubmit="return confirm('Ubah semua ketidaksesuaian menjadi OK secara otomatis di data audit?')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-audit-solid" title="Edit Otomatis (jadikan OK)">
+                                                    <i class="fas fa-magic"></i>
+                                                </button>
+                                            </form>
+                                        @elseif($showEdit)
                                             <a href="{{ $report->is_audit
                                                     ? route('report_rm_arrivals.edit', $report->uuid)
                                                     : route('report_rm_arrivals.copy-to-audit', $report->uuid) }}"
@@ -142,85 +158,11 @@
                                             </a>
                                         @endif
 
-                                        {{-- Hapus: hanya salinan audit --}}
-                                        @if($report->is_audit)
-                                            @can('delete report')
-                                            <form action="{{ route('report_rm_arrivals.destroy', $report->uuid) }}"
-                                                method="POST" class="d-inline"
-                                                onsubmit="return confirm('Yakin ingin menghapus data audit ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-sm btn-danger" title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                            @endcan
-                                        @endif
-
-                                        {{-- Known --}}
-                                        @can('known report')
-                                            @if(!$report->known_by)
-                                                @if($report->is_audit)
-                                                    <form action="{{ route('report_rm_arrivals.known', $report->id) }}"
-                                                        method="POST" class="d-inline"
-                                                        onsubmit="return confirm('Ketahui laporan ini?')">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
-                                                            <i class="fas fa-check-double"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            @else
-                                                <span class="badge bg-success"
-                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                    ✔ {{ $report->known_by }}
-                                                </span>
-                                            @endif
-                                        @else
-                                            @if($report->known_by)
-                                                <span class="badge bg-success"
-                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                    ✔ {{ $report->known_by }}
-                                                </span>
-                                            @endif
-                                        @endcan
-
-                                        {{-- Approve --}}
-                                        @can('approve report')
-                                            @if(!$report->approved_by)
-                                                @if($report->is_audit)
-                                                    <form action="{{ route('report_rm_arrivals.approve', $report->id) }}"
-                                                        method="POST" class="d-inline"
-                                                        onsubmit="return confirm('Setujui laporan ini?')">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
-                                                            <i class="fas fa-thumbs-up"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            @else
-                                                <span class="badge bg-success"
-                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                    ✔ {{ $report->approved_by }}
-                                                </span>
-                                            @endif
-                                        @else
-                                            @if($report->approved_by)
-                                                <span class="badge bg-success"
-                                                    style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
-                                                    ✔ {{ $report->approved_by }}
-                                                </span>
-                                            @endif
-                                        @endcan
-
                                         {{-- Export PDF --}}
                                         <a href="{{ route('report_rm_arrivals.export-pdf', $report->uuid) }}"
                                             target="_blank" class="btn btn-sm btn-outline-secondary" title="Export PDF">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
-
-                                        {{-- Dropdown audit (gear) --}}
-                                        <x-audit-dropdown :item="$report" route-prefix="report_rm_arrivals" />
                                     </td>
                                 </tr>
 

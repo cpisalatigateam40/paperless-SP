@@ -399,7 +399,11 @@ class ReportProductionNonconformityController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('report_production_nonconformities.index')->with('success', 'Report berhasil diupdate.');
+            return redirect()
+        ->route($report->is_audit ? 'report_production_nonconformities.audit' : 'report_production_nonconformities.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal mengupdate: ' . $e->getMessage());
