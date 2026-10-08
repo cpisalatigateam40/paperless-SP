@@ -20,10 +20,21 @@ use App\Traits\HasBulkPdfExport;
 use App\Models\DetailMtCleanPhoto;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportMtCleanController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportMtClean::class; }
+    protected function auditRoutePrefix(): string { return 'report_mt_cleans'; }
+    protected function auditViewPrefix(): string { return 'report_mt_cleans'; }
+    protected function auditRelations(): array { return ['area', 'details.product', 'details.photos']; }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
 
     protected string $bulkModel = ReportMtClean::class;
 
@@ -73,7 +84,7 @@ class ReportMtCleanController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ReportMtClean::with([
+        $query = ReportMtClean::operasional()->with([
             'area',
             'details.product',
             'details.photos'
@@ -374,8 +385,10 @@ class ReportMtCleanController extends Controller
         });
 
         return redirect()
-            ->route('report_mt_cleans.index')
-            ->with('success', 'Laporan berhasil diperbarui.');
+        ->route($report->is_audit ? 'report_mt_cleans.audit' : 'report_mt_cleans.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     /**

@@ -23,10 +23,33 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportPasteurController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportPasteur::class; }
+    protected function auditRoutePrefix(): string { return 'report_pasteurs'; }
+    protected function auditViewPrefix(): string { return 'report_pasteurs'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'area',
+            'details.product',
+            'details.steps.standardStep',
+            'details.steps.drainageStep',
+            'details.steps.finishStep',
+        ];
+    }
+    protected function auditSearchColumns(): array
+    {
+        return ['shift', 'problem', 'corrective_action', 'created_by'];
+    }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportPasteur::class;
 
     protected function getBulkExportModelClass(): string
@@ -75,7 +98,7 @@ class ReportPasteurController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportPasteur::with([
+        $query = ReportPasteur::operasional()->with([
             'details.product',
             'details.steps.standardStep',
             'details.steps.drainageStep',
@@ -486,8 +509,8 @@ class ReportPasteurController extends Controller
 
     public function update(Request $request, $uuid)
     {
-        DB::transaction(function () use ($request, $uuid) {
-            $report = ReportPasteur::where('uuid', $uuid)->firstOrFail();
+        $report = ReportPasteur::where('uuid', $uuid)->firstOrFail();
+        DB::transaction(function () use ($request, $report) {
 
             // 🧾 Update header
             $report->update([
@@ -556,8 +579,11 @@ class ReportPasteurController extends Controller
             }
         });
 
-        return redirect()->route('report_pasteurs.index')
-            ->with('success', 'Data laporan Pasteurisasi berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report_pasteurs.audit' : 'report_pasteurs.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

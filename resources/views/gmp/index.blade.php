@@ -111,6 +111,12 @@
                 @can('create report')
                 <a href="{{ route('gmp.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('gmp.audit') }}" class="btn btn-sm btn-audit">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
         </div>
 
@@ -208,6 +214,10 @@
                                 <a href="{{ route('gmp.export', $header) }}" class="btn btn-sm btn-outline-secondary" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$header" route-prefix="gmp" />
+                                @endhasanyrole -->
                             </td>
                         </tr>
 

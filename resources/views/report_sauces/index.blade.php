@@ -116,6 +116,12 @@
                 @can('create report')
                 <a href="{{ route('report_sauces.create') }}" class="btn btn-sm btn-primary">Tambah Laporan</a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_sauces.audit') }}" class="btn btn-sm btn-audit">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
         </div>
         <div class="card-body" style="padding-top: 1rem !important;">
@@ -250,6 +256,10 @@
                                     class="btn btn-outline-secondary btn-sm" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$r" route-prefix="report_sauces" />
+                                @endhasanyrole -->
                             </td>
                         </tr>
                         {{-- Detail Collapse --}}

@@ -18,11 +18,25 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 
 class ReportTofuVerifController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportTofuVerif::class; }
+    protected function auditRoutePrefix(): string { return 'report_tofu_verifs'; }
+    protected function auditViewPrefix(): string { return 'report_tofu_verifs'; }
+    protected function auditRelations(): array
+    {
+        return ['area', 'productInfos', 'weightVerifs', 'defectVerifs'];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportTofuVerif::class;
 
     protected function getBulkExportModelClass(): string
@@ -67,12 +81,12 @@ class ReportTofuVerifController extends Controller
 
     public function index(Request $request)
         {
-        $query = ReportTofuVerif::with([
-            'area',
-            'productInfos',
-            'weightVerifs',
-            'defectVerifs'
-        ]);
+            $query = ReportTofuVerif::operasional()->with([
+                'area',
+                'productInfos',
+                'weightVerifs',
+                'defectVerifs'
+            ]);
 
             if (
                 auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
@@ -281,7 +295,11 @@ class ReportTofuVerifController extends Controller
             }
         }
 
-        return redirect()->route('report_tofu_verifs.index')->with('success', 'Report updated.');
+        return redirect()
+        ->route($report->is_audit ? 'report_tofu_verifs.audit' : 'report_tofu_verifs.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function approve($id)

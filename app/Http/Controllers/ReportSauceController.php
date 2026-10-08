@@ -24,11 +24,32 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 
 class ReportSauceController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportSauce::class; }
+    protected function auditRoutePrefix(): string { return 'report_sauces'; }
+    protected function auditViewPrefix(): string { return 'report_sauces'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'product', 'area', 'formula',
+            'details.rawMaterials.rawMaterial',
+            'details.rawMaterials.premix',
+        ];
+    }
+    protected function auditSearchColumns(): array
+    {
+        return ['production_code', 'shift', 'created_by'];
+    }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportSauce::class;
 
     protected function getBulkExportModelClass(): string
@@ -76,7 +97,7 @@ class ReportSauceController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportSauce::with([
+        $query = ReportSauce::operasional()->with([
             'product',
             'area',
             'details.rawMaterials.rawMaterial',
@@ -586,7 +607,11 @@ public function exportPdf($uuid)
             }
 
             DB::commit();
-            return redirect()->route('report_sauces.index')->with('success', 'Laporan berhasil diperbarui.');
+            return redirect()
+        ->route($report->is_audit ? 'report_sauces.audit' : 'report_sauces.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -1,0 +1,432 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container-fluid">
+    <x-audit-banner />
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between">
+            <h5 style="color: #552f93;">
+                <i class="fas fa-user-shield mr-1"></i>
+                Verifikasi Proses Stuffing
+            </h5>
+
+            <div class="d-flex gap-2" style="gap: .4rem;">
+                {{-- SEARCH --}}
+                <form method="GET"
+                    action="{{ route('report_weight_stuffers.audit') }}"
+                    class="d-flex align-items-center"
+                    style="gap: .4rem;">
+
+                    <input type="text" name="search" class="form-control"
+                        placeholder="Cari shift, pembuat..." value="{{ request('search') }}">
+
+                    <select name="per_page" class="form-select form-control" onchange="this.form.submit()">
+                        @foreach([5, 10, 25] as $n)
+                            <option value="{{ $n }}" {{ request('per_page', 5) == $n ? 'selected' : '' }}>
+                                {{ $n }} / halaman
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="btn btn-outline-primary">Cari</button>
+
+                    @if(request('search') || request('per_page'))
+                        <a href="{{ route('report_weight_stuffers.audit') }}"
+                           class="btn btn-danger" title="Reset Filter">Reset</a>
+                    @endif
+                </form>
+
+                <x-audit-bulk-auto route-prefix="report_weight_stuffers" />
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_weight_stuffers.index') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Data Operasional
+                </a>
+                @endhasanyrole
+            </div>
+        </div>
+
+        <div class="card-body" style="padding-top: 1rem !important;">
+            @if(session('success'))
+                <div id="success-alert" class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('info'))
+                <div id="info-alert" class="alert alert-info">{{ session('info') }}</div>
+            @endif
+            @if ($errors->any())
+                <div id="error-alert" class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No.</th>
+                            <th>Tanggal</th>
+                            <th>Shift</th>
+                            <th>Nama Produk</th>
+                            <th>Kode Produksi</th>
+                            <th>Waktu</th>
+                            <th>Area</th>
+                            <th>Dibuat Oleh</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($records as $report)
+                        @php
+                            $codes = $report->details->pluck('production_code')->filter()->implode(', ');
+                            $collapseId = 'codes-' . $report->uuid;
+
+                            $user = auth()->user();
+                            $canEdit = ! $user->hasRole('auditor')
+                                && ($user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2)));
+                        @endphp
+                        <tr>
+                            <td>{{ $records->firstItem() + $loop->index }}</td>
+                            <td>{{ $report->date }}</td>
+                            <td>{{ $report->shift }}</td>
+                            <td>
+                                {{ $report->details->pluck('product.product_name')->filter()->unique()->implode(', ') ?: '-' }}
+                            </td>
+                            <td>
+                                @if($codes)
+                                    @if(strlen($codes) > 50)
+                                        <span id="{{ $collapseId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
+                                        </span>
+                                        <span id="{{ $collapseId }}-full" class="d-none">
+                                            {{ $codes }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $codes }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>{{ $report->created_at->format('H:i') }}</td>
+                            <td>{{ $report->area->name ?? '-' }}</td>
+                            <td>{{ $report->created_by }}
+                                @if($report->is_audit)
+                                    <span class="badge bg-info" style="color: white;">Audit</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex" style="gap: .2rem;">
+                                    @php
+                                        $user = auth()->user();
+                                        $canManage = $user->hasAnyRole(['admin', 'superadmin', 'SPV QC']);
+                                        $hasRules = method_exists($report, 'hasAuditNormalizeRules') && $report->hasAuditNormalizeRules();
+
+                                        // ungu: masih ada ketidaksesuaian yang bisa diubah otomatis
+                                        $showAuto = $canManage && $hasRules && $report->wouldNormalizeAudit();
+
+                                        // kuning: sudah tidak ada yang perlu diubah otomatis
+                                        $showEdit = ! $showAuto
+                                            && $canEdit
+                                            && ! $user->hasRole('auditor');
+                                    @endphp
+
+                                    {{-- Toggle Detail --}}
+                                    <button class="btn btn-info btn-sm" data-bs-toggle="collapse"
+                                        data-bs-target="#detail-{{ $report->id }}" title="Lihat Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    @if($showAuto)
+                                        {{-- Edit Otomatis (ungu solid, ikon saja), redirect ke halaman edit --}}
+                                        <form action="{{ route('report_weight_stuffers.auto-audit', $report->uuid) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Ubah semua ketidaksesuaian menjadi OK secara otomatis di data audit?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-audit-solid" title="Edit Otomatis (jadikan OK)">
+                                                <i class="fas fa-magic"></i>
+                                            </button>
+                                        </form>
+                                    @elseif($showEdit)
+                                        <a href="{{ $report->is_audit
+                                                ? route('report_weight_stuffers.edit', $report->uuid)
+                                                : route('report_weight_stuffers.copy-to-audit', $report->uuid) }}"
+                                            class="btn btn-sm btn-warning"
+                                            title="{{ $report->is_audit ? 'Edit Data Audit' : 'Salin & Edit Data Audit' }}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    @endif
+
+                                    {{-- Export PDF (pilih produk) --}}
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-secondary btn-pdf"
+                                        title="Cetak PDF"
+                                        data-report-uuid="{{ $report->uuid }}"
+                                        data-details="{{ $report->details->map(fn($d) => [
+                                            'uuid'             => $d->uuid,
+                                            'product'          => $d->product->product_name ?? '-',
+                                            'gramase'          => $d->gramase ?? ($d->product->nett_weight ?? '-'),
+                                            'production_code'  => $d->production_code ?? '-',
+                                            'time'             => \Carbon\Carbon::parse($d->time)->format('H:i'),
+                                            'machine'          => $d->machine ?? '-'
+                                        ])->toJson() }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalPilihProduk">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {{-- DETAIL --}}
+                        <tr class="collapse" id="detail-{{ $report->id }}">
+                            <td colspan="9" class="p-0">
+                                <div class="px-4 py-3" style="background:#f8f9fa">
+
+                                    @php $details = $report->details; @endphp
+
+                                    <div class="table-responsive mb-3">
+                                        <table class="table table-bordered table-sm text-center align-middle mb-4">
+                                            <tr>
+                                                <th class="text-start">Nama Produk</th>
+                                                @foreach ($details as $d)
+                                                    <th>{{ $d->product->product_name ?? '-' }}</th>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
+                                                <th class="text-start">Gramase</th>
+                                                @foreach ($details as $d)
+                                                    <th>{{ !empty($d->gramase) ? $d->gramase : ($d->product->nett_weight ?? '-') }} g</th>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
+                                                <th class="text-start">Kode Produksi</th>
+                                                @foreach ($details as $d)
+                                                    <td>{{ $d->production_code }}</td>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
+                                                <th class="text-start">Waktu Proses</th>
+                                                @foreach ($details as $d)
+                                                    <td>{{ \Carbon\Carbon::parse($d->time)->format('H:i') }}</td>
+                                                @endforeach
+                                            </tr>
+                                            <tr>
+                                                <th class="text-start">Mesin Stuffer</th>
+                                                @foreach ($details as $d)
+                                                    @php
+                                                        $machineName = '-';
+                                                        if ($d->townsend)      $machineName = 'Townsend';
+                                                        elseif ($d->hitech)    $machineName = 'Hitech';
+                                                        elseif ($d->vemag)     $machineName = 'Vemag';
+                                                        elseif ($d->vemag2)    $machineName = 'Vemag 2';
+                                                        elseif ($d->handtmann) $machineName = 'Handtmann';
+                                                    @endphp
+                                                    <td>{{ $machineName }}</td>
+                                                @endforeach
+                                            </tr>
+
+                                            @php
+                                            $labels = [
+                                                'Kecepatan Stuffer (rpm)'                            => 'speed',
+                                                'Ukuran Casing<br><small>(Aktual Diameter)</small>'  => 'casing',
+                                                'Standar Berat (gr)'                                 => 'standard',
+                                                'Berat Aktual (gr)'                                  => 'actual_weight',
+                                                'Rata-rata Berat Aktual (gr)'                        => 'avg',
+                                                'Status Berat'                                       => 'weight_status',
+                                                'Tindakan Koreksi Berat'                             => 'weight_corrective_action',
+                                                'Keterangan Berat'                                   => 'weight_notes',
+                                                'Standar Panjang'                                    => 'standard_long',
+                                                'Panjang Aktual'                                     => 'actual_long',
+                                                'Rata-rata Panjang Aktual'                           => 'avg_long',
+                                                'Status Panjang'                                     => 'long_status',
+                                                'Tindakan Koreksi Panjang'                           => 'long_corrective_action',
+                                                'Keterangan Panjang'                                 => 'long_notes',
+                                                'Standar Berat Fla'                                  => 'standard_fla',
+                                                'Berat Aktual Fla'                                   => 'actual_fla',
+                                                'Rata-rata Berat Aktual Fla'                         => 'avg_fla',
+                                                'Status Berat Fla'                                   => 'fla_status',
+                                                'Tindakan Koreksi Berat Fla'                         => 'fla_corrective_action',
+                                                'Keterangan Berat Fla'                               => 'fla_notes',
+                                                'Catatan'                                            => 'notes',
+                                            ];
+                                            @endphp
+
+                                            @foreach ($labels as $label => $key)
+                                            <tr>
+                                                <td class="text-start">{!! $label !!}</td>
+                                                @foreach ($details as $d)
+                                                    @php
+                                                        $stuffer = $d->townsend ?? $d->hitech ?? $d->vemag ?? $d->vemag2 ?? $d->handtmann;
+                                                        $case    = $d->cases->first();
+                                                    @endphp
+                                                    @switch($key)
+                                                        @case('speed')         <td>{{ $stuffer?->stuffer_speed ?? '-' }}</td> @break
+                                                        @case('casing')        <td>{{ $case?->actual_case_2 ?? '-' }}</td> @break
+                                                        @case('standard')      <td>{{ $d->weight_standard ?? '-' }}</td> @break
+                                                        @case('actual_weight') <td>{{ $d->weights->pluck('actual_weight')->filter()->implode(' / ') ?: '-' }}</td> @break
+                                                        @case('avg')           <td>{{ $stuffer?->avg_weight ?? '-' }}</td> @break
+                                                        @case('weight_status') <td>{{ $d->weight_status ?? '-' }}</td> @break
+                                                        @case('weight_corrective_action') <td>{{ $d->weight_corrective_action ?? '-' }}</td> @break
+                                                        @case('weight_notes')  <td>{{ $d->weight_notes ?? '-' }}</td> @break
+                                                        @case('standard_long') <td>{{ $d->long_standard ?? '-' }}</td> @break
+                                                        @case('actual_long')   <td>{{ $d->weights->pluck('actual_long')->filter()->implode(' / ') ?: '-' }}</td> @break
+                                                        @case('avg_long')      <td>{{ $stuffer?->avg_long ?? '-' }}</td> @break
+                                                        @case('long_status')   <td>{{ $d->long_status ?? '-' }}</td> @break
+                                                        @case('long_corrective_action') <td>{{ $d->long_corrective_action ?? '-' }}</td> @break
+                                                        @case('long_notes')    <td>{{ $d->long_notes ?? '-' }}</td> @break
+                                                        @case('standard_fla')  <td>{{ $d->fla_standard ?? '-' }}</td> @break
+                                                        @case('actual_fla')    <td>{{ $d->weights->pluck('actual_fla')->filter()->implode(' / ') ?: '-' }}</td> @break
+                                                        @case('avg_fla')       <td>{{ $stuffer?->avg_fla ?? '-' }}</td> @break
+                                                        @case('fla_status')    <td>{{ $d->fla_status ?? '-' }}</td> @break
+                                                        @case('fla_corrective_action') <td>{{ $d->fla_corrective_action ?? '-' }}</td> @break
+                                                        @case('fla_notes')     <td>{{ $d->fla_notes ?? '-' }}</td> @break
+                                                        @case('notes')         <td>{{ $stuffer?->notes ?? '-' }}</td> @break
+                                                    @endswitch
+                                                @endforeach
+                                            </tr>
+                                            @endforeach
+                                        </table>
+
+                                        {{-- Dokumentasi per detail --}}
+                                        @foreach ($details as $d)
+                                            @if($d->documentations->isNotEmpty())
+                                            <div class="mb-3">
+                                                <p class="mb-1 fw-semibold" style="font-size:13px">
+                                                    Dokumentasi — {{ $d->product->product_name ?? '-' }}
+                                                    <span class="text-muted fw-normal">({{ \Carbon\Carbon::parse($d->time)->format('H:i') }})</span>
+                                                </p>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach($d->documentations as $doc)
+                                                    <a href="{{ Storage::url($doc->image) }}" target="_blank">
+                                                        <img src="{{ Storage::url($doc->image) }}"
+                                                            style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;"
+                                                            title="{{ $d->product->product_name ?? '-' }}">
+                                                    </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+
+                                    {{-- Tambah detail: hanya salinan audit --}}
+                                    @if($report->is_audit)
+                                        @can('create report')
+                                        <div class="d-flex justify-content-end pb-2">
+                                            <a href="{{ route('report_weight_stuffers.add-detail', $report->uuid) }}"
+                                                class="btn btn-secondary btn-sm">
+                                                + Tambah Detail
+                                            </a>
+                                        </div>
+                                        @endcan
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="9" class="text-center">Belum ada data laporan.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
+                {{-- Modal Pilih Produk untuk Export PDF (di luar tbody) --}}
+                <div class="modal fade" id="modalPilihProduk" tabindex="-1" aria-labelledby="modalPilihProdukLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h6 class="modal-title fw-bold" id="modalPilihProdukLabel">Pilih Produk untuk Export PDF</h6>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="modalProdukBody">
+                                {{-- diisi JS --}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    {{ $records->withQueryString()->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('script')
+<script>
+$(document).ready(function() {
+    setTimeout(() => {
+        $('#success-alert, #info-alert, #error-alert').fadeOut('slow');
+    }, 3000);
+});
+
+document.querySelectorAll('.btn-pdf').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const reportUuid = this.dataset.reportUuid;
+        const details    = JSON.parse(this.dataset.details);
+        const body       = document.getElementById('modalProdukBody');
+
+        if (details.length === 0) {
+            body.innerHTML = '<p class="text-muted">Tidak ada detail produk.</p>';
+            return;
+        }
+
+        const groups = {};
+        details.forEach(function(d) {
+            const key = d.product + '||' + d.gramase + '||' + d.production_code;
+            if (!groups[key]) {
+                groups[key] = {
+                    product         : d.product,
+                    gramase         : d.gramase,
+                    production_code : d.production_code,
+                    uuids           : [],
+                    machines        : [],
+                };
+            }
+            groups[key].uuids.push(d.uuid);
+            groups[key].machines.push(d.machine + ' (' + d.time + ')');
+        });
+
+        let html = '<div class="list-group">';
+
+        Object.values(groups).forEach(function(g) {
+            const uuidParam = g.uuids.length === 1 ? g.uuids[0] : 'group:' + g.uuids.join(',');
+            const url       = '/report-weight-stuffers/' + reportUuid + '/export-pdf/' + encodeURIComponent(uuidParam);
+
+            html += `
+                <a href="${url}" target="_blank"
+                    class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-semibold mb-1">${g.product}</div>
+                            <table style="font-size:12px; color:#555; line-height:1.6;">
+                                <tr><td style="padding-right:8px;">Gramase</td><td>: ${g.gramase} gr</td></tr>
+                                <tr><td>Kode Produksi</td><td>: ${g.production_code}</td></tr>
+                                <tr><td>Mesin</td><td>: ${g.machines.join(', ')}</td></tr>
+                            </table>
+                        </div>
+                        <i class="fas fa-file-pdf text-danger ms-3 mt-1"></i>
+                    </div>
+                </a>`;
+        });
+
+        html += '</div>';
+        body.innerHTML = html;
+    });
+});
+
+function toggleCodes(id) {
+    document.getElementById(id + '-short').classList.toggle('d-none');
+    document.getElementById(id + '-full').classList.toggle('d-none');
+}
+</script>
+@endsection

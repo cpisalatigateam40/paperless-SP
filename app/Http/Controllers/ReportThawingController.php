@@ -18,10 +18,21 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportThawingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportThawing::class; }
+    protected function auditRoutePrefix(): string { return 'report_thawings'; }
+    protected function auditViewPrefix(): string { return 'report_thawings'; }
+    protected function auditRelations(): array { return ['area', 'details.rawMaterial']; }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportThawing::class;
 
     protected function getBulkExportModelClass(): string
@@ -71,7 +82,7 @@ class ReportThawingController extends Controller
     {
         $search = $request->search;
 
-        $query = ReportThawing::with(['area', 'details.rawMaterial']);
+        $query = ReportThawing::operasional()->with(['area', 'details.rawMaterial']);
 
         // Filter area (khusus admin & superadmin)
         if (
@@ -461,8 +472,10 @@ class ReportThawingController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('report_thawings.index')
-                ->with('success', 'Report thawing berhasil diperbarui');
+            ->route($report->is_audit ? 'report_thawings.audit' : 'report_thawings.index')
+            ->with('success', $report->is_audit
+                ? 'Data audit berhasil diperbarui.'
+                : 'Data berhasil diperbarui.');
 
         } catch (\Exception $e) {
 

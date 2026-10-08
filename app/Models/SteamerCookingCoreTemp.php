@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class SteamerCookingCoreTemp extends Model implements Auditable
+class SteamerCookingCoreTemp extends Model
 {
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'steamer_cooking_core_temps';
 
@@ -23,10 +22,6 @@ class SteamerCookingCoreTemp extends Model implements Auditable
         'detail_uuid',
         'sequence',
         'temp_value',
-    ];
-
-    protected $auditEvents = [
-        'updated',
     ];
 
     protected static function boot()

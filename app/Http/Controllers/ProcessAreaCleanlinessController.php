@@ -20,11 +20,22 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ProcessAreaCleanlinessController extends Controller
 {
     use HasRoles;
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportProcessAreaCleanliness::class; }
+    protected function auditRoutePrefix(): string { return 'process-area-cleanliness'; }
+    protected function auditViewPrefix(): string { return 'cleanliness_PA'; }
+    protected function auditRelations(): array { return ['details.items.followups', 'area']; }
+    protected function auditSearchColumns(): array { return ['shift', 'section_name', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportProcessAreaCleanliness::class;
 
     protected function getBulkExportModelClass(): string
@@ -71,7 +82,7 @@ class ProcessAreaCleanlinessController extends Controller
     {
         $search = $request->search;
 
-        $query = ReportProcessAreaCleanliness::with([
+        $query = ReportProcessAreaCleanliness::operasional()->with([
             'details.items.followups',
             'area'
         ]);
@@ -440,7 +451,11 @@ class ProcessAreaCleanlinessController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('process-area-cleanliness.index')->with('success', 'Data berhasil diperbarui.');
+            return redirect()
+        ->route($report->is_audit ? 'process-area-cleanliness.audit' : 'process-area-cleanliness.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal update: ' . $e->getMessage());

@@ -25,10 +25,28 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SmokeHouseExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportSmokeHouseController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportSmokeHouse::class; }
+    protected function auditRoutePrefix(): string { return 'report-smoke-houses'; }
+    protected function auditViewPrefix(): string { return 'report-smoke-houses'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'area', 'creator',
+            'details.product', 'details.steps',
+            'details.reworks.steps', 'details.sensories',
+        ];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'notes']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportSmokeHouse::class;
 
     protected function getBulkExportModelClass(): string
@@ -77,7 +95,7 @@ class ReportSmokeHouseController extends Controller
     
     public function index(Request $request)
     {
-        $query = ReportSmokeHouse::with([
+        $query = ReportSmokeHouse::operasional()->with([
             'area',
             'creator',
             'details' => function ($q) {
@@ -419,12 +437,12 @@ class ReportSmokeHouseController extends Controller
             'details.*.sensories.notes' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($validated, $uuid) {
-
-            $report = ReportSmokeHouse::with('details.steps', 'details.reworks.steps', 'details.sensories')
+        $report = ReportSmokeHouse::with('details.steps', 'details.reworks.steps', 'details.sensories')
                 ->firstWhere('uuid', $uuid);
 
             abort_if(!$report, 404);
+
+        DB::transaction(function () use ($validated, $report) {
 
             $shift = auth()->user()->hasRole('QC Inspector')
                 ? session('shift_number') . '-' . session('shift_group')
@@ -541,9 +559,12 @@ class ReportSmokeHouseController extends Controller
             }
         });
 
+        
         return redirect()
-            ->route('report-smoke-houses.index')
-            ->with('success', 'Report Smoke House berhasil diperbarui.');
+        ->route($report->is_audit ? 'report-smoke-houses.audit' : 'report-smoke-houses.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function destroy($uuid)

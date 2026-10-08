@@ -18,10 +18,21 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportProductionNonconformityController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportProductionNonconformity::class; }
+    protected function auditRoutePrefix(): string { return 'report_production_nonconformities'; }
+    protected function auditViewPrefix(): string { return 'report_production_nonconformities'; }
+    protected function auditRelations(): array { return ['area', 'details']; }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportProductionNonconformity::class;
 
     protected function getBulkExportModelClass(): string
@@ -64,86 +75,86 @@ class ReportProductionNonconformityController extends Controller
         return 'laporan_production_nonconformity';
     }
 
-public function index(Request $request)
-{
-    $query = ReportProductionNonconformity::with([
-        'area',
-        'details'
-    ]);
+    public function index(Request $request)
+    {
+        $query = ReportProductionNonconformity::operasional()->with([
+            'area',
+            'details'
+        ]);
 
-    // Filter Area (khusus admin & superadmin)
-    if (
-        auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
-        $request->filled('area')
-    ) {
-        $query->where('area_uuid', $request->area);
-    }
+        // Filter Area (khusus admin & superadmin)
+        if (
+            auth()->user()->hasAnyRole(['admin', 'superadmin']) &&
+            $request->filled('area')
+        ) {
+            $query->where('area_uuid', $request->area);
+        }
 
-    // 🔍 FILTER TANGGAL
-    $query->when($request->date, function ($q) use ($request) {
-        $q->whereDate('date', $request->date);
-    });
+        // 🔍 FILTER TANGGAL
+        $query->when($request->date, function ($q) use ($request) {
+            $q->whereDate('date', $request->date);
+        });
 
-    // 🔍 GLOBAL SEARCH
-    $query->when($request->search, function ($q) use ($request) {
+        // 🔍 GLOBAL SEARCH
+        $query->when($request->search, function ($q) use ($request) {
 
-        $search = $request->search;
+            $search = $request->search;
 
-        $q->where(function ($qq) use ($search) {
+            $q->where(function ($qq) use ($search) {
 
-            // ===== HEADER REPORT =====
-            $qq->where('date', 'like', "%{$search}%")
-                ->orWhere('shift', 'like', "%{$search}%")
-                ->orWhere('created_by', 'like', "%{$search}%")
-                ->orWhere('known_by', 'like', "%{$search}%")
-                ->orWhere('approved_by', 'like', "%{$search}%");
+                // ===== HEADER REPORT =====
+                $qq->where('date', 'like', "%{$search}%")
+                    ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('created_by', 'like', "%{$search}%")
+                    ->orWhere('known_by', 'like', "%{$search}%")
+                    ->orWhere('approved_by', 'like', "%{$search}%");
 
-            // ===== AREA =====
-            $qq->orWhereHas('area', function ($a) use ($search) {
-                $a->where('name', 'like', "%{$search}%");
-            });
+                // ===== AREA =====
+                $qq->orWhereHas('area', function ($a) use ($search) {
+                    $a->where('name', 'like', "%{$search}%");
+                });
 
-            // ===== DETAIL NONCONFORMITY =====
-            $qq->orWhereHas('details', function ($d) use ($search) {
+                // ===== DETAIL NONCONFORMITY =====
+                $qq->orWhereHas('details', function ($d) use ($search) {
 
-                $d->where('occurrence_time', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('quantity', 'like', "%{$search}%")
-                    ->orWhere('unit', 'like', "%{$search}%")
-                    ->orWhere('hazard_category', 'like', "%{$search}%")
-                    ->orWhere('disposition', 'like', "%{$search}%")
-                    ->orWhere('remark', 'like', "%{$search}%")
-                    ->orWhere('evidence', 'like', "%{$search}%");
+                    $d->where('occurrence_time', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('quantity', 'like', "%{$search}%")
+                        ->orWhere('unit', 'like', "%{$search}%")
+                        ->orWhere('hazard_category', 'like', "%{$search}%")
+                        ->orWhere('disposition', 'like', "%{$search}%")
+                        ->orWhere('remark', 'like', "%{$search}%")
+                        ->orWhere('evidence', 'like', "%{$search}%");
+
+                });
 
             });
 
         });
 
-    });
+        // 📅 FILTER TANGGAL REPORT
+            if ($request->filled('report_date')) {
+                $query->whereDate('date', $request->report_date);
+            }
 
-    // 📅 FILTER TANGGAL REPORT
-        if ($request->filled('report_date')) {
-            $query->whereDate('date', $request->report_date);
-        }
+            // 🔽 SORTING
+            $this->applyReportSort($query, $request, [
+                'report_date_column' => 'date',
+                'production_code' => [
+                    'relation' => 'details',
+                    'column' => 'production_code',
+                ],
+            ]);
 
-        // 🔽 SORTING
-        $this->applyReportSort($query, $request, [
-            'report_date_column' => 'date',
-            'production_code' => [
-                'relation' => 'details',
-                'column' => 'production_code',
-            ],
-        ]);
+        $reports = $query->paginate(10)
+            ->withQueryString();
 
-    $reports = $query->paginate(10)
-        ->withQueryString();
+        $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
+            ? Area::orderBy('name')->get()
+            : collect();
 
-    $areas = auth()->user()->hasAnyRole(['admin', 'superadmin'])
-        ? Area::orderBy('name')->get()
-        : collect();
-
-    return view('report_production_nonconformities.index', compact('reports', 'areas'));
-}
+        return view('report_production_nonconformities.index', compact('reports', 'areas'));
+    }
 
 
     public function create()
@@ -388,7 +399,11 @@ public function index(Request $request)
             }
 
             DB::commit();
-            return redirect()->route('report_production_nonconformities.index')->with('success', 'Report berhasil diupdate.');
+            return redirect()
+        ->route($report->is_audit ? 'report_production_nonconformities.audit' : 'report_production_nonconformities.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal mengupdate: ' . $e->getMessage());

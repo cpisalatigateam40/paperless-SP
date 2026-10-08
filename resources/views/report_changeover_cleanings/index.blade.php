@@ -112,6 +112,13 @@
                     Tambah Laporan
                 </a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_changeover_cleanings.audit') }}" class="btn btn-audit btn-sm">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
+
             </div>
         </div>
 
@@ -269,6 +276,10 @@
                                     class="btn btn-sm btn-outline-secondary" target="_blank" title="Cetak PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$report" route-prefix="report_changeover_cleanings" />
+                                @endhasanyrole -->
                             </td>
                         </tr>
 

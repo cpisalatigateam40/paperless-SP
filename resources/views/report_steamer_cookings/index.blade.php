@@ -110,6 +110,12 @@
                 <a href="{{ route('report_steamer_cookings.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
 
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report_steamer_cookings.audit') }}" class="btn btn-audit btn-sm">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
+
             </div>
             
         </div>
@@ -276,6 +282,10 @@
                                     <a href="{{ route('report_steamer_cookings.export_pdf', $report->uuid) }}" class="btn btn-sm btn-outline-secondary" target="_blank" title="Export PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
+
+                                    <!-- @hasanyrole('admin|superadmin|SPV QC')
+                                    <x-audit-dropdown :item="$report" route-prefix="report_steamer_cookings" />
+                                    @endhasanyrole -->
                                 </td>
                                 </div>
                             </tr>

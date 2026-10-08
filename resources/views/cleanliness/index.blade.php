@@ -121,6 +121,12 @@
                 @can('create report')
                 <a href="{{ route('cleanliness.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('cleanliness.audit') }}" class="btn btn-sm btn-audit">
+                    <i class="fas fa-user-shield"></i> Data Audit
+                </a>
+                @endhasanyrole
             </div>
         </div>
 

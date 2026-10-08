@@ -26,10 +26,29 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportProcessProdController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportProcessProd::class; }
+    protected function auditRoutePrefix(): string { return 'report_process_productions'; }
+    protected function auditViewPrefix(): string { return 'report_process_productions'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'area', 'section',
+            'detail.product', 'detail.reworkProduct', 'detail.formula',
+            'detail.items.formulation.rawMaterial', 'detail.items.formulation.premix',
+            'detail.emulsifying', 'detail.sensoric', 'detail.tumbling', 'detail.aging',
+        ];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by', 'notes']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportProcessProd::class;
 
     protected function getBulkExportModelClass(): string
@@ -81,7 +100,7 @@ class ReportProcessProdController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportProcessProd::with([
+        $query = ReportProcessProd::operasional()->with([
             'area',
             'section',
             'detail.product',
@@ -725,7 +744,11 @@ public function update(Request $request, $uuid)
             }
         }
 
-        return redirect()->route('report_process_productions.index')->with('success', 'Data berhasil diperbarui.');
+        return redirect()
+        ->route($report->is_audit ? 'report_process_productions.audit' : 'report_process_productions.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
     }
 
     public function getFormulasByName(Request $request)

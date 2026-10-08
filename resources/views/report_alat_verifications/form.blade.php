@@ -6,6 +6,7 @@
 
 @section('content')
 <div class="container-fluid">
+
     <x-breadcrumb :items="[
         ['label' => 'Verifikasi Alat Ukur', 'url' => route('report-alat-verifications.index')],
         ['label' => 'Tambah/Edit Data', 'url' => null],
@@ -68,7 +69,7 @@
                 <button type="button" class="btn btn-outline-primary btn-sm mt-3" id="add-row">+ Tambah Baris</button>
 
                 <div class="mt-4">
-                    <a href="{{ route('report-alat-verifications.index') }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
                     <button class="btn btn-success">Simpan</button>
                 </div>
             </form>

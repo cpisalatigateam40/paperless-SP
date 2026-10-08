@@ -22,10 +22,31 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\DocumentationFreezPackaging;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
 
 class ReportFreezPackagingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportFreezPackaging::class; }
+    protected function auditRoutePrefix(): string { return 'report_freez_packagings'; }
+    protected function auditViewPrefix(): string { return 'report_freez_packagings'; }
+    protected function auditRelations(): array
+    {
+        return [
+            'area',
+            'details.product',
+            'details.freezing.actualTemps',
+            'details.kartoning',
+            'details.documentations',
+            'details.kartoningDocumentations',
+        ];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by', 'notes']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportFreezPackaging::class;
 
     protected function getBulkExportModelClass(): string
@@ -77,7 +98,7 @@ class ReportFreezPackagingController extends Controller
     {
         $search = $request->search;
 
-        $query = ReportFreezPackaging::with([
+        $query = ReportFreezPackaging::operasional()->with([
             'area',
             'details.product',
             'details.freezing.actualTemps',
@@ -881,8 +902,10 @@ class ReportFreezPackagingController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('report_freez_packagings.index')
-                ->with('success', 'Data berhasil diperbarui');
+        ->route($report->is_audit ? 'report_freez_packagings.audit' : 'report_freez_packagings.index')
+        ->with('success', $report->is_audit
+            ? 'Data audit berhasil diperbarui.'
+            : 'Data berhasil diperbarui.');
 
         } catch (\Throwable $e) {
 

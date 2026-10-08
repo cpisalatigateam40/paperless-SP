@@ -20,7 +20,7 @@
                     : [],
             ];
         })->values()->all();
-    }
+    } 
 @endphp
 
 @if ($errors->any())
@@ -79,7 +79,7 @@
             <button type="button" id="add-waktu" class="btn btn-sm btn-info mb-3">+ Tambah Waktu Pemeriksaan</button>
 
             <div class="d-flex justify-content-between">
-                <a href="{{ route('gmp.index') }}" class="btn btn-secondary">Kembali</a>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
                 <button type="submit" class="btn btn-success">Simpan</button>
             </div>
         </form>
