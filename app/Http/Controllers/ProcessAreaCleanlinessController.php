@@ -485,7 +485,6 @@ class ProcessAreaCleanlinessController extends Controller
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')
-            ->orderBy('shift')
             ->get();
     
         $filename = 'Kebersihan_Area_Proses_'
