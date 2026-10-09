@@ -157,30 +157,7 @@
                             <td>{{ $r->shift }}</td>
                             <td>{{ $r->created_at->format('H:i') }}</td>
                             <td>{{ $r->area->name ?? '-' }}</td>
-                            @php
-                                $codes = $r->pluck('production_code')->filter()->implode(', ');
-                                $collapseId = 'codes-' . $r->uuid;
-                            @endphp
-
-                            <td>
-                                @if($codes)
-                                    @if(strlen($codes) > 50)
-                                        <span id="{{ $collapseId }}-short">
-                                            {{ \Illuminate\Support\Str::limit($codes, 50) }}
-                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show more</a>
-                                        </span>
-
-                                        <span id="{{ $collapseId }}-full" class="d-none">
-                                            {{ $codes }}
-                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $collapseId }}'); return false;">Show less</a>
-                                        </span>
-                                    @else
-                                        {{ $codes }}
-                                    @endif
-                                @else
-                                    -
-                                @endif
-                            </td>
+                            <td>{{ $r->production_code ?? '-' }}</td>
                             <td>
                                 @if ($r->ketidaksesuaian > 0)
                                 Ada

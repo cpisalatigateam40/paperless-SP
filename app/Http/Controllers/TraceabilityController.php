@@ -19,6 +19,19 @@ class TraceabilityController extends Controller
                 'production_code' => 'Masukkan kata kunci atau pilih tanggal.'
             ]);
         }
+//         dd(
+//     \App\Models\DetailMetalDetector::with('report')
+//         ->where('production_code', 'like', '%QF26801AAO%')
+//         ->get()
+//         ->map(fn($d) => [
+//             'detail_id' => $d->id,
+//             'report_id' => $d->report->id ?? null,
+//             'report_uuid' => $d->report->uuid ?? null,
+//             'date' => $d->report->date ?? null,
+//             'shift' => $d->report->shift ?? null,
+//             'hour' => $d->hour,
+//         ])
+// );
         return view('traceability.index', [
             'results' => $service->traceByBatch(
                 $request->production_code ?? '',

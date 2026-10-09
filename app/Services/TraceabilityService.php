@@ -64,33 +64,48 @@ class TraceabilityService
             collect($cfg['detail_with'] ?? [])->values()->all(),
             collect($cfg['related'] ?? [])->map(fn($r) => $r['relation'])->values()->all()
         );
-        $details = $cfg['model']::with($with)
+        $rows = $cfg['model']::with($with)
             ->whereIn($keyName, $ids)
-            ->get()
-            ->map(function ($detail) use ($cfg) {
-                $related = collect($cfg['related'] ?? [])
-                    ->map(function ($rcfg) use ($detail) {
-                        $rel = $detail->{$rcfg['relation']};
-                        if (!$rel)
-                            return null;
-                        return [
-                            'label' => $rcfg['label'],
-                            'fields' =>
+            ->get();
 
-                                $rcfg['display_fields']($rel)
-                        ];
-                    })
-                    ->filter()
-                    ->values();
-                return [
-                    'fields' => $cfg['display_fields']($detail),
-                    'related' =>
+        if (!empty($cfg['partial'])) {
+            $form = data_get($rows->first(), $cfg['form_relation']);
 
-                        $related
-                ];
-            })
-            ->values();
-        return ['details' => $details];
+            return [
+                'mode' => 'html',
+                'html' => view($cfg['partial'], [
+                    'details' => $rows,
+                    'report'  => $form,
+                ])->render(),
+            ];
+        }
+
+        // Mode tabel (jika modul mendefinisikan table_columns)
+        if (!empty($cfg['table_columns'])) {
+            $form = data_get($rows->first(), $cfg['form_relation']);
+
+            return [
+                'mode'    => 'table',
+                'columns' => $cfg['table_columns'],
+                'rows'    => $rows->map(fn($d) => $cfg['table_row']($d))->values(),
+                'notes'   => isset($cfg['form_notes']) && $form ? ($cfg['form_notes'])($form) : null,
+            ];
+        }
+
+        // Mode lama (field list) untuk modul lain
+        $details = $rows->map(function ($detail) use ($cfg) {
+            $related = collect($cfg['related'] ?? [])
+                ->map(function ($rcfg) use ($detail) {
+                    $rel = $detail->{$rcfg['relation']};
+                    if (!$rel) return null;
+                    return ['label' => $rcfg['label'], 'fields' => $rcfg['display_fields']($rel)];
+                })
+                ->filter()->values();
+
+            return ['fields' => $cfg['display_fields']($detail), 'related' => $related];
+        })->values();
+
+        return ['mode' => 'fields', 'details' => $details];
     }
     protected function matchDetails(
         array $cfg,
@@ -116,13 +131,13 @@ class TraceabilityService
                 }
             });
         }
-        if ($date) {
-            $query->whereHas($cfg['form_relation'], fn($q) => $q->whereDate(
-                'date',
+        $query->whereHas($cfg['form_relation'], function ($q) use ($date) {
+            $q->where(fn($w) => $w->where('is_audit', 0)->orWhereNull('is_audit'));
 
-                $date
-            ));
-        }
+            if ($date) {
+                $q->whereDate('date', $date);
+            }
+        });
         $with = array_merge(
             [$cfg['form_relation']],
             collect($cfg['search_relations'] ?? [])->keys()->values()->all()
