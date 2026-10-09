@@ -56,10 +56,10 @@ function addDetailRow() {
         <h6 style="font-weight: bold; margin-bottom: 1rem;">Detail #${index + 1}</h6>
         <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">Hapus</button>
     </div>
-    <div class="row">
+    <div class="row detail-row">
         <div class="col-md-6 mb-3">
             <label>Produk</label>
-            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this, ${index})">
+            <select name="details[${index}][product_uuid]" class="form-control select2-product" onchange="updateBestBefore(this)">
                 <option value="">- Pilih Produk -</option>
                 ${productOptions}
             </select>
@@ -71,16 +71,13 @@ function addDetailRow() {
         </div>
         <div class="col-md-6 mb-3">
             <label>Kode Produksi</label>
-            <input type="text" name="details[${index}][production_code]" class="form-control" placeholder="Kode Batch/Produksi">
+            <input type="text" name="details[${index}][production_code]" class="form-control production-code" placeholder="Kode Batch/Produksi">
         </div>
         <div class="col-md-6 mb-3">
             <label>Best Before</label>
-            <input type="date" name="details[${index}][best_before]" class="form-control" >
+            <input type="date" name="details[${index}][best_before]" class="form-control best-before">
         </div>
-        
     </div>
-
-    
 
     <h6 class="mt-5 mb-3" style="font-weight: bold;">Pembekuan</h6>
     <div class="row mb-3">
@@ -94,7 +91,7 @@ function addDetailRow() {
         </div>
         <div class="col-md-6">
             <label>Nama Mesin</label>
-            <input type="text" name="details[${index}][freezing][iqf_machine]" class="form-control production-code" placeholder="Nama Mesin IQF">
+            <input type="text" name="details[${index}][freezing][iqf_machine]" class="form-control" placeholder="Nama Mesin IQF">
         </div>
     </div>
     <div class="row mt-3 mb-3">
@@ -110,8 +107,8 @@ function addDetailRow() {
     <div class="row">
         <div class="col-md-6">
             <label>Standard Suhu Produk (°C)</label>
-            <input type="number" step="0.0000001" 
-                name="details[${index}][freezing][standard_temp]" 
+            <input type="number" step="0.0000001"
+                name="details[${index}][freezing][standard_temp]"
                 class="form-control"
                 value="-18">
         </div>
@@ -132,7 +129,7 @@ function addDetailRow() {
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     <div class="row mt-3">
@@ -195,7 +192,7 @@ function addDetailRow() {
             </select>
         </div>
     </div>
-    
+
     <div class="row mt-3">
         <div class="col-md-6 mb-3">
             <label>Isi Per Kemasan Sekunder</label>
@@ -209,16 +206,16 @@ function addDetailRow() {
             <label>Isi per binded *prod. binded</label>
             <input type="number" name="details[${index}][kartoning][content_binded]" class="form-control">
         </div>
-        
+
     </div>
-    
+
     <div class="row mt-3">
         <div class="col-md-6">
             <label>Standar Berat Hasil Kartoning (kg)</label>
             <input type="text" name="details[${index}][kartoning][carton_weight_standard]" class="form-control" placeholder="contoh: 12-13">
         </div>
     </div>
-    
+
     <div class="row kartoning-group mt-3" data-index="${index}">
         <div class="col-md-2">
             <label>Berat Aktual Hasil Karton 1</label>
@@ -254,7 +251,7 @@ function addDetailRow() {
                 class="form-control"
                 rows="1"></textarea>
         </div>
-        <div class="col-md-12 mb-3">
+        <div class="col-md-12 mb-3 mt-3">
             <label>Dokumentasi Pengemasan Sekunder</label>
 
             <input
@@ -265,7 +262,7 @@ function addDetailRow() {
                 multiple>
         </div>
     </div>
-    
+
     <h6 class="mt-5 mb-3" style="font-weight: bold;">Status Produk</h6>
 
     <div class="row">
@@ -307,24 +304,33 @@ function addDetailRow() {
 
 window.onload = () => addDetailRow();
 
-function updateBestBefore(select, index) {
+function formatDateLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Best before dari shelf life produk (hanya jika kode produksi masih kosong)
+function updateBestBefore(select) {
+    const row = select.closest('.detail-row');
+    if (!row) return;
+
+    const codeInput = row.querySelector('.production-code');
+    if (codeInput && codeInput.value.trim() !== '') return;
+
     const option = select.options[select.selectedIndex];
     const shelfLife = parseInt(option.getAttribute('data-shelf-life'));
     const createdAt = option.getAttribute('data-created-at');
     if (!shelfLife || !createdAt) return;
 
-    const createdDate = new Date(createdAt);
-    createdDate.setMonth(createdDate.getMonth() + shelfLife);
+    const d = new Date(createdAt);
+    d.setMonth(d.getMonth() + shelfLife);
 
-    const yyyy = createdDate.getFullYear();
-    const mm = String(createdDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(createdDate.getDate()).padStart(2, '0');
-
-    const formattedDate = `${yyyy}-${mm}-${dd}`;
-    const bestBeforeInput = document.querySelector(`input[name="details[${index}][best_before]"]`);
-    if (bestBeforeInput) bestBeforeInput.value = formattedDate;
+    row.querySelector('.best-before').value = formatDateLocal(d);
 }
 
+// Hitung rata-rata berat karton
 document.addEventListener("input", function(e) {
     if (e.target.classList.contains("weight-input")) {
         const group = e.target.closest(".kartoning-group");
@@ -346,6 +352,7 @@ document.addEventListener("input", function(e) {
     }
 });
 
+// Tambah / hapus input suhu aktual
 document.addEventListener('click', function(e) {
 
     if (e.target.classList.contains('add-temp')) {
@@ -376,69 +383,152 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// ===== Best Before otomatis dari Kode Produksi =====
+function parseBatchCodeToDate(batchCode) {
+    if (!batchCode || batchCode.length < 4) {
+        return null;
+    }
+
+    try {
+        const yearChar = batchCode[0].toUpperCase();
+        const baseYear = 2009;
+        const year = baseYear + (yearChar.charCodeAt(0) - 'A'.charCodeAt(0));
+
+        const monthChar = batchCode[1].toUpperCase();
+        const month = (monthChar.charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
+
+        const day = parseInt(batchCode.substring(2, 4), 10);
+
+        if (
+            isNaN(year) ||
+            isNaN(month) || month < 1 || month > 12 ||
+            isNaN(day) || day < 1 || day > 31
+        ) {
+            return null;
+        }
+
+        return new Date(year, month - 1, day);
+    } catch (e) {
+        return null;
+    }
+}
+
+function calculateExpirationDate(batchCode, expirationMonths) {
+    const productionDate = parseBatchCodeToDate(batchCode);
+
+    if (!productionDate || isNaN(expirationMonths)) {
+        return null;
+    }
+
+    const originalDay = productionDate.getDate();
+
+    let expirationDate = new Date(
+        productionDate.getFullYear(),
+        productionDate.getMonth(),
+        originalDay
+    );
+
+    expirationDate.setMonth(expirationDate.getMonth() + expirationMonths);
+
+    const lastDayOfNewMonth = new Date(
+        expirationDate.getFullYear(),
+        expirationDate.getMonth() + 1,
+        0
+    ).getDate();
+
+    expirationDate.setDate(Math.min(originalDay, lastDayOfNewMonth));
+
+    return {
+        production_date: formatDateLocal(productionDate),
+        expiration_date: formatDateLocal(expirationDate)
+    };
+}
+
+document.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('production-code')) return;
+
+    const row = e.target.closest('.detail-row');
+    if (!row) return;
+
+    const bestBeforeInput = row.querySelector('.best-before');
+
+    // ambil pola kode batch, contoh: QA01
+    const match = e.target.value.match(/([A-Z]{2}\d{2})/i);
+    if (!match) {
+        bestBeforeInput.value = '';
+        return;
+    }
+
+    const batchCode = match[1].toUpperCase();
+    const expirationMonths = 24;
+
+    const result = calculateExpirationDate(batchCode, expirationMonths);
+    bestBeforeInput.value = result ? result.expiration_date : '';
+});
+
 // ===== Compress & Validasi Upload File =====
-    const MAX_SIZE_MB = 2;
-    const MAX_FILES = 10;
-    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-    const COMPRESS_QUALITY = 0.7; // 70% kualitas JPEG
+const MAX_SIZE_MB = 2;
+const MAX_FILES = 10;
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+const COMPRESS_QUALITY = 0.7; // 70% kualitas JPEG
 
-    // Fungsi compress 1 file gambar
-    function compressImage(file, quality) {
-        return new Promise((resolve, reject) => {
-            if (!file.type.startsWith('image/')) {
-                resolve(file);
-                return;
-            }
+// Fungsi compress 1 file gambar
+function compressImage(file, quality) {
+    return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/')) {
+            resolve(file);
+            return;
+        }
 
-            const reader = new FileReader();
-            reader.onerror = () => reject(new Error('Gagal membaca file: ' + file.name));
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Gagal membaca file: ' + file.name));
 
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onerror = () => reject(new Error('Format gambar tidak didukung: ' + file.name));
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Format gambar tidak didukung: ' + file.name));
 
-                img.onload = function() {
-                    let width = img.width;
-                    let height = img.height;
-                    const MAX_DIMENSION = 1280;
+            img.onload = function() {
+                let width = img.width;
+                let height = img.height;
+                const MAX_DIMENSION = 1280;
 
-                    if (width > height) {
-                        if (width > MAX_DIMENSION) {
-                            height *= MAX_DIMENSION / width;
-                            width = MAX_DIMENSION;
-                        }
-                    } else {
-                        if (height > MAX_DIMENSION) {
-                            width *= MAX_DIMENSION / height;
-                            height = MAX_DIMENSION;
-                        }
+                if (width > height) {
+                    if (width > MAX_DIMENSION) {
+                        height *= MAX_DIMENSION / width;
+                        width = MAX_DIMENSION;
                     }
+                } else {
+                    if (height > MAX_DIMENSION) {
+                        width *= MAX_DIMENSION / height;
+                        height = MAX_DIMENSION;
+                    }
+                }
 
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
 
-                    canvas.toBlob(function(blob) {
-                        if (!blob) {
-                            reject(new Error('Gagal mengompres: ' + file.name));
-                            return;
-                        }
-                        resolve(new File(
-                            [blob],
-                            file.name.replace(/\.[^.]+$/, '.jpg'),
-                            { type: 'image/jpeg' }
-                        ));
-                    }, 'image/jpeg', quality);
-                };
-
-                img.src = e.target.result;
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        reject(new Error('Gagal mengompres: ' + file.name));
+                        return;
+                    }
+                    resolve(new File(
+                        [blob],
+                        file.name.replace(/\.[^.]+$/, '.jpg'),
+                        { type: 'image/jpeg' }
+                    ));
+                }, 'image/jpeg', quality);
             };
 
-            reader.readAsDataURL(file);
-        });
-    }
+            img.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
 
 document.getElementById('reportFreezPackagingForm')
 .addEventListener('submit', async function(e) {
