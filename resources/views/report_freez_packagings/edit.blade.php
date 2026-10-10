@@ -172,7 +172,7 @@ function addDetailRow(detail = null) {
 
     <div class="d-flex justify-content-between align-items-center">
         <h6 style="font-weight:bold; margin-bottom:1rem;">Detail #${index+1}</h6>
-        <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">Hapus</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="confirmRemoveDetail(this)">Hapus</button>
     </div>
 
     <div class="row">
@@ -668,6 +668,27 @@ document.addEventListener('click', function(e) {
             submitBtn.textContent = 'Simpan';
         }
     });
+
+    function confirmRemoveDetail(btn) {
+        const card = btn.closest('.card');
+        const message = 'Detail produk ini akan dihapus setelah Anda klik "Update". Lanjutkan?';
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Hapus detail?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) card.remove();
+            });
+        } else if (confirm(message)) {
+            card.remove();
+        }
+    }
 
 
     

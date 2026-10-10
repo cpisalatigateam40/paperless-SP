@@ -61,7 +61,13 @@
                 <h5>Detail Pemeriksaan</h5>
                 <div id="detail-container">
                     @foreach($report->details as $i => $detail)
-                    <div class="detail-row p-3 border rounded bg-light" style="margin-bottom: 7rem;">
+                    <div class="detail-row detail-item p-3 border rounded bg-light" style="margin-bottom: 7rem;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <strong>Pemeriksaan #<span class="detail-number">{{ $loop->iteration }}</span></strong>
+                            <button type="button" class="btn btn-sm btn-danger btn-remove-detail">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
                         <div class="row align-items-end">
                             <div class="col-md-4">
                                 <label class="form-label">Bahan Baku</label>
@@ -564,6 +570,39 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('initKoreksiToggle gagal:', e);
         }
     });
+});
+</script>
+
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-remove-detail');
+    if (!btn) return;
+
+    const item = btn.closest('.detail-item');
+
+    const removeItem = () => {
+        item.remove();
+        document.querySelectorAll('.detail-item .detail-number')
+            .forEach((el, i) => el.textContent = i + 1);
+    };
+
+    const message = 'Detail pemeriksaan ini akan dihapus setelah Anda klik "Update". Lanjutkan?';
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Hapus detail?',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal'
+        }).then(result => {
+            if (result.isConfirmed) removeItem();
+        });
+    } else if (confirm(message)) {
+        removeItem();
+    }
 });
 </script>
 
