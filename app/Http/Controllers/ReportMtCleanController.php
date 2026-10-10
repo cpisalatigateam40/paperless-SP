@@ -578,7 +578,8 @@ class ReportMtCleanController extends Controller
                 . $dateTo->format('d/m/Y');
         }
 
-        $reports = ReportMtClean::with([
+        $reports = ReportMtClean::operasional()
+            ->with([
                 'area',
                 'details.product'
             ])

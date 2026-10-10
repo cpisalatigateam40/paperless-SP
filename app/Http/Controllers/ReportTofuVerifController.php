@@ -394,7 +394,8 @@ class ReportTofuVerifController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportTofuVerif::with([
+        $reports = ReportTofuVerif::operasional()
+            ->with([
                 'productInfos',
                 'weightVerifs',
                 'defectVerifs',

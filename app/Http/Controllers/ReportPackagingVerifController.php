@@ -790,7 +790,8 @@ class ReportPackagingVerifController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportPackagingVerif::with([
+        $reports = ReportPackagingVerif::operasional()
+            ->with([
                 'details.product',
                 'details.checklist',
             ])

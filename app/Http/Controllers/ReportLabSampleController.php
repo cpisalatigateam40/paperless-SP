@@ -385,7 +385,8 @@ class ReportLabSampleController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportLabSample::with(['details.product'])
+        $reports = ReportLabSample::operasional()
+            ->with(['details.product'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

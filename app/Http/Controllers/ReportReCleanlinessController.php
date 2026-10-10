@@ -584,7 +584,8 @@ public function exportPdf($uuid)
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportReCleanliness::with([
+        $reports = ReportReCleanliness::operasional()
+            ->with([
                 'roomDetails.room',
                 'roomDetails.element',
                 'equipmentDetails.equipment',

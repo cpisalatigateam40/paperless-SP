@@ -57,6 +57,40 @@ trait HasBulkPdfExport
         ];
     }
 
+    /**
+     * Default: hanya data operasional.
+     * Kirim mode=audit (dari halaman Data Audit) untuk data audit-first:
+     * semua salinan audit + data operasional yang belum punya salinan.
+     */
+    protected function applyBulkExportAuditScope($query, Request $request)
+    {
+        $modelClass = $this->getBulkExportModelClass();
+
+        // model tanpa fitur audit tidak difilter
+        if (!method_exists($modelClass, 'scopeOperasional')) {
+            return $query;
+        }
+
+        if ($request->input('mode') === 'audit') {
+            $auditedSourceUuids = $modelClass::audit()
+                ->whereNotNull('source_uuid')
+                ->pluck('source_uuid');
+
+            return $query->where(function ($q) use ($auditedSourceUuids) {
+                $q->where('is_audit', true)
+                ->orWhere(function ($sub) use ($auditedSourceUuids) {
+                    $sub->where('is_audit', false);
+
+                    if ($auditedSourceUuids->isNotEmpty()) {
+                        $sub->whereNotIn('uuid', $auditedSourceUuids);
+                    }
+                });
+            });
+        }
+
+        return $query->operasional();
+    }
+
     public function exportPdfBulk(Request $request)
     {
         $request->validate([
@@ -89,9 +123,11 @@ trait HasBulkPdfExport
             }
         }
 
-        $reports = $query->whereBetween($dateColumn, [$start, $end])
-            ->orderBy($dateColumn)
-            ->get();
+        $query->whereBetween($dateColumn, [$start, $end]);
+
+        $query = $this->applyBulkExportAuditScope($query, $request);
+
+        $reports = $query->orderBy($dateColumn)->get();
 
         if ($reports->isEmpty()) {
             return back()->with('error', 'Tidak ada laporan pada periode yang dipilih.');

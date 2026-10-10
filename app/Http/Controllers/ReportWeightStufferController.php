@@ -839,7 +839,8 @@ public function exportPdf($uuid, $detail_uuid)
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportWeightStuffer::with([
+        $reports = ReportWeightStuffer::operasional()
+            ->with([
                 'details.product',
                 'details.townsend',
                 'details.hitech',

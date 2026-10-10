@@ -429,7 +429,8 @@ class ReportProductionNonconformityController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportProductionNonconformity::with(['details'])
+        $reports = ReportProductionNonconformity::operasional()
+            ->with(['details'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

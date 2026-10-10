@@ -576,7 +576,8 @@ class ReportWaterbathController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportWaterbath::with([
+        $reports = ReportWaterbath::operasional()
+            ->with([
                 'details.product',
                 'pasteurisasi',
                 'coolingShocks',

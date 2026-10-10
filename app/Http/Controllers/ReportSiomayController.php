@@ -527,7 +527,8 @@ class ReportSiomayController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportSiomay::with([
+        $reports = ReportSiomay::operasional()
+            ->with([
                 'product',
                 'details.rawMaterials.rawMaterial',
             ])

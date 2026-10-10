@@ -625,7 +625,8 @@ class ReportChangeoverCleaningController extends Controller
                 . $dateTo->format('d/m/Y');
         }
 
-        $reports = ReportChangeoverCleaning::with([
+        $reports = ReportChangeoverCleaning::operasional()
+        ->with([
             'details.item.section',
             'details.product',
             'area'

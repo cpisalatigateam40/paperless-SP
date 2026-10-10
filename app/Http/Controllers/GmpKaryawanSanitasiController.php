@@ -433,7 +433,8 @@ class GmpKaryawanSanitasiController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
 
-        $headers = GmpHeader::with([
+        $headers = GmpHeader::operasional()
+            ->with([
                 'waktuPemeriksaans.employeeChecks.section',
                 'waktuPemeriksaans.sanitationChecks.section',
             ])

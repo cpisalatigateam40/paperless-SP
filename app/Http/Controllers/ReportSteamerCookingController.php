@@ -588,7 +588,8 @@ public function exportExcel(Request $request)
     |--------------------------------------------------------------------------
     */
 
-    $reports = ReportSteamerCooking::with([
+    $reports = ReportSteamerCooking::operasional()
+        ->with([
             'creator',
             'product',
             'batches.details.coreTemps',

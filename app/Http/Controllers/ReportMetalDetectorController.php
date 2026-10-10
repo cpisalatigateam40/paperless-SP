@@ -502,7 +502,8 @@ class ReportMetalDetectorController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportMetalDetector::with(['details.product', 'section'])
+        $reports = ReportMetalDetector::operasional()
+            ->with(['details.product', 'section'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

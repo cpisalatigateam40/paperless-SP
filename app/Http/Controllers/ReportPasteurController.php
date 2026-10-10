@@ -605,7 +605,8 @@ class ReportPasteurController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportPasteur::with([
+        $reports = ReportPasteur::operasional()
+            ->with([
                 'details.product',
                 'details.steps.standardStep',
                 'details.steps.drainageStep',

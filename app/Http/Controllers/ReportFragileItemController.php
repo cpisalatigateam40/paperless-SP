@@ -431,7 +431,8 @@ class ReportFragileItemController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportFragileItem::with(['details.item', 'detailManuals.section'])
+        $reports = ReportFragileItem::operasional()
+            ->with(['details.item', 'detailManuals.section'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

@@ -698,7 +698,8 @@ class ReportSmokeHouseController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
 
-        $reports = ReportSmokeHouse::with([
+        $reports = ReportSmokeHouse::operasional()
+            ->with([
                 'creator',
                 'details.product',
                 'details.steps',

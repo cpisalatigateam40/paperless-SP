@@ -592,7 +592,8 @@ class ReportEmulsionMakingController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportEmulsionMaking::with([
+        $reports = ReportEmulsionMaking::operasional()
+            ->with([
                 'header.details.rawMaterial',
                 'header.details.premix',
                 'header.agings',

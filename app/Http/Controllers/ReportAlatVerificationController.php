@@ -431,7 +431,7 @@ class ReportAlatVerificationController extends Controller
 
         $suffix = $dateFrom->format('Ymd') . '_' . $dateTo->format('Ymd');
 
-        $reports = ReportAlatVerification::query()
+        $reports = ReportAlatVerification::operasional()
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

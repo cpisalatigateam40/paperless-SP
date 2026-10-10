@@ -784,7 +784,8 @@ public function update(Request $request, $uuid)
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportProcessProd::with([
+        $reports = ReportProcessProd::operasional()
+        ->with([
                 'section',
                 'detail.product',
                 'detail.formula',

@@ -596,7 +596,8 @@ class ReportRmArrivalController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportRmArrival::with(['details.rawMaterial', 'details.premix', 'section'])
+        $reports = ReportRmArrival::operasional()
+            ->with(['details.rawMaterial', 'details.premix', 'section'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

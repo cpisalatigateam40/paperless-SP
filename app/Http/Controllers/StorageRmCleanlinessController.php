@@ -502,7 +502,8 @@ class StorageRmCleanlinessController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportStorageRmCleanliness::with(['details.items'])
+        $reports = ReportStorageRmCleanliness::operasional()
+            ->with(['details.items'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

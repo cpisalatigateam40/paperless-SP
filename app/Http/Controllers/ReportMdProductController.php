@@ -548,7 +548,8 @@ class ReportMdProductController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportMdProduct::with([
+        $reports = ReportMdProduct::operasional()
+            ->with([
                 'details.product',
                 'details.positions',
             ])

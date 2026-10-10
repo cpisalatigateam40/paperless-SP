@@ -557,7 +557,8 @@ class ReportBoilingTankController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
 
-        $reports = ReportBoilingTank::with([
+        $reports = ReportBoilingTank::operasional()
+            ->with([
                 'product',
                 'details.checks',
             ])

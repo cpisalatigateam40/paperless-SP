@@ -506,7 +506,8 @@ class ReportThawingController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportThawing::with(['details.rawMaterial', 'area'])
+        $reports = ReportThawing::operasional()
+            ->with(['details.rawMaterial', 'area'])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
             ->orderBy('date')

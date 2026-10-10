@@ -937,7 +937,8 @@ class ReportFreezPackagingController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' - ' . $dateTo->format('d/m/Y');
         }
 
-        $reports = ReportFreezPackaging::with([
+        $reports = ReportFreezPackaging::operasional()
+            ->with([
                 'details.product',
                 'details.freezing.actualTemps',
                 'details.kartoning',
