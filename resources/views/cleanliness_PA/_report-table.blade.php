@@ -27,7 +27,10 @@
                 @endif
             </td>
             <td>{{ $report->created_by }}</td>
-            <td class="d-flex" style="gap: .3rem;">
+            <td >
+                <div class="d-flex" style="gap: .3rem;">
+
+                
                 {{-- Lihat Detail --}}
                 <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $report->id }}"
                     title="Lihat Detail">
@@ -117,6 +120,7 @@
                 <!-- @hasanyrole('admin|superadmin|SPV QC')
                 <x-audit-dropdown :item="$report" route-prefix="process-area-cleanliness" />
                 @endhasanyrole -->
+                </div>
             </td>
 
         </tr>

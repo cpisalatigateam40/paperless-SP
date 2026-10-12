@@ -3,20 +3,18 @@
 @section('content')
 <div class="container-fluid">
     <div class="card shadow mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Verifikasi Kesesuaian Area Proses Produksi</h5>
-            
-            <div class="d-flex gap-2" style="gap: .4rem;">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-2 mb-lg-0 mr-3">Verifikasi Kesesuaian Area Proses Produksi</h5>
+
+            <div class="op-toolbar d-flex flex-row flex-wrap align-items-center">
                 @hasanyrole('admin|superadmin')
-                <form method="GET" action="{{ route('process-area-cleanliness.index') }}">
+                <form method="GET" action="{{ route('process-area-cleanliness.index') }}"
+                    class="op-item op-form">
                     <input type="hidden" name="section" value="{{ request('section') }}">
                     <input type="hidden" name="search" value="{{ request('search') }}">
 
-                    <select name="area"
-                            class="form-select form-control form-control"
-                            onchange="this.form.submit()">
+                    <select name="area" class="form-control form-control-sm" onchange="this.form.submit()">
                         <option value="">Semua Area</option>
-
                         @foreach($areas as $area)
                             <option value="{{ $area->uuid }}"
                                 {{ request('area') == $area->uuid ? 'selected' : '' }}>
@@ -27,103 +25,104 @@
                 </form>
                 @endhasanyrole
 
-                {{-- 🔍 SEARCH --}}
-                <form method="GET"
-                    action="{{ route('process-area-cleanliness.index') }}"
-                    class="d-flex align-items-center"
-                    style="gap: .4rem;">
+                {{-- SEARCH --}}
+                <form method="GET" action="{{ route('process-area-cleanliness.index') }}"
+                    class="op-item op-form op-search d-flex flex-row flex-wrap align-items-center">
 
                     {{-- pertahankan filter section --}}
                     <input type="hidden" name="section" value="{{ request('section') }}">
 
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        placeholder="Cari laporan..."
-                        value="{{ request('search') }}"
-                    >
+                    <input type="text" name="search"
+                        class="form-control form-control-sm op-search-input"
+                        placeholder="Cari laporan..." value="{{ request('search') }}">
 
-                    {{-- 🔍 BUTTON CARI --}}
-                    <button type="submit" class="btn btn-outline-primary">
-                        Cari
-                    </button>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Cari</button>
 
-                    {{-- 🔄 RESET --}}
                     @if(request('search') || request('section'))
                         <a href="{{ route('process-area-cleanliness.index') }}"
-                        class="btn btn-danger"
-                        title="Reset Filter">
-                            Reset
-                        </a>
+                            class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
                     @endif
-
                 </form>
 
-                {{-- Buttons --}}
-                <div class="d-flex gap-2">
-                    @role('Produksi')
+                {{-- Approve --}}
+                @role('Produksi')
+                <div class="op-item">
                     <button type="button" class="btn btn-warning btn-sm"
-                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
                         <i class="fas fa-check-double"></i> Approve (Produksi)
                     </button>
-                    @endrole
-
-                    @role('SPV QC')
-                    <button type="button" class="btn btn-success btn-sm"
-                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
-                        <i class="fas fa-check-circle"></i> Approve (QC)
-                    </button>
-                    @endrole
                 </div>
-
-                <x-export-pdf-modal
-                    :route="route('process-area-cleanliness.export_pdf_bulk')"
-                    title="Verifikasi Kebersihan Area Proses"
-                    modal-id="modalExportPdfProcessAreaCleanliness"
-                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
-                />
-
-                {{-- Modals --}}
-                @role('Produksi')
-                <x-bulk-approval-modal
-                    prefix="known"
-                    title="Produksi"
-                    color="warning"
-                    icon="fa-check-double"
-                    action-route="process-area-cleanliness.bulk-known"
-                    count-route="process-area-cleanliness.bulk-known-count"
-                    label="Approve Semua"
-                />
                 @endrole
 
                 @role('SPV QC')
-                <x-bulk-approval-modal
-                    prefix="approve"
-                    title="QC"
-                    color="success"
-                    icon="fa-check-circle"
-                    action-route="process-area-cleanliness.bulk-approve"
-                    count-route="process-area-cleanliness.bulk-approve-count"
-                    label="Approve Semua"
-                />
+                <div class="op-item">
+                    <button type="button" class="btn btn-success btn-sm"
+                        data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                </div>
                 @endrole
 
-                <x-export-excel-modal 
-                    :route="route('process-area-cleanliness.export')" 
-                    title="Verifikasi Kebersihan Area Proses" />
+                <div class="op-divider d-none d-lg-block"></div>
+
+                {{-- Export --}}
+                <div class="op-item">
+                    <x-export-pdf-modal
+                        :route="route('process-area-cleanliness.export_pdf_bulk')"
+                        title="Verifikasi Kebersihan Area Proses"
+                        modal-id="modalExportPdfProcessAreaCleanliness"
+                        :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
+                    />
+                </div>
+
+                <div class="op-item">
+                    <x-export-excel-modal
+                        :route="route('process-area-cleanliness.export')"
+                        title="Verifikasi Kebersihan Area Proses" />
+                </div>
 
                 @can('create report')
-                <a href="{{ route('process-area-cleanliness.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                <div class="op-item">
+                    <a href="{{ route('process-area-cleanliness.create') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Tambah
+                    </a>
+                </div>
                 @endcan
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('process-area-cleanliness.audit') }}" class="btn btn-sm btn-audit">
-                    <i class="fas fa-user-shield"></i> Data Audit
-                </a>
+                <div class="op-item">
+                    <a href="{{ route('process-area-cleanliness.audit') }}" class="btn btn-sm btn-audit">
+                        <i class="fas fa-user-shield"></i> Audit
+                    </a>
+                </div>
                 @endhasanyrole
             </div>
         </div>
+
+        {{-- Modals: di luar toolbar --}}
+        @role('Produksi')
+        <x-bulk-approval-modal
+            prefix="known"
+            title="Produksi"
+            color="warning"
+            icon="fa-check-double"
+            action-route="process-area-cleanliness.bulk-known"
+            count-route="process-area-cleanliness.bulk-known-count"
+            label="Approve Semua"
+        />
+        @endrole
+
+        @role('SPV QC')
+        <x-bulk-approval-modal
+            prefix="approve"
+            title="QC"
+            color="success"
+            icon="fa-check-circle"
+            action-route="process-area-cleanliness.bulk-approve"
+            count-route="process-area-cleanliness.bulk-approve-count"
+            label="Approve Semua"
+        />
+        @endrole
 
         <div class="card-body" style="padding-top: 1rem !important;">
             <div class="table-responsive">

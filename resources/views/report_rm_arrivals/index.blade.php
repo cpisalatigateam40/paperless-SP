@@ -3,22 +3,20 @@
 @section('content')
     <div class="container-fluid">
         <div class="card shadow mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h5 class="mb-2 mb-lg-0 mr-3">
                     Verifikasi Bahan Baku dan Bahan Penunjang
                 </h5>
 
-                <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="op-toolbar d-flex flex-row flex-wrap align-items-center">
                     @hasanyrole('admin|superadmin')
-                    <form method="GET" action="{{ route('report_rm_arrivals.index') }}">
+                    <form method="GET" action="{{ route('report_rm_arrivals.index') }}"
+                        class="op-item op-form  ">
                         <input type="hidden" name="section" value="{{ request('section') }}">
                         <input type="hidden" name="search" value="{{ request('search') }}">
 
-                        <select name="area"
-                                class="form-select form-control-sm form-control"
-                                onchange="this.form.submit()">
+                        <select name="area" class="form-control form-control-sm" onchange="this.form.submit()">
                             <option value="">Semua Area</option>
-
                             @foreach($areas as $area)
                                 <option value="{{ $area->uuid }}"
                                     {{ request('area') == $area->uuid ? 'selected' : '' }}>
@@ -28,9 +26,11 @@
                         </select>
                     </form>
                     @endhasanyrole
+
                     {{-- FILTER SECTION --}}
-                    <form method="GET" action="{{ route('report_rm_arrivals.index') }}">
-                        <select name="section" class="form-select form-control-sm form-control" onchange="this.form.submit()">
+                    <form method="GET" action="{{ route('report_rm_arrivals.index') }}"
+                        class="op-item op-form  ">
+                        <select name="section" class="form-control form-control-sm" onchange="this.form.submit()">
                             <option value="">Semua Section</option>
                             <option value="Chillroom" {{ request('section') == 'Chillroom' ? 'selected' : '' }}>Chillroom</option>
                             <option value="Seasoning" {{ request('section') == 'Seasoning' ? 'selected' : '' }}>Seasoning</option>
@@ -38,88 +38,101 @@
                     </form>
 
                     {{-- SEARCH --}}
-                    <form method="GET" action="{{ route('report_rm_arrivals.index') }}" class="d-flex align-items-center gap-1" style="gap: .4rem;;">
+                    <form method="GET" action="{{ route('report_rm_arrivals.index') }}"
+                        class="op-item op-form op-search d-flex flex-row flex-wrap align-items-center ">
                         <input type="hidden" name="section" value="{{ request('section') }}">
-                        <div class="input-group input-group-sm">
-                            <input type="text" name="search" class="form-control form-control-sm mr-2"
-                                placeholder="Cari laporan..." value="{{ request('search') }}">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">Cari</button>
-                        </div>
+
+                        <input type="text" name="search"
+                            class="form-control form-control-sm   op-search-input"
+                            placeholder="Cari laporan..." value="{{ request('search') }}">
+
+                        <button type="submit" class="btn btn-sm btn-outline-secondary  ">Cari</button>
+
                         @if(request('search') || request('section'))
-                            <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-sm btn-outline-danger">Reset</a>
+                            <a href="{{ route('report_rm_arrivals.index') }}"
+                                class="btn btn-sm btn-outline-danger ">Reset</a>
                         @endif
                     </form>
 
-                    {{-- Buttons --}}
-                    <div class="d-flex gap-2">
-                        @role('Produksi')
+                    {{-- Approve --}}
+                    @role('Produksi')
+                    <div class="op-item  ">
                         <button type="button" class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
                             <i class="fas fa-check-double"></i> Approve (Produksi)
                         </button>
-                        @endrole
-
-                        @role('SPV QC')
-                        <button type="button" class="btn btn-success btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
-                            <i class="fas fa-check-circle"></i> Approve (QC)
-                        </button>
-                        @endrole
                     </div>
-
-                    <x-export-pdf-modal
-                        :route="route('report_rm_arrivals.export_pdf_bulk')"
-                        title="RM Arrival"
-                        modal-id="modalExportPdfRmArrival"
-                        :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
-                    />
-
-                    {{-- Modals --}}
-                    @role('Produksi')
-                    <x-bulk-approval-modal
-                        prefix="known"
-                        title="Produksi"
-                        color="warning"
-                        icon="fa-check-double"
-                        action-route="report-rm-arrival.bulk-known"
-                        count-route="report-rm-arrival.bulk-known-count"
-                        label="Approve Semua"
-                    />
                     @endrole
 
                     @role('SPV QC')
-                    <x-bulk-approval-modal
-                        prefix="approve"
-                        title="QC"
-                        color="success"
-                        icon="fa-check-circle"
-                        action-route="report-rm-arrival.bulk-approve"
-                        count-route="report-rm-arrival.bulk-approve-count"
-                        label="Approve Semua"
-                    />
+                    <div class="op-item  ">
+                        <button type="button" class="btn btn-success btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                            <i class="fas fa-check-circle"></i> Approve (QC)
+                        </button>
+                    </div>
                     @endrole
 
-                    <div class="vr"></div>
+                    <div class="op-divider d-none d-lg-block  "></div>
 
-                    {{-- Tombol Export Excel --}}
-                    <x-export-excel-modal 
-                        :route="route('report_rm_arrivals.export')" 
-                        title="RM Arrival" />
+                    {{-- Export --}}
+                    <div class="op-item  ">
+                        <x-export-pdf-modal
+                            :route="route('report_rm_arrivals.export_pdf_bulk')"
+                            title="RM Arrival"
+                            modal-id="modalExportPdfRmArrival"
+                            :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
+                        />
+                    </div>
+
+                    <div class="op-item  ">
+                        <x-export-excel-modal
+                            :route="route('report_rm_arrivals.export')"
+                            title="RM Arrival" />
+                    </div>
 
                     @can('create report')
-                    <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
-                        Tambah Laporan
-                    </a>
+                    <div class="op-item  ">
+                        <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus"></i> Tambah
+                        </a>
+                    </div>
                     @endcan
 
                     @hasanyrole('admin|superadmin|SPV QC')
-                    <a href="{{ route('report_rm_arrivals.audit') }}" class="btn btn-sm btn-audit">
-                        <i class="fas fa-user-shield"></i> Data Audit
-                    </a>
+                    <div class="op-item ">
+                        <a href="{{ route('report_rm_arrivals.audit') }}" class="btn btn-sm btn-audit">
+                            <i class="fas fa-user-shield"></i> Audit
+                        </a>
+                    </div>
                     @endhasanyrole
-
                 </div>
             </div>
+
+            {{-- Modals: di luar toolbar supaya tidak ikut layout flex --}}
+            @role('Produksi')
+            <x-bulk-approval-modal
+                prefix="known"
+                title="Produksi"
+                color="warning"
+                icon="fa-check-double"
+                action-route="report-rm-arrival.bulk-known"
+                count-route="report-rm-arrival.bulk-known-count"
+                label="Approve Semua"
+            />
+            @endrole
+
+            @role('SPV QC')
+            <x-bulk-approval-modal
+                prefix="approve"
+                title="QC"
+                color="success"
+                icon="fa-check-circle"
+                action-route="report-rm-arrival.bulk-approve"
+                count-route="report-rm-arrival.bulk-approve-count"
+                label="Approve Semua"
+            />
+            @endrole
 
 
             <div class="card-body" style="padding-top: 1rem !important;">
@@ -294,7 +307,7 @@
 
                                     {{-- Export PDF --}}
                                     <a href="{{ route('report_rm_arrivals.export-pdf', $report->uuid) }}"
-                                        target="_blank" class="btn btn-sm btn-outline-secondary" title="Export PDF">
+                                        target="_blank" class="btn btn-sm btn-secondary" title="Export PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
 

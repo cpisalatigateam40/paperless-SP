@@ -4,23 +4,23 @@
 <div class="container-fluid">
     <x-audit-banner />
     <div class="card shadow mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 style="color: #552f93;">
-                <i class="fas fa-user-shield mr-1"></i>
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-2 mb-lg-0 mr-3" style="color: #552f93;">
+                <i class="fas fa-user-shield "></i>
                 Verifikasi Proses Pembuatan Kulit Siomay/Gyoza
             </h5>
 
-            <div class="d-flex gap-2" style="gap: .4rem;">
+            <div class="audit-toolbar d-flex flex-row flex-wrap align-items-center">
                 {{-- SEARCH --}}
-                <form method="GET"
-                    action="{{ route('report_siomays.audit') }}"
-                    class="d-flex align-items-center"
-                    style="gap: .4rem;">
+                <form method="GET" action="{{ route('report_siomays.audit') }}"
+                    class="audit-search d-flex flex-row flex-wrap align-items-center ">
 
-                    <input type="text" name="search" class="form-control"
+                    <input type="text" name="search"
+                        class="form-control form-control-sm  audit-search-input"
                         placeholder="Cari kode produksi, shift, pembuat..." value="{{ request('search') }}">
 
-                    <select name="per_page" class="form-select form-control" onchange="this.form.submit()">
+                    <select name="per_page" class="form-control form-control-sm  audit-per-page"
+                        onchange="this.form.submit()">
                         @foreach([5, 10, 25] as $n)
                             <option value="{{ $n }}" {{ request('per_page', 5) == $n ? 'selected' : '' }}>
                                 {{ $n }} / halaman
@@ -28,18 +28,21 @@
                         @endforeach
                     </select>
 
-                    <button type="submit" class="btn btn-outline-primary">Cari</button>
+                    <button type="submit" class="btn btn-sm btn-outline-primary ">Cari</button>
 
                     @if(request('search') || request('per_page'))
                         <a href="{{ route('report_siomays.audit') }}"
-                           class="btn btn-danger" title="Reset Filter">Reset</a>
+                            class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
                     @endif
                 </form>
 
-                <x-audit-bulk-auto route-prefix="report_siomays" />
+                <div class="audit-bulk-wrap ">
+                    <x-audit-bulk-auto route-prefix="report_siomays" />
+                </div>
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('report_siomays.index') }}" class="btn btn-sm btn-outline-secondary">
+                <a href="{{ route('report_siomays.index') }}"
+                    class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Data Operasional
                 </a>
                 @endhasanyrole
@@ -128,12 +131,12 @@
                                 @endif
                             </td>
                             <td>{{ $totalKetidaksesuaian > 0 ? 'Ada' : '-' }}</td>
-                            <td>{{ $r->created_by }}
+                            <td>{{ $r->created_by }} <br>
                                 @if($r->is_audit)
                                     <span class="badge bg-info" style="color: white;">Audit</span>
                                 @endif
                             </td>
-                            <td class="d-flex" style="gap: .3rem;">
+                            <td>
                                 @php
                                     $user = auth()->user();
                                     $canManage = $user->hasAnyRole(['admin', 'superadmin', 'SPV QC']);

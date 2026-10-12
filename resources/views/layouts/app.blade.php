@@ -271,6 +271,76 @@
     .btn, .badge {
         align-content: center !important;
     }
+
+    .audit-toolbar,
+    .audit-search {
+        flex-direction: row !important;
+        text-align: left;
+    }
+
+    .audit-search-input { width: 200px; }
+    .audit-per-page     { width: auto; }
+
+    @media (max-width: 991.98px) {
+        .audit-toolbar,
+        .audit-search,
+        .audit-bulk-wrap {
+            width: 100%;
+            margin-right: 0 !important;
+        }
+
+        .audit-search .form-control,
+        .audit-search .btn,
+        .audit-bulk-wrap > .btn-audit-bulk,
+        .audit-toolbar > .btn {
+            display: block;
+            width: 100%;
+            flex: 0 0 100%;
+            margin-right: 0 !important;
+        }
+    }
+
+
+    .op-toolbar { flex-direction: row !important; text-align: left; }
+    .op-search-input { width: 200px; }
+    .op-divider { width: 1px; height: 24px; background: #dee2e6; }
+
+    @media (max-width: 991.98px) {
+        .op-toolbar,
+        .op-item {
+            width: 100%;
+            margin-right: 0 !important;
+        }
+
+        /* kontrol form: select, input, tombol Cari/Reset */
+        .op-form .form-control,
+        .op-form .btn {
+            display: block;
+            width: 100%;
+            flex: 0 0 100%;
+            margin-right: 0 !important;
+        }
+
+        /* tombol/link langsung di dalam wrapper (trigger modal, Tambah, Data Audit, komponen export) */
+        .op-item > .btn {
+            display: block;
+            width: 100%;
+        }
+    }
+
+    a.btn-outline-secondary:has(> .fa-file-pdf),
+    button.btn-outline-secondary:has(> .fa-file-pdf) {
+        color: #fff;
+        background-color: #858796;
+        border-color: #858796;
+    }
+
+    a.btn-outline-secondary:has(> .fa-file-pdf):hover,
+    button.btn-outline-secondary:has(> .fa-file-pdf):hover {
+        color: #fff;
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
     </style>
 
 

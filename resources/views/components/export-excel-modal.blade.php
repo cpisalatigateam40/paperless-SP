@@ -10,7 +10,7 @@
     'route',
     'title'    => 'Export Excel',
     'modalId'  => 'modalExport',
-    'btnLabel' => 'Export Excel',
+    'btnLabel' => 'Excel',
 ])
 
 {{-- ── Tombol trigger ──────────────────────────────────────────────────────── --}}

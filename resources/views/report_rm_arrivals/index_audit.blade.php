@@ -5,39 +5,44 @@
         <x-audit-banner />
 
         <div class="card shadow mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 style="color: #552f93;">
-                    <i class="fas fa-user-shield mr-1"></i>
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h5 class="mb-2 mb-lg-0 mr-3" style="color: #552f93;">
+                    <i class="fas fa-user-shield"></i>
                     Verifikasi Bahan Baku dan Bahan Penunjang
                 </h5>
 
-                <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="audit-toolbar d-flex flex-row flex-wrap align-items-center">
                     {{-- SEARCH --}}
-                    <form method="GET" action="{{ route('report_rm_arrivals.audit') }}" class="d-flex align-items-center"
-                        style="gap: .4rem;">
-                        <div class="input-group input-group-sm">
-                            <input type="text" name="search" class="form-control form-control-sm mr-2"
-                                placeholder="Cari catatan, shift..." value="{{ request('search') }}">
-                            <select name="per_page" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
-                                @foreach([10, 25] as $n)
-                                    <option value="{{ $n }}" {{ request('per_page', 10) == $n ? 'selected' : '' }}>
-                                        {{ $n }} / halaman
-                                    </option>
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">Cari</button>
-                        </div>
+                    <form method="GET" action="{{ route('report_rm_arrivals.audit') }}"
+                        class="audit-search d-flex flex-row flex-wrap align-items-center">
+                        <input type="text" name="search"
+                            class="form-control form-control-sm audit-search-input"
+                            placeholder="Cari catatan, shift..." value="{{ request('search') }}">
+
+                        <select name="per_page" class="form-control form-control-sm audit-per-page"
+                                onchange="this.form.submit()">
+                            @foreach([10, 25] as $n)
+                                <option value="{{ $n }}" {{ request('per_page', 10) == $n ? 'selected' : '' }}>
+                                    {{ $n }} / halaman
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Cari</button>
+
                         @if(request('search') || request('per_page'))
-                            <a href="{{ route('report_rm_arrivals.audit') }}" class="btn btn-sm btn-outline-danger">Reset</a>
+                            <a href="{{ route('report_rm_arrivals.audit') }}"
+                            class="btn btn-sm btn-outline-danger">Reset</a>
                         @endif
                     </form>
 
-                    <div class="vr"></div>
-
-                    <x-audit-bulk-auto route-prefix="report_rm_arrivals" />
+                    <div class="audit-bulk-wrap">
+                        <x-audit-bulk-auto route-prefix="report_rm_arrivals" />
+                    </div>
 
                     @hasanyrole('admin|superadmin|SPV QC')
-                    <a href="{{ route('report_rm_arrivals.index') }}" class="btn btn-sm btn-outline-secondary">
+                    <a href="{{ route('report_rm_arrivals.index') }}"
+                    class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Data Operasional
                     </a>
                     @endhasanyrole
@@ -73,7 +78,7 @@
                                 <th>Kode Produksi</th>
                                 <th>Ketidaksesuaian</th>
                                 <th>Dibuat oleh</th>
-                                <th>Aksi</th>
+                                <th style="min-width: 250px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,7 +118,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $report->ketidaksesuaian > 0 ? 'Ada' : '-' }}</td>
-                                    <td>{{ $report->created_by }}
+                                    <td>{{ $report->created_by }} <br>
                                         @if($report->is_audit)
                                             <span class="badge bg-info" style="color: white;">Audit</span>
                                         @endif

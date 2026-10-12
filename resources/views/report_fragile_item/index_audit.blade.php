@@ -4,43 +4,48 @@
 <div class="container-fluid">
     <x-audit-banner />
     <div class="card shadow">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 style="color: #552f93;">
-                    <i class="fas fa-user-shield mr-1"></i>
-                    Pemeriksaan Barang Mudah Pecah (Glass & Brittle Plastic)
-                </h5>
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-2 mb-lg-0 mr-3" style="color: #552f93;">
+                <i class="fas fa-user-shield "></i>
+                Pemeriksaan Barang Mudah Pecah (Glass &amp; Brittle Plastic)
+            </h5>
 
-                <div class="d-flex gap-2" style="gap: .4rem;">
-                    {{-- SEARCH --}}
-                    <form method="GET" action="{{ route('report-fragile-item.audit') }}"
-                        class="d-flex align-items-center" style="gap: .4rem;">
-                        <input type="text" name="search" class="form-control"
-                            placeholder="Cari shift, pembuat..." value="{{ request('search') }}">
+            <div class="audit-toolbar d-flex flex-row flex-wrap align-items-center">
+                {{-- SEARCH --}}
+                <form method="GET" action="{{ route('report-fragile-item.audit') }}"
+                    class="audit-search d-flex flex-row flex-wrap align-items-center ">
 
-                        <select name="per_page" class="form-select form-control" onchange="this.form.submit()">
-                            @foreach([5, 10, 25] as $n)
-                                <option value="{{ $n }}" {{ request('per_page', 5) == $n ? 'selected' : '' }}>
-                                    {{ $n }} / halaman
-                                </option>
-                            @endforeach
-                        </select>
+                    <input type="text" name="search"
+                        class="form-control form-control-sm  audit-search-input"
+                        placeholder="Cari shift, pembuat..." value="{{ request('search') }}">
 
-                        <button type="submit" class="btn btn-outline-primary">Cari</button>
+                    <select name="per_page" class="form-control form-control-sm  audit-per-page"
+                        onchange="this.form.submit()">
+                        @foreach([5, 10, 25] as $n)
+                            <option value="{{ $n }}" {{ request('per_page', 5) == $n ? 'selected' : '' }}>
+                                {{ $n }} / halaman
+                            </option>
+                        @endforeach
+                    </select>
 
-                        @if(request('search') || request('per_page'))
-                            <a href="{{ route('report-fragile-item.audit') }}" class="btn btn-danger">Reset</a>
-                        @endif
-                    </form>
+                    <button type="submit" class="btn btn-sm btn-outline-primary ">Cari</button>
 
+                    @if(request('search') || request('per_page'))
+                        <a href="{{ route('report-fragile-item.audit') }}"
+                            class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
+                    @endif
+                </form>
+
+                <div class="audit-bulk-wrap ">
                     <x-audit-bulk-auto route-prefix="report-fragile-item" />
-
-                    @hasanyrole('admin|superadmin|SPV QC')
-                    <a href="{{ route('report-fragile-item.index') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Data Operasional
-                    </a>
-                    @endhasanyrole
                 </div>
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <a href="{{ route('report-fragile-item.index') }}"
+                    class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Data Operasional
+                </a>
+                @endhasanyrole
             </div>
         </div>
 
@@ -82,12 +87,12 @@
                             <td>{{ $report->shift }}</td>
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
-                            <td>{{ $report->created_by }}
+                            <td>{{ $report->created_by }} <br>
                                 @if($report->is_audit)
                                     <span class="badge bg-info" style="color: white;">Audit</span>
                                 @endif
                             </td>
-                            <td class="d-flex" style="gap: .2rem;">
+                            <td>
                                 @php
                                     $user = auth()->user();
                                     $canManage = $user->hasAnyRole(['admin', 'superadmin', 'SPV QC']);

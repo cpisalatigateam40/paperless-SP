@@ -2,20 +2,18 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Verifikasi Proses Pemasakan di Boiling Tank</h5>
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+        <h5 class="mb-2 mb-lg-0 mr-3">Verifikasi Proses Pemasakan di Boiling Tank</h5>
 
-        <div class="d-flex gap-2" style="gap: .4rem;">
+        <div class="op-toolbar d-flex flex-row flex-wrap align-items-center">
             @hasanyrole('admin|superadmin')
-            <form method="GET" action="{{ route('report_boiling_tanks.index') }}">
+            <form method="GET" action="{{ route('report_boiling_tanks.index') }}"
+                class="op-item op-form">
                 <input type="hidden" name="section" value="{{ request('section') }}">
                 <input type="hidden" name="search" value="{{ request('search') }}">
 
-                <select name="area"
-                        class="form-select form-control form-control"
-                        onchange="this.form.submit()">
+                <select name="area" class="form-control form-control-sm" onchange="this.form.submit()">
                     <option value="">Semua Area</option>
-
                     @foreach($areas as $area)
                         <option value="{{ $area->uuid }}"
                             {{ request('area') == $area->uuid ? 'selected' : '' }}>
@@ -26,109 +24,109 @@
             </form>
             @endhasanyrole
 
-            <button type="button"
-                class="btn btn-outline-secondary btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#oldReportModal">
-
-                <i class="bx bx-history"></i>
-                Akses Data Lama
-
-            </button>
+            {{-- Akses Data Lama --}}
+            <div class="op-item">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                    data-bs-toggle="modal" data-bs-target="#oldReportModal">
+                    <i class="fas fa-history"></i> Data Lama
+                </button>
+            </div>
 
             {{-- SEARCH --}}
-            <form method="GET"
-                action="{{ route('report_boiling_tanks.index') }}"
-                class="d-flex align-items-center"
-                style="gap: .4rem;">
+            <form method="GET" action="{{ route('report_boiling_tanks.index') }}"
+                class="op-item op-form op-search d-flex flex-row flex-wrap align-items-center">
 
-                <input
-                    type="text"
-                    name="search"
-                    class="form-control"
-                    placeholder="Cari laporan..."
-                    value="{{ request('search') }}"
-                >
+                <input type="text" name="search"
+                    class="form-control form-control-sm op-search-input"
+                    placeholder="Cari laporan..." value="{{ request('search') }}">
 
-                <button type="submit"
-                        class="btn btn-outline-primary">
-                    Cari
-                </button>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Cari</button>
 
                 @if(request('search'))
                     <a href="{{ route('report_boiling_tanks.index') }}"
-                    class="btn btn-danger">
-                        Reset
-                    </a>
+                        class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
                 @endif
             </form>
 
-            {{-- Buttons --}}
-            <div class="d-flex gap-2">
-                @role('Produksi')
+            {{-- Approve --}}
+            @role('Produksi')
+            <div class="op-item">
                 <button type="button" class="btn btn-warning btn-sm"
-                        data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                    data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
                     <i class="fas fa-check-double"></i> Approve (Produksi)
                 </button>
-                @endrole
+            </div>
+            @endrole
 
-                @role('SPV QC')
+            @role('SPV QC')
+            <div class="op-item">
                 <button type="button" class="btn btn-success btn-sm"
-                        data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                    data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
                     <i class="fas fa-check-circle"></i> Approve (QC)
                 </button>
-                @endrole
+            </div>
+            @endrole
+
+            <div class="op-divider d-none d-lg-block"></div>
+
+            {{-- Export --}}
+            <div class="op-item">
+                <x-export-pdf-modal
+                    :route="route('report_boiling_tanks.export_pdf_bulk')"
+                    title="Boiling tank"
+                    modal-id="modalExportBoilingTank"
+                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
+                />
             </div>
 
-            <x-export-pdf-modal
-                :route="route('report_boiling_tanks.export_pdf_bulk')"
-                title="Boiling tank"
-                modal-id="modalExportBoilingTank"
-                :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
-            />
-
-            {{-- Modals --}}
-            @role('Produksi')
-            <x-bulk-approval-modal
-                prefix="known"
-                title="Produksi"
-                color="warning"
-                icon="fa-check-double"
-                action-route="report_boiling_tanks.bulk-known"
-                count-route="report_boiling_tanks.bulk-known-count"
-                label="Approve Semua"
-            />
-            @endrole
-
-            @role('SPV QC') 
-            <x-bulk-approval-modal
-                prefix="approve"
-                title="QC"
-                color="success"
-                icon="fa-check-circle"
-                action-route="report_boiling_tanks.bulk-approve"
-                count-route="report_boiling_tanks.bulk-approve-count"
-                label="Approve Semua"
-            />
-            @endrole
-
-            <x-export-excel-modal
-            :route="route('report_boiling_tanks.export')"
-            title="Verifikasi Proses Pemasakan di Boiling Tank" />
+            <div class="op-item">
+                <x-export-excel-modal
+                    :route="route('report_boiling_tanks.export')"
+                    title="Verifikasi Proses Pemasakan di Boiling Tank" />
+            </div>
 
             @can('create report')
-            <a href="{{ route('report_boiling_tanks.create') }}" class="btn btn-primary">Tambah Laporan</a>
+            <div class="op-item">
+                <a href="{{ route('report_boiling_tanks.create') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Tambah
+                </a>
+            </div>
             @endcan
 
             @hasanyrole('admin|superadmin|SPV QC')
-            <a href="{{ route('report_boiling_tanks.audit') }}" class="btn btn-audit btn-sm">
-                <i class="fas fa-user-shield"></i> Data Audit
-            </a>
+            <div class="op-item">
+                <a href="{{ route('report_boiling_tanks.audit') }}" class="btn btn-sm btn-audit">
+                    <i class="fas fa-user-shield"></i> Audit
+                </a>
+            </div>
             @endhasanyrole
         </div>
-
-        
     </div>
+
+    {{-- Modals: di luar toolbar --}}
+    @role('Produksi')
+    <x-bulk-approval-modal
+        prefix="known"
+        title="Produksi"
+        color="warning"
+        icon="fa-check-double"
+        action-route="report_boiling_tanks.bulk-known"
+        count-route="report_boiling_tanks.bulk-known-count"
+        label="Approve Semua"
+    />
+    @endrole
+
+    @role('SPV QC')
+    <x-bulk-approval-modal
+        prefix="approve"
+        title="QC"
+        color="success"
+        icon="fa-check-circle"
+        action-route="report_boiling_tanks.bulk-approve"
+        count-route="report_boiling_tanks.bulk-approve-count"
+        label="Approve Semua"
+    />
+    @endrole
 
     <div class="card-body" style="padding-top: 1rem !important;">
         @if(session('success'))

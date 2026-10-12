@@ -3,21 +3,19 @@
 @section('content')
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Checklist Audit Kepatuhan Proses Packing Primer</h5>
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-2 mb-lg-0 mr-3">Checklist Audit Kepatuhan Proses Packing Primer</h5>
 
-            <div class="d-flex align-items-center" style="gap: .4rem;">
+            <div class="op-toolbar d-flex flex-row flex-wrap align-items-center">
                 @hasanyrole('admin|superadmin')
-                <form method="GET" action="{{ route('report_audit_packing_primers.index') }}">
+                <form method="GET" action="{{ route('report_audit_packing_primers.index') }}"
+                    class="op-item op-form">
                     <input type="hidden" name="date" value="{{ request('date') }}">
                     <input type="hidden" name="section_uuid" value="{{ request('section_uuid') }}">
                     <input type="hidden" name="search" value="{{ request('search') }}">
 
-                    <select name="area"
-                            class="form-select form-control form-control"
-                            onchange="this.form.submit()">
+                    <select name="area" class="form-control form-control-sm" onchange="this.form.submit()">
                         <option value="">Semua Area</option>
-
                         @foreach($areas as $area)
                             <option value="{{ $area->uuid }}"
                                 {{ request('area') == $area->uuid ? 'selected' : '' }}>
@@ -28,53 +26,45 @@
                 </form>
                 @endhasanyrole
 
-                {{-- 🔍 SEARCH --}}
-                <form method="GET"
-                    action="{{ route('report_audit_packing_primers.index') }}"
-                    class="d-flex align-items-center"
-                    style="gap: .4rem;">
-
-                    {{-- pertahankan filter lain yang mungkin sedang aktif --}}
+                {{-- SEARCH --}}
+                <form method="GET" action="{{ route('report_audit_packing_primers.index') }}"
+                    class="op-item op-form op-search d-flex flex-row flex-wrap align-items-center">
                     <input type="hidden" name="date" value="{{ request('date') }}">
                     <input type="hidden" name="section_uuid" value="{{ request('section_uuid') }}">
+                    <input type="hidden" name="area" value="{{ request('area') }}">
 
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        placeholder="Cari nama produk..."
-                        value="{{ request('search') }}"
-                    >
+                    <input type="text" name="search"
+                        class="form-control form-control-sm op-search-input"
+                        placeholder="Cari nama produk..." value="{{ request('search') }}">
 
-                    {{-- 🔍 BUTTON CARI --}}
-                    <button type="submit" class="btn btn-outline-primary">
-                        Cari
-                    </button>
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Cari</button>
 
-                    {{-- 🔄 RESET --}}
-                    @if(request('search') || request('date') || request('section_uuid'))
+                    @if(request('search') || request('date') || request('section_uuid') || request('area'))
                         <a href="{{ route('report_audit_packing_primers.index') }}"
-                        class="btn btn-danger"
-                        title="Reset Filter">
-                            Reset
-                        </a>
+                            class="btn btn-sm btn-outline-danger" title="Reset Filter">Reset</a>
                     @endif
                 </form>
 
-                <x-export-pdf-modal
-                    :route="route('report_audit_packing_primers.exportPdfBulk')"
-                    title="Audit Packing Primer"
-                    modal-id="modalExportPdfAuditPackingPrimer"
-                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
-                />
+                <div class="op-divider d-none d-lg-block"></div>
+
+                {{-- Export --}}
+                <div class="op-item">
+                    <x-export-pdf-modal
+                        :route="route('report_audit_packing_primers.exportPdfBulk')"
+                        title="Audit Packing Primer"
+                        modal-id="modalExportPdfAuditPackingPrimer"
+                        :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
+                    />
+                </div>
 
                 @can('create report')
-                <a href="{{ route('report_audit_packing_primers.create') }}" class="btn btn-primary">
-                    Tambah Laporan
-                </a>
+                <div class="op-item">
+                    <a href="{{ route('report_audit_packing_primers.create') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Tambah
+                    </a>
+                </div>
                 @endcan
             </div>
-            
         </div>
         <div class="card-body" style="padding-top: 1rem !important;">
 
@@ -102,6 +92,7 @@
                 :with-date-filter="true"
             />
 
+            <div class="table-responsive">
             <table class="table table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
@@ -265,6 +256,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
 
             {{ $reports->links('pagination::bootstrap-5') }}
         </div>

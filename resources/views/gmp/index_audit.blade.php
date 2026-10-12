@@ -4,20 +4,23 @@
 <div class="container-fluid">
     <x-audit-banner />
     <div class="card shadow">
-        <div class="card-header d-flex justify-content-between">
-            <h5 style="color: #552f93;">
-                <i class="fas fa-user-shield mr-1"></i>
-                Verifikasi Penerapan GMP Karyawan & Sanitasi Area
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-2 mb-lg-0 mr-3" style="color: #552f93;">
+                <i class="fas fa-user-shield "></i>
+                Verifikasi Penerapan GMP Karyawan &amp; Sanitasi Area
             </h5>
 
-            <div class="d-flex gap-2" style="gap: .4rem;">
+            <div class="audit-toolbar d-flex flex-row flex-wrap align-items-center">
                 {{-- SEARCH --}}
                 <form method="GET" action="{{ route('gmp.audit') }}"
-                    class="d-flex align-items-center" style="gap: .4rem;">
-                    <input type="text" name="search" class="form-control"
+                    class="audit-search d-flex flex-row flex-wrap align-items-center ">
+
+                    <input type="text" name="search"
+                        class="form-control form-control-sm  audit-search-input"
                         placeholder="Cari shift, section, pembuat..." value="{{ request('search') }}">
 
-                    <select name="per_page" class="form-select form-control" onchange="this.form.submit()">
+                    <select name="per_page" class="form-control form-control-sm  audit-per-page"
+                        onchange="this.form.submit()">
                         @foreach([5, 10, 25] as $n)
                             <option value="{{ $n }}" {{ request('per_page', 5) == $n ? 'selected' : '' }}>
                                 {{ $n }} / halaman
@@ -25,17 +28,21 @@
                         @endforeach
                     </select>
 
-                    <button type="submit" class="btn btn-outline-primary">Cari</button>
+                    <button type="submit" class="btn btn-sm btn-outline-primary ">Cari</button>
 
                     @if(request('search') || request('per_page'))
-                        <a href="{{ route('gmp.audit') }}" class="btn btn-danger">Reset</a>
+                        <a href="{{ route('gmp.audit') }}"
+                            class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
                     @endif
                 </form>
 
-                <x-audit-bulk-auto route-prefix="gmp" />
+                <div class="audit-bulk-wrap ">
+                    <x-audit-bulk-auto route-prefix="gmp" />
+                </div>
 
                 @hasanyrole('admin|superadmin|SPV QC')
-                <a href="{{ route('gmp.index') }}" class="btn btn-sm btn-outline-secondary">
+                <a href="{{ route('gmp.index') }}"
+                    class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Data Operasional
                 </a>
                 @endhasanyrole
@@ -84,7 +91,7 @@
                                     {{ $header->section === 'gmp_karyawan' ? 'GMP Karyawan' : 'Sanitasi Area' }}
                                 </span>
                             </td>
-                            <td class="align-middle">{{ $header->created_by }}
+                            <td class="align-middle">{{ $header->created_by }} <br>
                                 @if($header->is_audit)
                                     <span class="badge bg-info" style="color: white;">Audit</span>
                                 @endif
