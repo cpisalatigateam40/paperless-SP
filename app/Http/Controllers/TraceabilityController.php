@@ -77,12 +77,20 @@ class TraceabilityController extends Controller
         return array_filter($request->only($keys), 'filled');
     }
 
+    private function isAuditor(): bool
+    {
+        return auth()->user()?->hasRole('auditor') ?? false;
+    }
+
     // Filter untuk query: non-superadmin dipaksa ke areanya sendiri
     private function scoped(array $filters): array
     {
         if (!$this->isSuperadmin() && auth()->user()?->area_uuid) {
             $filters['area'] = auth()->user()->area_uuid;
         }
+
+        // Auditor hanya melihat data audit, role lain hanya data operasional
+        $filters['audit'] = $this->isAuditor();
 
         return $filters;
     }

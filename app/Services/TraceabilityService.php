@@ -170,8 +170,25 @@ class TraceabilityService
         }
 
         // Filter level report: non-audit, shift, rentang tanggal
-        $query->whereHas($cfg['form_relation'], function ($q) use ($filters) {
-            $q->where(fn($w) => $w->where('is_audit', 0)->orWhereNull('is_audit'));
+        $query->whereHas($cfg['form_relation'], function ($q) use ($filters, $cfg) {
+            if (!empty($filters['audit'])) {
+                // Mode audit: salinan audit + asli yang belum punya salinan
+                $q->where(function ($w) use ($cfg) {
+                    $w->where('is_audit', 1)
+                    ->orWhere(function ($o) use ($cfg) {
+                        $o->where(fn($x) => $x->where('is_audit', 0)->orWhereNull('is_audit'))
+                            ->whereNotExists(function ($sub) use ($cfg) {
+                                $table = (new $cfg['form_model'])->getTable();
+                                $sub->selectRaw(1)
+                                    ->from("$table as copies")
+                                    ->whereColumn("copies.source_uuid", "$table.uuid") // ← ganti kolom penghubung
+                                    ->where('copies.is_audit', 1);
+                            });
+                    });
+                });
+            } else {
+                $q->where(fn($w) => $w->where('is_audit', 0)->orWhereNull('is_audit'));
+            }
 
             if (!empty($filters['shift'])) {
                 $q->where('shift', $filters['shift']);

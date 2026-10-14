@@ -557,7 +557,7 @@ body.audit-mode-page .table-bordered th {
     </li>
     @endhasanyrole
 
-    @hasanyrole('admin|superadmin|Produksi|SPV QC')
+    @hasanyrole('admin|superadmin|Produksi|SPV QC|auditor')
     <li class="nav-item {{ Request::is('traceability*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('traceability.index') }}">
             <i class="fas fa-fw fa-search-location"></i>
