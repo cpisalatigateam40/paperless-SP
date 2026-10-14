@@ -1,147 +1,150 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <div class="card shadow">
-        <div class="card-header d-flex justify-content-between">
-            <h4>Data Formula</h4>
+    <div class="container-fluid">
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between">
+                <h4>Data Formula</h4>
 
-            <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
-                @hasanyrole('admin|superadmin')
-                <form method="GET" action="{{ route('formulas.index') }}" class="mr-3">
-                    <input type="hidden" name="section" value="{{ request('section') }}">
-                    <input type="hidden" name="search" value="{{ request('search') }}">
+                <div class="d-flex align-items-center gap-2" style="gap: .5rem;">
+                    @hasanyrole('admin|superadmin')
+                    <form method="GET" action="{{ route('formulas.index') }}" class="mr-3">
+                        <input type="hidden" name="section" value="{{ request('section') }}">
+                        <input type="hidden" name="search" value="{{ request('search') }}">
 
-                    <select name="area"
-                            class="form-select form-control-sm form-control"
-                            onchange="this.form.submit()">
-                        <option value="">Semua Area</option>
+                        <select name="area"
+                                class="form-select form-control-sm form-control"
+                                onchange="this.form.submit()">
+                            <option value="">Semua Area</option>
 
-                        @foreach($areas as $area)
-                            <option value="{{ $area->uuid }}"
-                                {{ request('area') == $area->uuid ? 'selected' : '' }}>
-                                {{ $area->name }}
+                            @foreach($areas as $area)
+                                <option value="{{ $area->uuid }}"
+                                    {{ request('area') == $area->uuid ? 'selected' : '' }}>
+                                    {{ $area->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <select name="category" class="form-select form-control-sm form-control" onchange="this.form.submit()">
+                            <option value="">Semua Kategori</option>
+                            @foreach($categories as $value => $label)
+                            <option value="{{ $value }}" {{ request('category') == $value ? 'selected' : '' }}>
+                                {{ $label }}
                             </option>
-                        @endforeach
-                    </select>
-                    <select name="category" class="form-select form-control-sm form-control" onchange="this.form.submit()">
-                        <option value="">Semua Kategori</option>
-                        @foreach($categories as $value => $label)
-                        <option value="{{ $value }}" {{ request('category') == $value ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-                        @endforeach
-                    </select>
-                </form>
-                @endhasanyrole
-                <form action="{{ route('formulas.index') }}" method="GET">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-auto p-0">
-                            <input type="text"
-                                name="search"
-                                value="{{ request('search') }}"
-                                class="form-control form-control-sm"
-                                placeholder="Cari formula / produk...">
-                        </div>
-
-                        <div class="col-auto">
-                            <button class="btn btn-primary btn-sm">
-                                Search
-                            </button>
-
-                            @if(request('search'))
-                                <a href="{{ route('formulas.index') }}"
-                                class="btn btn-secondary btn-sm">
-                                    Reset
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </form>
-
-                <div class="d-flex align-items-center gap-2 flex-wrap" style="gap: .4rem;">
-                    <a href="{{ route('formulas.template') }}" class="btn btn-outline-success btn-sm">
-                        Download Template
-                    </a>
-
-                    <form action="{{ route('formulas.import') }}"
-                        method="POST"
-                        enctype="multipart/form-data"
-                        class="d-flex align-items-center gap-2">
-                        @csrf
-
-                        <input type="file"
-                            name="file"
-                            accept=".xlsx,.xls"
-                            class="form-control form-control-sm mr-2"
-                            style="max-width: 220px"
-                            required>
-
-                        <button type="submit" class="btn btn-success btn-sm">
-                            Import Excel
-                        </button>
+                            @endforeach
+                        </select>
                     </form>
+                    @endhasanyrole
+                    <form action="{{ route('formulas.index') }}" method="GET">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto p-0">
+                                <input type="text"
+                                    name="search"
+                                    value="{{ request('search') }}"
+                                    class="form-control form-control-sm"
+                                    placeholder="Cari formula / produk...">
+                            </div>
+
+                            <div class="col-auto">
+                                <button class="btn btn-primary btn-sm">
+                                    Search
+                                </button>
+
+                                @if(request('search'))
+                                    <a href="{{ route('formulas.index') }}"
+                                    class="btn btn-secondary btn-sm">
+                                        Reset
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap" style="gap: .4rem;">
+                        <a href="{{ route('formulas.template') }}" class="btn btn-outline-success btn-sm">
+                            Download Template
+                        </a>
+
+                        <form action="{{ route('formulas.import') }}"
+                            method="POST"
+                            enctype="multipart/form-data"
+                            class="d-flex align-items-center gap-2">
+                            @csrf
+
+                            <input type="file"
+                                name="file"
+                                accept=".xlsx,.xls"
+                                class="form-control form-control-sm mr-2"
+                                style="max-width: 220px"
+                                required>
+
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Import Excel
+                            </button>
+                        </form>
+                    </div>
+                    <a href="{{ route('formulas.create') }}" class="btn btn-primary btn-sm">Tambah Formula</a>
                 </div>
-                <a href="{{ route('formulas.create') }}" class="btn btn-primary btn-sm">Tambah Formula</a>
             </div>
-        </div>
-        <div class="card-body">
-            @if(session('success'))
-            <div id="success-alert" class="alert alert-success">
-                {{ session('success') }}
-            </div>
-            @endif
+            <div class="card-body">
+                @if(session('success'))
+                <div id="success-alert" class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+                @endif
 
-            @if ($errors->any())
-            <div id="error-alert" class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Nama Formula</th>
-                            <th>Produk</th>
-                            <th>Area</th>
-                            <th>Kategori</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($formulas as $formula)
-                        <tr>
-                            <td>{{ $formula->formula_name }}</td>
-                            <td>{{ $formula->product->product_name ?? '-' }}</td>
-                            <td>{{ $formula->area->name ?? '-' }}</td>
-                            <td>{{ \App\Models\Formula::categories()[$formula->category] ?? 'Formulasi Produk' }}</td>
-                            <td>
-                                <a href="{{ route('formulas.detail', $formula->uuid) }}" class="btn btn-info btn-sm">Lihat
-                                    Formula</a>
-                                <form action="{{ route('formulas.destroy', $formula->uuid) }}" method="POST"
-                                    style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Delete formula?')"
-                                        class="btn btn-danger btn-sm">Hapus</button>
-                                </form>
-                            </td>
-                        </tr>
+                @if ($errors->any())
+                <div id="error-alert" class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    </ul>
+                </div>
+                @endif
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nama Formula</th>
+                                <th>Produk</th>
+                                <th>Area</th>
+                                <th>Kategori</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($formulas as $formula)
+                                <tr>
+                                    <td>{{ $formula->formula_name }}</td>
+                                    <td>{{ $formula->product->product_name ?? '-' }}</td>
+                                    <td>{{ $formula->area->name ?? '-' }}</td>
+                                    <td>{{ \App\Models\Formula::categories()[$formula->category] ?? 'Formulasi Produk' }}</td>
+                                    <td>
+                                        <a href="{{ route('formulas.detail', $formula->uuid) }}" class="btn btn-info btn-sm">Lihat
+                                            Formula</a>
+                                        <a href="{{ route('formulas.editName', $formula->uuid) }}" class="btn btn-warning btn-sm">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('formulas.destroy', $formula->uuid) }}" method="POST"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button onclick="return confirm('Delete formula?')"
+                                                class="btn btn-danger btn-sm">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="mt-3">
-                {{ $formulas->links('pagination::bootstrap-5') }}
+                <div class="mt-3">
+                    {{ $formulas->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('script')

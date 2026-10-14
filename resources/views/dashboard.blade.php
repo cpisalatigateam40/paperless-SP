@@ -8,6 +8,7 @@
 
 <div class="container-fluid">
     {{-- Form filter: auto-submit, tanpa tombol --}}
+    @hasanyrole(['superadmin', 'QC Inspector', 'SPV QC'])
     <div class="filter-bar-card mb-4">
         <form method="GET" action="{{ route('dashboard') }}" id="filterForm" class="row g-3 align-items-end">
 
@@ -55,6 +56,7 @@
 
         </form>
     </div>
+    @endhasanyrole
 
     <!-- CARD 1 -->
     <!-- @hasanyrole(['SPV QC', 'superadmin', 'QC Inspector'])
@@ -1535,6 +1537,7 @@
     </div>
     @endhasanyrole
 
+    @hasanyrole(['superadmin', 'QC Inspector', 'SPV QC'])
     <div class="process-status-container mb-5">
         <div class="process-status-banner">
             <span class="process-status-number">2</span>
@@ -1679,6 +1682,7 @@
         </div>
 
     </div>
+    @endhasanyrole
 
     
 

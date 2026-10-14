@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class SteamerCookingDetail extends Model implements Auditable
+class SteamerCookingDetail extends Model
 {
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'steamer_cooking_details';
 
@@ -33,9 +32,6 @@ class SteamerCookingDetail extends Model implements Auditable
         'sensory_tekstur',
     ];
 
-    protected $auditEvents = [
-        'updated',
-    ];
 
     protected static function boot()
     {

@@ -76,62 +76,72 @@ class ProcessAreaCleanlinessExport implements WithEvents, WithTitle
                 $row = 5;
                 $no  = 1;
 
-                foreach ($this->reports as $report) {
+                // Flatten report -> detail, lalu urutkan berdasarkan tanggal, jam, area
+                $rows = $this->reports
+                    ->flatMap(function ($report) {
+                        return $report->details->map(fn ($detail) => [
+                            'report' => $report,
+                            'detail' => $detail,
+                        ]);
+                    })
+                    ->sortBy([
+                        fn ($a, $b) => strtotime((string) $a['report']->date) <=> strtotime((string) $b['report']->date),
+                        fn ($a, $b) => strtotime((string) $a['detail']->inspection_hour) <=> strtotime((string) $b['detail']->inspection_hour),
+                        fn ($a, $b) => strcmp((string) $a['report']->section_name, (string) $b['report']->section_name),
+                    ])
+                    ->values();
+
+                foreach ($rows as $entry) {
+                    $report = $entry['report'];
+                    $detail = $entry['detail'];
+
                     [$shiftNum, $shiftGroup] = array_pad(
                         explode('-', $report->shift ?? '', 2), 2, ''
                     );
 
-                    foreach ($report->details as $detail) {
-                        $itemsByName = $detail->items->keyBy('item');
+                    $itemsByName = $detail->items->keyBy('item');
 
-                        $ruangan   = $itemsByName->get('Kondisi Kebersihan Ruangan');
-                        $peralatan = $itemsByName->get('Kondisi Kebersihan Peralatan');
-                        $karyawan  = $itemsByName->get('Kondisi Kebersihan Karyawan');
-                        $suhu      = $itemsByName->get('Suhu ruang (℃)');
+                    $ruangan   = $itemsByName->get('Kondisi Kebersihan Ruangan');
+                    $peralatan = $itemsByName->get('Kondisi Kebersihan Peralatan');
+                    $karyawan  = $itemsByName->get('Kondisi Kebersihan Karyawan');
+                    $suhu      = $itemsByName->get('Suhu ruang (℃)');
 
-                        $verif = fn($item) => match ((string) ($item?->verification ?? '')) {
-                            '1'     => 'OK',
-                            '0'     => 'Tidak OK',
-                            default => '-',
-                        };
+                    $verif = fn($item) => match ((string) ($item?->verification ?? '')) {
+                        '1'     => 'OK',
+                        '0'     => 'Tidak OK',
+                        default => '-',
+                    };
 
-                        // Kumpulkan ketidaksesuaian dari semua item yang tidak OK
-                        $ketidaksesuaian = collect([$ruangan, $peralatan, $karyawan])
-                            ->filter(fn($i) => $i && (string) $i->verification === '0' && $i->notes)
-                            ->map(fn($i) => $i->notes)
-                            ->implode('; ');
+                    $sheet->setCellValue("A{$row}", $no);
+                    $sheet->setCellValue("B{$row}", Carbon::parse($report->date)->format('d/m/Y'));
+                    $sheet->setCellValue("C{$row}", $shiftNum ?: ($report->shift ?? '-'));
+                    $sheet->setCellValue("D{$row}", $detail->inspection_hour ?? '-');
+                    $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
+                    $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
+                    $sheet->setCellValue("G{$row}", $report->section_name ?? '-');
+                    $sheet->setCellValue("H{$row}", $suhu?->temperature_actual ?? '-');
+                    $sheet->setCellValue("I{$row}", $suhu?->temperature_display ?? '-');
+                    // Kebersihan Ruangan
+                    $sheet->setCellValue("J{$row}", $ruangan?->condition ?? '-');
+                    $sheet->setCellValue("K{$row}", $ruangan?->notes ?? '-');
+                    $sheet->setCellValue("L{$row}", $ruangan?->corrective_action ?? '-');
+                    $sheet->setCellValue("M{$row}", $verif($ruangan));
+                    // Kebersihan Peralatan
+                    $sheet->setCellValue("N{$row}", $peralatan?->condition ?? '-');
+                    $sheet->setCellValue("O{$row}", $peralatan?->notes ?? '-');
+                    $sheet->setCellValue("P{$row}", $peralatan?->corrective_action ?? '-');
+                    $sheet->setCellValue("Q{$row}", $verif($peralatan));
+                    // Kebersihan Karyawan
+                    $sheet->setCellValue("R{$row}", $karyawan?->condition ?? '-');
+                    $sheet->setCellValue("S{$row}", $karyawan?->notes ?? '-');
+                    $sheet->setCellValue("T{$row}", $karyawan?->corrective_action ?? '-');
+                    $sheet->setCellValue("U{$row}", $verif($karyawan));
 
-                        $sheet->setCellValue("A{$row}", $no);
-                        $sheet->setCellValue("B{$row}", Carbon::parse($report->date)->format('d/m/Y'));
-                        $sheet->setCellValue("C{$row}", $shiftNum ?: ($report->shift ?? '-'));
-                        $sheet->setCellValue("D{$row}", $detail->inspection_hour ?? '-');
-                        $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
-                        $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $report->section_name ?? '-');
-                        $sheet->setCellValue("H{$row}", $suhu?->temperature_actual ?? '-');
-                        $sheet->setCellValue("I{$row}", $suhu?->temperature_display ?? '-');
-                        // Kebersihan Ruangan
-                        $sheet->setCellValue("J{$row}", $ruangan?->condition ?? '-');
-                        $sheet->setCellValue("K{$row}", $ruangan?->notes ?? '-');
-                        $sheet->setCellValue("L{$row}", $ruangan?->corrective_action ?? '-');
-                        $sheet->setCellValue("M{$row}", $verif($ruangan));
-                        // Kebersihan Peralatan
-                        $sheet->setCellValue("N{$row}", $peralatan?->condition ?? '-');
-                        $sheet->setCellValue("O{$row}", $peralatan?->notes ?? '-');
-                        $sheet->setCellValue("P{$row}", $peralatan?->corrective_action ?? '-');
-                        $sheet->setCellValue("Q{$row}", $verif($peralatan));
-                        // Kebersihan Karyawan
-                        $sheet->setCellValue("R{$row}", $karyawan?->condition ?? '-');
-                        $sheet->setCellValue("S{$row}", $karyawan?->notes ?? '-');
-                        $sheet->setCellValue("T{$row}", $karyawan?->corrective_action ?? '-');
-                        $sheet->setCellValue("U{$row}", $verif($karyawan));
+                    $sheet->getStyle("A{$row}:{$lastCol}{$row}")
+                        ->getAlignment()->setHorizontal('center')->setWrapText(true);
 
-                        $sheet->getStyle("A{$row}:{$lastCol}{$row}")
-                            ->getAlignment()->setHorizontal('center')->setWrapText(true);
-
-                        $row++;
-                        $no++;
-                    }
+                    $row++;
+                    $no++;
                 }
 
                 if ($no === 1) {

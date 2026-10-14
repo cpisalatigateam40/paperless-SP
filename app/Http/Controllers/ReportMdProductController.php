@@ -22,10 +22,25 @@ use Carbon\Carbon;
 use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
+use App\Http\Controllers\Traits\HasAuditController;
+use Illuminate\Support\Facades\DB;
 
 class ReportMdProductController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+
+    protected function auditModel(): string { return ReportMdProduct::class; }
+    protected function auditRoutePrefix(): string { return 'report_md_products'; }
+    protected function auditViewPrefix(): string { return 'report_md_products'; }
+    protected function auditRelations(): array
+    {
+        return ['area', 'metalDetector', 'details.product', 'details.positions'];
+    }
+    protected function auditSearchColumns(): array { return ['shift', 'created_by', 'notes']; }
+    protected function auditDateColumn(): string { return 'date'; }
+    protected function auditTimeColumn(): string { return 'created_at'; }
+    protected function auditPlanColumn(): ?string { return null; }
+
     protected string $bulkModel = ReportMdProduct::class;
 
     protected function getBulkExportModelClass(): string
@@ -70,7 +85,7 @@ class ReportMdProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReportMdProduct::with([
+        $query = ReportMdProduct::operasional()->with([
             'area',
             'metalDetector',
             'details.product',
@@ -373,58 +388,123 @@ class ReportMdProductController extends Controller
         return view('report_md_products.edit', compact('report', 'products'));
     }
  
+    // public function update(Request $request, $uuid)
+    // {
+    //     $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
+ 
+    //     // Update header
+    //     $report->update([
+    //         'date' => $request->date,
+    //         'shift' => $request->shift,
+    //         'notes' => $request->notes,
+    //     ]);
+ 
+    //     // Hapus detail lama sebelum menulis ulang
+    //     foreach ($report->details as $oldDetail) {
+    //         $oldDetail->positions()->delete();
+    //         $oldDetail->delete();
+    //     }
+ 
+    //     // Simpan detail baru dari form edit
+    //     if ($request->has('details')) {
+    //         foreach ($request->details as $detail) {
+    //             $detailModel = DetailMdProduct::create([
+    //                 'uuid' => Str::uuid(),
+    //                 'report_uuid' => $report->uuid,
+    //                 'product_uuid' => $detail['product_uuid'] ?? null,
+    //                 'production_code' => $detail['production_code'] ?? null,
+    //                 'gramase' => $detail['gramase'] ?? null,
+    //                 'best_before' => $detail['best_before'] ?? null,
+    //                 'time' => $detail['time'] ?? null,
+    //                 'program_number' => $detail['program_number'] ?? null,
+    //                 'corrective_action' => $detail['corrective_action'] ?? null,
+    //                 'verification' => $detail['verification'] ?? null,
+    //                 'status' => isset($detail['status']) ? (bool) $detail['status'] : true,
+    //                 'process_type' => $detail['process_type'] ?? null,
+    //             ]);
+ 
+    //             // Simpan ulang posisi
+    //             if (!empty($detail['positions'])) {
+    //                 foreach ($detail['positions'] as $position) {
+    //                     PositionMdProduct::create([
+    //                         'uuid' => Str::uuid(),
+    //                         'detail_uuid' => $detailModel->uuid,
+    //                         'specimen' => $position['specimen'] ?? null,
+    //                         'position' => $position['position'] ?? null,
+    //                         'status' => isset($position['status']) ? (bool) $position['status'] : false,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+    //     }
+ 
+    //     return redirect()
+    //     ->route($report->is_audit ? 'report_md_products.audit' : 'report_md_products.index')
+    //     ->with('success', $report->is_audit
+    //         ? 'Data audit berhasil diperbarui.'
+    //         : 'Data berhasil diperbarui.');
+    // }
+
     public function update(Request $request, $uuid)
     {
-        $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
- 
-        // Update header
-        $report->update([
-            'date' => $request->date,
-            'shift' => $request->shift,
-            'notes' => $request->notes,
-        ]);
- 
-        // Hapus detail lama sebelum menulis ulang
-        foreach ($report->details as $oldDetail) {
-            $oldDetail->positions()->delete();
-            $oldDetail->delete();
-        }
- 
-        // Simpan detail baru dari form edit
-        if ($request->has('details')) {
-            foreach ($request->details as $detail) {
+        $report = DB::transaction(function () use ($request, $uuid) {
+
+            // Lock baris report: request kedua harus menunggu request pertama selesai
+            $report = ReportMdProduct::where('uuid', $uuid)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Update header
+            $report->update([
+                'date'  => $request->date,
+                'shift' => $request->shift,
+                'notes' => $request->notes,
+            ]);
+
+            // Hapus detail lama (query fresh di dalam lock, bukan relasi yang sudah ter-load)
+            $oldDetailUuids = DetailMdProduct::where('report_uuid', $report->uuid)
+                ->pluck('uuid');
+
+            PositionMdProduct::whereIn('detail_uuid', $oldDetailUuids)->delete();
+            DetailMdProduct::where('report_uuid', $report->uuid)->delete();
+
+            // Simpan detail baru dari form edit
+            foreach ($request->input('details', []) as $detail) {
                 $detailModel = DetailMdProduct::create([
-                    'uuid' => Str::uuid(),
-                    'report_uuid' => $report->uuid,
-                    'product_uuid' => $detail['product_uuid'] ?? null,
-                    'production_code' => $detail['production_code'] ?? null,
-                    'gramase' => $detail['gramase'] ?? null,
-                    'best_before' => $detail['best_before'] ?? null,
-                    'time' => $detail['time'] ?? null,
-                    'program_number' => $detail['program_number'] ?? null,
+                    'uuid'              => Str::uuid(),
+                    'report_uuid'       => $report->uuid,
+                    'product_uuid'      => $detail['product_uuid'] ?? null,
+                    'production_code'   => $detail['production_code'] ?? null,
+                    'gramase'           => $detail['gramase'] ?? null,
+                    'best_before'       => $detail['best_before'] ?? null,
+                    'time'              => $detail['time'] ?? null,
+                    'program_number'    => $detail['program_number'] ?? null,
                     'corrective_action' => $detail['corrective_action'] ?? null,
-                    'verification' => $detail['verification'] ?? null,
-                    'status' => isset($detail['status']) ? (bool) $detail['status'] : true,
-                    'process_type' => $detail['process_type'] ?? null,
+                    'verification'      => $detail['verification'] ?? null,
+                    'status'            => isset($detail['status']) ? (bool) $detail['status'] : true,
+                    'process_type'      => $detail['process_type'] ?? null,
                 ]);
- 
+
                 // Simpan ulang posisi
-                if (!empty($detail['positions'])) {
-                    foreach ($detail['positions'] as $position) {
-                        PositionMdProduct::create([
-                            'uuid' => Str::uuid(),
-                            'detail_uuid' => $detailModel->uuid,
-                            'specimen' => $position['specimen'] ?? null,
-                            'position' => $position['position'] ?? null,
-                            'status' => isset($position['status']) ? (bool) $position['status'] : false,
-                        ]);
-                    }
+                foreach (($detail['positions'] ?? []) as $position) {
+                    PositionMdProduct::create([
+                        'uuid'        => Str::uuid(),
+                        'detail_uuid' => $detailModel->uuid,
+                        'specimen'    => $position['specimen'] ?? null,
+                        'position'    => $position['position'] ?? null,
+                        'status'      => isset($position['status']) ? (bool) $position['status'] : false,
+                    ]);
                 }
             }
-        }
- 
-        return redirect()->route('report_md_products.index')
-            ->with('success', 'Report berhasil diperbarui.');
+
+            return $report;
+        });
+
+        return redirect()
+            ->route($report->is_audit ? 'report_md_products.audit' : 'report_md_products.index')
+            ->with('success', $report->is_audit
+                ? 'Data audit berhasil diperbarui.'
+                : 'Data berhasil diperbarui.');
     }
 
     public function downloadTemplate()
@@ -468,7 +548,8 @@ class ReportMdProductController extends Controller
             $periodLabel = $dateFrom->format('d/m/Y') . ' – ' . $dateTo->format('d/m/Y');
         }
     
-        $reports = ReportMdProduct::with([
+        $reports = ReportMdProduct::operasional()
+            ->with([
                 'details.product',
                 'details.positions',
             ])

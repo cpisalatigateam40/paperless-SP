@@ -140,4 +140,17 @@ class MasterBoilingTankStandardController extends Controller
             'berat_matang_min' => $standard->berat_matang_min,
         ]);
     }
+
+    public function destroy(MasterBoilingTankStandard $master_boiling_tank_standard)
+    {
+        abort_unless(
+            $master_boiling_tank_standard->area_uuid === Auth::user()->area_uuid,
+            403
+        );
+
+        $master_boiling_tank_standard->delete();
+
+        return redirect()->route('master_boiling_tank_standards.index')
+            ->with('success', 'Master standar Boiling Tank berhasil dihapus');
+    }
 }

@@ -37,9 +37,6 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
                 // ── Header (row 4) ─────────────────────────────────────────
-                // Kolom mengikuti struktur di form: setiap item punya
-                // Kondisi, Catatan, Tindakan Koreksi, Hasil Verifikasi
-                // (termasuk item "Suhu Ruang (°C)", tanpa split kolom suhu/RH terpisah)
                 $headers = [
                     'A' => 'No',
                     'B' => 'Tanggal',
@@ -77,63 +74,79 @@ class StorageRmCleanlinessExport implements WithEvents, WithTitle
                 $row = 5;
                 $no  = 1;
 
-                foreach ($this->reports as $report) {
+                // Flatten report -> detail, lalu urutkan berdasarkan tanggal, jam, ruangan
+                $rows = $this->reports
+                    ->flatMap(function ($report) {
+                        return $report->details->map(fn ($detail) => [
+                            'report' => $report,
+                            'detail' => $detail,
+                        ]);
+                    })
+                    ->sortBy([
+                        fn ($a, $b) => strtotime((string) $a['report']->date) <=> strtotime((string) $b['report']->date),
+                        fn ($a, $b) => strtotime((string) $a['detail']->inspection_hour) <=> strtotime((string) $b['detail']->inspection_hour),
+                        fn ($a, $b) => strcmp((string) $a['report']->room_name, (string) $b['report']->room_name),
+                    ])
+                    ->values();
+
+                foreach ($rows as $entry) {
+                    $report = $entry['report'];
+                    $detail = $entry['detail'];
+
                     [$shiftNum, $shiftGroup] = array_pad(
                         explode('-', $report->shift ?? '', 2), 2, ''
                     );
 
-                    foreach ($report->details as $detail) {
-                        // Kelompokkan items berdasarkan nama item
-                        $itemsByName = $detail->items->keyBy('item');
+                    // Kelompokkan items berdasarkan nama item
+                    $itemsByName = $detail->items->keyBy('item');
 
-                        $kondisi = $itemsByName->get('Kondisi dan penempatan barang');
-                        $label_  = $itemsByName->get('Pelabelan');
-                        $bersih  = $itemsByName->get('Kebersihan Ruangan');
-                        $suhu    = $itemsByName->get('Suhu ruang (℃) / RH (%)');
+                    $kondisi = $itemsByName->get('Kondisi dan penempatan barang');
+                    $label_  = $itemsByName->get('Pelabelan');
+                    $bersih  = $itemsByName->get('Kebersihan Ruangan');
+                    $suhu    = $itemsByName->get('Suhu ruang (℃) / RH (%)');
 
-                        $verif = fn($item) => match((string)($item?->verification ?? '')) {
-                            '1'  => 'OK',
-                            '0'  => 'Tidak OK',
-                            default => '-',
-                        };
+                    $verif = fn($item) => match((string)($item?->verification ?? '')) {
+                        '1'  => 'OK',
+                        '0'  => 'Tidak OK',
+                        default => '-',
+                    };
 
-                        $notes = fn($item) => $item
-                            ? (is_string($item->notes) && str_starts_with($item->notes, '[')
-                                ? implode(', ', json_decode($item->notes, true) ?? [])
-                                : ($item->notes ?? '-'))
-                            : '-';
+                    $notes = fn($item) => $item
+                        ? (is_string($item->notes) && str_starts_with($item->notes, '[')
+                            ? implode(', ', json_decode($item->notes, true) ?? [])
+                            : ($item->notes ?? '-'))
+                        : '-';
 
-                        $sheet->setCellValue("A{$row}", $no);
-                        $sheet->setCellValue("B{$row}", Carbon::parse($report->date)->format('d/m/Y'));
-                        $sheet->setCellValue("C{$row}", $shiftNum ?: ($report->shift ?? '-'));
-                        $sheet->setCellValue("D{$row}", $detail->inspection_hour ?? '-');
-                        $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
-                        $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
-                        $sheet->setCellValue("G{$row}", $report->room_name ?? '-');
-                        $sheet->setCellValue("H{$row}", $kondisi?->condition ?? '-');
-                        $sheet->setCellValue("I{$row}", $notes($kondisi));
-                        $sheet->setCellValue("J{$row}", $kondisi?->corrective_action ?? '-');
-                        $sheet->setCellValue("K{$row}", $verif($kondisi));
-                        $sheet->setCellValue("L{$row}", $label_?->condition ?? '-');
-                        $sheet->setCellValue("M{$row}", $notes($label_));
-                        $sheet->setCellValue("N{$row}", $label_?->corrective_action ?? '-');
-                        $sheet->setCellValue("O{$row}", $verif($label_));
-                        $sheet->setCellValue("P{$row}", $bersih?->condition ?? '-');
-                        $sheet->setCellValue("Q{$row}", $notes($bersih));
-                        $sheet->setCellValue("R{$row}", $bersih?->corrective_action ?? '-');
-                        $sheet->setCellValue("S{$row}", $verif($bersih));
-                        // Suhu ruang: tampilkan apa adanya (mendukung nilai negatif, mis. "Suhu: -1.2 °C")
-                        $sheet->setCellValue("T{$row}", $suhu?->condition ?? '-');
-                        $sheet->setCellValue("U{$row}", $notes($suhu));
-                        $sheet->setCellValue("V{$row}", $suhu?->corrective_action ?? '-');
-                        $sheet->setCellValue("W{$row}", $verif($suhu));
+                    $sheet->setCellValue("A{$row}", $no);
+                    $sheet->setCellValue("B{$row}", Carbon::parse($report->date)->format('d/m/Y'));
+                    $sheet->setCellValue("C{$row}", $shiftNum ?: ($report->shift ?? '-'));
+                    $sheet->setCellValue("D{$row}", $detail->inspection_hour ?? '-');
+                    $sheet->setCellValue("E{$row}", $report->created_by ?? '-');
+                    $sheet->setCellValue("F{$row}", $shiftGroup ?: '-');
+                    $sheet->setCellValue("G{$row}", $report->room_name ?? '-');
+                    $sheet->setCellValue("H{$row}", $kondisi?->condition ?? '-');
+                    $sheet->setCellValue("I{$row}", $notes($kondisi));
+                    $sheet->setCellValue("J{$row}", $kondisi?->corrective_action ?? '-');
+                    $sheet->setCellValue("K{$row}", $verif($kondisi));
+                    $sheet->setCellValue("L{$row}", $label_?->condition ?? '-');
+                    $sheet->setCellValue("M{$row}", $notes($label_));
+                    $sheet->setCellValue("N{$row}", $label_?->corrective_action ?? '-');
+                    $sheet->setCellValue("O{$row}", $verif($label_));
+                    $sheet->setCellValue("P{$row}", $bersih?->condition ?? '-');
+                    $sheet->setCellValue("Q{$row}", $notes($bersih));
+                    $sheet->setCellValue("R{$row}", $bersih?->corrective_action ?? '-');
+                    $sheet->setCellValue("S{$row}", $verif($bersih));
+                    // Suhu ruang: tampilkan apa adanya (mendukung nilai negatif, mis. "Suhu: -1.2 °C")
+                    $sheet->setCellValue("T{$row}", $suhu?->condition ?? '-');
+                    $sheet->setCellValue("U{$row}", $notes($suhu));
+                    $sheet->setCellValue("V{$row}", $suhu?->corrective_action ?? '-');
+                    $sheet->setCellValue("W{$row}", $verif($suhu));
 
-                        $sheet->getStyle("A{$row}:W{$row}")
-                            ->getAlignment()->setHorizontal('center')->setWrapText(true);
+                    $sheet->getStyle("A{$row}:W{$row}")
+                        ->getAlignment()->setHorizontal('center')->setWrapText(true);
 
-                        $row++;
-                        $no++;
-                    }
+                    $row++;
+                    $no++;
                 }
 
                 if ($no === 1) {

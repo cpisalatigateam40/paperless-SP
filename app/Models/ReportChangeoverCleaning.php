@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportChangeoverCleaning extends Model
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
 
     protected $table = 'report_changeover_cleanings';
 
@@ -22,10 +27,12 @@ class ReportChangeoverCleaning extends Model
         'known_by',
         'approved_by',
         'approved_at',
+        'is_audit', 'source_uuid'
     ];
 
     protected $casts = [
         'date' => 'date',
+        'is_audit' => 'boolean'
     ];
 
     protected static function boot()
@@ -39,6 +46,68 @@ class ReportChangeoverCleaning extends Model
         });
 
         static::addGlobalScope(new UserAreaScope);
+    }
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'details' => [],
+            ]);
+
+            return $clone;
+        });
+    }
+
+    protected function auditNormalizeRules(): array
+    {
+        // kriteria tidak OK => kriteria OK pasangannya
+        $map = [2 => 1, 4 => 3, 6 => 5, 8 => 7];
+
+        $hasBad = function ($row) use ($map) {
+            foreach ((array) $row->score as $s) {
+                if (isset($map[(int) $s])) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        $toOk = function ($row) use ($map) {
+            $result = [];
+
+            foreach ((array) $row->score as $s) {
+                $new = $map[(int) $s] ?? $s;
+                $result[] = is_string($s) ? (string) $new : (int) $new;
+            }
+
+            return array_values(array_unique($result, SORT_REGULAR));
+        };
+
+        return [
+            'details' => [
+                'score' => ['when' => $hasBad, 'ok' => $toOk],
+
+                // kosongkan tindakan koreksi di semua baris yang terisi
+                'corrective_action' => [
+                    'when' => fn ($row) => $row->corrective_action !== null && $row->corrective_action !== '',
+                    'ok'   => null,
+                ],
+            ],
+        ];
     }
 
     /**

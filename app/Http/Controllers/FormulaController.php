@@ -288,4 +288,28 @@ class FormulaController extends Controller
             ->with('success', 'Formulasi berhasil diperbarui.');
     }
 
+    public function edit($uuid)
+    {
+        $formula = Formula::where('uuid', $uuid)->firstOrFail();
+
+        return view('formulas.edit', compact('formula'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $formula = Formula::where('uuid', $uuid)->firstOrFail();
+
+        $request->validate([
+            'formula_name' => 'required|string|max:255',
+        ]);
+
+        $formula->update([
+            'formula_name' => $request->formula_name,
+        ]);
+
+        return redirect()
+            ->route('formulas.index')
+            ->with('success', 'Nama formula berhasil diperbarui.');
+    }
+
 }

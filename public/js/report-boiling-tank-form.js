@@ -9,30 +9,40 @@ document.addEventListener('DOMContentLoaded', function () {
         'std-berat-matang': { label: 'berat_matang_label', min: 'berat_matang_min', unit: 'gr', input: '.check-berat-matang-input' },
     };
 
-    function applyStandardToDom() {
+    // Tandai semua input yang sudah berisi dari server (data draft) sebagai "touched"
+    // supaya tidak tertimpa nilai master standar.
+    Object.values(fieldMap).forEach(function (cfg) {
+        document.querySelectorAll(cfg.input).forEach(function (input) {
+            if (input.value !== '') input.dataset.touched = '1';
+        });
+    });
+
+    function applyStandardToDom(fillValues = true) {
         Object.entries(fieldMap).forEach(function ([labelClass, cfg]) {
-            // Update teks "Std ..."
+            // Update teks "Std ..." (selalu)
             document.querySelectorAll('.' + labelClass).forEach(function (el) {
                 const label = currentStandard?.[cfg.label];
                 el.textContent = label ? `Std ${label}${cfg.unit === '°C' ? '°C' : ' ' + cfg.unit}` : '';
             });
 
-            // Auto-isi input yang belum disentuh manual
+            if (!fillValues) return;
+
+            // Auto-isi hanya input yang kosong dan belum disentuh
             const min = currentStandard?.[cfg.min];
             if (min === undefined || min === null || min === '') return;
 
             document.querySelectorAll(cfg.input).forEach(function (input) {
-                if (input.dataset.touched !== '1') {
+                if (input.dataset.touched !== '1' && input.value === '') {
                     input.value = min;
                 }
             });
         });
     }
 
-    function fetchStandard(productUuid) {
+    function fetchStandard(productUuid, fillValues = true) {
         if (!productUuid) {
             currentStandard = null;
-            applyStandardToDom();
+            applyStandardToDom(false);
             return;
         }
 
@@ -42,21 +52,22 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 currentStandard = data.found ? data : null;
-                applyStandardToDom();
+                applyStandardToDom(fillValues);
             })
             .catch(function () {
                 currentStandard = null;
             });
     }
 
+    // User mengganti produk -> label + isi field yang kosong
     document.getElementById('productSelect')?.addEventListener('change', function () {
-        fetchStandard(this.value);
+        fetchStandard(this.value, true);
     });
 
-    // Edit mode: produk sudah terpilih dari awal -> langsung fetch std-nya
+    // Edit mode: produk sudah terpilih -> hanya ambil standar untuk label, jangan isi nilai
     const initialProductUuid = document.getElementById('productSelect')?.value;
     if (initialProductUuid) {
-        fetchStandard(initialProductUuid);
+        fetchStandard(initialProductUuid, false);
     }
 
 
@@ -107,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
         newCard.querySelector('.detail-start-input').value = document.getElementById('waktuProsesStartHidden').value;
         newCard.querySelector('.detail-end-input').value = document.getElementById('waktuProsesEndHidden').value;
 
-        applyStandardToDom();
+        applyStandardToDom(true);
     });
 
     document.body.addEventListener('input', function (e) {
@@ -143,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             list.insertAdjacentHTML('beforeend', html);
 
-            applyStandardToDom();
+            applyStandardToDom(true);
         }
 
         if (e.target.classList.contains('remove-check-btn')) {

@@ -3,20 +3,18 @@
 @section('content')
 <div class="container-fluid">
     <div class="card shadow">
-        <div class="card-header d-flex justify-content-between">
-            <h5>Verifikasi Penerapan GMP Karyawan & Sanitasi Area</h5>
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-2 mb-lg-0 mr-3">Verifikasi Penerapan GMP Karyawan &amp; Sanitasi Area</h5>
 
-            <div class="d-flex gap-2" style="gap: .4rem;">
+            <div class="op-toolbar d-flex flex-row flex-wrap align-items-center">
                 @hasanyrole('admin|superadmin')
-                <form method="GET" action="{{ route('gmp.index') }}">
+                <form method="GET" action="{{ route('gmp.index') }}"
+                    class="op-item op-form">
                     <input type="hidden" name="section" value="{{ request('section') }}">
                     <input type="hidden" name="search" value="{{ request('search') }}">
 
-                    <select name="area"
-                            class="form-select form-control form-control"
-                            onchange="this.form.submit()">
+                    <select name="area" class="form-control form-control-sm" onchange="this.form.submit()">
                         <option value="">Semua Area</option>
-
                         @foreach($areas as $area)
                             <option value="{{ $area->uuid }}"
                                 {{ request('area') == $area->uuid ? 'selected' : '' }}>
@@ -27,92 +25,108 @@
                 </form>
                 @endhasanyrole
 
-                <button type="button"
-                    class="btn btn-outline-secondary btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#oldReportModal">
+                {{-- Akses Data Lama --}}
+                <div class="op-item">
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-toggle="modal" data-bs-target="#oldReportModal">
+                        <i class="fas fa-history"></i> Data Lama
+                    </button>
+                </div>
 
-                    <i class="bx bx-history"></i>
-                    Akses Data Lama
-
-                </button>
-
-                <form method="GET" action="{{ route('gmp.index') }}" class="d-flex align-items-center" style="gap: .4rem;">
-                    <select name="section" class="form-select form-control" onchange="this.form.submit()">
+                {{-- FILTER SECTION + RESET --}}
+                <form method="GET" action="{{ route('gmp.index') }}"
+                    class="op-item op-form op-search d-flex flex-row flex-wrap align-items-center">
+                    <select name="section" class="form-control form-control-sm" onchange="this.form.submit()">
                         <option value="">Semua Section</option>
                         <option value="gmp_karyawan" {{ request('section') == 'gmp_karyawan' ? 'selected' : '' }}>GMP Karyawan</option>
                         <option value="sanitasi_area" {{ request('section') == 'sanitasi_area' ? 'selected' : '' }}>Sanitasi Area</option>
                     </select>
 
-                    <!-- <input type="text" name="search" class="form-control" placeholder="Cari laporan..." value="{{ request('search') }}">
-
-                    <button type="submit" class="btn btn-outline-primary">Cari</button> -->
-
                     @if(request('search') || request('section'))
-                        <a href="{{ route('gmp.index') }}" class="btn btn-danger" title="Reset Filter">Reset</a>
+                        <a href="{{ route('gmp.index') }}"
+                            class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
                     @endif
                 </form>
 
-                {{-- Buttons --}}
-                <div class="d-flex gap-2">
-                    @role('Produksi')
+                {{-- Approve --}}
+                @role('Produksi')
+                <div class="op-item">
                     <button type="button" class="btn btn-warning btn-sm"
-                            data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
                         <i class="fas fa-check-double"></i> Approve (Produksi)
                     </button>
-                    @endrole
-
-                    @role('SPV QC')
-                    <button type="button" class="btn btn-success btn-sm"
-                            data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
-                        <i class="fas fa-check-circle"></i> Approve (QC)
-                    </button>
-                    @endrole
                 </div>
-
-                
-
-                <x-export-pdf-modal
-                    :route="route('gmp.export_pdf_bulk')"
-                    title="GMP"
-                    modal-id="gmp"
-                    :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
-                />
-
-                <x-export-excel-modal 
-                :route="route('gmp.export_excel')" 
-                title="Verifikasi GMP Karyawan & Sanitasi Area" />
-
-                {{-- Modals --}}
-                @role('Produksi')
-                <x-bulk-approval-modal
-                    prefix="known"
-                    title="Produksi"
-                    color="warning"
-                    icon="fa-check-double"
-                    action-route="gmp.bulk-known"
-                    count-route="gmp.bulk-known-count"
-                    label="Approve Semua"
-                />
                 @endrole
 
                 @role('SPV QC')
-                <x-bulk-approval-modal
-                    prefix="approve"
-                    title="QC"
-                    color="success"
-                    icon="fa-check-circle"
-                    action-route="gmp.bulk-approve"
-                    count-route="gmp.bulk-approve-count"
-                    label="Approve Semua"
-                />
+                <div class="op-item">
+                    <button type="button" class="btn btn-success btn-sm"
+                        data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                </div>
                 @endrole
 
+                <div class="op-divider d-none d-lg-block"></div>
+
+                {{-- Export --}}
+                <div class="op-item">
+                    <x-export-pdf-modal
+                        :route="route('gmp.export_pdf_bulk')"
+                        title="GMP"
+                        modal-id="gmp"
+                        :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
+                    />
+                </div>
+
+                <div class="op-item">
+                    <x-export-excel-modal
+                        :route="route('gmp.export_excel')"
+                        title="Verifikasi GMP Karyawan &amp; Sanitasi Area" />
+                </div>
+
                 @can('create report')
-                <a href="{{ route('gmp.create') }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                <div class="op-item">
+                    <a href="{{ route('gmp.create') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Tambah
+                    </a>
+                </div>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <div class="op-item">
+                    <a href="{{ route('gmp.audit') }}" class="btn btn-sm btn-audit">
+                        <i class="fas fa-user-shield"></i> Audit
+                    </a>
+                </div>
+                @endhasanyrole
             </div>
         </div>
+
+        {{-- Modals: di luar toolbar --}}
+        @role('Produksi')
+        <x-bulk-approval-modal
+            prefix="known"
+            title="Produksi"
+            color="warning"
+            icon="fa-check-double"
+            action-route="gmp.bulk-known"
+            count-route="gmp.bulk-known-count"
+            label="Approve Semua"
+        />
+        @endrole
+
+        @role('SPV QC')
+        <x-bulk-approval-modal
+            prefix="approve"
+            title="QC"
+            color="success"
+            icon="fa-check-circle"
+            action-route="gmp.bulk-approve"
+            count-route="gmp.bulk-approve-count"
+            label="Approve Semua"
+        />
+        @endrole
 
         <div class="card-body" style="padding-top: 1rem !important;">
             @if(session('success'))
@@ -208,6 +222,10 @@
                                 <a href="{{ route('gmp.export', $header) }}" class="btn btn-sm btn-outline-secondary" title="Export PDF" target="_blank">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
+
+                                <!-- @hasanyrole('admin|superadmin|SPV QC')
+                                <x-audit-dropdown :item="$header" route-prefix="gmp" />
+                                @endhasanyrole -->
                             </td>
                         </tr>
 

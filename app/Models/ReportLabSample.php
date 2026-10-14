@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Traits\HasAudit;
+use Illuminate\Support\Facades\DB;
 
 class ReportLabSample extends Model implements Auditable
 {
     use HasFactory;
+    use HasAudit {
+        copyToAudit as copyHeaderToAudit;
+    }
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
@@ -23,11 +28,40 @@ class ReportLabSample extends Model implements Auditable
         'accepted_by',
         'approved_by',
         'approved_at',
+        'is_audit',
+        'source_uuid',
     ];
     
     protected $auditEvents = [
         'updated',
     ];
+
+    protected $casts = [
+        'is_audit' => 'boolean',
+    ];
+
+    protected function auditBooleanResetFields(): array
+    {
+        return [];
+    }
+
+    protected function auditNullableResetFields(): array
+    {
+        return ['known_by', 'accepted_by', 'approved_by', 'approved_at'];
+    }
+
+    public function copyToAudit(): self
+    {
+        return DB::transaction(function () {
+            $clone = $this->copyHeaderToAudit();
+
+            $this->copyChildren($this, $clone, [
+                'details' => [],
+            ]);
+
+            return $clone;
+        });
+    }
 
     // Relasi ke detail_lab_samples
     public function details()

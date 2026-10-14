@@ -9,7 +9,7 @@
     'route',
     'title'        => 'Export PDF',
     'modalId'      => 'modalExportPdf',
-    'btnLabel'     => 'Export PDF',
+    'btnLabel'     => 'PDF',
     'shiftOptions' => [], // contoh: ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']
 ])
 

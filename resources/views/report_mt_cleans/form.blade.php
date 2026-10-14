@@ -333,7 +333,7 @@
 
                 <div class="mt-4 d-flex gap-2"
                     style="gap:.4rem;">
-                    <a href="{{ route('report_mt_cleans.index') }}"
+                    <a href="{{ url()->previous() }}"
                         class="btn btn-secondary">
                     
                         Kembali

@@ -4,6 +4,8 @@
 <head>
     <title>Verifikasi Proses Thawing</title>
 
+    <meta charset="UTF-8">
+
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -139,9 +141,9 @@
                 <th>Jumlah</th>
                 <th>Kondisi Ruang</th>
                 <th>Waktu Pemeriksaan</th>
-                <th>Suhu Ruang (°C)</th>
-                <th>Suhu Air Thawing (°C)</th>
-                <th>Suhu Produk (°C)</th>
+                <th>Suhu Ruang (&deg;C)</th>
+                <th>Suhu Air Thawing (&deg;C)</th>
+                <th>Suhu Produk (&deg;C)</th>
                 <th>Kondisi Produk</th>
 
             </tr>
@@ -192,15 +194,15 @@
                 </td>
 
                 <td>
-                    {{ $detail->room_temp ? $detail->room_temp.' °C' : '-' }}
+                    {{ !is_null($detail->room_temp) ? $detail->room_temp . '°C' : '-' }}
                 </td>
 
                 <td>
-                    {{ $detail->water_temp ? $detail->water_temp.' °C' : '-' }}
+                    {{ !is_null($detail->water_temp) ? $detail->water_temp . '°C' : '-' }}
                 </td>
 
                 <td>
-                    {{ $detail->product_temp ? $detail->product_temp.' °C' : '-' }}
+                    {{ !is_null($detail->product_temp) ? $detail->product_temp . '°C' : '-' }}
                 </td>
 
                 <td>

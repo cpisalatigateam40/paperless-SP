@@ -30,7 +30,10 @@
 
 
             <td>{{ $report->created_by }}</td>
-            <td class="d-flex" style="gap: .3rem;">
+            <td >
+                <div class="d-flex" style="gap: .3rem;">
+
+                
                 {{-- Toggle Detail --}}
                 <button class="btn btn-sm btn-info toggle-detail" data-target="#detail-{{ $report->id }}"
                     title="Lihat Detail">
@@ -126,6 +129,11 @@
                     class="btn btn-sm btn-outline-secondary" title="Cetak PDF">
                     <i class="fas fa-file-pdf"></i>
                 </a>
+
+                <!-- @hasanyrole('admin|superadmin|SPV QC')
+                <x-audit-dropdown :item="$report" route-prefix="cleanliness" />
+                @endhasanyrole -->
+                </div>
             </td>
 
         </tr>

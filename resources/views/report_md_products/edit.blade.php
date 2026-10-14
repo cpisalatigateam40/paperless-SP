@@ -1,9 +1,20 @@
 @extends('layouts.app')
 
+@php
+    $auditMode = $report->is_audit || request()->boolean('audit');
+@endphp
+
 @section('content')
 <div class="container-fluid">
+    @if ($report->is_audit)
+        <x-audit-banner />
+    @endif
+
     <x-breadcrumb :items="[
-        ['label' => 'Verifikasi Kinerja Metal Detector Produk', 'url' => route('report_md_products.index')],
+        [
+            'label' => $auditMode ? 'Verifikasi Kinerja Metal Detector Produk (Audit)' : 'Verifikasi Kinerja Metal Detector Produk',
+            'url'   => $auditMode ? route('report_md_products.audit') : route('report_md_products.index'),
+        ],
         ['label' => 'Edit Data', 'url' => null],
     ]" />
 
@@ -32,7 +43,13 @@
                 <hr>
                 <h5 class="mt-5">Detail Pemeriksaan</h5>
                 @foreach ($report->details as $i => $detail)
-                <div class="border rounded p-3 mb-3">
+                <div class="border rounded p-3 mb-3 detail-item">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>Pemeriksaan #<span class="detail-number">{{ $loop->iteration }}</span></strong>
+                        <button type="button" class="btn btn-sm btn-danger btn-remove-detail">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </div>
                     <div class="mb-3">
                         <label>Waktu Pengecekan</label>
                         <input type="time" name="details[{{ $i }}][time]" class="form-control"
@@ -162,8 +179,14 @@
                     </div>
                 </div>
 
-                <a href="{{ route('report_md_products.index') }}" class="btn btn-secondary">Kembali</a>
-                <button type="submit" class="btn btn-success">Perbarui</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn {{ $report->is_audit ? 'btn-audit' : 'btn-success' }}">
+                    @if ($report->is_audit)
+                        <i class="fas fa-user-shield"></i> Update Data Audit
+                    @else
+                        Update
+                    @endif
+                </button>
             </form>
         </div>
     </div>
@@ -256,6 +279,38 @@ document.addEventListener('input', function (e) {
 
     const result = calculateExpirationDate(batchCode, expirationMonths);
     bestBeforeInput.value = result ? result.expiration_date : '';
+});
+
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-remove-detail');
+    if (!btn) return;
+
+    const item = btn.closest('.detail-item');
+
+    const removeItem = () => {
+        item.remove();
+        // renumber ulang label
+        document.querySelectorAll('.detail-item .detail-number')
+            .forEach((el, i) => el.textContent = i + 1);
+    };
+
+    const message = 'Detail pemeriksaan ini akan dihapus setelah Anda klik "Update". Lanjutkan?';
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Hapus detail?',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal'
+        }).then(result => {
+            if (result.isConfirmed) removeItem();
+        });
+    } else if (confirm(message)) {
+        removeItem();
+    }
 });
 
 </script>

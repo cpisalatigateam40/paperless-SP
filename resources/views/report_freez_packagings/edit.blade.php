@@ -1,9 +1,19 @@
 @extends('layouts.app')
 
+@php
+    $auditMode = $report->is_audit || request()->boolean('audit');
+@endphp
+
 @section('content')
 <div class="container-fluid">
+    @if ($report->is_audit)
+        <x-audit-banner />
+    @endif
     <x-breadcrumb :items="[
-        ['label' => 'Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk', 'url' => route('report_freez_packagings.index')],
+        [
+            'label' => $auditMode ? 'Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk (Audit)' : 'Verifikasi Proses Pembekuan, Pengemasan Sekunder, dan Release Produk',
+            'url'   => $auditMode ? route('report_freez_packagings.audit') : route('report_freez_packagings.index'),
+        ],
         ['label' => 'Edit Data', 'url' => null],
     ]" />
 
@@ -46,8 +56,14 @@
                 </div>
 
                 <!-- <button type="button" class="btn btn-outline-primary" onclick="addDetailRow()">+ Tambah Baris Detail</button> -->
-                <a href="{{ route('report_freez_packagings.index') }}" class="btn btn-secondary">Kembali</a>
-                <button type="submit" class="btn btn-success">Update</button>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn {{ $report->is_audit ? 'btn-audit' : 'btn-success' }}">
+                        @if ($report->is_audit)
+                            <i class="fas fa-user-shield"></i> Update Data Audit
+                        @else
+                            Update
+                        @endif
+                    </button>
             </form>
         </div>
     </div>
@@ -156,7 +172,7 @@ function addDetailRow(detail = null) {
 
     <div class="d-flex justify-content-between align-items-center">
         <h6 style="font-weight:bold; margin-bottom:1rem;">Detail #${index+1}</h6>
-        <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">Hapus</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="confirmRemoveDetail(this)">Hapus</button>
     </div>
 
     <div class="row">
@@ -652,6 +668,27 @@ document.addEventListener('click', function(e) {
             submitBtn.textContent = 'Simpan';
         }
     });
+
+    function confirmRemoveDetail(btn) {
+        const card = btn.closest('.card');
+        const message = 'Detail produk ini akan dihapus setelah Anda klik "Update". Lanjutkan?';
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Hapus detail?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) card.remove();
+            });
+        } else if (confirm(message)) {
+            card.remove();
+        }
+    }
 
 
     

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <x-breadcrumb :items="[
     ['label' => 'Verifikasi Proses Pemasakan di Boiling Tank', 'url' => route('report_boiling_tanks.index')],
     ['label' => 'Tambah/Edit Data', 'url' => null],

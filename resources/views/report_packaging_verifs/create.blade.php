@@ -229,33 +229,33 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
 
-{{-- Berat Produk Per Pcs --}}
-<div class="card mb-3">
-    <div class="card-header p-2"><strong>Berat Produk Per Pcs</strong></div>
-    <div class="card-body p-2">
-        <div class="row mb-2">
+    {{-- Berat Produk Per Pcs --}}
+    <div class="card mb-3">
+        <div class="card-header p-2"><strong>Berat Produk Per Pcs</strong></div>
+        <div class="card-body p-2">
+            <div class="row mb-2">
+                <div class="col-md-2">
+                    <label class="small">Standar</label>
+                    <input type="text" name="details[0][checklist][standard_weight_pcs]" class="form-control">
+                </div>
+            </div>
+            <div class="row">
+                @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
+                    <label class="small">Aktual {{ $i }}</label>
+                    <input type="number" step="0.01" name="details[0][checklist][actual_weight_pcs_{{ $i }}]"
+                        class="form-control actual-input-wpcs">
+            </div>
+            @endfor
             <div class="col-md-2">
-                <label class="small">Standar</label>
-                <input type="text" name="details[0][checklist][standard_weight_pcs]" class="form-control">
+                <label class="small">Rata-Rata Berat</label>
+                <input type="number" step="0.01" name="details[0][checklist][avg_weight_pcs]" class="form-control"
+                    id="avg-weight-pcs" readonly>
             </div>
         </div>
-        <div class="row">
-            @for($i=1; $i<=5; $i++) <div class="col-md-2 mb-2">
-                <label class="small">Aktual {{ $i }}</label>
-                <input type="number" step="0.01" name="details[0][checklist][actual_weight_pcs_{{ $i }}]"
-                    class="form-control actual-input-wpcs">
-        </div>
-        @endfor
-        <div class="col-md-2">
-            <label class="small">Rata-Rata Berat</label>
-            <input type="number" step="0.01" name="details[0][checklist][avg_weight_pcs]" class="form-control"
-                id="avg-weight-pcs" readonly>
-        </div>
     </div>
-</div>
-</div>
+    </div>
 
 {{-- Isi Per-Pack --}}
 <!-- <div class="card mb-3">
