@@ -4,12 +4,12 @@ use Illuminate\Support\Collection;
 
 class TraceabilityService
 {
-    public function traceByBatch(string $searchTerm, ?string $date = null): Collection
+    public function traceByBatch(string $searchTerm, array $filters = []): Collection
     {
         $tokens = $this->tokenize($searchTerm);
         return collect(config('traceability.modules'))
-            ->map(function (array $cfg, string $key) use ($tokens, $date) {
-                $matched = $this->matchDetails($cfg, $tokens, $date);
+            ->map(function (array $cfg, string $key) use ($tokens, $filters) {
+                $matched = $this->matchDetails($cfg, $tokens, $filters);
                 if ($matched->isEmpty()) {
                     return null;
                 }
@@ -18,7 +18,34 @@ class TraceabilityService
                     ->groupBy(fn($d) => data_get($d, "{$cfg['form_relation']}.{$routeKey}"))
                     ->map(function ($group) use ($cfg, $routeKey) {
                         $form = data_get($group->first(), $cfg['form_relation']);
-                        return [
+
+                        // Kode produksi dari semua detail yang cocok
+                        $codes = $group
+                            ->flatMap(fn($d) => collect($cfg['search_columns'] ?? [])->map(fn($c) => $d->{$c}))
+                            ->push($form->production_code ?? null)
+                            ->push($form->product_code ?? null)
+                            ->filter()->unique()->values()->implode(', ');
+
+                        $products = $group
+                            ->map(fn($d) => $d->product->product_name ?? null)
+                            ->push($form->product->product_name ?? null)
+                            ->filter()->unique()->values()->implode(', ');
+
+                        // Kolom tambahan untuk tabel (tebakan nama kolom/relasi; bisa di-override per modul)
+                        $meta = [
+                            'time'          => $form->created_at ? $form->created_at->format('H:i') : null,
+                            'area'          => $form->area->area_name ?? $form->area->name ?? null,
+                            'codes'         => $codes ?: null,
+                            'products' => $products ?: null,
+                            'nonconformity' => $form->nonconformity ?? null,
+                            'creator'       => $form->creator->name ?? $form->user->name ?? null,
+                        ];
+
+                        if (isset($cfg['form_meta'])) {
+                            $meta = array_merge($meta, ($cfg['form_meta'])($form, $group));
+                        }
+
+                        return array_merge([
                             'form_key' => $form->{$routeKey},
                             'date' => $form->date,
                             'shift' => $form->shift ?? null,
@@ -26,12 +53,12 @@ class TraceabilityService
                                 ? route(
                                     $cfg['pdf_route'],
                                     isset($cfg['pdf_route_params'])
-                                    ? $cfg['pdf_route_params']($form, $group)
-                                    : $form->{$routeKey}
+                                        ? $cfg['pdf_route_params']($form, $group)
+                                        : $form->{$routeKey}
                                 )
                                 : null,
                             'match_count' => $group->count(),
-                        ];
+                        ], $meta);
                     })
                     ->sortByDesc('date')
                     ->values();
@@ -45,13 +72,13 @@ class TraceabilityService
         string $moduleKey,
         string $formKey,
         string $searchTerm,
-        ?string $date = null
+        array $filters = []
     ): array {
         $cfg = config("traceability.modules.{$moduleKey}");
         abort_if(!$cfg, 404, 'Modul tidak ditemukan.');
         $tokens = $this->tokenize($searchTerm);
         $routeKey = $cfg['route_key_column'] ?? 'uuid';
-        $matched = $this->matchDetails($cfg, $tokens, $date)
+        $matched = $this->matchDetails($cfg, $tokens, $filters)
             ->filter(fn($d) => (string) data_get($d, "{$cfg['form_relation']}.{$routeKey}") === (string) $formKey);
 
         if ($matched->isEmpty()) {
@@ -107,13 +134,15 @@ class TraceabilityService
 
         return ['mode' => 'fields', 'details' => $details];
     }
+
     protected function matchDetails(
         array $cfg,
         Collection $tokens,
-        ?string $date = null
+        array $filters = []
     ): Collection {
         $ownColumns = $cfg['search_columns'] ?? array_filter([$cfg['column'] ?? null]);
         $query = $cfg['model']::query();
+
         foreach ($tokens as $token) {
             $query->where(function ($q) use ($token, $cfg, $ownColumns) {
                 $matched = false;
@@ -123,7 +152,6 @@ class TraceabilityService
                 }
                 foreach ($cfg['search_relations'] ?? [] as $relation => $col) {
                     $q->orWhereHas($relation, fn($rq) => $rq->where($col, 'like', "%{$token}%"));
-
                     $matched = true;
                 }
                 if (!$matched) {
@@ -131,17 +159,39 @@ class TraceabilityService
                 }
             });
         }
-        $query->whereHas($cfg['form_relation'], function ($q) use ($date) {
+
+        // Filter produk (eksak) lewat relasi yang kolomnya product_name
+        if (!empty($filters['product'])) {
+            foreach ($cfg['search_relations'] ?? [] as $relation => $col) {
+                if ($col === 'product_name') {
+                    $query->whereHas($relation, fn($q) => $q->where('product_name', $filters['product']));
+                }
+            }
+        }
+
+        // Filter level report: non-audit, shift, rentang tanggal
+        $query->whereHas($cfg['form_relation'], function ($q) use ($filters) {
             $q->where(fn($w) => $w->where('is_audit', 0)->orWhereNull('is_audit'));
 
-            if ($date) {
-                $q->whereDate('date', $date);
+            if (!empty($filters['shift'])) {
+                $q->where('shift', $filters['shift']);
+            }
+            if (!empty($filters['date_from'])) {
+                $q->whereDate('date', '>=', $filters['date_from']);
+            }
+            if (!empty($filters['date_to'])) {
+                $q->whereDate('date', '<=', $filters['date_to']);
+            }
+            if (!empty($filters['area'])) {
+                $q->where('area_uuid', $filters['area']);
             }
         });
+
         $with = array_merge(
             [$cfg['form_relation']],
             collect($cfg['search_relations'] ?? [])->keys()->values()->all()
         );
+
         return $query->with($with)
             ->get()
             ->filter(function ($detail) use ($cfg, $tokens, $ownColumns) {
@@ -149,13 +199,13 @@ class TraceabilityService
                     ->map(fn($col) => $detail->{$col} ?? null)
                     ->merge(collect($cfg['search_relations'] ?? [])
                         ->map(fn($col, $relation) => data_get($detail, "{$relation}.{$col}")))
-
                     ->filter()
                     ->implode(' '));
                 return $tokens->every(fn($t) => str_contains($haystack, strtolower($t)));
             })
             ->values();
     }
+    
     protected function tokenize(string $term): Collection
     {
         return collect(preg_split('/\s+/', trim($term)))->filter()->values();

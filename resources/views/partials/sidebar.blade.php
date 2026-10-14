@@ -475,11 +475,13 @@ $isAudit = Request::is([
     </li>
     @endhasanyrole
 
+    @hasanyrole('admin|superadmin|Produksi|SPV QC')
     <li class="nav-item {{ Request::is('traceability*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('traceability.index') }}">
             <i class="fas fa-fw fa-search-location"></i>
             <span>Traceability</span></a>
     </li>
+    @endhasanyrole
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

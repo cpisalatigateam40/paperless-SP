@@ -38,6 +38,9 @@ return [
                 ];
             },
             'form_notes' => fn($form) => $form->notes,
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'pdf_route' => 'report_metal_detectors.export_pdf',
             'label' => 'Verifikasi Kinerja Metal Detector Adonan',
             'route_key_column' => 'uuid',
@@ -54,6 +57,9 @@ return [
             ],
             'form_model' => \App\Models\ReportProcessProd::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => [
                 'product', 'formula', 'reworkProduct',
@@ -77,6 +83,9 @@ return [
             ],
             'form_model' => \App\Models\ReportWeightStuffer::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => [
                 'product', 'townsend', 'hitech', 'vemag', 'vemag2', 'handtmann',
@@ -103,6 +112,9 @@ return [
             ],
             'form_model' => \App\Models\ReportSiomay::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['report.product', 'rawMaterials.rawMaterial'],
             'partial' => 'traceability.partials.siomays',
@@ -123,6 +135,9 @@ return [
             'form_model' => \App\Models\ReportSmokeHouse::class,
             'form_relation' => 'report',
             'detail_relation' => 'details',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->creator->name ?? null,
+            ],
             'detail_with' => [
                 'product', 'steps', 'sensories', 'reworks.steps',
             ],
@@ -144,7 +159,10 @@ return [
             ],
 
             'form_model' => \App\Models\ReportSteamerCooking::class,
-            'form_relation' => 'batch.report', // dot notation, jalan setelah fix service di atas
+            'form_relation' => 'batch.report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'batches.details',
             'detail_with' => [
                 'batch.report.product',
@@ -171,6 +189,9 @@ return [
 
             'form_model' => \App\Models\ReportBoilingTank::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['report.product', 'checks'],
 
@@ -195,6 +216,9 @@ return [
 
             'form_model' => \App\Models\ReportSauce::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => [
                 'report.product', 'report.formula',
@@ -220,6 +244,9 @@ return [
             ],
             'form_model' => \App\Models\ReportPackagingVerif::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product', 'checklist'],
             'pdf_route' => 'report_packaging_verifs.export-pdf',
@@ -240,6 +267,9 @@ return [
             ],
             'form_model' => \App\Models\ReportMdProduct::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product', 'positions'],
             'pdf_route' => 'report_md_products.export-pdf',
@@ -260,6 +290,9 @@ return [
             ],
             'form_model' => \App\Models\ReportLabSample::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product'],
             'table_columns' => [
@@ -297,6 +330,9 @@ return [
             ],
             'form_model' => \App\Models\ReportPasteur::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product', 'steps'],
             'pdf_route' => 'report_pasteurs.export_pdf',
@@ -317,6 +353,9 @@ return [
             ],
             'form_model' => \App\Models\ReportWaterbath::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product'],
             'pdf_route' => 'report_waterbaths.export_pdf',
@@ -337,6 +376,9 @@ return [
             ],
             'form_model' => \App\Models\ReportFreezPackaging::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product', 'freezing', 'kartoning', 'documentations', 'kartoningDocumentations'],
             'pdf_route' => 'report_freez_packagings.export_pdf',
@@ -357,6 +399,9 @@ return [
             ],
             'form_model' => \App\Models\ReportChangeoverCleaning::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product'],
             'pdf_route' => 'report_changeover_cleanings.exportPdf',
@@ -377,6 +422,9 @@ return [
             ],
             'form_model' => \App\Models\ReportForeignObject::class,
             'form_relation' => 'report',
+            'form_meta' => fn($form, $group) => [
+                'creator' => $form->created_by ?? null,
+            ],
             'detail_relation' => 'details',
             'detail_with' => ['product'],
             'pdf_route' => 'report-foreign-objects.export-pdf',

@@ -1,60 +1,100 @@
 <?php
 namespace App\Http\Controllers;
+
 use App\Services\TraceabilityService;
 use Illuminate\Http\Request;
+
 class TraceabilityController extends Controller
 {
+    private const SHIFTS = ['1', '2', '3']; // sesuaikan dengan nilai shift di database
+
     public function index()
     {
-        return view('traceability.index');
+        return view('traceability.index', $this->options());
     }
+
     public function search(Request $request, TraceabilityService $service)
     {
         $request->validate([
             'production_code' => 'nullable|string|min:2',
-            'date' => 'nullable|date',
+            'product'         => 'nullable|string',
+            'shift'           => 'nullable|string',
+            'date_from'       => 'nullable|date',
+            'date_to'         => 'nullable|date|after_or_equal:date_from',
+            'area' => 'nullable|string',
         ]);
-        if (blank($request->production_code) && blank($request->date)) {
+
+        $filters = $this->filters($request);
+
+        if (blank($request->production_code) && empty($filters)) {
             return back()->withErrors([
-                'production_code' => 'Masukkan kata kunci atau pilih tanggal.'
-            ]);
+                'production_code' => 'Isi kata kunci atau pilih minimal satu filter.',
+            ])->withInput();
         }
-//         dd(
-//     \App\Models\DetailMetalDetector::with('report')
-//         ->where('production_code', 'like', '%QF26801AAO%')
-//         ->get()
-//         ->map(fn($d) => [
-//             'detail_id' => $d->id,
-//             'report_id' => $d->report->id ?? null,
-//             'report_uuid' => $d->report->uuid ?? null,
-//             'date' => $d->report->date ?? null,
-//             'shift' => $d->report->shift ?? null,
-//             'hour' => $d->hour,
-//         ])
-// );
-        return view('traceability.index', [
-            'results' => $service->traceByBatch(
-                $request->production_code ?? '',
 
-                $request->date
-            ),
-
+        return view('traceability.index', $this->options() + [
+            'results' => $service->traceByBatch($request->production_code ?? '', $this->scoped($filters)),
             'production_code' => $request->production_code,
-            'date' => $request->date,
+            'filters'         => $filters,
         ]);
     }
+
     public function formDetails(Request $request, TraceabilityService $service)
     {
         $request->validate([
-            'module' => 'required|string',
-            'form_key' => 'required|string',
-            'search' => 'nullable|string',
-            'date' => 'nullable|date',
+            'module'    => 'required|string',
+            'form_key'  => 'required|string',
+            'search'    => 'nullable|string',
+            'product'   => 'nullable|string',
+            'shift'     => 'nullable|string',
+            'date_from' => 'nullable|date',
+            'date_to'   => 'nullable|date',
         ]);
-        return response()->json(
-            $service->getFormDetails($request->module, $request->form_key, $request->search
 
-                ?? '', $request->date)
+        return response()->json(
+            $service->getFormDetails(
+                $request->module,
+                $request->form_key,
+                $request->search ?? '',
+                $this->scoped($this->filters($request))
+            )
         );
+    }
+
+    private function isSuperadmin(): bool
+    {
+        return auth()->user()?->hasRole('superadmin') ?? false;
+    }
+
+    // Filter pilihan user (untuk form, chip, dan AJAX)
+    private function filters(Request $request): array
+    {
+        $keys = ['product', 'shift', 'date_from', 'date_to'];
+        if ($this->isSuperadmin()) {
+            $keys[] = 'area';
+        }
+
+        return array_filter($request->only($keys), 'filled');
+    }
+
+    // Filter untuk query: non-superadmin dipaksa ke areanya sendiri
+    private function scoped(array $filters): array
+    {
+        if (!$this->isSuperadmin() && auth()->user()?->area_uuid) {
+            $filters['area'] = auth()->user()->area_uuid;
+        }
+
+        return $filters;
+    }
+
+    private function options(): array
+    {
+        return [
+            'products' => \App\Models\Product::orderBy('product_name')->pluck('product_name')->unique()->values(),
+            'shifts'   => self::SHIFTS,
+            'areas'    => $this->isSuperadmin()
+                ? \App\Models\Area::orderBy('name')->get(['uuid', 'name'])
+                : collect(),
+        ];
     }
 }
