@@ -1,8 +1,28 @@
 @php
 $isMasterData =
-Request::is('users*','area*','section*','rooms*','fragile-item*','sharp-tools*','scales*','thermometers*','products*','raw-material*','premixes*','formulas*',
-'standard-stuffers*', 'maurer-standards*', 'fessman-standards*', 'master-checklist-items*', 'master-smoke-houses*',
-'steamer-standards*', 'form-numbers*', 'metal_detectors*', 'master-boiling-tank-standard*');
+Request::is(
+'users*',
+'area*',
+'section*',
+'rooms*',
+'fragile-item*',
+'sharp-tools*',
+'scales*',
+'thermometers*',
+'products*',
+'raw-material*',
+'premixes*',
+'formulas*',
+'standard-stuffers*',
+'maurer-standards*',
+'fessman-standards*',
+'master-checklist-items*',
+'master-smoke-houses*',
+'steamer-standards*',
+'form-numbers*',
+'metal_detectors*',
+'master-boiling-tank-standard*'
+);
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
 Request::is('report-rm-arrivals*') ||
@@ -525,8 +545,8 @@ body.audit-mode-page .table-bordered th {
             <i class="fas fa-clipboard-check"></i>
             <span>Audit</span>
         </a>
-        <div id="collapsePagesaudit" class="collapse {{ $isAudit ? 'show' : '' }}"
-            aria-labelledby="headingPages" data-parent="#accordionSidebar">
+        <div id="collapsePagesaudit" class="collapse {{ $isAudit ? 'show' : '' }}" aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
             <div class="soft-salmon py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('report-audit-packing-primers*') ? 'active' : '' }}"
                     href="{{ route('report_audit_packing_primers.index') }}">
@@ -534,6 +554,14 @@ body.audit-mode-page .table-bordered th {
                 </a>
             </div>
         </div>
+    </li>
+    @endhasanyrole
+
+    @hasanyrole('admin|superadmin|Produksi|SPV QC')
+    <li class="nav-item {{ Request::is('traceability*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('traceability.index') }}">
+            <i class="fas fa-fw fa-search-location"></i>
+            <span>Traceability</span></a>
     </li>
     @endhasanyrole
 
