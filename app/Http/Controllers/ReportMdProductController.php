@@ -214,10 +214,12 @@ class ReportMdProductController extends Controller
 
         if ($request->has('details')) {
             foreach ($request->details as $detail) {
+                $isTestPiece = ($detail['product_uuid'] ?? null) === 'test-pieces';
                 $detailModel = DetailMdProduct::create([
                     'uuid' => Str::uuid(),
                     'report_uuid' => $report->uuid,
-                    'product_uuid' => $detail['product_uuid'] ?? null,
+                    'product_uuid' => $isTestPiece ? null : ($detail['product_uuid'] ?? null),
+                    'is_test_piece' => $isTestPiece,
                     'production_code' => $detail['production_code'] ?? null,
                     'gramase' => $detail['gramase'] ?? null,
                     'best_before' => $detail['best_before'] ?? null,
@@ -270,10 +272,13 @@ class ReportMdProductController extends Controller
  
         if ($request->details) {
             foreach ($request->details as $detail) {
+                $isTestPiece = ($detail['product_uuid'] ?? null) === 'test-pieces';
+
                 $detailModel = DetailMdProduct::create([
                     'uuid' => \Illuminate\Support\Str::uuid(),
                     'report_uuid' => $report->uuid,
-                    'product_uuid' => $detail['product_uuid'] ?? null,
+                    'product_uuid' => $isTestPiece ? null : ($detail['product_uuid'] ?? null),
+                    'is_test_piece' => $isTestPiece,
                     'production_code' => $detail['production_code'] ?? null,
                     'gramase' => $detail['gramase'] ?? null,
                     'best_before' => $detail['best_before'] ?? null,
@@ -387,63 +392,6 @@ class ReportMdProductController extends Controller
         ->get();
         return view('report_md_products.edit', compact('report', 'products'));
     }
- 
-    // public function update(Request $request, $uuid)
-    // {
-    //     $report = ReportMdProduct::where('uuid', $uuid)->firstOrFail();
- 
-    //     // Update header
-    //     $report->update([
-    //         'date' => $request->date,
-    //         'shift' => $request->shift,
-    //         'notes' => $request->notes,
-    //     ]);
- 
-    //     // Hapus detail lama sebelum menulis ulang
-    //     foreach ($report->details as $oldDetail) {
-    //         $oldDetail->positions()->delete();
-    //         $oldDetail->delete();
-    //     }
- 
-    //     // Simpan detail baru dari form edit
-    //     if ($request->has('details')) {
-    //         foreach ($request->details as $detail) {
-    //             $detailModel = DetailMdProduct::create([
-    //                 'uuid' => Str::uuid(),
-    //                 'report_uuid' => $report->uuid,
-    //                 'product_uuid' => $detail['product_uuid'] ?? null,
-    //                 'production_code' => $detail['production_code'] ?? null,
-    //                 'gramase' => $detail['gramase'] ?? null,
-    //                 'best_before' => $detail['best_before'] ?? null,
-    //                 'time' => $detail['time'] ?? null,
-    //                 'program_number' => $detail['program_number'] ?? null,
-    //                 'corrective_action' => $detail['corrective_action'] ?? null,
-    //                 'verification' => $detail['verification'] ?? null,
-    //                 'status' => isset($detail['status']) ? (bool) $detail['status'] : true,
-    //                 'process_type' => $detail['process_type'] ?? null,
-    //             ]);
- 
-    //             // Simpan ulang posisi
-    //             if (!empty($detail['positions'])) {
-    //                 foreach ($detail['positions'] as $position) {
-    //                     PositionMdProduct::create([
-    //                         'uuid' => Str::uuid(),
-    //                         'detail_uuid' => $detailModel->uuid,
-    //                         'specimen' => $position['specimen'] ?? null,
-    //                         'position' => $position['position'] ?? null,
-    //                         'status' => isset($position['status']) ? (bool) $position['status'] : false,
-    //                     ]);
-    //                 }
-    //             }
-    //         }
-    //     }
- 
-    //     return redirect()
-    //     ->route($report->is_audit ? 'report_md_products.audit' : 'report_md_products.index')
-    //     ->with('success', $report->is_audit
-    //         ? 'Data audit berhasil diperbarui.'
-    //         : 'Data berhasil diperbarui.');
-    // }
 
     public function update(Request $request, $uuid)
     {
@@ -470,10 +418,12 @@ class ReportMdProductController extends Controller
 
             // Simpan detail baru dari form edit
             foreach ($request->input('details', []) as $detail) {
+                $isTestPiece = ($detail['product_uuid'] ?? null) === 'test-pieces';
                 $detailModel = DetailMdProduct::create([
                     'uuid'              => Str::uuid(),
                     'report_uuid'       => $report->uuid,
-                    'product_uuid'      => $detail['product_uuid'] ?? null,
+                    'product_uuid'      => $isTestPiece ? null : ($detail['product_uuid'] ?? null),
+                    'is_test_piece'     => $isTestPiece,
                     'production_code'   => $detail['production_code'] ?? null,
                     'gramase'           => $detail['gramase'] ?? null,
                     'best_before'       => $detail['best_before'] ?? null,

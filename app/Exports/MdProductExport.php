@@ -352,7 +352,7 @@ class MdProductExport implements WithEvents, WithTitle
 
                         $sheet->setCellValue(
                             "J{$dataRow}",
-                            $detail->product->product_name ?? '-'
+                            $detail->is_test_piece ? 'Test Pieces' : ($detail->product->product_name ?? '-')
                         );
 
                         $sheet->setCellValue(

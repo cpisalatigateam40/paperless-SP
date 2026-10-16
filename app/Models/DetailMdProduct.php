@@ -24,7 +24,8 @@ class DetailMdProduct extends Model implements Auditable
         'corrective_action',
         'verification',
         'process_type',
-        'status'
+        'status',
+        'is_test_piece'
     ];
 
     protected $auditEvents = [

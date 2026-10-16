@@ -201,7 +201,7 @@
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td class="text-center">{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
-                <td>{{ $detail->product->product_name ?? '-' }}</td>
+                <td>{{ $detail->is_test_piece ? 'Test Pieces' : ($detail->product->product_name ?? '-') }}</td>
                 <td class="text-center">{{ !empty($detail->gramase)
                                                         ? $detail->gramase
                                                         : ($detail->product->nett_weight ?? '-') }}</td>

@@ -60,9 +60,10 @@
                         <label>Nama Produk</label>
                         <select name="details[{{ $i }}][product_uuid]" class="form-control select2-product">
                             <option value="">-- Pilih Produk --</option>
+                            <option value="test-pieces" {{ $detail->is_test_piece ? 'selected' : '' }}>Test Pieces</option>
                             @foreach ($products as $product)
                             <option value="{{ $product->uuid }}"
-                                {{ $product->uuid == $detail->product_uuid ? 'selected' : '' }}>
+                                {{ !$detail->is_test_piece && $product->uuid == $detail->product_uuid ? 'selected' : '' }}>
                                 {{ $product->product_name }}
                             </option>
                             @endforeach

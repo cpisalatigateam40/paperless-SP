@@ -351,7 +351,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($detail->time)->format('H:i') }}</td>
-                                                <td>{{ $detail->product->product_name ?? '-' }}</td>
+                                                <td>{{ $detail->is_test_piece ? 'Test Pieces' : ($detail->product->product_name ?? '-') }}</td>
                                                 <td>{{ $detail->gramase ?? '-' }}</td>
                                                 <td>{{ $detail->production_code ?? '-' }}</td>
                                                 <td>{{ $detail->program_number ?? '-' }}</td>
