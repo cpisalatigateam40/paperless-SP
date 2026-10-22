@@ -6,6 +6,9 @@ use App\Models\ReportForeignObject;
 use App\Models\DetailForeignObject;
 use App\Models\Product;
 use App\Models\Section;
+use App\Models\RawMaterial;
+use App\Models\Premix;
+use App\Models\ContaminationCategory;
 use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -21,6 +24,8 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ReportForeignObjectController extends Controller
 {
@@ -83,6 +88,9 @@ class ReportForeignObjectController extends Controller
             'area',
             'section',
             'details.product',
+            'details.premix',
+            'details.rawMaterial',
+            'details.contaminationType.category',
         ]);
 
         // Filter Area (khusus admin & superadmin)
@@ -115,6 +123,7 @@ class ReportForeignObjectController extends Controller
                     ->orWhere('known_by', 'like', "%{$search}%")
                     ->orWhere('approved_by', 'like', "%{$search}%")
                     ->orWhere('shift', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
                     ->orWhere('date', 'like', "%{$search}%");
 
                 // ===== AREA =====
@@ -129,24 +138,35 @@ class ReportForeignObjectController extends Controller
 
                 // ===== DETAIL FOREIGN OBJECT =====
                 $qq->orWhereHas('details', function ($d) use ($search) {
-
                     $d->where('time', 'like', "%{$search}%")
                         ->orWhere('production_code', 'like', "%{$search}%")
+                        ->orWhere('process_stage', 'like', "%{$search}%")
+                        ->orWhere('line', 'like', "%{$search}%")
+                        ->orWhere('size_quantity', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('affected_quantity', 'like', "%{$search}%")
+                        ->orWhere('investigation', 'like', "%{$search}%")
+                        ->orWhere('immediate_correction', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%")
+                        // kolom legacy (data lama)
                         ->orWhere('contaminant_type', 'like', "%{$search}%")
                         ->orWhere('analysis_stage', 'like', "%{$search}%")
-                        ->orWhere('contaminant_origin', 'like', "%{$search}%")
-                        ->orWhere('notes', 'like', "%{$search}%")
-                        ->orWhere('evidence', 'like', "%{$search}%")
-                        ->orWhere('qc_paraf', 'like', "%{$search}%")
-                        ->orWhere('production_paraf', 'like', "%{$search}%")
-                        ->orWhere('engineering_paraf', 'like', "%{$search}%");
-
+                        ->orWhere('contaminant_origin', 'like', "%{$search}%");
                 });
 
                 // ===== PRODUK =====
                 $qq->orWhereHas('details.product', function ($p) use ($search) {
                     $p->where('product_name', 'like', "%{$search}%")
                         ->orWhere('production_code', 'like', "%{$search}%");
+                });
+
+                $qq->orWhereHas('details.rawMaterial', fn ($r) => $r->where('material_name', 'like', "%{$search}%"));
+                $qq->orWhereHas('details.premix', fn ($p) => $p->where('name', 'like', "%{$search}%"));
+
+                // ===== KATEGORI / TIPE KONTAMINAN =====
+                $qq->orWhereHas('details.contaminationType', function ($t) use ($search) {
+                    $t->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%{$search}%"));
                 });
 
             });
@@ -177,16 +197,21 @@ class ReportForeignObjectController extends Controller
         return view('report_foreign_objects.index', compact('reports', 'areas'));
     }
 
+    private function parseItem(?string $value): array
+    {
+        if ($value && preg_match('/^(product|raw_material|premix):([0-9a-f-]{36})$/i', $value, $m)) {
+            return [strtolower($m[1]), $m[2]];
+        }
+
+        return [null, null];
+    }
+
 
     public function create()
     {
-        $areas = Area::all();
-        $sections = Section::all();
-        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
-            ->groupBy('product_name')
-            ->get();
-
-        return view('report_foreign_objects.create', compact('areas', 'sections', 'products'));
+        return view('report_foreign_objects.create', [
+            'areas' => Area::all(),
+        ] + $this->formData());
     }
 
     private function saveSignature($base64Image, $prefix)
@@ -215,82 +240,171 @@ class ReportForeignObjectController extends Controller
         return null;
     }
 
+    private function detailRules(): array
+    {
+        $actionKeys = array_keys(DetailForeignObject::ACTION_OPTIONS);
+
+        return [
+            'details' => 'required|array|min:1',
+
+            'details.*.time' => 'required',
+            'details.*.item' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    [$type, $uuid] = $this->parseItem($value);
+
+                    $exists = match ($type) {
+                        'product'      => Product::where('uuid', $uuid)->exists(),
+                        'raw_material' => RawMaterial::where('uuid', $uuid)->exists(),
+                        'premix'       => Premix::where('uuid', $uuid)->exists(),
+                        default        => false,
+                    };
+
+                    if (! $exists) {
+                        $fail('Produk / RM yang dipilih tidak valid.');
+                    }
+                },
+            ],
+            'details.*.production_code' => 'nullable|string|max:255',
+            'details.*.gramase' => 'nullable|numeric|min:0',
+            'details.*.process_stage' => 'nullable|string|max:255',
+            'details.*.line' => 'nullable|string|max:255',
+
+            'details.*.contamination_type_uuid' => [
+                'nullable',
+                'uuid',
+                Rule::exists('contamination_types', 'uuid')->whereNull('deleted_at'),
+            ],
+            'details.*.size_quantity' => 'nullable|string|max:255',
+            'details.*.description' => 'nullable|string',
+
+            'details.*.product_status' => ['nullable', Rule::in($actionKeys)],
+            'details.*.affected_quantity' => 'nullable|string|max:255',
+            'details.*.disposition' => ['nullable', Rule::in($actionKeys)],
+
+            'details.*.investigation' => 'nullable|array|max:5',
+            'details.*.investigation.*' => 'nullable|string|max:1000',
+            'details.*.immediate_correction' => 'nullable|string',
+            'details.*.corrective_action' => ['nullable', Rule::in($actionKeys)],
+
+            'details.*.evidence' => ['nullable', 'array', 'max:' . DetailForeignObject::MAX_EVIDENCE],
+            'details.*.evidence.*' => ['image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'details.*.old_evidence' => 'nullable|array',
+            'details.*.old_evidence.*' => 'string',
+            'details.*.notes' => 'nullable|string',
+        ];
+    }
+
+    // Buang baris kosong, rapikan spasi, batasi 5 item, null kalau tidak ada isi
+    private function cleanInvestigation($items): ?array
+    {
+        $items = array_values(array_filter(
+            array_map(fn ($v) => trim((string) $v), (array) $items),
+            fn ($v) => $v !== ''
+        ));
+
+        return $items ? array_slice($items, 0, 5) : null;
+    }
+
+    private function detailPayload(array $detail): array
+    {
+        return [
+            'item_type'    => $this->parseItem($detail['item'] ?? null)[0],
+            'item_uuid'    => $this->parseItem($detail['item'] ?? null)[1],
+            'product_uuid' => $this->parseItem($detail['item'] ?? null)[0] === 'product'
+                                ? $this->parseItem($detail['item'])[1]
+                                : null,
+            'time' => $detail['time'],
+            'production_code' => $detail['production_code'] ?? null,
+            'gramase' => $detail['gramase'] ?? null,
+            'process_stage' => $detail['process_stage'] ?? null,
+            'line' => $detail['line'] ?? null,
+
+            'contamination_type_uuid' => $detail['contamination_type_uuid'] ?? null,
+            'size_quantity' => $detail['size_quantity'] ?? null,
+            'description' => $detail['description'] ?? null,
+
+            'product_status' => $detail['product_status'] ?? null,
+            'affected_quantity' => $detail['affected_quantity'] ?? null,
+            'disposition' => $detail['disposition'] ?? null,
+
+            'investigation' => $this->cleanInvestigation($detail['investigation'] ?? []),
+            'immediate_correction' => $detail['immediate_correction'] ?? null,
+            'corrective_action' => $detail['corrective_action'] ?? null,
+
+            'notes' => $detail['notes'] ?? null,
+        ];
+    }
+
+    private function storeEvidenceFiles($files, $index): array
+    {
+        $paths = [];
+
+        foreach (array_values((array) $files) as $i => $file) {
+            if (! $file instanceof \Illuminate\Http\UploadedFile) {
+                continue;
+            }
+
+            $filename = time() . "_{$index}_{$i}_" . Str::random(6) . '.' . $file->extension();
+            $paths[] = $file->storeAs('evidence_foreign_objects', $filename, 'public');
+        }
+
+        return $paths;
+    }
+
+    private function createDetails(ReportForeignObject $report, array $details): void
+    {
+        foreach ($details as $index => $detail) {
+            DetailForeignObject::create($this->detailPayload($detail) + [
+                'uuid' => Str::uuid(),
+                'report_uuid' => $report->uuid,
+                'evidence' => $this->storeEvidenceFiles($detail['evidence'] ?? [], $index),
+            ]);
+        }
+    }
+
+    private function formData(): array
+    {
+        return [
+            'sections' => Section::all(),
+            'products' => Product::selectRaw('MIN(uuid) as uuid, product_name')
+                ->groupBy('product_name')
+                ->get(),
+            'contaminationCategories' => ContaminationCategory::with('types')
+                ->orderBy('sort_order')
+                ->get(),
+            'actionOptions' => DetailForeignObject::ACTION_OPTIONS,
+            'rawMaterials' => RawMaterial::orderBy('material_name')->get(['uuid', 'material_name']),
+            'premixes'     => Premix::orderBy('name')->get(['uuid', 'name']),
+        ];
+    }
+
     public function store(Request $request)
     {
-        // dd($request->details);
-        $request->validate([
+        $request->validate($this->detailRules() + [
             'date' => 'required|date',
             'section_uuid' => 'required|uuid',
-            'details' => 'required|array|min:1',
-            'details.*.time' => 'required',
-            'details.*.product_uuid' => 'required|uuid',
-            'details.*.production_code' => 'nullable|string',
-            'details.*.contaminant_type' => 'nullable|string',
-            'details.*.evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'details.*.analysis_stage' => 'nullable|string',
-            'details.*.contaminant_origin' => 'nullable|string',
-            'details.*.notes' => 'nullable|string',
-            'details.*.qc_paraf' => 'nullable|string',
-            'details.*.production_paraf' => 'nullable|string',
-            'details.*.engineering_paraf' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         $shift = auth()->user()->hasRole('QC Inspector')
-        ? session('shift_number') . '-' . session('shift_group')
-        : ($request->shift ?? 'NON-SHIFT');
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
 
-        $report = ReportForeignObject::create([
-            'uuid' => Str::uuid(),
-            'date' => $request->date,
-            'shift' => $shift,
-            'area_uuid' => Auth::user()->area_uuid,
-            'section_uuid' => $request->section_uuid,
-            'created_by' => Auth::user()->name,
-        ]);
-
-        foreach ($request->details as $index => $detail) {
-            $evidencePath = null;
-
-            if (isset($detail['evidence']) && $detail['evidence'] instanceof \Illuminate\Http\UploadedFile) {
-                $file = $detail['evidence'];
-                $filename = time() . '_' . $index . '_' . $file->getClientOriginalName();
-                $evidencePath = $file->storeAs('evidence_foreign_objects', $filename, 'public');
-            }
-
-            // === Simpan paraf tanda tangan digital ===
-            $qcParafPath = null;
-            if (!empty($detail['qc_paraf'])) {
-                $qcParafPath = $this->saveSignature($detail['qc_paraf'], "qc_{$index}");
-            }
-
-            $productionParafPath = null;
-            if (!empty($detail['production_paraf'])) {
-                $productionParafPath = $this->saveSignature($detail['production_paraf'], "production_{$index}");
-            }
-
-            $engineeringParafPath = null;
-            if (!empty($detail['engineering_paraf'])) {
-                $engineeringParafPath = $this->saveSignature($detail['engineering_paraf'], "engineering_{$index}");
-            }
-
-            DetailForeignObject::create([
+        DB::transaction(function () use ($request, $shift) {
+            $report = ReportForeignObject::create([
                 'uuid' => Str::uuid(),
-                'report_uuid' => $report->uuid,
-                'product_uuid' => $detail['product_uuid'],
-                'time' => $detail['time'],
-                'production_code' => $detail['production_code'] ?? null,
-                'contaminant_type' => $detail['contaminant_type'] ?? null,
-                'evidence' => $evidencePath,
-                'analysis_stage' => $detail['analysis_stage'] ?? null,
-                'contaminant_origin' => $detail['contaminant_origin'] ?? null,
-                'notes' => $detail['notes'] ?? null,
-                'qc_paraf' => $qcParafPath,
-                'production_paraf' => $productionParafPath,
-                'engineering_paraf' => $engineeringParafPath,
-                'production_code' => $detail['production_code'] ?? null,
-                'gramase' => $detail['gramase'] ?? null,
+                'date' => $request->date,
+                'shift' => $shift,
+                'notes' => $request->notes,
+                'area_uuid' => Auth::user()->area_uuid,
+                'section_uuid' => $request->section_uuid,
+                'created_by' => Auth::user()->name,
             ]);
-        }
+
+            $this->createDetails($report, $request->details);
+        });
 
         return redirect()->route('report-foreign-objects.index')->with('success', 'Laporan berhasil disimpan');
     }
@@ -298,70 +412,19 @@ class ReportForeignObjectController extends Controller
     public function createDetail($uuid)
     {
         $report = ReportForeignObject::where('uuid', $uuid)->firstOrFail();
-        $products = Product::selectRaw('MIN(uuid) as uuid, product_name')
-            ->groupBy('product_name')
-            ->get();
 
-        return view('report_foreign_objects.add_detail', compact('report', 'products'));
+        return view('report_foreign_objects.add_detail', ['report' => $report] + $this->formData());
     }
 
     public function storeDetail(Request $request, $uuid)
     {
         $report = ReportForeignObject::where('uuid', $uuid)->firstOrFail();
 
-        $request->validate([
-            'time' => 'required',
-            'product_uuid' => 'required|uuid',
-            'production_code' => 'nullable|string',
-            'contaminant_type' => 'nullable|string',
-            'evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'analysis_stage' => 'nullable|string',
-            'contaminant_origin' => 'nullable|string',
-            'notes' => 'nullable|string',
-            'qc_paraf' => 'nullable|string',
-            'production_paraf' => 'nullable|string',
-            'engineering_paraf' => 'nullable|string',
-        ]);
+        $request->validate($this->detailRules());
 
-        $evidencePath = null;
-        if ($request->hasFile('evidence')) {
-            $file = $request->file('evidence');
-            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-            $evidencePath = $file->storeAs('evidence_foreign_objects', $filename, 'public');
-        }
-
-        // === Simpan paraf tanda tangan digital ===
-        $qcParafPath = null;
-        if (!empty($request->qc_paraf)) {
-            $qcParafPath = $this->saveSignature($request->qc_paraf, "qc");
-        }
-
-        $productionParafPath = null;
-        if (!empty($request->production_paraf)) {
-            $productionParafPath = $this->saveSignature($request->production_paraf, "production");
-        }
-
-        $engineeringParafPath = null;
-        if (!empty($request->engineering_paraf)) {
-            $engineeringParafPath = $this->saveSignature($request->engineering_paraf, "engineering");
-        }
-
-        DetailForeignObject::create([
-            'uuid' => Str::uuid(),
-            'report_uuid' => $report->uuid,
-            'product_uuid' => $request->product_uuid,
-            'time' => $request->time,
-            'production_code' => $request->production_code,
-            'contaminant_type' => $request->contaminant_type,
-            'evidence' => $evidencePath,
-            'analysis_stage' => $request->analysis_stage,
-            'contaminant_origin' => $request->contaminant_origin,
-            'notes' => $request->notes,
-            'qc_paraf' => $qcParafPath,
-            'production_paraf' => $productionParafPath,
-            'engineering_paraf' => $engineeringParafPath,
-            'gramase' => $request->gramase,
-        ]);
+        DB::transaction(function () use ($request, $report) {
+            $this->createDetails($report, $request->details);
+        });
 
         return redirect()->route('report-foreign-objects.index')->with('success', 'Detail berhasil ditambahkan');
     }
@@ -371,11 +434,11 @@ class ReportForeignObjectController extends Controller
     {
         $report = ReportForeignObject::where('uuid', $uuid)->firstOrFail();
 
-        // Hapus semua file evidence terkait
+        // Hapus semua file evidence terkait (evidence = array path)
         foreach ($report->details as $detail) {
-            if ($detail->evidence && Storage::disk('public')->exists($detail->evidence)) {
-                Storage::disk('public')->delete($detail->evidence);
-            }
+            Storage::disk('public')->delete(
+                array_values(array_filter((array) $detail->evidence, fn ($v) => filled($v)))
+            );
         }
 
         // Hapus semua detail
@@ -420,7 +483,14 @@ class ReportForeignObjectController extends Controller
 
     public function exportPdf($uuid)
     {
-        $report = ReportForeignObject::with('area', 'section', 'details.product')
+        $report = ReportForeignObject::with(
+            'area',
+            'section',
+            'details.product',
+            'details.rawMaterial',
+            'details.premix',
+            'details.contaminationType.category'
+        )
             ->where('uuid', $uuid)
             ->firstOrFail();
 
@@ -459,90 +529,85 @@ class ReportForeignObjectController extends Controller
     public function edit($uuid)
     {
         $report = ReportForeignObject::with('details')->where('uuid', $uuid)->firstOrFail();
-        $areas = Area::all();
-        $sections = Section::all();
-        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
-        ->groupBy('product_name')
-        ->get();
 
-        return view('report_foreign_objects.edit', compact('report', 'areas', 'sections', 'products'));
+        return view('report_foreign_objects.edit', ['report' => $report] + $this->formData());
     }
 
     public function update(Request $request, $uuid)
     {
-        $report = ReportForeignObject::where('uuid', $uuid)->firstOrFail();
+        $report = ReportForeignObject::with('details')->where('uuid', $uuid)->firstOrFail();
 
-        $request->validate([
+        $request->validate($this->detailRules() + [
             'date' => 'required|date',
-            'shift' => 'required|string',
             'section_uuid' => 'required|uuid',
-            'details' => 'required|array|min:1',
-            'details.*.time' => 'required',
-            'details.*.product_uuid' => 'required|uuid',
-            'details.*.production_code' => 'nullable|string',
-            'details.*.contaminant_type' => 'nullable|string',
-            'details.*.evidence' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'details.*.analysis_stage' => 'nullable|string',
-            'details.*.contaminant_origin' => 'nullable|string',
-            'details.*.notes' => 'nullable|string',
-            'details.*.qc_paraf' => 'nullable|string',
-            'details.*.production_paraf' => 'nullable|string',
-            'details.*.engineering_paraf' => 'nullable|string',
+            'shift' => 'nullable|string|max:50',
+            'notes' => 'nullable|string',
+            'details.*.uuid' => 'nullable|uuid',
         ]);
 
-        DB::beginTransaction();
-        try {
-            // Update header
-            $report->update([
-                'date' => $request->date,
-                'shift' => $request->shift,
-                'section_uuid' => $request->section_uuid,
-            ]);
+        foreach ($request->details as $i => $input) {
+            $total = count((array) ($input['old_evidence'] ?? [])) + count((array) ($input['evidence'] ?? []));
 
-            // Hapus detail lama
-            $report->details()->delete();
-
-            // Simpan detail baru
-            foreach ($request->details as $index => $detail) {
-                $evidencePath = null;
-                if(isset($detail['evidence']) && $detail['evidence'] instanceof \Illuminate\Http\UploadedFile){
-                    $file = $detail['evidence'];
-                    $filename = time().'_'.$index.'_'.$file->getClientOriginalName();
-                    $evidencePath = $file->storeAs('evidence_foreign_objects', $filename, 'public');
-                }
-
-                $qcParafPath = !empty($detail['qc_paraf']) ? $this->saveSignature($detail['qc_paraf'], "qc_{$index}") : null;
-                $productionParafPath = !empty($detail['production_paraf']) ? $this->saveSignature($detail['production_paraf'], "production_{$index}") : null;
-                $engineeringParafPath = !empty($detail['engineering_paraf']) ? $this->saveSignature($detail['engineering_paraf'], "engineering_{$index}") : null;
-
-                DetailForeignObject::create([
-                    'uuid' => Str::uuid(),
-                    'report_uuid' => $report->uuid,
-                    'product_uuid' => $detail['product_uuid'],
-                    'time' => $detail['time'],
-                    'production_code' => $detail['production_code'] ?? null,
-                    'contaminant_type' => $detail['contaminant_type'] ?? null,
-                    'evidence' => $evidencePath,
-                    'analysis_stage' => $detail['analysis_stage'] ?? null,
-                    'contaminant_origin' => $detail['contaminant_origin'] ?? null,
-                    'notes' => $detail['notes'] ?? null,
-                    'qc_paraf' => $qcParafPath,
-                    'production_paraf' => $productionParafPath,
-                    'engineering_paraf' => $engineeringParafPath,
-                    'gramase' => $detail['gramase'] ?? null,
+            if ($total > DetailForeignObject::MAX_EVIDENCE) {
+                throw ValidationException::withMessages([
+                    "details.{$i}.evidence" => 'Maksimal ' . DetailForeignObject::MAX_EVIDENCE . ' foto per detail.',
                 ]);
             }
+        }
 
-            DB::commit();
-            return redirect()
+        DB::transaction(function () use ($request, $report) {
+            // Header: field approval (known_by/approved_by/approved_at) sengaja tidak disentuh
+            $report->update([
+                'date' => $request->date,
+                'section_uuid' => $request->section_uuid,
+                'shift' => $request->shift ?: $report->shift,
+                'notes' => $request->notes,
+            ]);
+
+            $existing = $report->details->keyBy('uuid');
+            $keptUuids = [];
+
+            foreach ($request->details as $index => $input) {
+                $detail = !empty($input['uuid']) ? $existing->get($input['uuid']) : null;
+                $payload = $this->detailPayload($input);
+                $newPaths = $this->storeEvidenceFiles($input['evidence'] ?? [], $index);
+
+                if ($detail) {
+                    $before = $detail->evidence;
+
+                    // hanya path milik detail ini yang boleh dipertahankan
+                    $kept = array_values(array_intersect((array) ($input['old_evidence'] ?? []), $before));
+
+                    $detail->update($payload + ['evidence' => array_merge($kept, $newPaths)]);
+
+                    // foto lama yang dihapus user di form
+                    Storage::disk('public')->delete(array_values(array_diff($before, $kept)));
+
+                    $keptUuids[] = $detail->uuid;
+                } else {
+                    $created = DetailForeignObject::create($payload + [
+                        'uuid' => Str::uuid(),
+                        'report_uuid' => $report->uuid,
+                        'evidence' => $newPaths,
+                    ]);
+                    $keptUuids[] = $created->uuid;
+                }
+            }
+
+            // Detail yang blok-nya dihapus di form
+            foreach ($existing as $detail) {
+                if (!in_array($detail->uuid, $keptUuids, true)) {
+                    Storage::disk('public')->delete($detail->evidence);
+                    $detail->delete();
+                }
+            }
+        });
+
+        return redirect()
         ->route($report->is_audit ? 'report-foreign-objects.audit' : 'report-foreign-objects.index')
         ->with('success', $report->is_audit
             ? 'Data audit berhasil diperbarui.'
             : 'Data berhasil diperbarui.');
-        } catch(\Throwable $e){
-            DB::rollBack();
-            return back()->with('error', 'Gagal mengupdate: '.$e->getMessage());
-        }
     }
 
     public function exportExcel(Request $request)
@@ -565,12 +630,12 @@ class ReportForeignObjectController extends Controller
         }
     
         $reports = ReportForeignObject::operasional()
-            ->with(['details.product', 'section'])
-            ->where('area_uuid', auth()->user()->area_uuid)
-            ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
-            ->orderBy('date')
-            ->orderBy('shift')
-            ->get();
+        ->with(['details.product', 'details.premix', 'details.rawMaterial', 'details.contaminationType.category', 'section'])
+        ->where('area_uuid', auth()->user()->area_uuid)
+        ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
+        ->orderBy('date')
+        ->orderBy('shift')
+        ->get();
     
         $filename = 'Foreign_Object_'
             . $dateFrom->format('Ymd') . '_'
