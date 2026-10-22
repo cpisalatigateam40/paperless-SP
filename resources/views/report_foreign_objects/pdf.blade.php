@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <title>Pemeriksaan Kontaminasi Benda Asing</title>
+    <meta charset="utf-8">
+    <title>Foreign Object Contamination Report</title>
     <style>
     @font-face {
         font-family: "DejaVu Sans";
@@ -20,52 +21,10 @@
     table {
         border-collapse: collapse;
         width: 100%;
-        margin-bottom: 12px;
     }
 
-    th,
-    td {
-        border: 1px solid #000;
-        padding: 2px 3px;
-        text-align: left;
-        vertical-align: middle;
-    }
-
-    th {
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .signature-box {
-        height: 40px;
-        border-bottom: 1px solid #000;
-        margin-top: 20px;
-        width: 60%;
-    }
-
-    .no-border {
-        border: none !important;
-    }
-
-    .mb-2 {
-        margin-bottom: 1rem;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
-    }
-
-    .mb-4 {
-        margin-bottom: 2rem;
-    }
-
-    .underline {
-        text-decoration: underline;
-    }
+    .no-border { border: none !important; }
+    .text-center { text-align: center; }
 
     .header {
         position: fixed;
@@ -75,20 +34,51 @@
         border: none;
     }
 
-    .header-table {
-        width: 100%;
-        border-collapse: collapse;
+    .header-table { width: 100%; border-collapse: collapse; }
+
+    .section-title {
+        font-weight: bold;
+        font-size: 11px;
+        margin-top: 14px;
+        margin-bottom: 4px;
+    }
+
+    table.info td {
+        border: none;
+        padding: 2px 2px;
+        vertical-align: top;
+    }
+
+    table.info td.lbl { width: 140px; }
+    table.info td.sep { width: 10px; }
+
+    .evidence-box {
+        width: 170px;
+        height: 120px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .sign-box {
+        height: 110px;
+        width: 85%;
+        margin: 0 auto;
+        text-align: center;
     }
 
     @page {
         margin-top: 80px;
+        margin-bottom: 45px;
+        margin-left: 35px;
+        margin-right: 35px;
         size: 210mm 330mm;
     }
     </style>
 </head>
 
 <body>
-    {{-- header --}}
+
+    {{-- ===== HEADER FIXED (berulang di tiap halaman) ===== --}}
     <div class="header">
         <table class="header-table">
             <tr>
@@ -116,171 +106,225 @@
                         </tr>
                     </table>
                 </td>
+                <td class="no-border"
+                    style="text-align: right; vertical-align: middle; font-size: 9px; font-weight: bold;">
+                    {{ $formNumber ?? '-' }}
+                </td>
             </tr>
         </table>
     </div>
 
-    <h3 class="mb-2 text-center" style="text-transform: uppercase;">Pemeriksaan Kontaminasi Benda Asing</h3>
+    @php
+        $actionLabels = \App\Models\DetailForeignObject::ACTION_OPTIONS;
+    @endphp
 
-    <table style="width: 100%; border: none;">
-        <tr style="border: none;">
-            <td style="text-align: left; border: none;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Shift: <span style="text-decoration: underline;"> {{ $report->shift }} </span>
-            </td>
-            <td style="text-align: left; border: none;">
-                Area: <span style="text-decoration: underline;"> {{ $report->section->section_name }}</span>
-            </td>
-        </tr>
-    </table>
+    @foreach ($report->details as $detail)
+    @php
+        $type = $detail->contaminationType;
+        $typeText = $type
+            ? (($type->category->name ?? '-') . ' / ' . $type->name)
+            : ($detail->contaminant_type ?: '-');
 
-    <table style="margin-top: 10px;">
-        <thead>
+        $gramase = !empty($detail->gramase) ? $detail->gramase : ($detail->product->nett_weight ?? null);
+        $gramaseText = is_numeric($gramase)
+            ? rtrim(rtrim(number_format($gramase, 2, '.', ''), '0'), '.') . ' gr'
+            : '-';
+
+        // Investigation: daftar (maks. 5); data lama jatuh ke kolom legacy
+        $investigations = array_values(array_filter((array) $detail->investigation, fn ($v) => filled($v)));
+        if (empty($investigations)) {
+            $investigations = array_values(array_filter([$detail->analysis_stage, $detail->contaminant_origin]));
+        }
+
+        // Evidence -> base64 + ukuran yang muat di kotak 220x150
+        // Evidence -> daftar gambar base64 (maks. 170x120 px per foto)
+        $evidenceImgs = [];
+        foreach ($detail->evidence as $path) {
+            $full = storage_path('app/public/' . $path);
+            if (! is_file($full)) {
+                continue;
+            }
+
+            [$origW, $origH] = getimagesize($full) ?: [0, 0];
+            if ($origW <= 0 || $origH <= 0) {
+                continue;
+            }
+
+            $ratio = min(170 / $origW, 120 / $origH, 1);
+            $ext   = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+            $mime  = in_array($ext, ['jpg', 'jpeg']) ? 'jpeg' : $ext;
+
+            $evidenceImgs[] = [
+                'src' => 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($full)),
+                'w'   => (int) round($origW * $ratio),
+                'h'   => (int) round($origH * $ratio),
+            ];
+        }
+    @endphp
+
+    <div @if (!$loop->last) style="page-break-after: always;" @endif>
+
+        <h3 style="text-align: center; margin: 2px 0 10px 0; font-size: 13px; text-transform: uppercase;">
+            Foreign Object Contamination Report
+        </h3>
+
+        {{-- ===== A - EVENT INFORMATION ===== --}}
+        <div class="section-title">A - Event Information</div>
+        <table class="info">
             <tr>
-                <th class="align-middle">Jam</th>
-                <th class="align-middle">Nama Produk</th>
-                <th class="align-middle">Gramase</th>
-                <th class="align-middle">Kode Produksi</th>
-                <th class="align-middle">Jenis Kontaminan</th>
-                <th class="align-middle">Bukti (Foto)</th>
-                <th class="align-middle">Tahapan</th>
-                <th class="align-middle">Analisis Asal Kontaminan</th>
-                <th class="align-middle">Keterangan</th>
-                <!-- <th class="align-middle">Paraf QC</th>
-                <th class="align-middle">Paraf Produksi</th>
-                <th class="align-middle">Paraf Engineering</th> -->
+                <td class="lbl">Date</td><td class="sep">:</td>
+                <td>{{ \Carbon\Carbon::parse($report->date)->locale('en')->translatedFormat('l, d F Y') }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach ($report->details as $detail)
             <tr>
-                <td>{{ $detail->time }}</td>
-                <td>{{ $detail->product->product_name ?? '-' }}</td>
-                <td>{{ !empty($detail->gramase) 
-                                                        ? $detail->gramase 
-                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
-                <td>{{ $detail->production_code }}</td>
-                <td>{{ $detail->contaminant_type }}</td>
-                <td class="text-center">
-                    @php
-                    $evidencePath = storage_path('app/public/' . $detail->evidence);
-                    $evidenceBase64 = null;
+                <td class="lbl">Time Found</td><td class="sep">:</td>
+                <td>{{ \Carbon\Carbon::parse($detail->time)->format('h.i a') }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Product / RM</td><td class="sep">:</td>
+                <td>{{ $detail->item_name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Production code</td><td class="sep">:</td>
+                <td>{{ $detail->production_code ?: '-' }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Gramase</td><td class="sep">:</td>
+                <td>{{ $gramaseText }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Location / Shift</td><td class="sep">:</td>
+                <td>{{ $report->section->section_name ?? '-' }} / {{ $report->shift ?: '-' }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Process stage / Line</td><td class="sep">:</td>
+                <td>{{ $detail->process_stage ?: '-' }} / {{ $detail->line ?: '-' }}</td>
+            </tr>
+        </table>
 
-                    if ($detail->evidence && file_exists($evidencePath)) {
-                    $type = pathinfo($evidencePath, PATHINFO_EXTENSION);
-                    $data = file_get_contents($evidencePath);
-                    $evidenceBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                    @endphp
+        {{-- ===== B - CONTAMINATION DETAILS ===== --}}
+        <div class="section-title">B - Contamination Details</div>
+        <table class="info">
+            <tr>
+                <td class="lbl">Category / Type</td><td class="sep">:</td>
+                <td>{{ $typeText }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Size / Quantity</td><td class="sep">:</td>
+                <td>{{ $detail->size_quantity ?: '-' }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Description</td><td class="sep">:</td>
+                <td>{{ $detail->description ?: '-' }}</td>
+            </tr>
+        </table>
 
-                    @if($evidenceBase64)
-                    <img src="{{ $evidenceBase64 }}" width="50">
+        {{-- ===== C - PRODUCT CONTROL & DISPOSITION ===== --}}
+        <div class="section-title">C - Product Control &amp; Disposition</div>
+        <table class="info">
+            <tr>
+                <td class="lbl">Product Status</td><td class="sep">:</td>
+                <td>{{ $actionLabels[$detail->product_status] ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Affected Quantity</td><td class="sep">:</td>
+                <td>{{ $detail->affected_quantity ?: '-' }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Disposition</td><td class="sep">:</td>
+                <td>{{ $actionLabels[$detail->disposition] ?? '-' }}</td>
+            </tr>
+        </table>
+
+        {{-- ===== D - INVESTIGATION & CORRECTIVE ACTION ===== --}}
+        <div class="section-title">D - Investigation &amp; Corrective Action</div>
+        <table class="info">
+            <tr>
+                <td class="lbl">Investigation</td><td class="sep">:</td>
+                <td>
+                    @if (count($investigations) > 1)
+                        @foreach ($investigations as $item)
+                            {{ $loop->iteration }}. {{ $item }}<br>
+                        @endforeach
                     @else
-                    -
+                        {{ $investigations[0] ?? '-' }}
                     @endif
                 </td>
-                <td>{{ $detail->analysis_stage }}</td>
-                <td>{{ $detail->contaminant_origin }}</td>
-                <td>{{ $detail->notes }}</td>
-                <!-- <td>
-                    @php
-                    $qcBase64 = null;
-                    if ($detail->qc_paraf) {
-                    $qcPath = storage_path('app/public/' . $detail->qc_paraf);
-                    if (file_exists($qcPath)) {
-                    $type = pathinfo($qcPath, PATHINFO_EXTENSION);
-                    $data = file_get_contents($qcPath);
-                    $qcBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                    }
-                    @endphp
-
-                    @if($qcBase64)
-                    <img src="{{ $qcBase64 }}" alt="QC" width="60">
-                    @endif
-                </td>
-
-                <td>
-                    @php
-                    $prodBase64 = null;
-                    if ($detail->production_paraf) {
-                    $prodPath = storage_path('app/public/' . $detail->production_paraf);
-                    if (file_exists($prodPath)) {
-                    $type = pathinfo($prodPath, PATHINFO_EXTENSION);
-                    $data = file_get_contents($prodPath);
-                    $prodBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                    }
-                    @endphp
-
-                    @if($prodBase64)
-                    <img src="{{ $prodBase64 }}" alt="Produksi" width="60">
-                    @endif
-                </td>
-
-                <td>
-                    @php
-                    $engBase64 = null;
-                    if ($detail->engineering_paraf) {
-                    $engPath = storage_path('app/public/' . $detail->engineering_paraf);
-                    if (file_exists($engPath)) {
-                    $type = pathinfo($engPath, PATHINFO_EXTENSION);
-                    $data = file_get_contents($engPath);
-                    $engBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                    }
-                    @endphp
-
-                    @if($engBase64)
-                    <img src="{{ $engBase64 }}" alt="Engineering" width="60">
-                    @endif
-                </td> -->
-
             </tr>
-            @endforeach
             <tr>
-                <td colspan="9" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
+                <td class="lbl">Immediate Correction</td><td class="sep">:</td>
+                <td>{{ $detail->immediate_correction ?: '-' }}</td>
             </tr>
-        </tbody>
-    </table>
+            <tr>
+                <td class="lbl">Corrective Action</td><td class="sep">:</td>
+                <td>{{ $actionLabels[$detail->corrective_action] ?? '-' }}</td>
+            </tr>
+        </table>
 
-    <table style="width: 100%; border: none; margin-top: 4rem;">
-        <tr style="border: none;">
-            <td style="text-align: center; border: none; width: 33%;">
-                Diperiksa oleh:<br><br>
-                <img src="{{ $createdQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->created_by }}</strong><br><br>
-                QC Inspector
-            </td>
-            <td style="text-align: center; border: none; width: 33%;">
-                Diketahui oleh:<br><br>
-                @if($report->known_by)
-                <img src="{{ $knownQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->known_by }}</strong><br><br>
-                @else
-                <div style="height: 120px;"></div>
-                <strong>-</strong><br>
-                @endif
-                SPV/Foreman/Lady Produksi
-            </td>
-            <td style="text-align: center; border: none; width: 33%;">
-                Disetujui oleh:<br><br>
-                @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="80" style="margin: 10px 0;"><br>
-                <strong>{{ $report->approved_by }}</strong><br><br>
-                @else
-                <div style="height: 120px;"></div>
-                <strong>-</strong><br>
-                @endif
-                Supervisor QC
-            </td>
-        </tr>
-    </table>
+        {{-- ===== E - EVIDENCE & VERIFICATION ===== --}}
+        <div class="section-title">E - Evidence &amp; Verification</div>
+        @if (!empty($evidenceImgs))
+            <table style="width: auto; border: none; margin-bottom: 4px;">
+                @foreach (array_chunk($evidenceImgs, 3, true) as $rowImgs)
+                    <tr>
+                        @foreach ($rowImgs as $n => $img)
+                            <td class="no-border" style="padding: 0 10px 6px 0; vertical-align: top; text-align: center;">
+                                <img src="{{ $img['src'] }}" width="{{ $img['w'] }}" height="{{ $img['h'] }}">
+                                <div style="font-size: 8px; margin-top: 3px;">Evidence {{ sprintf('%02d', $n + 1) }}</div>
+                            </td>
+                        @endforeach
+                    </tr>
+                @endforeach
+            </table>
+        @else
+            <div style="color: #888;">No image</div>
+        @endif
+
+        <div style="margin-top: 8px;">{{ $detail->notes ?: '-' }}</div>
+
+        @if ($loop->last && $report->notes)
+            <div style="margin-top: 8px;"><strong>Notes:</strong> {{ $report->notes }}</div>
+        @endif
+
+        {{-- ===== TTD ===== --}}
+        <table style="width: 100%; border: none; margin-top: 22px;">
+            <tr>
+                <td class="no-border text-center" style="width: 33%; vertical-align: top;">
+                    <div style="font-weight: bold; margin-bottom: 6px;">Diperiksa oleh,</div>
+                    <div class="sign-box">
+                        <img src="{{ $createdQr }}" width="70" style="margin-top: 8px; margin-bottom: 12px;"><br>
+                        <strong>{{ $report->created_by }}</strong>
+                    </div>
+                    <div style="margin-top: 4px;">QC Inspector</div>
+                </td>
+                <td class="no-border text-center" style="width: 33%; vertical-align: top;">
+                    <div style="font-weight: bold; margin-bottom: 6px;">Diketahui oleh,</div>
+                    <div class="sign-box">
+                        @if ($report->known_by)
+                            <img src="{{ $knownQr }}" width="70" style="margin-top: 8px; margin-bottom: 12px;"><br>
+                            <strong>{{ $report->known_by }}</strong>
+                        @else
+                            <div style="padding-top: 78px;">Tanda Tangan &amp; Nama Terang</div>
+                        @endif
+                    </div>
+                    <div style="margin-top: 4px;">Foreman / SPV Produksi</div>
+                </td>
+                <td class="no-border text-center" style="width: 33%; vertical-align: top;">
+                    <div style="font-weight: bold; margin-bottom: 6px;">Disetujui oleh,</div>
+                    <div class="sign-box">
+                        @if ($report->approved_by)
+                            <img src="{{ $approvedQr }}" width="70" style="margin-top: 8px; margin-bottom: 12px;"><br>
+                            <strong>{{ $report->approved_by }}</strong>
+                        @else
+                            <div style="padding-top: 78px;">Tanda Tangan &amp; Nama Terang</div>
+                        @endif
+                    </div>
+                    <div style="margin-top: 4px;">Supervisor QC</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    @endforeach
+
 </body>
 
 </html>

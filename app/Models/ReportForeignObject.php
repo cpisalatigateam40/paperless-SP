@@ -25,6 +25,7 @@ class ReportForeignObject extends Model implements Auditable
         'section_uuid',
         'date',
         'shift',
+        'notes',
         'created_by',
         'known_by',
         'approved_by',

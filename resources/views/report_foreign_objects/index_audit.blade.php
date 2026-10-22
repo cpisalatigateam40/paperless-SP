@@ -169,61 +169,28 @@
 
                         <tr class="collapse" id="detail-{{ $report->id }}">
                             <td colspan="9">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="align-middle">Jam</th>
-                                                <th class="align-middle">Produk</th>
-                                                <th class="align-middle">Gramase</th>
-                                                <th class="align-middle">Kode Produksi</th>
-                                                <th class="align-middle">Jenis Kontaminan</th>
-                                                <th class="align-middle">Bukti</th>
-                                                <th class="align-middle">Tahapan Analisis</th>
-                                                <th class="align-middle">Asal Kontaminan</th>
-                                                <th class="align-middle">Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($report->details as $detail)
-                                            <tr>
-                                                <td>{{ $detail->time }}</td>
-                                                <td>{{ $detail->product->product_name ?? '-' }}</td>
-                                                <td>{{ !empty($detail->gramase)
-                                                        ? $detail->gramase
-                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
-                                                <td>{{ $detail->production_code }}</td>
-                                                <td>{{ $detail->contaminant_type }}</td>
-                                                <td>
-                                                    @if($detail->evidence)
-                                                    <a href="{{ asset('storage/' . $detail->evidence) }}" target="_blank">
-                                                        <img src="{{ asset('storage/' . $detail->evidence) }}"
-                                                            alt="Bukti" width="60">
-                                                    </a>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $detail->analysis_stage }}</td>
-                                                <td>{{ $detail->contaminant_origin }}</td>
-                                                <td>{{ $detail->notes }}</td>
-                                            </tr>
-                                            @empty
-                                            <tr>
-                                                <td colspan="9" class="text-center">Tidak ada detail</td>
-                                            </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                @forelse ($report->details as $detail)
+                                    @include('report_foreign_objects._detail_card', [
+                                        'detail' => $detail,
+                                        'number' => $loop->iteration,
+                                    ])
+                                @empty
+                                    <div class="text-center text-muted py-2">Tidak ada detail</div>
+                                @endforelse
+
+                                @if ($report->notes)
+                                    <div class="small mb-2"><strong>Catatan:</strong> {{ $report->notes }}</div>
+                                @endif
 
                                 {{-- Tambah detail: hanya salinan audit --}}
-                                @if($report->is_audit)
+                                @if ($report->is_audit)
                                     @can('create report')
-                                    <div class="mt-2 d-flex justify-content-end">
-                                        <a href="{{ route('report-foreign-objects.add-detail', $report->uuid) }}"
-                                            class="btn btn-sm btn-outline-secondary">
-                                            Tambah Detail
-                                        </a>
-                                    </div>
+                                        <div class="mt-2 d-flex justify-content-end">
+                                            <a href="{{ route('report-foreign-objects.add-detail', $report->uuid) }}"
+                                                class="btn btn-sm btn-outline-secondary">
+                                                Tambah Detail
+                                            </a>
+                                        </div>
                                     @endcan
                                 @endif
                             </td>

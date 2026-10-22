@@ -341,6 +341,10 @@
         background-color: #5a6268;
         border-color: #545b62;
     }
+
+    .badge {
+        color: white !important;
+    }
     </style>
 
 

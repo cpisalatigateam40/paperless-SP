@@ -160,6 +160,7 @@
                             <th class="align-middle">Waktu</th>
                             <th class="align-middle">Area</th>
                             <th class="align-middle">Section</th>
+                            <th class="align-middle">Produk / RM</th>
                             <th class="align-middle">Kode Produksi</th>
                             <th class="align-middle">Dibuat Oleh</th>
                             <th class="align-middle">Aksi</th>
@@ -174,6 +175,34 @@
                             <td>{{ $report->created_at->format('H:i') }}</td>
                             <td>{{ $report->area->name ?? '-' }}</td>
                             <td>{{ $report->section->section_name ?? '-' }}</td>
+                            @php
+                                $items = $report->details
+                                    ->map(fn ($d) => $d->item_name)
+                                    ->reject(fn ($name) => $name === '-')
+                                    ->unique()
+                                    ->implode(', ');
+                                $itemsId = 'items-' . $report->uuid;
+                            @endphp
+
+                            <td>
+                                @if($items)
+                                    @if(strlen($items) > 50)
+                                        <span id="{{ $itemsId }}-short">
+                                            {{ \Illuminate\Support\Str::limit($items, 50) }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $itemsId }}'); return false;">Show more</a>
+                                        </span>
+
+                                        <span id="{{ $itemsId }}-full" class="d-none">
+                                            {{ $items }}
+                                            <a class="ms-1" href="#" onclick="toggleCodes('{{ $itemsId }}'); return false;">Show less</a>
+                                        </span>
+                                    @else
+                                        {{ $items }}
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             @php
                                 $codes = $report->details->pluck('production_code')->filter()->implode(', ');
                                 $collapseId = 'codes-' . $report->uuid;
@@ -305,85 +334,27 @@
                         </tr>
 
                         <tr class="collapse" id="detail-{{ $report->id }}">
-                            <td colspan="9">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="align-middle">Jam</th>
-                                                <th class="align-middle">Produk</th>
-                                                <th class="align-middle">Gramase</th>
-                                                <th class="align-middle">Kode Produksi</th>
-                                                <th class="align-middle">Jenis Kontaminan</th>
-                                                <th class="align-middle">Bukti</th>
-                                                <th class="align-middle">Tahapan Analisis</th>
-                                                <th class="align-middle">Asal Kontaminan</th>
-                                                <th class="align-middle">Keterangan</th>
-                                                <!-- <th class="align-middle">Paraf QC</th>
-                                                <th class="align-middle">Paraf Produksi</th>
-                                                <th class="align-middle">Paraf Engineering</th> -->
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($report->details as $detail)
-                                            <tr>
-                                                <td>{{ $detail->time }}</td>
-                                                <td>{{ $detail->product->product_name ?? '-' }}</td>
-                                                <td>{{ !empty($detail->gramase) 
-                                                        ? $detail->gramase 
-                                                        : ($detail->product->nett_weight ?? '-') }} g</td>
-                                                <td>{{ $detail->production_code }}</td>
-                                                <td>{{ $detail->contaminant_type }}</td>
-                                                <td>
-                                                    @if($detail->evidence)
-                                                    <a href="{{ asset('storage/' . $detail->evidence) }}"
-                                                        target="_blank">
-                                                        <img src="{{ asset('storage/' . $detail->evidence) }}"
-                                                            alt="Bukti" width="60">
-                                                    </a>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $detail->analysis_stage }}</td>
-                                                <td>{{ $detail->contaminant_origin }}</td>
-                                                <td>{{ $detail->notes }}</td>
+                            <td colspan="10">
+                                @forelse ($report->details as $detail)
+                                    @include('report_foreign_objects._detail_card', [
+                                        'detail' => $detail,
+                                        'number' => $loop->iteration,
+                                    ])
+                                @empty
+                                    <div class="text-center text-muted py-2">Tidak ada detail</div>
+                                @endforelse
 
-                                                {{-- Tambahan kolom paraf --}}
-                                                <!-- <td>
-                                                    @if($detail->qc_paraf)
-                                                    <img src="{{ asset('storage/' . $detail->qc_paraf) }}" alt="QC"
-                                                        width="60">
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if($detail->production_paraf)
-                                                    <img src="{{ asset('storage/' . $detail->production_paraf) }}"
-                                                        alt="Produksi" width="60">
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if($detail->engineering_paraf)
-                                                    <img src="{{ asset('storage/' . $detail->engineering_paraf) }}"
-                                                        alt="Engineering" width="60">
-                                                    @endif
-                                                </td> -->
-                                            </tr>
-                                            @empty
-                                            <tr>
-                                                <td colspan="11" class="text-center">Tidak ada detail</td>
-                                            </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-
-                                </div>
+                                @if ($report->notes)
+                                    <div class="small mb-2"><strong>Catatan:</strong> {{ $report->notes }}</div>
+                                @endif
 
                                 @can('create report')
-                                <div class="mt-2 d-flex justify-content-end">
-                                    <a href="{{ route('report-foreign-objects.add-detail', $report->uuid) }}"
-                                        class="btn btn-sm btn-outline-secondary">
-                                        Tambah Detail
-                                    </a>
-                                </div>
+                                    <div class="mt-2 d-flex justify-content-end">
+                                        <a href="{{ route('report-foreign-objects.add-detail', $report->uuid) }}"
+                                            class="btn btn-sm btn-outline-secondary">
+                                            Tambah Detail
+                                        </a>
+                                    </div>
                                 @endcan
                             </td>
                         </tr>
