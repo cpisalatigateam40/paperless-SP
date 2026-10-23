@@ -23,6 +23,13 @@ class DetailForeignObject extends Model implements Auditable
         'lainnya'          => 'Lainnya',
     ];
 
+    // Opsi dropdown Product Status
+    public const PRODUCT_STATUS_OPTIONS = [
+        'hold'    => 'Hold',
+        'pending' => 'Pending',
+        'lainnya' => 'Lainnya',
+    ];
+
     protected function investigation(): Attribute
     {
         return Attribute::make(

@@ -308,7 +308,7 @@ $(document).ready(function() {
     });
 
     // Compress gambar sebelum dikirim
-    function compressImage(file, maxWidth = 1280, quality = 0.7) {
+    function compressImage(file, maxWidth = 1024, quality = 0.5) {
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.onload = function (e) {

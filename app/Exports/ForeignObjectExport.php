@@ -45,13 +45,12 @@ class ForeignObjectExport implements WithEvents, WithTitle
     // Kolom teks: rata kiri
     private const LEFT_COLS = [
         'section', 'product', 'process_stage', 'line', 'category', 'type',
-        'size_quantity', 'description', 'investigation', 'immediate_correction',
-        'notes', 'report_notes',
+        'size_quantity', 'description', 'investigation', 'immediate_correction', 'corrective_action', 'notes', 'report_notes', 
     ];
 
     // Kolom teks panjang: lebar tetap + wrap
     private const WIDE_COLS = [
-        'description', 'investigation', 'immediate_correction', 'notes', 'report_notes',
+        'description', 'investigation', 'immediate_correction', 'corrective_action', 'notes', 'report_notes',
     ];
 
     // Thumbnail evidence: 3 foto per baris di dalam sel
@@ -202,6 +201,8 @@ class ForeignObjectExport implements WithEvents, WithTitle
 
         $gramase = !empty($detail->gramase) ? $detail->gramase : ($detail->product->nett_weight ?? null);
 
+        $statuses = DetailForeignObject::PRODUCT_STATUS_OPTIONS;
+
         return [
             'no'                   => $no,
             'date'                 => Carbon::parse($report->date)->format('d/m/Y'),
@@ -221,12 +222,12 @@ class ForeignObjectExport implements WithEvents, WithTitle
             'type'                 => $type ? $type->name : ($detail->contaminant_type ?: '-'),
             'size_quantity'        => $detail->size_quantity ?: '-',
             'description'          => $detail->description ?: '-',
-            'product_status'       => $actions[$detail->product_status] ?? '-',
+            'product_status'    => $statuses[$detail->product_status] ?? '-',
             'affected_quantity'    => $detail->affected_quantity ?: '-',
             'disposition'          => $actions[$detail->disposition] ?? '-',
             'investigation'        => $investigation,
             'immediate_correction' => $detail->immediate_correction ?: '-',
-            'corrective_action'    => $actions[$detail->corrective_action] ?? '-',
+            'corrective_action' => $detail->corrective_action ?: '-',
             'evidence'             => '',   // gambar ditempel terpisah lewat placeEvidence()
             'notes'                => $detail->notes ?: '-',
             'report_notes'         => $report->notes ?: '-',

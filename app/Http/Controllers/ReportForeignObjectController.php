@@ -151,7 +151,8 @@ class ReportForeignObjectController extends Controller
                         // kolom legacy (data lama)
                         ->orWhere('contaminant_type', 'like', "%{$search}%")
                         ->orWhere('analysis_stage', 'like', "%{$search}%")
-                        ->orWhere('contaminant_origin', 'like', "%{$search}%");
+                        ->orWhere('contaminant_origin', 'like', "%{$search}%")
+                        ->orWhere('corrective_action', 'like', "%{$search}%");
                 });
 
                 // ===== PRODUK =====
@@ -279,14 +280,14 @@ class ReportForeignObjectController extends Controller
             'details.*.size_quantity' => 'nullable|string|max:255',
             'details.*.description' => 'nullable|string',
 
-            'details.*.product_status' => ['nullable', Rule::in($actionKeys)],
+            'details.*.product_status' => ['nullable', Rule::in(array_keys(DetailForeignObject::PRODUCT_STATUS_OPTIONS))],
             'details.*.affected_quantity' => 'nullable|string|max:255',
             'details.*.disposition' => ['nullable', Rule::in($actionKeys)],
 
             'details.*.investigation' => 'nullable|array|max:5',
             'details.*.investigation.*' => 'nullable|string|max:1000',
             'details.*.immediate_correction' => 'nullable|string',
-            'details.*.corrective_action' => ['nullable', Rule::in($actionKeys)],
+            'details.*.corrective_action' => 'nullable|string',
 
             'details.*.evidence' => ['nullable', 'array', 'max:' . DetailForeignObject::MAX_EVIDENCE],
             'details.*.evidence.*' => ['image', 'mimes:jpg,jpeg,png', 'max:2048'],
@@ -377,6 +378,7 @@ class ReportForeignObjectController extends Controller
             'actionOptions' => DetailForeignObject::ACTION_OPTIONS,
             'rawMaterials' => RawMaterial::orderBy('material_name')->get(['uuid', 'material_name']),
             'premixes'     => Premix::orderBy('name')->get(['uuid', 'name']),
+            'productStatusOptions' => DetailForeignObject::PRODUCT_STATUS_OPTIONS,
         ];
     }
 

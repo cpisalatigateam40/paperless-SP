@@ -116,6 +116,7 @@
 
     @php
         $actionLabels = \App\Models\DetailForeignObject::ACTION_OPTIONS;
+        $statusLabels = \App\Models\DetailForeignObject::PRODUCT_STATUS_OPTIONS;
     @endphp
 
     @foreach ($report->details as $detail)
@@ -223,7 +224,7 @@
         <table class="info">
             <tr>
                 <td class="lbl">Product Status</td><td class="sep">:</td>
-                <td>{{ $actionLabels[$detail->product_status] ?? '-' }}</td>
+                <td>{{ $statusLabels[$detail->product_status] ?? '-' }}</td> 
             </tr>
             <tr>
                 <td class="lbl">Affected Quantity</td><td class="sep">:</td>
@@ -256,7 +257,7 @@
             </tr>
             <tr>
                 <td class="lbl">Corrective Action</td><td class="sep">:</td>
-                <td>{{ $actionLabels[$detail->corrective_action] ?? '-' }}</td>
+                <td>{{ $detail->corrective_action ?: '-' }}</td>
             </tr>
         </table>
 

@@ -1,13 +1,11 @@
 {{-- $detail : DetailForeignObject, $number : nomor urut --}}
 @php
     $actionLabels = \App\Models\DetailForeignObject::ACTION_OPTIONS;
+    $statusLabels = \App\Models\DetailForeignObject::PRODUCT_STATUS_OPTIONS;
     $statusColors = [
-        'reject_musnahkan' => 'danger',
-        'return'           => 'warning',
-        'sortir'           => 'info',
-        'rework'           => 'primary',
-        'repack'           => 'secondary',
-        'lainnya'          => 'dark',
+        'hold'    => 'warning',
+        'pending' => 'info',
+        'lainnya' => 'secondary',
     ];
 
     $gramase = !empty($detail->gramase) ? $detail->gramase : ($detail->product->nett_weight ?? null);
@@ -58,7 +56,7 @@
 
             @if ($detail->product_status)
                 <span class="badge bg-{{ $statusColors[$detail->product_status] ?? 'secondary' }}">
-                    {{ $actionLabels[$detail->product_status] ?? $detail->product_status }}
+                    {{ $statusLabels[$detail->product_status] ?? $detail->product_status }}
                 </span>
             @endif
         </div>
@@ -96,7 +94,7 @@
             <div class="col-12 col-md-6 col-xl-3">
                 <div class="fo-section">
                     <div class="fo-section-title">C &middot; Product Control &amp; Disposition</div>
-                    <x-fo-field label="Product Status" :value="$actionLabels[$detail->product_status] ?? null" />
+                    <x-fo-field label="Product Status" :value="$statusLabels[$detail->product_status] ?? null" />
                     <x-fo-field label="Affected Quantity" :value="$detail->affected_quantity" />
                     <x-fo-field label="Disposition" :value="$actionLabels[$detail->disposition] ?? null" />
                 </div>
@@ -117,7 +115,7 @@
                         <x-fo-field label="Investigation" value="-" />
                     @endif
                     <x-fo-field label="Immediate Correction" :value="$detail->immediate_correction" />
-                    <x-fo-field label="Corrective Action" :value="$actionLabels[$detail->corrective_action] ?? null" />
+                    <x-fo-field label="Corrective Action" :value="$detail->corrective_action" />
 
                     {{-- data lama --}}
                     @if ($detail->analysis_stage)

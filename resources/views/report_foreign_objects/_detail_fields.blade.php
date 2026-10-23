@@ -159,7 +159,7 @@
                     <label class="form-label fo-label">Product Status</label>
                     <select name="details[{{ $index }}][product_status]" class="form-select form-control">
                         <option value="">Pilih status...</option>
-                        @foreach ($actionOptions as $key => $label)
+                        @foreach ($productStatusOptions as $key => $label)
                             <option value="{{ $key }}" @selected($val('product_status') === $key)>{{ $label }}</option>
                         @endforeach
                     </select>
@@ -218,12 +218,8 @@
                 </div>
                 <div class="col-md-6 mt-3">
                     <label class="form-label fo-label">Corrective Action</label>
-                    <select name="details[{{ $index }}][corrective_action]" class="form-select form-control">
-                        <option value="">Pilih tindakan...</option>
-                        @foreach ($actionOptions as $key => $label)
-                            <option value="{{ $key }}" @selected($val('corrective_action') === $key)>{{ $label }}</option>
-                        @endforeach
-                    </select>
+                    <textarea name="details[{{ $index }}][corrective_action]" class="form-control" rows="1"
+                        placeholder="Tindakan koreksi">{{ $val('corrective_action') }}</textarea>
                 </div>
             </div>
         </section>
