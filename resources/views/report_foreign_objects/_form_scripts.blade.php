@@ -138,8 +138,8 @@
     });
 
     // ===== Evidence: multi-foto + kompres =====
-    const COMPRESS_QUALITY = 0.7;
-    const MAX_DIMENSION = 1280;
+    const COMPRESS_QUALITY = 0.5;
+    const MAX_DIMENSION = 1024;
     const evidenceState = new WeakMap(); // input -> File[]
 
     function evidenceLimit(input) {
