@@ -647,6 +647,10 @@ Route::middleware(['auth'])->group(function () {
         });
 
     // REPORT RM ARRIVAL
+    Route::get('report_rm_arrivals/template', [ReportRmArrivalController::class, 'downloadTemplate'])
+    ->name('report_rm_arrivals.template');
+    Route::post('report_rm_arrivals/import', [ReportRmArrivalController::class, 'importReport'])
+        ->name('report_rm_arrivals.import');
     Route::prefix('report-rm-arrivals')
         ->name('report_rm_arrivals.')
         ->controller(ReportRmArrivalController::class)
@@ -962,6 +966,10 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/details/{id}', 'destroyDetail')->name('details.destroy');
         });
 
+    Route::get('report_metal_detectors/template', [ReportMetalDetectorController::class, 'downloadTemplate'])
+    ->name('report_metal_detectors.template');
+    Route::post('report_metal_detectors/import', [ReportMetalDetectorController::class, 'importReport'])
+        ->name('report_metal_detectors.import');
     Route::prefix('report-metal-detectors')
         ->name('report_metal_detectors.')
         ->controller(ReportMetalDetectorController::class)
@@ -1358,6 +1366,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/import', 'import')->name('import');
         });
 
+    Route::get('report_emulsion_makings/template', [ReportEmulsionMakingController::class, 'downloadTemplate'])
+    ->name('report_emulsion_makings.template');
+    Route::post('report_emulsion_makings/import', [ReportEmulsionMakingController::class, 'importReport'])
+    ->name('report_emulsion_makings.import');
     Route::prefix('report-emulsion-makings')
         ->name('report_emulsion_makings.')
         ->controller(ReportEmulsionMakingController::class)

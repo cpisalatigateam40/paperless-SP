@@ -22,11 +22,12 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportRmArrivalController extends Controller
 {
 
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController, HasExcelImport;
 
     protected function auditModel(): string
     {
@@ -105,6 +106,50 @@ class ReportRmArrivalController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_rm_arrival';
+    }
+
+    protected function getImportModelClass(): string
+    {
+        return ReportRmArrival::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-rm-arrival.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload, jadi report_uuid sama untuk semua baris
+    protected function getAdditionalImportData(): array
+    {
+        $r = request();
+        $u = auth()->user();
+
+        $shift = trim((string) $r->input('shift'));
+        if ($shift === '') {
+            $shift = $u->hasRole('QC Inspector') && session('shift_number') && session('shift_group')
+                ? session('shift_number') . '-' . session('shift_group')
+                : 'NON-SHIFT';
+        }
+
+        return [
+            'report_uuid'  => (string) Str::uuid(),
+            'area_uuid'    => $u->area_uuid,
+            'section_uuid' => $r->input('section_uuid') ?: null,
+            'date'         => $r->input('date'),
+            'shift'        => $shift,
+            'created_by'   => $u->name,
+        ];
+    }
+
+    public function importReport(Request $request)
+    {
+        $request->validate([
+            'date'         => 'required|date',
+            'section_uuid' => 'required',
+            'shift'        => 'nullable|string|max:50',
+        ]);
+
+        return $this->importExcel($request);
     }
 
     public function index(Request $request)
@@ -553,14 +598,6 @@ class ReportRmArrivalController extends Controller
             ->distinct()
             ->limit(10)
             ->pluck('production_code');
-    }
-
-    public function downloadTemplate()
-    {
-        return Excel::download(
-            new RmArrivalTemplateExport,
-            'template_laporan_kedatangan_bahan.xlsx'
-        );
     }
 
     public function import(Request $request)

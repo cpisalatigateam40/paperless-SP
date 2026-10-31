@@ -22,10 +22,11 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportMetalDetectorController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController, HasExcelImport;
 
     protected function auditModel(): string
     {
@@ -100,6 +101,52 @@ class ReportMetalDetectorController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_metal_detector';
+    }
+
+    protected function getImportModelClass(): string
+    {
+        return ReportMetalDetector::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-metal-detector.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload, jadi report_uuid sama untuk semua baris
+    protected function getAdditionalImportData(): array
+    {
+        $r = request();
+        $u = auth()->user();
+
+        $shift = trim((string) $r->input('shift'));
+
+        if ($shift === '') {
+            $shift = $u->hasRole('QC Inspector') && session('shift_number') && session('shift_group')
+                ? session('shift_number') . '-' . session('shift_group')
+                : 'NON-SHIFT';
+        }
+
+        return [
+            'report_uuid'  => (string) Str::uuid(),
+            'area_uuid'    => $u->area_uuid,
+            'section_uuid' => $r->input('section_uuid') ?: null,
+            'date'         => $r->input('date'),
+            'shift'        => $shift,
+            'created_by'   => $u->name,
+        ];
+    }
+
+    // Validasi isian modal dulu, baru proses file
+    public function importReport(Request $request)
+    {
+        $request->validate([
+            'date'         => 'required|date',
+            'section_uuid' => 'nullable',
+            'shift'        => 'nullable|string|max:50',
+        ]);
+
+        return $this->importExcel($request);
     }
 
     public function index(Request $request)
@@ -198,7 +245,9 @@ class ReportMetalDetectorController extends Controller
             $areas = collect();
         }
 
-        return view('report_metal_detectors.index', compact('reports', 'areas'));
+        $sections = Section::orderBy('section_name')->get();
+
+        return view('report_metal_detectors.index', compact('reports', 'areas', 'sections'));
     }
 
     // Form create
@@ -462,26 +511,18 @@ class ReportMetalDetectorController extends Controller
             : 'Data berhasil diperbarui.');
     }
 
-    public function downloadTemplate()
-    {
-        return Excel::download(
-            new MetalDetectorTemplateExport,
-            'template_pemeriksaan_md_adonan.xlsx'
-        );
-    }
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,xls',
+    //     ]);
 
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
-        ]);
+    //     Excel::import(new MetalDetectorImport, $request->file('file'));
 
-        Excel::import(new MetalDetectorImport, $request->file('file'));
-
-        return redirect()
-            ->route('report_metal_detectors.index')
-            ->with('success', 'Data Excel berhasil diimport.');
-    }
+    //     return redirect()
+    //         ->route('report_metal_detectors.index')
+    //         ->with('success', 'Data Excel berhasil diimport.');
+    // }
 
     public function exportExcel(Request $request)
     {

@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report_emulsion_makings.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -130,6 +136,8 @@
                 {{ session('success') }}
             </div>
             @endif
+
+            <x-import-alerts />
 
             @if ($errors->any())
             <div id="error-alert" class="alert alert-danger">
@@ -411,6 +419,37 @@
     </div>
 </div>
 
+@can('create report')
+<x-import-modal
+    title="Import Pembuatan Emulsi"
+    subtitle="Satu file akan membuat satu laporan baru"
+    :route="route('report_emulsion_makings.import')"
+    :template-route="route('report_emulsion_makings.template')">
+
+    <div>
+        <label class="imp-label">Hari/Tanggal</label>
+        <input type="date" name="date" value="{{ now()->toDateString() }}" class="form-control" required>
+    </div>
+    <div>
+        <label class="imp-label">Shift</label>
+        <input type="text" name="shift" class="form-control" placeholder="NON-SHIFT"
+               value="{{ auth()->user()->hasRole('QC Inspector') ? session('shift_number') . '-' . session('shift_group') : '' }}">
+    </div>
+    <div>
+        <label class="imp-label">Jenis Emulsi</label>
+        <select name="emulsion_type" class="form-select" required>
+            <option value="">- Pilih emulsi -</option>
+            @foreach(\App\Models\ReportEmulsionMaking::EMULSION_TYPES as $type)
+                <option value="{{ $type }}">{{ $type }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div>
+        <label class="imp-label">Kode Produksi</label>
+        <input type="text" name="production_code" class="form-control">
+    </div>
+</x-import-modal>
+@endcan
 
 @endsection
 

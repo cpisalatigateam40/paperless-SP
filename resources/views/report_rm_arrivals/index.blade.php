@@ -92,6 +92,12 @@
                     </div>
 
                     @can('create report')
+                    <div class="op-item">
+                        <x-import-button />
+                    </div>
+                    @endcan
+
+                    @can('create report')
                     <div class="op-item  ">
                         <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
                             <i class="fas fa-plus"></i> Tambah
@@ -145,6 +151,8 @@
                     <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                 </div>
                 @endif
+
+                <x-import-alerts />
 
                 <x-report-sort
                     :sort-options="[
@@ -404,6 +412,35 @@
         </div>
     </div>
 
+    @can('create report')
+    <x-import-modal
+        title="Import Kedatangan Bahan Baku"
+        subtitle="Satu file akan membuat satu laporan baru"
+        :route="route('report_rm_arrivals.import')"
+        :template-route="route('report_rm_arrivals.template')">
+
+        <div>
+            <label class="imp-label">Tanggal</label>
+            <input type="date" name="date" value="{{ now()->toDateString() }}" class="form-control" required>
+        </div>
+
+        <div>
+            <label class="imp-label">Shift</label>
+            <input type="text" name="shift" class="form-control" placeholder="NON-SHIFT"
+                value="{{ auth()->user()->hasRole('QC Inspector') ? session('shift_number') . '-' . session('shift_group') : '' }}">
+        </div>
+
+        <div class="imp-full">
+            <label class="imp-label">Section</label>
+            <select name="section_uuid" class="form-select" required>
+                <option value="">- Pilih section -</option>
+                @foreach($sections as $s)
+                    <option value="{{ $s->uuid }}">{{ $s->section_name }}</option>
+                @endforeach
+            </select>
+        </div>
+    </x-import-modal>
+    @endcan
 
 @endsection
 

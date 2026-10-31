@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report_metal_detectors.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -129,6 +135,8 @@
                 {{ session('success') }}
             </div>
             @endif
+
+            <x-import-alerts />
 
             @if ($errors->any())
             <div id="error-alert" class="alert alert-danger">
@@ -383,6 +391,27 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Metal Detector"
+    subtitle="Satu file akan membuat satu laporan baru"
+    :route="route('report_metal_detectors.import')"
+    :template-route="route('report_metal_detectors.template')">
+
+    <div>
+        <label class="imp-label">Tanggal</label>
+        <input type="date" name="date" value="{{ now()->toDateString() }}" class="form-control" required>
+    </div>
+
+    <div>
+        <label class="imp-label">Shift</label>
+        <input type="text" name="shift" class="form-control"
+               value="{{ auth()->user()->hasRole('QC Inspector') ? session('shift_number') . '-' . session('shift_group') : '' }}"
+               placeholder="NON-SHIFT">
+    </div>
+</x-import-modal>
+@endcan
 @endsection
 
 @section('script')
