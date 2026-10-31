@@ -200,6 +200,13 @@
                                         <i class="fas fa-check"></i> {{ $header->known_by }}
                                     </span>
                                     @endif
+                                    @else
+                                    @if($header->known_by)
+                                    <span class="badge bg-success"
+                                        style="color: white; border-radius: 1rem; padding-inline: .8rem; padding-block: .3rem;">
+                                        <i class="fas fa-check"></i> {{ $header->known_by }}
+                                    </span>
+                                    @endif
                                 @endcan
 
                                 {{-- APPROVE --}}
