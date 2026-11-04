@@ -77,6 +77,13 @@
                         title="Verifikasi Metal Detector Produk" />
                 </div>
 
+                {{-- toolbar --}}
+                @can('create report')
+                <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
                 @can('create report')
                 <div class="op-item">
                     <a href="{{ route('report_md_products.create') }}" class="btn btn-sm btn-primary">
@@ -125,6 +132,8 @@
                 {{ session('success') }}
             </div>
             @endif
+
+            <x-import-alerts />
 
             @if ($errors->any())
             <div id="error-alert" class="alert alert-danger">
@@ -410,6 +419,15 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Verifikasi Metal Detector Produk"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal, Shift, dan Metal Detector yang sama digabung menjadi satu laporan. Kosongkan sel posisi yang tidak diperiksa. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report_md_products.import')"
+    :template-route="route('report_md_products.template')" />
+@endcan
 @endsection
 
 @section('script')

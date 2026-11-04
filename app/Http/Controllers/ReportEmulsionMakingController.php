@@ -21,11 +21,13 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
+use Illuminate\Validation\Rule;
 
 
 class ReportEmulsionMakingController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController, HasExcelImport;
 
     protected function auditModel(): string
     {
@@ -100,6 +102,28 @@ class ReportEmulsionMakingController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_emulsion_making';
+    }
+
+    protected function getImportModelClass(): string
+    {
+        return ReportEmulsionMaking::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-emulsi.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)
@@ -550,14 +574,6 @@ class ReportEmulsionMakingController extends Controller
         ->with('success', $report->is_audit
             ? 'Data audit berhasil diperbarui.'
             : 'Data berhasil diperbarui.');
-    }
-
-    public function downloadTemplate()
-    {
-        return Excel::download(
-            new EmulsionMakingTemplateExport,
-            'template_verifikasi_pembuatan_emulsi.xlsx'
-        );
     }
 
     public function import(Request $request)

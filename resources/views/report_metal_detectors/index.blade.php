@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report_metal_detectors.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -129,6 +135,8 @@
                 {{ session('success') }}
             </div>
             @endif
+
+            <x-import-alerts />
 
             @if ($errors->any())
             <div id="error-alert" class="alert alert-danger">
@@ -383,6 +391,15 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Metal Detector"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal, Shift, dan Section yang sama digabung menjadi satu laporan. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report_metal_detectors.import')"
+    :template-route="route('report_metal_detectors.template')" />
+@endcan
 @endsection
 
 @section('script')

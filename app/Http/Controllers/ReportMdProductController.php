@@ -24,6 +24,7 @@ use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportMdProductController extends Controller
 {
@@ -81,6 +82,30 @@ class ReportMdProductController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_md_products';
+    }
+
+    use HasExcelImport;
+
+    protected function getImportModelClass(): string
+    {
+        return ReportMdProduct::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-md-produk.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)
@@ -455,14 +480,6 @@ class ReportMdProductController extends Controller
             ->with('success', $report->is_audit
                 ? 'Data audit berhasil diperbarui.'
                 : 'Data berhasil diperbarui.');
-    }
-
-    public function downloadTemplate()
-    {
-        return Excel::download(
-            new MdProductTemplateExport,
-            'template-md-produk.xlsx'
-        );
     }
 
     /* ================= IMPORT EXCEL ================= */

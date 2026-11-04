@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('process-area-cleanliness.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -142,6 +148,8 @@
                 </div>
                 @endif
 
+                <x-import-alerts />
+
                 <x-report-sort
                     :sort-options="[
                         'latest' => 'Terbaru',
@@ -185,6 +193,15 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Kesesuaian Area Proses Produksi"
+    subtitle="Satu file bisa berisi banyak inspeksi"
+    hint="Satu baris = satu item. Baris dengan Tanggal, Shift, Area, dan Jam Inspeksi yang sama digabung menjadi satu inspeksi. Untuk inspeksi lain, salin 4 baris contoh dan ganti jamnya."
+    :route="route('process-area-cleanliness.import')"
+    :template-route="route('process-area-cleanliness.template')" />
+@endcan
 @endsection
 
 @section('script')

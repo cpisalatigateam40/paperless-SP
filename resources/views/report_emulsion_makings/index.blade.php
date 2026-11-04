@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report_emulsion_makings.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -130,6 +136,8 @@
                 {{ session('success') }}
             </div>
             @endif
+
+            <x-import-alerts />
 
             @if ($errors->any())
             <div id="error-alert" class="alert alert-danger">
@@ -411,6 +419,14 @@
     </div>
 </div>
 
+@can('create report')
+<x-import-modal
+    title="Import Pembuatan Emulsi"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal, Shift, Jenis Emulsi, dan Kode Produksi yang sama digabung menjadi satu laporan. Kolom aging cukup diisi pada baris pertama tiap laporan. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report_emulsion_makings.import')"
+    :template-route="route('report_emulsion_makings.template')" />
+@endcan
 
 @endsection
 

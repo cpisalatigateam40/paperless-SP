@@ -180,6 +180,14 @@ class Product extends Model
         return $this->hasMany(ReportAuditPackingPrimer::class, 'product_uuid', 'uuid');
     }
 
+    // Daftar produk unik per nama (dipakai form create dan import Excel)
+    public static function uniqueByName()
+    {
+        return static::selectRaw('MIN(uuid) as uuid, product_name')
+            ->groupBy('product_name')
+            ->get();
+    }
+
 
 
 

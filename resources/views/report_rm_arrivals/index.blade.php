@@ -92,6 +92,12 @@
                     </div>
 
                     @can('create report')
+                    <div class="op-item">
+                        <x-import-button />
+                    </div>
+                    @endcan
+
+                    @can('create report')
                     <div class="op-item  ">
                         <a href="{{ route('report_rm_arrivals.create') }}" class="btn btn-sm btn-primary">
                             <i class="fas fa-plus"></i> Tambah
@@ -145,6 +151,8 @@
                     <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                 </div>
                 @endif
+
+                <x-import-alerts />
 
                 <x-report-sort
                     :sort-options="[
@@ -404,6 +412,14 @@
         </div>
     </div>
 
+    @can('create report')
+    <x-import-modal
+        title="Import Kedatangan Bahan Baku"
+        subtitle="Satu file bisa berisi banyak laporan"
+        hint="Baris dengan Tanggal, Shift, dan Section yang sama digabung menjadi satu laporan. Timpa atau hapus baris contoh sebelum upload."
+        :route="route('report_rm_arrivals.import')"
+        :template-route="route('report_rm_arrivals.template')" />
+    @endcan
 
 @endsection
 

@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report-fragile-item.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -140,6 +146,8 @@
                     </ul>
                 </div>
                 @endif
+
+                <x-import-alerts />
 
                 <x-report-sort
                     :sort-options="[
@@ -357,6 +365,15 @@
         
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Pemeriksaan Barang Mudah Pecah"
+    subtitle="Template sudah berisi semua barang"
+    hint="Pilih ✓ atau x di kolom Waktu Awal dan Keterangan. Jangan ubah Area, Nama Barang, dan Pemilik. Untuk barang manual, tambah baris baru, kosongkan Nama Barang, lalu isi kolom Manual beserta Tanggal dan Shift."
+    :route="route('report-fragile-item.import')"
+    :template-route="route('report-fragile-item.template')" />
+@endcan
 @endsection
 
 @section('script')

@@ -22,6 +22,7 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportSiomayController extends Controller
 {
@@ -81,6 +82,30 @@ class ReportSiomayController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_siomay';
+    }
+
+    use HasExcelImport;
+
+    protected function getImportModelClass(): string
+    {
+        return ReportSiomay::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-kulit-siomay-gyoza.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)
