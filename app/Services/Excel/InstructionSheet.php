@@ -36,7 +36,7 @@ class InstructionSheet implements FromArray, WithTitle
 
         // baris format hanya muncul bila kolomnya memang ada di template
         if (in_array('date', $this->mapping, true)) {
-            $result[] = ['- Tanggal: YYYY-MM-DD (contoh: ' . now()->format('Y-m-d') . ')'];
+            $result[] = ['- Tanggal (termasuk Best Before): DD/MM/YYYY (contoh: ' . now()->format('d/m/Y') . ')'];
         }
         $result[] = ['- Angka desimal: gunakan titik (contoh: 4.5)'];
         $result[] = [''];

@@ -114,57 +114,16 @@ class ReportEmulsionMakingController extends Controller
         return 'template-import-emulsi.xlsx';
     }
 
-    // Dipanggil SEKALI per upload, jadi uuid laporan dan header sama untuk semua baris
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
     protected function getAdditionalImportData(): array
     {
-        $r = request();
         $u = auth()->user();
 
-        $shift = trim((string) $r->input('shift'));
-        if ($shift === '') {
-            $shift = $u->hasRole('QC Inspector') && session('shift_number') && session('shift_group')
-                ? session('shift_number') . '-' . session('shift_group')
-                : 'NON-SHIFT';
-        }
-
         return [
-            'report_uuid'     => (string) Str::uuid(),
-            'header_uuid'     => (string) Str::uuid(),
-            'area_uuid'       => $u->area_uuid,
-            'date'            => $r->input('date'),
-            'shift'           => $shift,
-            'created_by'      => $u->name,
-            'emulsion_type'   => $r->input('emulsion_type'),
-            'production_code' => $r->input('production_code') ?: null,
-            'start_aging'     => $r->input('start_aging') ?: null,
-            'finish_aging'    => $r->input('finish_aging') ?: null,
-            'sensory_color'   => $r->input('sensory_color') ?: null,
-            'sensory_texture' => $r->input('sensory_texture') ?: null,
-            'temp_after'      => $r->input('temp_after') ?: null,
-            'emulsion_result' => $r->input('emulsion_result') ?: null,
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
         ];
-    }
-
-    // Validasi isian modal dulu (aging: semua terisi atau semua kosong), baru proses file
-    public function importReport(Request $request)
-    {
-        $aging = 'required_with:start_aging';
-
-        $request->validate([
-            'date'            => 'required|date',
-            'shift'           => 'nullable|string|max:50',
-            'emulsion_type'   => ['required', Rule::in(ReportEmulsionMaking::EMULSION_TYPES)],
-            'production_code' => 'nullable|string|max:100',
-
-            'start_aging'     => 'nullable|date_format:H:i|required_with:finish_aging,sensory_color,sensory_texture,temp_after,emulsion_result',
-            'finish_aging'    => "nullable|date_format:H:i|{$aging}",
-            'sensory_color'   => "nullable|in:✓,x|{$aging}",
-            'sensory_texture' => "nullable|in:✓,x|{$aging}",
-            'temp_after'      => 'nullable|numeric',
-            'emulsion_result' => "nullable|in:OK,Tidak OK|{$aging}",
-        ]);
-
-        return $this->importExcel($request);
     }
 
     public function index(Request $request)

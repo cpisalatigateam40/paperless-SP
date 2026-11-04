@@ -251,6 +251,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('cleanliness/copy-to-audit/{uuid}', [StorageRmCleanlinessController::class, 'copyToAudit'])->name('cleanliness.copy-to-audit');
     Route::post('cleanliness/auto-audit/{uuid}', [StorageRmCleanlinessController::class, 'autoNormalizeAudit'])
     ->name('cleanliness.auto-audit');
+    Route::get('cleanliness/template', [StorageRmCleanlinessController::class, 'downloadTemplate'])
+    ->name('cleanliness.template');
+    Route::post('cleanliness/import', [StorageRmCleanlinessController::class, 'importExcel'])
+            ->name('cleanliness.import');
     Route::prefix('storage-rm-cleanliness')
         ->name('cleanliness.')
         ->controller(StorageRmCleanlinessController::class)
@@ -283,6 +287,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('process-area-cleanliness.copy-to-audit');
     Route::post('process-area-cleanliness/auto-audit/{uuid}', [ProcessAreaCleanlinessController::class, 'autoNormalizeAudit'])
     ->name('process-area-cleanliness.auto-audit');
+    Route::get('process-area-cleanliness/template', [ProcessAreaCleanlinessController::class, 'downloadTemplate'])
+        ->name('process-area-cleanliness.template');
+    Route::post('process-area-cleanliness/import', [ProcessAreaCleanlinessController::class, 'importExcel'])
+        ->name('process-area-cleanliness.import');
     Route::prefix('process-area-cleanliness')
         ->name('process-area-cleanliness.')
         ->controller(ProcessAreaCleanlinessController::class)
@@ -386,6 +394,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('report-fragile-item.copy-to-audit');
     Route::post('report-fragile-item/auto-audit/{uuid}', [ReportFragileItemController::class, 'autoNormalizeAudit'])
     ->name('report-fragile-item.auto-audit');
+    Route::get('report-fragile-item/template', [ReportFragileItemController::class, 'downloadTemplate'])
+        ->name('report-fragile-item.template');
+    Route::post('report-fragile-item/import', [ReportFragileItemController::class, 'importExcel'])
+        ->name('report-fragile-item.import');
     Route::prefix('report-fragile-item')
         ->name('report-fragile-item.')
         ->controller(ReportFragileItemController::class)
@@ -649,8 +661,8 @@ Route::middleware(['auth'])->group(function () {
     // REPORT RM ARRIVAL
     Route::get('report_rm_arrivals/template', [ReportRmArrivalController::class, 'downloadTemplate'])
     ->name('report_rm_arrivals.template');
-    Route::post('report_rm_arrivals/import', [ReportRmArrivalController::class, 'importReport'])
-        ->name('report_rm_arrivals.import');
+    Route::post('report_rm_arrivals/import', [ReportRmArrivalController::class, 'importExcel'])
+    ->name('report_rm_arrivals.import');
     Route::prefix('report-rm-arrivals')
         ->name('report_rm_arrivals.')
         ->controller(ReportRmArrivalController::class)
@@ -715,6 +727,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-premixes/export-pdf-bulk', [ReportPremixController::class, 'exportPdfBulk'])
     ->name('report_premixes.export_pdf_bulk');
 
+    Route::get('report-alat-verifications/template', [ReportAlatVerificationController::class, 'downloadTemplate'])
+    ->name('report-alat-verifications.template');
+    Route::post('report-alat-verifications/import', [ReportAlatVerificationController::class, 'importExcel'])
+        ->name('report-alat-verifications.import');
     Route::get('report-alat-verifications/export-pdf-bulk', [ReportAlatVerificationController::class, 'exportPdfBulk'])
     ->name('report-alat-verifications.export_pdf_bulk');
     Route::post('report-alat-verifications/bulk-known', [ReportAlatVerificationController::class, 'bulkKnown'])->name('report-alat-verifications.bulk-known');
@@ -925,6 +941,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/export-excel', 'exportExcel')->name('export');
     });
 
+    Route::get('report_lab_samples/template', [ReportLabSampleController::class, 'downloadTemplate'])
+        ->name('report_lab_samples.template');
+    Route::post('report_lab_samples/import', [ReportLabSampleController::class, 'importExcel'])
+        ->name('report_lab_samples.import');
     Route::prefix('report-lab-samples')
         ->name('report_lab_samples.')
         ->controller(ReportLabSampleController::class)
@@ -968,8 +988,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('report_metal_detectors/template', [ReportMetalDetectorController::class, 'downloadTemplate'])
     ->name('report_metal_detectors.template');
-    Route::post('report_metal_detectors/import', [ReportMetalDetectorController::class, 'importReport'])
-        ->name('report_metal_detectors.import');
+    Route::post('report_metal_detectors/import', [ReportMetalDetectorController::class, 'importExcel'])
+    ->name('report_metal_detectors.import');
     Route::prefix('report-metal-detectors')
         ->name('report_metal_detectors.')
         ->controller(ReportMetalDetectorController::class)
@@ -1045,6 +1065,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/export-pdf/{uuid}', 'exportPdf')->name('export-pdf');
         });
 
+    Route::get('report_md_products/template', [ReportMdProductController::class, 'downloadTemplate'])
+    ->name('report_md_products.template');
+    Route::post('report_md_products/import', [ReportMdProductController::class, 'importExcel'])
+    ->name('report_md_products.import');
     Route::prefix('report-md-products')
         ->name('report_md_products.')
         ->controller(ReportMdProductController::class)
@@ -1251,6 +1275,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/known', 'known')->name('known');
         });
 
+    Route::get('report_tofu_verifs/template', [ReportTofuVerifController::class, 'downloadTemplate'])
+    ->name('report_tofu_verifs.template');
+    Route::post('report_tofu_verifs/import', [ReportTofuVerifController::class, 'importExcel'])
+        ->name('report_tofu_verifs.import');
     Route::prefix('report-tofu-verifs')
         ->name('report_tofu_verifs.')
         ->controller(ReportTofuVerifController::class)
@@ -1368,7 +1396,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('report_emulsion_makings/template', [ReportEmulsionMakingController::class, 'downloadTemplate'])
     ->name('report_emulsion_makings.template');
-    Route::post('report_emulsion_makings/import', [ReportEmulsionMakingController::class, 'importReport'])
+    Route::post('report_emulsion_makings/import', [ReportEmulsionMakingController::class, 'importExcel'])
     ->name('report_emulsion_makings.import');
     Route::prefix('report-emulsion-makings')
         ->name('report_emulsion_makings.')
@@ -1578,6 +1606,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-sauces/export-pdf-bulk', [ReportSauceController::class, 'exportPdfBulk'])
     ->name('report_sauces.export_pdf_bulk');
 
+    Route::get('report_siomays/template', [ReportSiomayController::class, 'downloadTemplate'])
+        ->name('report_siomays.template');
+    Route::post('report_siomays/import', [ReportSiomayController::class, 'importExcel'])
+        ->name('report_siomays.import');
     Route::prefix('report-siomays')
         ->name('report_siomays.')
         ->controller(ReportSiomayController::class)
@@ -1749,6 +1781,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-changeover-cleanings/bulk-approve-count', [ReportChangeoverCleaningController::class, 'bulkApproveCount'])->name('report-changeover-cleanings.bulk-approve-count');
     
 
+    Route::get('report_thawings/template', [ReportThawingController::class, 'downloadTemplate'])
+    ->name('report_thawings.template');
+    Route::post('report_thawings/import', [ReportThawingController::class, 'importExcel'])
+    ->name('report_thawings.import');
     Route::prefix('report-thawings')
         ->name('report_thawings.')
         ->controller(ReportThawingController::class)

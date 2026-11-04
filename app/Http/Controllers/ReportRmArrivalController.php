@@ -121,35 +121,13 @@ class ReportRmArrivalController extends Controller
     // Dipanggil SEKALI per upload, jadi report_uuid sama untuk semua baris
     protected function getAdditionalImportData(): array
     {
-        $r = request();
         $u = auth()->user();
 
-        $shift = trim((string) $r->input('shift'));
-        if ($shift === '') {
-            $shift = $u->hasRole('QC Inspector') && session('shift_number') && session('shift_group')
-                ? session('shift_number') . '-' . session('shift_group')
-                : 'NON-SHIFT';
-        }
-
         return [
-            'report_uuid'  => (string) Str::uuid(),
             'area_uuid'    => $u->area_uuid,
-            'section_uuid' => $r->input('section_uuid') ?: null,
-            'date'         => $r->input('date'),
-            'shift'        => $shift,
             'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
         ];
-    }
-
-    public function importReport(Request $request)
-    {
-        $request->validate([
-            'date'         => 'required|date',
-            'section_uuid' => 'required',
-            'shift'        => 'nullable|string|max:50',
-        ]);
-
-        return $this->importExcel($request);
     }
 
     public function index(Request $request)

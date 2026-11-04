@@ -21,6 +21,7 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class StorageRmCleanlinessController extends Controller
 {
@@ -77,6 +78,30 @@ class StorageRmCleanlinessController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_storage_rm_cleanliness';
+    }
+
+    use HasExcelImport;
+
+    protected function getImportModelClass(): string
+    {
+        return ReportStorageRmCleanliness::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-kondisi-ruang-penyimpanan.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)

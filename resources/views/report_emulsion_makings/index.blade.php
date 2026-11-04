@@ -422,33 +422,10 @@
 @can('create report')
 <x-import-modal
     title="Import Pembuatan Emulsi"
-    subtitle="Satu file akan membuat satu laporan baru"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal, Shift, Jenis Emulsi, dan Kode Produksi yang sama digabung menjadi satu laporan. Kolom aging cukup diisi pada baris pertama tiap laporan. Timpa atau hapus baris contoh sebelum upload."
     :route="route('report_emulsion_makings.import')"
-    :template-route="route('report_emulsion_makings.template')">
-
-    <div>
-        <label class="imp-label">Hari/Tanggal</label>
-        <input type="date" name="date" value="{{ now()->toDateString() }}" class="form-control" required>
-    </div>
-    <div>
-        <label class="imp-label">Shift</label>
-        <input type="text" name="shift" class="form-control" placeholder="NON-SHIFT"
-               value="{{ auth()->user()->hasRole('QC Inspector') ? session('shift_number') . '-' . session('shift_group') : '' }}">
-    </div>
-    <div>
-        <label class="imp-label">Jenis Emulsi</label>
-        <select name="emulsion_type" class="form-select" required>
-            <option value="">- Pilih emulsi -</option>
-            @foreach(\App\Models\ReportEmulsionMaking::EMULSION_TYPES as $type)
-                <option value="{{ $type }}">{{ $type }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div>
-        <label class="imp-label">Kode Produksi</label>
-        <input type="text" name="production_code" class="form-control">
-    </div>
-</x-import-modal>
+    :template-route="route('report_emulsion_makings.template')" />
 @endcan
 
 @endsection

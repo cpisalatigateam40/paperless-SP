@@ -91,6 +91,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report-alat-verifications.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -149,6 +155,8 @@
                     </ul>
                 </div>
                 @endif
+
+                <x-import-alerts />
 
                 <x-report-sort
                     :sort-options="[
@@ -405,6 +413,15 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Verifikasi Alat Ukur"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal dan Shift yang sama digabung menjadi satu laporan. Pilih alat dan titik ukur dari dropdown. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report-alat-verifications.import')"
+    :template-route="route('report-alat-verifications.template')" />
+@endcan
 @endsection
 
 @section('script')

@@ -105,7 +105,52 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
         static::addGlobalScope(new UserAreaScope);
     }
 
-        /* ===================== IMPORT EXCEL ===================== */
+    /* ===================== IMPORT EXCEL ===================== */
+
+        // Peta "batch upload + (tanggal|shift|section)" => uuid laporan, supaya baris sekelompok masuk laporan yang sama
+    private static array $importReportUuids = [];
+
+    private static ?array $sectionOptionsCache = null;
+
+    // SAMAKAN query dan urutannya dengan ReportRmArrivalController@create
+    private static function sectionOptions(): array
+    {
+        if (self::$sectionOptionsCache === null) {
+            self::$sectionOptionsCache = Section::orderBy('section_name')->get()
+                ->map(fn ($s) => ['name' => $s->section_name, 'uuid' => $s->uuid])
+                ->all();
+        }
+        return self::$sectionOptionsCache;
+    }
+
+    // Shift cadangan bila kolom Shift di Excel kosong
+    private static function defaultShift(): string
+    {
+        return auth()->user()->hasRole('QC Inspector') && session('shift_number') && session('shift_group')
+            ? session('shift_number') . '-' . session('shift_group')
+            : 'NON-SHIFT';
+    }
+
+    // Serial Excel / DateTime / "2026-10-27" / "27/10/2026" -> "Y-m-d" (atau null)
+    private static function toDate($v): ?string
+    {
+        if ($v === null || $v === '') return null;
+        if ($v instanceof \DateTimeInterface) return $v->format('Y-m-d');
+
+        if (is_int($v) || is_float($v) || (is_string($v) && is_numeric($v))) {
+            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject((float) $v)->format('Y-m-d');
+        }
+
+        $s = trim((string) $v);
+        foreach (['Y-m-d', 'j/n/Y', 'j-n-Y', 'j.n.Y'] as $format) {
+            $d   = \DateTime::createFromFormat('!' . $format, $s);
+            $err = \DateTime::getLastErrors();
+            if ($d && (!$err || ($err['warning_count'] === 0 && $err['error_count'] === 0))) {
+                return $d->format('Y-m-d');
+            }
+        }
+        return null;
+    }
 
     public const RM_CONDITIONS = ['Fresh (F)', 'Thawing (Th)', 'Frozen (Fr)', 'Dry'];
 
@@ -153,6 +198,11 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
     public static function getImportMapping(): array
     {
         return [
+            // Laporan (kolom yang sama di semua baris satu laporan)
+            'Tanggal'            => 'date',
+            'Shift'              => 'shift',
+            'Section'            => 'section_uuid',
+            // Detail
             'Bahan Baku'         => 'material_uuid',
             'Kondisi RM'         => 'rm_condition',
             'Produsen'           => 'supplier',
@@ -167,6 +217,8 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
             'Status'             => 'status',
             'Tindakan Koreksi'   => 'corrective_action',
             'Catatan'            => 'problem',
+            // Notes laporan: isi di baris pertama tiap laporan
+            'Notes Laporan'      => 'report_notes',
         ];
     }
 
@@ -176,13 +228,16 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
         $check    = 'required|in:✓,x';
 
         return [
-            // header (dari getAdditionalImportData di controller)
-            'report_uuid'  => 'required',
+            // dari controller
+            'import_batch' => 'required',
             'area_uuid'    => 'required',
+            'created_by'   => 'required|string',
+
+            // laporan (dari Excel)
             'date'         => 'required|date',
             'shift'        => 'required|string|max:50',
-            'created_by'   => 'required|string',
             'section_uuid' => ['required', Rule::exists('sections', 'uuid')->where('area_uuid', $areaUuid)],
+            'report_notes' => 'nullable|string',
 
             // detail (dari Excel)
             'material_uuid'       => 'required',
@@ -220,16 +275,21 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
             'sensory_color'       => ['label' => 'Sensory Warna'] + $check,
             'contamination'       => ['label' => 'Kontaminasi'] + $check,
             'status'              => ['label' => 'Status', 'options' => ['OK', 'Tidak OK']],
+            'section_uuid' => [
+                'label'    => 'Section',
+                'callback' => fn () => array_column(self::sectionOptions(), 'name'),
+            ],
         ];
     }
 
     // Baris contoh di template, terisi penuh
     public static function getImportPrefillRows(): array
     {
-        $first = self::materialOptions()[0]['label'] ?? null;
-
         return [[
-            'material_uuid'       => $first,
+            'date'                => now()->toDateString(),
+            'shift'               => self::defaultShift(),
+            'section_uuid'        => self::sectionOptions()[0]['name'] ?? null,
+            'material_uuid'       => self::materialOptions()[0]['label'] ?? null,
             'rm_condition'        => 'Fresh (F)',
             'supplier'            => self::suppliersForArea()[0] ?? null,
             'production_code'     => 'QC28101CC0',
@@ -243,11 +303,46 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
             'status'              => 'OK',
             'corrective_action'   => '',
             'problem'             => 'Contoh pengisian, timpa atau hapus baris ini',
+            'report_notes'        => '',
         ]];
     }
 
     public static function transformImportRow(array $row): array
     {
+                // Tanggal
+        if (array_key_exists('date', $row)) {
+            $date = self::toDate($row['date']);
+            if ($date === null) {
+                throw new \RuntimeException('Tanggal tidak valid (contoh: 2026-10-27).');
+            }
+            $row['date'] = $date;
+        }
+
+        // Shift: kosong -> session (QC Inspector) atau NON-SHIFT
+        $shift = isset($row['shift']) ? trim((string) $row['shift']) : '';
+        $row['shift'] = $shift !== '' ? $shift : self::defaultShift();
+
+        // Section: nama -> uuid
+        if (isset($row['section_uuid'])) {
+            $name  = trim((string) $row['section_uuid']);
+            $match = array_values(array_filter(
+                self::sectionOptions(),
+                fn ($o) => mb_strtolower(trim($o['name'])) === mb_strtolower($name)
+            ));
+
+            if (count($match) === 0) {
+                throw new \RuntimeException("Section \"{$name}\" tidak ditemukan.");
+            }
+            if (count($match) > 1) {
+                throw new \RuntimeException("Section \"{$name}\" ganda, tidak bisa dibedakan.");
+            }
+            $row['section_uuid'] = $match[0]['uuid'];
+        }
+
+        if (isset($row['report_notes'])) {
+            $row['report_notes'] = (string) $row['report_notes'];
+        }
+
         // Bahan: label -> uuid + type (tolak bila tidak ada / ganda)
         if (isset($row['material_uuid'])) {
             $name  = trim((string) $row['material_uuid']);
@@ -334,15 +429,20 @@ class ReportRmArrival extends Model implements Auditable, ImportableModel, Custo
 
     public static function importRow(array $row): void
     {
-        // Induk: dibuat sekali per upload (report_uuid sama untuk semua baris)
+        // Laporan: satu per kombinasi tanggal + shift + section dalam SATU upload
+        $key  = implode('|', [$row['date'], $row['shift'], $row['section_uuid']]);
+        $uuid = self::$importReportUuids[$row['import_batch']][$key] ??= (string) Str::uuid();
+
+        // firstOrCreate: bila baris pertama gagal dan dibatalkan, baris berikutnya membuatnya ulang
         $report = static::firstOrCreate(
-            ['uuid' => $row['report_uuid']],
+            ['uuid' => $uuid],
             [
                 'area_uuid'    => $row['area_uuid'],
                 'section_uuid' => $row['section_uuid'],
                 'date'         => $row['date'],
                 'shift'        => $row['shift'],
                 'created_by'   => $row['created_by'],
+                'notes'        => $row['report_notes'] ?? null,
             ]
         );
 

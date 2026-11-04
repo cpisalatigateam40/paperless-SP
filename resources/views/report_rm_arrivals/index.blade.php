@@ -415,31 +415,10 @@
     @can('create report')
     <x-import-modal
         title="Import Kedatangan Bahan Baku"
-        subtitle="Satu file akan membuat satu laporan baru"
+        subtitle="Satu file bisa berisi banyak laporan"
+        hint="Baris dengan Tanggal, Shift, dan Section yang sama digabung menjadi satu laporan. Timpa atau hapus baris contoh sebelum upload."
         :route="route('report_rm_arrivals.import')"
-        :template-route="route('report_rm_arrivals.template')">
-
-        <div>
-            <label class="imp-label">Tanggal</label>
-            <input type="date" name="date" value="{{ now()->toDateString() }}" class="form-control" required>
-        </div>
-
-        <div>
-            <label class="imp-label">Shift</label>
-            <input type="text" name="shift" class="form-control" placeholder="NON-SHIFT"
-                value="{{ auth()->user()->hasRole('QC Inspector') ? session('shift_number') . '-' . session('shift_group') : '' }}">
-        </div>
-
-        <div class="imp-full">
-            <label class="imp-label">Section</label>
-            <select name="section_uuid" class="form-select" required>
-                <option value="">- Pilih section -</option>
-                @foreach($sections as $s)
-                    <option value="{{ $s->uuid }}">{{ $s->section_name }}</option>
-                @endforeach
-            </select>
-        </div>
-    </x-import-modal>
+        :template-route="route('report_rm_arrivals.template')" />
     @endcan
 
 @endsection

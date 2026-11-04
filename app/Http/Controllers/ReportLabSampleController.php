@@ -20,10 +20,11 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportLabSampleController extends Controller
 {
-    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController;
+    use HasBulkApproval, HasBulkPdfExport, HasSortableReport, HasAuditController, HasExcelImport;
 
     protected function auditModel(): string { return ReportLabSample::class; }
     protected function auditRoutePrefix(): string { return 'report_lab_samples'; }
@@ -74,6 +75,28 @@ class ReportLabSampleController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_lab_samples';
+    }
+
+    protected function getImportModelClass(): string
+    {
+        return ReportLabSample::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-lab-sample.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)

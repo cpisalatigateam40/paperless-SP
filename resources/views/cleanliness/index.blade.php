@@ -86,6 +86,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('cleanliness.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -145,6 +151,8 @@
                 </div>
                 @endif
 
+                <x-import-alerts />
+
                 <x-report-sort
                     :sort-options="[
                         'latest' => 'Terbaru',
@@ -189,6 +197,15 @@
 
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Kondisi Ruang Penyimpanan"
+    subtitle="Satu file bisa berisi banyak inspeksi"
+    hint="Satu baris = satu item. Baris dengan Tanggal, Shift, Area, dan Jam Inspeksi yang sama digabung menjadi satu inspeksi. Isi beberapa catatan dalam satu sel dengan titik koma; daftarnya ada di sheet Master Data. Untuk inspeksi lain, salin 4 baris contoh dan ganti jamnya."
+    :route="route('cleanliness.import')"
+    :template-route="route('cleanliness.template')" />
+@endcan
 
 @endsection
 

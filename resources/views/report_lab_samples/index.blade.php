@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report_lab_samples.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -139,6 +145,8 @@
                 </ul>
             </div>
             @endif
+
+            <x-import-alerts />
 
             <x-report-sort
                 :sort-options="[
@@ -362,6 +370,15 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Pengambilan Sample"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal, Shift, dan Storage yang sama digabung menjadi satu laporan. Best Before dihitung otomatis dari Kode Produksi bila dikosongkan. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report_lab_samples.import')"
+    :template-route="route('report_lab_samples.template')" />
+@endcan
 @endsection
 
 @section('script')

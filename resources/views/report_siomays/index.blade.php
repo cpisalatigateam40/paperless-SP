@@ -83,6 +83,12 @@
 
                 @can('create report')
                 <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                @can('create report')
+                <div class="op-item">
                     <a href="{{ route('report_siomays.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
@@ -127,6 +133,8 @@
             @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
             @endif
+
+            <x-import-alerts />
 
             <x-report-sort
                 :sort-options="[
@@ -416,6 +424,15 @@
         </div>
     </div>
 </div>
+
+@can('create report')
+<x-import-modal
+    title="Import Kulit Siomay/Gyoza"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Satu baris = satu bahan baku. Baris pertama tiap laporan memuat Gramase dan data proses. Baris berikutnya cukup mengulang Tanggal, Shift, Produk, dan Kode Produksi, lalu isi bahan baku. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report_siomays.import')"
+    :template-route="route('report_siomays.template')" />
+@endcan
 @endsection
 
 @section('script')

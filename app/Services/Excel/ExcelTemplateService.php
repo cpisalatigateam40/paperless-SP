@@ -11,6 +11,11 @@ class ExcelTemplateService
     {
         $mapping      = $modelClass::getImportMapping();
         $masterFields = $modelClass::getMasterDataFields();
+        // Shift: dropdown otomatis untuk semua modul yang punya kolom shift
+        $shifts = config('paperless.shifts', []);
+        if ($shifts && in_array('shift', $mapping, true) && !isset($masterFields['shift'])) {
+            $masterFields['shift'] = ['label' => 'Shift', 'options' => $shifts];
+        }
 
         // opsional: informasi nilai otomatis (mis. tanggal/shift dari session)
         $context = method_exists($modelClass, 'getImportContext')

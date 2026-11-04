@@ -19,6 +19,7 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportThawingController extends Controller
 {
@@ -73,6 +74,30 @@ class ReportThawingController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_thawing';
+    }
+
+    use HasExcelImport;
+
+    protected function getImportModelClass(): string
+    {
+        return ReportThawing::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-thawing.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     /**

@@ -395,22 +395,10 @@
 @can('create report')
 <x-import-modal
     title="Import Metal Detector"
-    subtitle="Satu file akan membuat satu laporan baru"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Baris dengan Tanggal, Shift, dan Section yang sama digabung menjadi satu laporan. Timpa atau hapus baris contoh sebelum upload."
     :route="route('report_metal_detectors.import')"
-    :template-route="route('report_metal_detectors.template')">
-
-    <div>
-        <label class="imp-label">Tanggal</label>
-        <input type="date" name="date" value="{{ now()->toDateString() }}" class="form-control" required>
-    </div>
-
-    <div>
-        <label class="imp-label">Shift</label>
-        <input type="text" name="shift" class="form-control"
-               value="{{ auth()->user()->hasRole('QC Inspector') ? session('shift_number') . '-' . session('shift_group') : '' }}"
-               placeholder="NON-SHIFT">
-    </div>
-</x-import-modal>
+    :template-route="route('report_metal_detectors.template')" />
 @endcan
 @endsection
 

@@ -19,7 +19,7 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
-
+use App\Http\Controllers\Traits\HasExcelImport;
 
 class ReportTofuVerifController extends Controller
 {
@@ -77,6 +77,30 @@ class ReportTofuVerifController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_tofu_verif';
+    }
+
+    use HasExcelImport;
+
+    protected function getImportModelClass(): string
+    {
+        return ReportTofuVerif::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-tofu.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)

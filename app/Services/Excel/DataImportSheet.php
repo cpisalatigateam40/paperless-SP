@@ -14,6 +14,9 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 /* Sheet 1: Data Import (header + dropdown) */
 class DataImportSheet implements FromArray, WithHeadings, WithTitle, WithEvents
 {
+        // Kolom tanggal di template: tampil dd/mm/yyyy dan berformat Teks
+    private const DATE_FIELDS = ['date', 'best_before', 'expired_date'];
+
     public function __construct(
         private array $mapping,
         private array $masterFields,
@@ -43,7 +46,8 @@ class DataImportSheet implements FromArray, WithHeadings, WithTitle, WithEvents
             return array_map(function (array $values) {
                 $row = [];
                 foreach ($this->mapping as $excelCol => $dbField) {
-                    $row[] = $values[$dbField] ?? '';
+                    $value = $values[$dbField] ?? '';
+                    $row[] = in_array($dbField, self::DATE_FIELDS, true) ? $this->toDmy($value) : $value;
                 }
                 return $row;
             }, $this->prefill);
@@ -52,9 +56,18 @@ class DataImportSheet implements FromArray, WithHeadings, WithTitle, WithEvents
         $now = Carbon::now();
         $row = [];
         foreach ($this->mapping as $excelCol => $dbField) {
-            $row[] = in_array($dbField, ['date', 'tanggal'], true) ? $now->format('Y-m-d') : '';
+            $row[] = in_array($dbField, ['date', 'tanggal'], true) ? $now->format('d/m/Y') : '';
         }
         return [$row];
+    }
+
+    // "2026-10-27" -> "27/10/2026" (nilai lain dibiarkan)
+    private function toDmy($value)
+    {
+        if (is_string($value) && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $m)) {
+            return "{$m[3]}/{$m[2]}/{$m[1]}";
+        }
+        return $value;
     }
 
     public function registerEvents(): array
@@ -82,6 +95,7 @@ class DataImportSheet implements FromArray, WithHeadings, WithTitle, WithEvents
                 $sheet->getRowDimension(1)->setRowHeight(25);
 
                 $this->applyDropdowns($sheet);
+                $this->applyDateFormat($sheet);
             },
         ];
     }
@@ -118,6 +132,20 @@ class DataImportSheet implements FromArray, WithHeadings, WithTitle, WithEvents
                 $sheet->getStyle($range)->applyFromArray([
                     'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => 'FFF2CC']],
                 ]);
+            }
+            $columnIndex++;
+        }
+    }
+
+    private function applyDateFormat($sheet): void
+    {
+        $columnIndex = 1;
+        foreach ($this->mapping as $excelCol => $dbField) {
+            if (in_array($dbField, self::DATE_FIELDS, true)) {
+                $letter = Coordinate::stringFromColumnIndex($columnIndex);
+                $sheet->getStyle("{$letter}2:{$letter}1000")
+                    ->getNumberFormat()
+                    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
             }
             $columnIndex++;
         }

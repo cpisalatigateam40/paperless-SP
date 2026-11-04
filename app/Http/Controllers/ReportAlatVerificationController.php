@@ -20,6 +20,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AlatVerificationExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Http\Controllers\Traits\HasExcelImport;
+use Illuminate\Support\Str;
 
 class ReportAlatVerificationController extends Controller
 {
@@ -75,6 +77,30 @@ class ReportAlatVerificationController extends Controller
     protected function getBulkExportFileName(): string
     {
         return 'laporan_alat_verif';
+    }
+
+    use HasExcelImport;
+
+    protected function getImportModelClass(): string
+    {
+        return ReportAlatVerification::class;
+    }
+
+    protected function getTemplateFilename(): string
+    {
+        return 'template-import-verifikasi-alat-ukur.xlsx';
+    }
+
+    // Dipanggil SEKALI per upload; import_batch menandai semua baris dari upload yang sama
+    protected function getAdditionalImportData(): array
+    {
+        $u = auth()->user();
+
+        return [
+            'area_uuid'    => $u->area_uuid,
+            'created_by'   => $u->name,
+            'import_batch' => (string) Str::uuid(),
+        ];
     }
 
     public function index(Request $request)
