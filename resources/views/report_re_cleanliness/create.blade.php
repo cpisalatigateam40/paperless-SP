@@ -14,12 +14,34 @@
         <div class="card-body">
             <form action="{{ route('report-re-cleanliness.store') }}" method="POST">
                 @csrf
-                {{-- Header --}}
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Tanggal</label>
-                        <input type="date" name="date" class="form-control mb-5"
+                        <input type="date" name="date" class="form-control"
                             value="{{ \Carbon\Carbon::today()->toDateString() }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Jam Verifikasi</label>
+                        <input type="time" name="verification_time" class="form-control"
+                            value="{{ now()->format('H:i') }}" required>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label>Pilih Ruangan yang Diverifikasi</label>
+                        <select id="roomPicker" name="selected_rooms[]" class="form-select" multiple size="6">
+                            @foreach ($rooms as $room)
+                                <option value="{{ $room->uuid }}">{{ $room->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Pilih Mesin & Peralatan yang Diverifikasi</label>
+                        <select id="equipmentPicker" name="selected_equipments[]" class="form-select" multiple size="6">
+                            @foreach ($equipments as $equipment)
+                                <option value="{{ $equipment->uuid }}">{{ $equipment->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
@@ -370,6 +392,31 @@ document.addEventListener('change', function(e) {
         const checkall = document.querySelector(`.checkall-equipment[data-equipment="${eqId}"]`);
         if (checkall) checkall.checked = (all.length > 0 && all.length === checked.length);
     }
+});
+
+function syncSelection(selectEl, tabSelector) {
+    const selected = Array.from(selectEl.selectedOptions).map(o => o.value);
+
+    document.querySelectorAll(`${tabSelector} .cleanliness-item`).forEach(item => {
+        const on = selected.includes(item.dataset.uuid);
+        item.classList.toggle('d-none', !on);
+        // input disabled = tidak ikut ter-submit
+        item.querySelectorAll('input, select').forEach(el => el.disabled = !on);
+
+        if (on) {
+            item.querySelectorAll('.element-checkbox:checked, .part-checkbox:checked')
+                .forEach(cb => toggleCleanlinessFields(cb));
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const rp = document.getElementById('roomPicker');
+    const ep = document.getElementById('equipmentPicker');
+    rp.addEventListener('change', () => syncSelection(rp, '#roomTab'));
+    ep.addEventListener('change', () => syncSelection(ep, '#equipmentTab'));
+    syncSelection(rp, '#roomTab');       // awal: semua disembunyikan & disabled
+    syncSelection(ep, '#equipmentTab');
 });
 </script>
 @endsection

@@ -24,6 +24,7 @@ class DetailRoomCleanliness extends Model implements Auditable
         'notes',
         'corrective_action',
         'verification',
+        'verification_time'
     ];
 
     protected $auditEvents = [
