@@ -506,6 +506,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/import', 'importRoom')->name('import');
         });
 
+    Route::put('/equipments/{uuid}', [RoomEquipmentController::class, 'updateEquipment'])->name('equipments.update');
     Route::prefix('equipments')
         ->name('equipments.')
         ->controller(RoomEquipmentController::class)

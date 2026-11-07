@@ -40,5 +40,10 @@ class Room extends Model implements Auditable
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
 
+    public function equipments(): HasMany
+    {
+        return $this->hasMany(Equipment::class, 'room_uuid', 'uuid');
+    }
+
     
 }

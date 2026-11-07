@@ -16,7 +16,7 @@ class Equipment extends Model implements Auditable
 
     protected $table = 'equipments';
 
-    protected $fillable = ['uuid', 'name', 'area_uuid'];
+    protected $fillable = ['uuid', 'name', 'area_uuid', 'room_uuid'];
 
     protected $auditEvents = [
         'updated',
@@ -54,5 +54,10 @@ class Equipment extends Model implements Auditable
     public function preOperationEquipments()
     {
         return $this->hasMany(PreOperationEquipment::class, 'equipment_uuid', 'uuid');
+    }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_uuid', 'uuid');
     }
 }

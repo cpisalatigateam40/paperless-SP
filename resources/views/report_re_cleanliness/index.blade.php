@@ -167,7 +167,13 @@
                         <tr>
                             <td>{{ $reports->firstItem() + $loop->index }}</td>
                             <td>{{ \Carbon\Carbon::parse($report->date)->format('d/m/Y') }}</td>
-                            <td>{{ $report->created_at->format('H:i') }}</td>
+                            <td>
+                                @forelse ($report->verification_times as $t)
+                                    <span>{{ $t }}</span>
+                                @empty
+                                    {{ $report->created_at ? $report->created_at->format('H:i') : '-' }}
+                                @endforelse
+                            </td>
                             <td>{{ $report->area->name ?? '-' }}</td>
                             <td>
                                 @if ($report->ketidaksesuaian > 0)
@@ -197,12 +203,13 @@
 
                                 @php
                                     $user = auth()->user();
-                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(2));
+                                    $canEdit = $user->hasRole(['admin', 'SPV QC'])
+                                        || $report->created_at->gt(now()->subHours(2));
                                 @endphp
 
-                                @if($canEdit)
+                                @if ($canEdit && ! $report->approved_by)
                                     <a href="{{ route('report-re-cleanliness.edit', $report->uuid) }}"
-                                        class="btn btn-sm btn-warning" title="Edit Laporan">
+                                    class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 @endif
@@ -285,140 +292,11 @@
                             </td>
 
                         </tr>
-
-
-
                         {{-- Baris detail (ruangan & equipment) --}}
-                        <tr id="detail-{{ $report->uuid }}" style="display: none;">
-                            <td colspan="7">
-                                {{-- Detail Ruangan --}}
-                                <h6 style="font-weight: bold;">Pemeriksaan Ruangan</h6>
-                                <table class="table table-bordered table-sm mb-4 align-middle">
-                                    <thead class="align-middle text-center">
-                                        <tr>
-                                            <th rowspan="2" class="align-middle">No</th>
-                                            <th rowspan="2" class="align-middle">Area Produksi / Elemen</th>
-                                            <th colspan="2" class="align-middle">Kondisi</th>
-                                            <th rowspan="2" class="align-middle">Keterangan</th>
-                                            <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
-                                            <th rowspan="2" class="align-middle">Verifikasi Setelah Tindakan Koreksi
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>Bersih</th>
-                                            <th>Kotor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $no = 1; @endphp
-                                        @foreach ($report->roomDetails->groupBy('room.name') as $roomName => $details)
-                                        {{-- Baris judul ruangan --}}
-                                        <tr>
-                                            <td class="text-center fw-bold">{{ $no++ }}</td>
-                                            <td class="fw-bold" colspan="7" style="font-weight: bold;">
-                                                {{ strtoupper($roomName) }}
-                                            </td>
-                                        </tr>
-
-                                        {{-- Baris elemen-elemen ruangan --}}
-                                        @foreach ($details as $detail)
-                                        <tr>
-                                            <td></td> {{-- Kosongkan kolom No --}}
-                                            <td>{{ optional($detail->element)->element_name }}</td>
-                                            <td class="text-center">
-                                                @if ($detail->condition === 'clean') ✔ @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if ($detail->condition === 'dirty') ✔ @endif
-                                            </td>
-                                            <td>{{ $detail->notes }}</td>
-                                            <td>{{ $detail->corrective_action }}</td>
-                                            <td>{{ $detail->verification }}</td>
-                                        </tr>
-
-                                        {{-- Koreksi lanjutan --}}
-                                        @foreach ($detail->followups as $index => $followup)
-                                        <tr class="table-secondary">
-                                            <td></td>
-                                            <td colspan="3">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
-                                            <td>{{ $followup->notes }}</td>
-                                            <td>{{ $followup->corrective_action }}</td>
-                                            <td>{{ $followup->verification }}</td>
-                                        </tr>
-                                        @endforeach
-                                        @endforeach
-
-                                        @endforeach
-                                    </tbody>
-
-
-                                </table>
-
-                                {{-- Detail Equipment --}}
-                                <h6 style="font-weight: bold;">Pemeriksaan Mesin & Peralatan</h6>
-                                <table class="table table-bordered table-sm align-middle">
-                                    <thead class="align-middle text-center">
-                                        <tr>
-                                            <th rowspan="2" class="align-middle">No</th>
-                                            <th rowspan="2" class="align-middle">Peralatan / Part</th>
-                                            <th colspan="2" class="align-middle">Kondisi</th>
-                                            <th rowspan="2" class="align-middle">Keterangan</th>
-                                            <th rowspan="2" class="align-middle">Tindakan Koreksi</th>
-                                            <th rowspan="2" class="align-middle">Verifikasi Setelah Tindakan Koreksi
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>Bersih</th>
-                                            <th>Kotor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $no = 1; @endphp
-                                        @foreach ($report->equipmentDetails->groupBy('equipment.name') as $equipmentName
-                                        =>
-                                        $details)
-                                        {{-- Baris judul peralatan --}}
-                                        <tr>
-                                            <td class="text-center fw-bold">{{ $no++ }}</td>
-                                            <td class="fw-bold" colspan="6" styl e="font-weight: bold;">
-                                                {{ strtoupper($equipmentName) }}</td>
-                                        </tr>
-
-                                        {{-- Baris part-part dari peralatan --}}
-                                        @foreach ($details as $detail)
-                                        <tr>
-                                            <td></td>
-                                            <td>{{ optional($detail->part)->part_name }}</td>
-                                            <td class="text-center">
-                                                @if ($detail->condition === 'clean') ✔ @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if ($detail->condition === 'dirty') ✔ @endif
-                                            </td>
-                                            <td>{{ $detail->notes }}</td>
-                                            <td>{{ $detail->corrective_action }}</td>
-                                            <td>{{ $detail->verification }}</td>
-                                        </tr>
-
-                                        {{-- Koreksi lanjutan --}}
-                                        @foreach ($detail->followups as $index => $followup)
-                                        <tr class="table-secondary">
-                                            <td></td>
-                                            <td colspan="3">↳ Koreksi Lanjutan #{{ $index + 1 }}</td>
-                                            <td>{{ $followup->notes }}</td>
-                                            <td>{{ $followup->corrective_action }}</td>
-                                            <td>{{ $followup->verification }}</td>
-                                        </tr>
-                                        @endforeach
-                                        @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
+                        @include('report_re_cleanliness._detail', ['report' => $report, 'cols' => 8])
                         @empty
                         <tr>
-                            <td colspan="4">Belum ada laporan</td>
+                            <td colspan="8" class="text-center text-muted">Belum ada laporan</td>
                         </tr>
                         @endforelse
                     </tbody>
