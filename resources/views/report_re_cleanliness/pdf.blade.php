@@ -5,328 +5,267 @@
     <meta charset="UTF-8">
     <title>Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan</title>
     <style>
+    @page { margin: 85px 35px 45px 35px; }
+
     body {
         font-family: DejaVu Sans, sans-serif;
         font-size: 8px;
-        line-height: 1.25;
+        line-height: 1.3;
         margin: 0;
+        color: #111;
     }
 
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-bottom: 8px;
-        table-layout: fixed;
+    table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+
+    .header { position: fixed; top: -65px; left: 0; width: 100%; }
+    .no-border, .no-border td { border: none !important; }
+
+    .title {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: .5px;
+        margin: 0 0 6px 0;
+        padding-bottom: 4px;
+        border-bottom: 2px solid #000;
     }
 
-    th,
-    td {
-        border: 1px solid #000;
-        padding: 1.5px 2px;
-        text-align: left;
+    .meta td { border: none; padding: 1px 0; font-size: 8.5px; }
+
+    .section-title {
+        font-size: 9.5px;
+        font-weight: bold;
+        margin: 8px 0 3px 0;
+        padding: 3px 6px;
+        background: #333;
+        color: #fff;
+    }
+
+    table.data { margin-bottom: 6px; }
+    table.data th, table.data td {
+        border: 0.6px solid #555;
+        padding: 2.5px 3px;
         vertical-align: middle;
         word-wrap: break-word;
         font-size: 7.5px;
     }
-
-    th {
+    table.data thead th {
+        background: #d9d9d9;
         text-align: center;
         font-weight: bold;
     }
+    table.data thead { display: table-header-group; }
+    table.data tr { page-break-inside: avoid; }
 
-    thead {
-        display: table-header-group;
-    }
+    .group td { background: #e9ecef; font-weight: bold; }
+    .row-dirty td { background: #f1f1f1; }
+    .row-alt td { background: #fafafa; }
+    .row-dirty.row-alt td { background: #f1f1f1; }
 
-    tr {
-        page-break-inside: avoid;
-    }
+    .text-center { text-align: center; }
+    .muted { color: #666; font-style: italic; }
+    .mark-clean { font-weight: bold; font-size: 9px; }
+    .mark-dirty { font-weight: bold; font-size: 9px; }
 
-    .text-center {
-        text-align: center;
-    }
+    .verif-line { margin: 0 0 2px 0; }
+    .verif-line:last-child { margin-bottom: 0; }
+    .followup { border-top: 0.5px dashed #888; padding-top: 2px; margin-top: 2px; }
 
-    .fw-bold {
-        font-weight: bold;
-    }
+    .note-box { margin-top: 8px; font-size: 7.5px; }
+    .note-box ul { list-style: none; padding-left: 0; margin: 2px 0; }
+    .note-box ol { margin: 3px 0; padding-left: 16px; }
 
-    .signature-box {
-        height: 40px;
-        border-bottom: 1px solid #000;
-        margin-top: 20px;
-        width: 60%;
-    }
-
-    .no-border {
-        border: none !important;
-    }
-
-    .mb-2 {
-        margin-bottom: 6px;
-    }
-
-    .mb-4 {
-        margin-bottom: 10px;
-    }
-
-    .underline {
-        text-decoration: underline;
-    }
-
-    .header {
-        position: fixed;
-        top: -60px;
-        left: 0;
-        width: 100%;
-        border: none;
-    }
-
-    .header-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    @page {
-        margin-top: 80px;
-        margin-bottom: 45px;
-        margin-left: 35px;
-        margin-right: 35px;
-    }
-
-    .verif-line {
-        margin: 0 0 2px 0;
-    }
-
-    .verif-line:last-child {
-        margin-bottom: 0;
-    }
-
-    ol {
-        margin: 4px 0;
-        padding-left: 16px;
-    }
-
-    ul.keterangan {
-        list-style: none;
-        padding-left: 0;
-        margin: 4px 0;
-    }
+    .sign td { border: none; text-align: center; width: 33%; font-size: 8px; }
     </style>
 </head>
 
 <body>
-    {{-- ===== HEADER FIXED ===== --}}
-    <div class="header">
-        <table class="header-table">
-            <tr>
-                <td class="no-border" style="width: 25%; vertical-align: middle;">
-                    <table style="border: none; border-collapse: collapse;">
-                        <tr>
-                            <td class="no-border" style="width: 20%; vertical-align: middle;">
-                    <table style="border: none; border-collapse: collapse;">
-                        <tr>
-                            <td class="no-border" style="vertical-align: middle; width: 50px;">
-                                @php
-                                    $path = public_path('storage/image/logo.png');
-                                    if (file_exists($path)) {
-                                        $type   = pathinfo($path, PATHINFO_EXTENSION);
-                                        $data   = file_get_contents($path);
-                                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                    }
-                                @endphp
-                                <img src="{{ $base64 ?? '' }}" alt="Logo" style="width: 50px;">
-                            </td>
-                            <td class="no-border" style="vertical-align: middle; padding-left: 8px;">
-                                <div style="font-size: 9px; font-weight: bold; line-height: 1.2;">
-                                    PT. CHAROEN POKPHAND INDONESIA<br>
-                                    FOOD DIVISION<br>
-                                    {{ strtoupper($report->area->name ?? '') }} - INDONESIA
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="no-border" style="text-align: right; vertical-align: middle; font-size: 9px; font-weight: bold;">
-                    {{ $formNumber ?? '-' }}
-                </td>
-            </tr>
-        </table>
+@php
+    $fallbackTime = $report->created_at ? $report->created_at->format('H:i') : null;
+    $timeOf = function ($d) use ($fallbackTime) {
+        return $d->verification_time ? substr($d->verification_time, 0, 5) : $fallbackTime;
+    };
+
+    $sortKey = function ($d) use ($timeOf) {
+        return $timeOf($d) ?? '99:99'; // tanpa jam ke paling bawah
+    };
+
+    $reportTimes = $report->verification_times;
+    $reportTimeText = count($reportTimes) ? implode(', ', $reportTimes) : ($fallbackTime ?? '-');
+
+    $path = public_path('storage/image/logo.png');
+    if (file_exists($path)) {
+        $base64 = 'data:image/' . pathinfo($path, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($path));
+    }
+
+    $sections = [
+        [
+            'title'   => 'Pemeriksaan Ruangan',
+            'col'     => 'Area Produksi / Elemen',
+            'details' => $report->roomDetails,
+            'group'   => fn ($d) => optional($d->room)->name ?? '-',
+            'item'    => fn ($d) => optional($d->element)->element_name,
+            'whole'   => 'Keseluruhan ruangan',
+        ],
+        [
+            'title'   => 'Pemeriksaan Mesin & Peralatan',
+            'col'     => 'Peralatan / Part',
+            'details' => $report->equipmentDetails,
+            'group'   => fn ($d) => optional($d->equipment)->name ?? '-',
+            'item'    => fn ($d) => optional($d->part)->part_name,
+            'whole'   => 'Keseluruhan mesin / peralatan',
+        ],
+    ];
+@endphp
+
+<div class="header" style="height: 60px;">
+    <img src="{{ $base64 ?? '' }}" style="position: absolute; left: 0; top: 0; width: 50px;">
+    <div style="position: absolute; left: 58px; top: 2px; font-size: 9px; font-weight: bold; line-height: 1.3;">
+        PT. CHAROEN POKPHAND INDONESIA<br>
+        FOOD DIVISION<br>
+        {{ strtoupper($report->area->name ?? '') }} - INDONESIA
     </div>
+    <div style="position: absolute; right: 0; top: 2px; font-size: 9px; font-weight: bold;">
+        {{ $formNumber ?? '-' }}
+    </div>
+</div>
 
-    <h3 class="mb-2 text-center" style="text-transform: uppercase; margin: 4px 0 8px 0; font-size: 11px;">
-        Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan
-    </h3>
+    <h3 class="title">Pemeriksaan Kondisi Ruangan, Mesin, dan Peralatan</h3>
 
-    <table style="width: 100%; border: none; margin-bottom: 6px;">
-        <tr style="border: none;">
-            <td style="text-align: left; border: none; padding: 0;">
-                Hari/Tanggal:
-                <span style="text-decoration: underline;">
-                    {{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}
-                </span>
+    <table class="meta">
+        <tr>
+            <td style="width: 50%;">
+                Hari/Tanggal :
+                <strong>{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d/m/Y') }}</strong>
+            </td>
+            <td style="text-align: right;">
+                Jam Verifikasi : <strong>{{ $reportTimeText }}</strong>
             </td>
         </tr>
     </table>
 
-    <h3 style="margin: 4px 0; font-size: 10px;">Pemeriksaan Ruangan</h3>
-    <table class="mb-4">
-        <colgroup>
-            <col style="width:3%">
-            <col style="width:20%">
-            <col style="width:6%">
-            <col style="width:6%">
-            <col style="width:15%">
-            <col style="width:15%">
-            <col style="width:35%">
-        </colgroup>
-        <thead>
-            <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Area Produksi / Elemen</th>
-                <th colspan="2">Kondisi</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
-            </tr>
-            <tr>
-                <th>Bersih</th>
-                <th>Kotor</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $no = 1; @endphp
-            @foreach ($report->roomDetails->groupBy('room.name') as $roomName => $details)
-            <tr>
-                <td class="text-center fw-bold">{{ $no++ }}</td>
-                <td class="fw-bold" colspan="6">{{ strtoupper($roomName) }}</td>
-            </tr>
-            @foreach ($details as $detail)
-            <tr>
-                <td></td>
-                <td>{{ optional($detail->element)->element_name }}</td>
-                <td class="text-center">
-                    @if ($detail->condition === 'clean') ✔ @endif
-                </td>
-                <td class="text-center">
-                    @if ($detail->condition === 'dirty') X @endif
-                </td>
-                <td>{{ $detail->notes }}</td>
-                <td>{{ $detail->corrective_action }}</td>
-                <td>
-                    <div class="verif-line">V.Utama: {{ $detail->verification ?? '-' }} | {{ $detail->notes ?? '-' }} | {{ $detail->corrective_action ?? '-' }}</div>
-                    @foreach($detail->followups as $index => $followup)
-                    <div class="verif-line">Lanjutan #{{ $index + 1 }}: {{ $followup->verification ?? '-' }} | {{ $followup->notes ?? '-' }} | {{ $followup->corrective_action ?? '-' }}</div>
+    {{-- ===== TABEL ===== --}}
+    @foreach ($sections as $s)
+        <div class="section-title">{{ $s['title'] }}</div>
+        <table class="data">
+            <colgroup>
+                <col style="width:1%">
+                <col style="width:21%">
+                <col style="width:6%">
+                <col style="width:5%">
+                <col style="width:5%">
+                <col style="width:14%">
+                <col style="width:14%">
+                <col style="width:34%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th rowspan="2">No</th>
+                    <th rowspan="2">{{ $s['col'] }}</th>
+                    <th rowspan="2">Jam</th>
+                    <th colspan="2">Kondisi</th>
+                    <th rowspan="2">Keterangan</th>
+                    <th rowspan="2">Tindakan Koreksi</th>
+                    <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
+                </tr>
+                <tr>
+                    <th>Bersih</th>
+                    <th>Kotor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($s['details']->groupBy($s['group'])->sortBy(fn ($g) => $g->map($sortKey)->min()) as $groupName => $details)
+                    <tr class="group">
+                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td colspan="7">{{ strtoupper($groupName) }}</td>
+                    </tr>
+
+                    @foreach ($details->sortBy($sortKey)->values() as $detail)
+                        @php $itemName = $s['item']($detail); @endphp
+                        <tr class="{{ $detail->condition === 'dirty' ? 'row-dirty' : '' }} {{ $loop->even ? 'row-alt' : '' }}">
+                            <td></td>
+                            <td>
+                                @if ($itemName) {{ $itemName }} @else <span class="muted">{{ $s['whole'] }}</span> @endif
+                            </td>
+                            <td class="text-center">{{ $timeOf($detail) ?? '-' }}</td>
+                            <td class="text-center">
+                                @if ($detail->condition === 'clean') <span class="mark-clean">&#10004;</span> @endif
+                            </td>
+                            <td class="text-center">
+                                @if ($detail->condition === 'dirty') <span class="mark-dirty">X</span> @endif
+                            </td>
+                            <td>{{ $detail->notes }}</td>
+                            <td>{{ $detail->corrective_action }}</td>
+                            <td>
+                                <div class="verif-line">
+                                    <strong>Utama:</strong> {{ $detail->verification ?? '-' }}
+                                </div>
+                                @foreach ($detail->followups as $index => $followup)
+                                    <div class="verif-line followup">
+                                        <strong>Lanjutan #{{ $index + 1 }}:</strong>
+                                        {{ $followup->verification ?? '-' }}
+                                        | {{ $followup->notes ?: '-' }}
+                                        | {{ $followup->corrective_action ?: '-' }}
+                                    </div>
+                                @endforeach
+                            </td>
+                        </tr>
                     @endforeach
-                </td>
-            </tr>
-            @endforeach
-            @endforeach
-        </tbody>
-    </table>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center muted">Tidak ada data pemeriksaan.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    @endforeach
 
-    <h3 style="margin: 4px 0; font-size: 10px;">Pemeriksaan Mesin & Peralatan</h3>
-    <table>
-        <colgroup>
-            <col style="width:3%">
-            <col style="width:20%">
-            <col style="width:6%">
-            <col style="width:6%">
-            <col style="width:15%">
-            <col style="width:15%">
-            <col style="width:35%">
-        </colgroup>
-        <thead>
-            <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Peralatan / Part</th>
-                <th colspan="2">Kondisi</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2">Tindakan Koreksi</th>
-                <th rowspan="2">Verifikasi Setelah Tindakan Koreksi</th>
-            </tr>
-            <tr>
-                <th>Bersih</th>
-                <th>Kotor</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $no = 1; @endphp
-            @foreach ($report->equipmentDetails->groupBy('equipment.name') as $equipmentName => $details)
-            <tr>
-                <td class="text-center fw-bold">{{ $no++ }}</td>
-                <td class="fw-bold" colspan="6">{{ strtoupper($equipmentName) }}</td>
-            </tr>
-            @foreach ($details as $detail)
-            <tr>
-                <td></td>
-                <td>{{ optional($detail->part)->part_name }}</td>
-                <td class="text-center">
-                    @if ($detail->condition === 'clean') ✔ @endif
-                </td>
-                <td class="text-center">
-                    @if ($detail->condition === 'dirty') X @endif
-                </td>
-                <td>{{ $detail->notes }}</td>
-                <td>{{ $detail->corrective_action }}</td>
-                <td>
-                    <div class="verif-line">V.Utama: {{ $detail->verification ?? '-' }} | {{ $detail->notes ?? '-' }} | {{ $detail->corrective_action ?? '-' }}</div>
-                    @foreach($detail->followups as $index => $followup)
-                    <div class="verif-line">Lanjutan #{{ $index + 1 }}: {{ $followup->verification ?? '-' }} | {{ $followup->notes ?? '-' }} | {{ $followup->corrective_action ?? '-' }}</div>
-                    @endforeach
-                </td>
-            </tr>
-            @endforeach
-            @endforeach
-            <tr>
-                <td colspan="7" style="text-align: right; border: none;">{{ $formNumber ?? '-' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div style="text-align: right; font-size: 7.5px; margin-top: 2px;">{{ $formNumber ?? '-' }}</div>
 
-    <p style="margin: 4px 0;"><strong>Keterangan:</strong></p>
-    <ul class="keterangan">
-        <li>✔ : Bersih dan bebas material non halal</li>
-        <li>x : Kotor</li>
-    </ul>
+    {{-- ===== KETERANGAN ===== --}}
+    <div class="note-box">
+        <strong>Keterangan:</strong>
+        <ul>
+            <li>&#10004; : Bersih dan bebas material non halal</li>
+            <li>X : Kotor, dengan kriteria:</li>
+        </ul>
+        <ol>
+            <li>Berdebu</li>
+            <li>Noda (karat, cat atau sejenisnya)</li>
+            <li>Endapan kotoran</li>
+            <li>Pertumbuhan mikroorganisme (jamur, bau busuk)</li>
+            <li>Becek/menggenang</li>
+        </ol>
+    </div>
 
-    <ol>
-        <li>Berdebu</li>
-        <li>Noda (karat, cat atau sejenisnya)</li>
-        <li>Endapan kotoran</li>
-        <li>Pertumbuhan mikroorganisme (jamur, bau busuk)</li>
-        <li>Becek/menggenang</li>
-    </ol>
-
-    <table style="width: 100%; border: none; margin-top: 20px;">
-        <tr style="border: none;">
-            <td style="text-align: center; border: none; width: 33%;">
+    {{-- ===== TANDA TANGAN ===== --}}
+    <table class="sign" style="margin-top: 15px; page-break-inside: avoid;">
+        <tr>
+            <td>
                 Diperiksa oleh:<br><br>
                 <img src="{{ $createdQr }}" width="60" style="margin: 6px 0;"><br>
-                <strong>{{ $report->created_by }}</strong><br><br>
+                <strong>{{ $report->created_by }}</strong><br>
                 QC Inspector
             </td>
-            <td style="text-align: center; border: none; width: 33%;">
+            <td>
                 Diketahui oleh:<br><br>
-                @if($report->known_by)
-                <img src="{{ $knownQr }}" width="60" style="margin: 6px 0;"><br>
-                <strong>{{ $report->known_by }}</strong><br><br>
+                @if ($report->known_by)
+                    <img src="{{ $knownQr }}" width="60" style="margin: 6px 0;"><br>
+                    <strong>{{ $report->known_by }}</strong><br>
                 @else
-                <div style="height: 70px;"></div>
-                <strong>-</strong><br>
+                    <div style="height: 72px;"></div>
+                    <strong>-</strong><br>
                 @endif
                 SPV/Foreman/Lady Produksi
             </td>
-            <td style="text-align: center; border: none; width: 33%;">
+            <td>
                 Disetujui oleh:<br><br>
-                @if($report->approved_by)
-                <img src="{{ $approvedQr }}" width="60" style="margin: 6px 0;"><br>
-                <strong>{{ $report->approved_by }}</strong><br><br>
+                @if ($report->approved_by)
+                    <img src="{{ $approvedQr }}" width="60" style="margin: 6px 0;"><br>
+                    <strong>{{ $report->approved_by }}</strong><br>
                 @else
-                <div style="height: 70px;"></div>
-                <strong>-</strong><br>
+                    <div style="height: 72px;"></div>
+                    <strong>-</strong><br>
                 @endif
                 Supervisor QC
             </td>

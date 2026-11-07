@@ -71,7 +71,7 @@
             <div class="tab-content mt-3" id="masterTabContent">
                 {{-- Tab Ruangan --}}
                 <div class="tab-pane fade show active" id="room" role="tabpanel">
-                    <div class="d-flex align-items-center gap-2 flex-wrap mb-4 mt-4" style="gap: .4rem;">
+                    <!-- <div class="d-flex align-items-center gap-2 flex-wrap mb-4 mt-4" style="gap: .4rem;">
                         <a href="{{ route('rooms.template') }}" class="btn btn-outline-success btn-sm">
                             Download Template
                         </a>
@@ -93,7 +93,7 @@
                                 Import Excel
                             </button>
                         </form>
-                    </div>
+                    </div> -->
                     <form action="{{ route('rooms.store') }}" method="POST" class="mb-4">
                         @csrf
 
@@ -155,7 +155,7 @@
 
                 {{-- Tab Mesin/Peralatan --}}
                 <div class="tab-pane fade" id="equipment" role="tabpanel">
-                    <div class="d-flex align-items-center gap-2 flex-wrap mb-4 mt-4" style="gap: .4rem;">
+                    <!-- <div class="d-flex align-items-center gap-2 flex-wrap mb-4 mt-4" style="gap: .4rem;">
                         <a href="{{ route('equipments.template') }}" class="btn btn-outline-success btn-sm">
                             Download Template
                         </a>
@@ -177,18 +177,26 @@
                                 Import Excel
                             </button>
                         </form>
-                    </div>
+                    </div> -->
                     <form action="{{ route('equipments.store') }}" method="POST" class="mb-4">
                         @csrf
                         <div class="row">
+                            <div class="col-md-4">
+                                <label>Ruangan</label>
+                                <select name="room_uuid" class="form-control" required>
+                                    <option value="">-- Pilih Ruangan --</option>
+                                    @foreach($roomOptions as $r)
+                                        <option value="{{ $r->uuid }}">{{ $r->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="col-md-4">
                                 <label for="equipmentName">Nama Mesin/Peralatan</label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
                             <div class="col-md-4">
                                 <label for="parts">Part (pisahkan dengan koma)</label>
-                                <input type="text" name="parts" class="form-control"
-                                    placeholder="Contoh: Screw, Panel, Cover">
+                                <input type="text" name="parts" class="form-control" placeholder="Contoh: Screw, Panel, Cover">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary mt-3 mb-5">Simpan Mesin/Peralatan</button>
@@ -201,6 +209,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
+                                    <th>Ruangan</th>
                                     <th>Area</th>
                                     <th>Parts</th>
                                     <th>Aksi</th>
@@ -211,6 +220,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $eq->name }}</td>
+                                    <td>{{ optional($eq->room)->name }}</td>
                                     <td>{{ optional($eq->area)->name }}</td>
                                     <td>
                                         <ul>
@@ -220,6 +230,14 @@
                                         </ul>
                                     </td>
                                     <td>
+                                        <button type="button" class="btn btn-sm btn-warning btn-edit-equipment mb-1"
+                                            data-action="{{ route('equipments.update', $eq->uuid) }}"
+                                            data-name="{{ $eq->name }}"
+                                            data-room="{{ $eq->room_uuid }}"
+                                            data-parts="{{ $eq->parts->pluck('part_name')->implode(', ') }}">
+                                            Edit
+                                        </button>
+
                                         <form action="{{ route('equipments.destroy', $eq->uuid) }}" method="POST"
                                             onsubmit="return confirm('Hapus peralatan ini?')">
                                             @csrf @method('DELETE')
@@ -238,7 +256,41 @@
 </div>
 
 {{-- JavaScript bantuan --}}
-
+<div class="modal fade" id="editEquipmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" id="editEquipmentForm" class="modal-content">
+            @csrf @method('PUT')
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Mesin / Peralatan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label>Ruangan</label>
+                    <select name="room_uuid" id="editEqRoom" class="form-control" required>
+                        <option value="">-- Pilih Ruangan --</option>
+                        @foreach($roomOptions as $r)
+                            <option value="{{ $r->uuid }}">{{ $r->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label>Nama Mesin/Peralatan</label>
+                    <input type="text" name="name" id="editEqName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Part (pisahkan dengan koma)</label>
+                    <input type="text" name="parts" id="editEqParts" class="form-control">
+                    <small class="text-muted">Menghapus part dari daftar ini juga menghapusnya dari master data.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -263,6 +315,18 @@ $(document).ready(function() {
             $(this).toggle(isMatch);
         });
     });
+});
+
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-edit-equipment');
+    if (!btn) return;
+
+    document.getElementById('editEquipmentForm').action = btn.dataset.action;
+    document.getElementById('editEqName').value  = btn.dataset.name;
+    document.getElementById('editEqRoom').value  = btn.dataset.room || '';
+    document.getElementById('editEqParts').value = btn.dataset.parts;
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('editEquipmentModal')).show();
 });
 </script>
 @endsection

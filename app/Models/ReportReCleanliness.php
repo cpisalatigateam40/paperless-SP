@@ -109,4 +109,13 @@ class ReportReCleanliness extends Model implements Auditable
     {
         return $this->belongsTo(Area::class, 'area_uuid', 'uuid');
     }
+
+    public function getVerificationTimesAttribute(): array
+    {
+        return $this->roomDetails->concat($this->equipmentDetails)
+            ->pluck('verification_time')
+            ->filter()
+            ->map(fn ($t) => substr($t, 0, 5))
+            ->unique()->sort()->values()->all();
+    }
 }
