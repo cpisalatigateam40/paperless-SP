@@ -51,4 +51,14 @@ class DetailPasteur extends Model implements Auditable
     {
         return $this->hasMany(StepPasteur::class, 'detail_uuid', 'uuid');
     }
+
+    public function runs()
+    {
+        return $this->hasMany(PasteurRun::class, 'detail_uuid', 'uuid')->orderBy('attempt');
+    }
+
+    public function isLegacy(): bool
+    {
+        return $this->runs->isEmpty() && $this->steps->isNotEmpty();
+    }
 }

@@ -19,6 +19,7 @@ use App\Http\Controllers\QcEquipmentController;
 use App\Http\Controllers\ReportQcEquipmentController;
 use App\Http\Controllers\ScaleController;
 use App\Http\Controllers\ReportScaleController;
+use App\Http\Controllers\MasterPasteurController;
 use App\Http\Controllers\ThermometerController;
 use App\Http\Controllers\RoomEquipmentController;
 use App\Http\Controllers\ReportReCleanlinessController;
@@ -1550,6 +1551,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-rtg-steamers/export-pdf-bulk', [ReportRtgSteamerController::class, 'exportPdfBulk'])
     ->name('report_rtg_steamers.export_pdf_bulk');
 
+    Route::get('report-pasteurs/master/{product_uuid}', [ReportPasteurController::class, 'masterByProduct'])
+    ->name('report_pasteurs.master');
     Route::prefix('report-pasteurs')
         ->name('report_pasteurs.')
         ->controller(ReportPasteurController::class)
@@ -1851,8 +1854,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('formulas.updateDetail');
 
     Route::get('/check-vars', function () {
-    dd(php_ini_loaded_file(), ini_get('max_input_vars'));
-});
+        dd(php_ini_loaded_file(), ini_get('max_input_vars'));
+    });
+
+    Route::get('master-pasteurs/by-product/{product_uuid}', [MasterPasteurController::class, 'byProduct'])
+        ->name('master_pasteurs.by_product');
+
+    Route::resource('master-pasteurs', MasterPasteurController::class)
+        ->parameters(['master-pasteurs' => 'master_pasteur'])
+        ->names('master_pasteurs')
+        ->except(['show']);
 
     });
 });
