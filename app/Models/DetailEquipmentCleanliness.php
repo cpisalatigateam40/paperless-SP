@@ -44,12 +44,12 @@ class DetailEquipmentCleanliness extends Model implements Auditable
 
     public function equipment()
     {
-        return $this->belongsTo(Equipment::class, 'equipment_uuid', 'uuid');
+        return $this->belongsTo(Equipment::class, 'equipment_uuid', 'uuid')->withTrashed();
     }
 
     public function part()
     {
-        return $this->belongsTo(EquipmentPart::class, 'equipment_part_uuid', 'uuid');
+        return $this->belongsTo(EquipmentPart::class, 'equipment_part_uuid', 'uuid')->withTrashed();
     }
 
     public function followups()

@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RoomElement extends Model implements Auditable
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'room_elements';

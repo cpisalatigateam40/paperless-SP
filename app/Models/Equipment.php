@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Scopes\UserAreaScope;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model implements Auditable
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'equipments';

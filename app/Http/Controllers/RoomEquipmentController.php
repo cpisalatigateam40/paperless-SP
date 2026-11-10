@@ -120,9 +120,12 @@ class RoomEquipmentController extends Controller
 
     public function destroyRoom($uuid)
     {
-        DB::transaction(function () use ($uuid) {
-            Equipment::where('room_uuid', $uuid)->update(['room_uuid' => null]);
-            Room::where('uuid', $uuid)->delete();
+        $room = Room::where('uuid', $uuid)->firstOrFail();
+
+        DB::transaction(function () use ($room) {
+            // lepaskan mesin agar bisa dipindah ke ruangan lain
+            Equipment::where('room_uuid', $room->uuid)->update(['room_uuid' => null]);
+            $room->delete(); // soft delete; elemen dibiarkan agar riwayat tetap terbaca
         });
 
         return back()->with('success', 'Ruangan berhasil dihapus.');
@@ -160,13 +163,7 @@ class RoomEquipmentController extends Controller
 
     public function destroyEquipment($uuid)
     {
-        DB::transaction(function () use ($uuid) {
-            // Hapus detail yang berelasi dulu
-            DB::table('detail_equipment_cleanliness')->where('equipment_uuid', $uuid)->delete();
-
-            // Baru hapus equipment
-            Equipment::where('uuid', $uuid)->delete();
-        });
+        Equipment::where('uuid', $uuid)->firstOrFail()->delete();
 
         return back()->with('success', 'Mesin/peralatan berhasil dihapus.');
     }

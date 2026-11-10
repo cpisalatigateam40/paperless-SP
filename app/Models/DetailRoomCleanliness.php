@@ -45,12 +45,12 @@ class DetailRoomCleanliness extends Model implements Auditable
 
     public function room()
     {
-        return $this->belongsTo(Room::class, 'room_uuid', 'uuid');
+        return $this->belongsTo(Room::class, 'room_uuid', 'uuid')->withTrashed();
     }
 
     public function element()
     {
-        return $this->belongsTo(RoomElement::class, 'room_element_uuid', 'uuid');
+        return $this->belongsTo(RoomElement::class, 'room_element_uuid', 'uuid')->withTrashed();
     }
 
     public function followups()
