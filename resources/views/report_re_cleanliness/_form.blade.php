@@ -283,8 +283,10 @@ function addBlock(type, preselect = null) {
         <div class="cl-block-head d-flex flex-wrap gap-2 align-items-center p-3">
             <div class="flex-grow-1" style="min-width:220px">
                 <select class="form-select form-control block-picker">
-                    <option value="">-- Pilih ${c.label} --</option>
-                    ${MASTER[type].map(m => `<option value="${m.uuid}">${esc(m.name)}${type === 'equipment' && m.room ? ' — ' + esc(m.room) : ''}</option>`).join('')}
+                    ${type === 'equipment'
+                        ? equipmentOptionsHtml()
+                        : `<option value="">-- Pilih ${c.label} --</option>` +
+                        MASTER[type].map(m => `<option value="${m.uuid}">${esc(m.name)}</option>`).join('')}
                 </select>
             </div>
             <span class="badge bg-info text-dark block-room d-none"></span>
@@ -300,7 +302,9 @@ function addBlock(type, preselect = null) {
     document.getElementById(c.container).appendChild(div);
 
     if (preselect) {
-        q(div, '.block-picker').value = preselect;
+        const sel = q(div, '.block-picker');
+        if (type === 'equipment') sel.innerHTML = equipmentOptionsHtml(preselect);
+        sel.value = preselect;
         selectBlock(div, type, preselect);
     } else {
         refreshOptions(type);
@@ -338,7 +342,9 @@ function autoAddEquipments(roomUuid) {
             // pakai blok kosong yang ada, kalau tidak ada baru buat blok baru
             const blk = [...wrap.querySelectorAll('.cleanliness-item')].find(i => !i.dataset.uuid)
                 || addBlock('equipment');
-            q(blk, '.block-picker').value = e.uuid;
+            const sel = q(blk, '.block-picker');
+            sel.innerHTML = equipmentOptionsHtml(e.uuid);
+            sel.value = e.uuid;
             blk.dataset.auto = roomUuid;
             selectBlock(blk, 'equipment', e.uuid);
         });
@@ -365,6 +371,31 @@ function refreshOptions(type) {
             if (o.value) o.disabled = picked.includes(o.value) && o.value !== sel.value;
         });
     });
+}
+
+// Daftar mesin yang boleh dipilih = mesin milik ruangan yang sedang dipilih
+function selectedRoomUuids() {
+    return [...document.getElementById(CFG.room.container).querySelectorAll('.block-picker')]
+        .map(s => s.value).filter(Boolean);
+}
+
+function equipmentOptionsHtml(currentValue = '') {
+    const rooms = selectedRoomUuids();
+    const list = MASTER.equipment.filter(e =>
+        rooms.includes(e.room_uuid) || e.uuid === currentValue // mesin yang sudah terpilih tetap tampil
+    );
+    const withLabel = rooms.length > 1;
+
+    return `<option value="">${rooms.length ? '-- Pilih Mesin / Peralatan --' : '-- Pilih ruangan dulu --'}</option>` +
+        list.map(m => `<option value="${m.uuid}"${m.uuid === currentValue ? ' selected' : ''}>${esc(m.name)}${withLabel && m.room ? ' — ' + esc(m.room) : ''}</option>`).join('');
+}
+
+// Bangun ulang semua dropdown mesin (dipanggil saat pilihan ruangan berubah)
+function refreshEquipmentPickers() {
+    document.getElementById(CFG.equipment.container).querySelectorAll('.block-picker').forEach(sel => {
+        sel.innerHTML = equipmentOptionsHtml(sel.value);
+    });
+    refreshOptions('equipment');
 }
 
 function updateCounts() {
@@ -553,9 +584,12 @@ document.addEventListener('change', function (e) {
     const type = t.closest('#roomBlocks') ? 'room' : 'equipment';
 
     if (t.classList.contains('block-picker')) {
-        if (type === 'room') removeAutoBlocks(item.dataset.uuid); // ruangan sebelumnya
+        if (type === 'room') removeAutoBlocks(item.dataset.uuid);
         selectBlock(item, type, t.value);
-        if (type === 'room' && t.value) autoAddEquipments(t.value);
+        if (type === 'room') {
+            if (t.value) autoAddEquipments(t.value);
+            refreshEquipmentPickers();
+        }
         return;
     }
 
@@ -622,6 +656,7 @@ document.addEventListener('click', function (e) {
         const type = item.closest('#roomBlocks') ? 'room' : 'equipment';
         if (type === 'room') removeAutoBlocks(item.dataset.uuid);
         item.remove();
+        if (type === 'room') refreshEquipmentPickers();
         refreshOptions(type);
         updateCounts();
         updateToggleAll(type);
