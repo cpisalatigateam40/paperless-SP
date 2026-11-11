@@ -170,7 +170,7 @@
 {{-- Catatan --}}
 <div class="card border mb-4">
     <div class="card-body">
-        <div class="section-label mb-2">C. Catatan &amp; Dokumentasi</div>
+        <div class="section-label mb-2">Catatan &amp; Dokumentasi</div>
         <textarea name="problem" class="form-control" rows="3"
             placeholder="Tuliskan kendala atau catatan lain jika ada">{{ old('problem', $report?->problem) }}</textarea>
     </div>

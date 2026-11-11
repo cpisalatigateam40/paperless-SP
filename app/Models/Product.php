@@ -193,6 +193,11 @@ class Product extends Model
             ->get();
     }
 
+    public function masterWaterbath()
+    {
+        return $this->hasOne(MasterWaterbath::class, 'product_uuid', 'uuid');
+    }
+
 
 
 

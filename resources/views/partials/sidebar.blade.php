@@ -22,7 +22,8 @@ Request::is(
 'form-numbers*',
 'metal_detectors*',
 'master-boiling-tank-standard*',
-'master-pasteurs*'
+'master-pasteurs*',
+'master_waterbaths*'
 );
 $isAccessControl = Request::is('roles*') || Request::is('permissions*');
 $isMeatPrep =
@@ -249,7 +250,9 @@ body.audit-mode-page .table-bordered th {
                 <a class="collapse-item {{ Request::is('metal_detectors*') ? 'active' : '' }}"
                     href="{{ route('metal_detectors.index') }}">Metal Detector</a>
                 <a class="collapse-item {{ Request::is('master-pasteurs*') ? 'active' : '' }}"
-                    href="{{ route('master_pasteurs.index') }}">Master Pasteurisasi</a>
+                    href="{{ route('master_pasteurs.index') }}">Master Pasteurisasi Retort Chamber</a>
+                <a class="collapse-item {{ Request::is('master_waterbaths*') ? 'active' : '' }}"
+                    href="{{ route('master_waterbaths.index') }}">Master Pasteurisasi Waterbath</a>
             </div>
         </div>
     </li>

@@ -211,7 +211,7 @@
     </div>
 
     {{-- Sensori & notes --}}
-    <div class="row g-3">
+    <div class="row g-3 mb-3">
         <div class="col-md-3">
             <label class="form-label d-block">Sensori</label>
             <div class="sensori-toggle" role="radiogroup" aria-label="Sensori">
@@ -228,7 +228,10 @@
                 </label>
             </div>
         </div>
-        <div class="col-md-9">
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
             <label class="form-label">Notes</label>
             <textarea name="{{ $n }}[notes]" rows="2" class="form-control"
                 placeholder="Mis. kejadian saat proses berlangsung">{{ old("$p.notes", $run?->notes) }}</textarea>
