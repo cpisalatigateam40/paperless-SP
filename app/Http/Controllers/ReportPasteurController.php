@@ -692,6 +692,9 @@ class ReportPasteurController extends Controller
         $reports = ReportPasteur::operasional()
             ->with([
                 'details.product',
+                'details.runs.steps.standardStep',
+                'details.runs.steps.finishStep',
+                // format lama
                 'details.steps.standardStep',
                 'details.steps.drainageStep',
                 'details.steps.finishStep',

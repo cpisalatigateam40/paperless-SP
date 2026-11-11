@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function renumber(detail) {
         detail.querySelectorAll('.run-item').forEach((run, i) => {
             run.querySelector('.run-title').textContent =
-                i === 0 ? 'B. Hasil Verifikasi' : 'Pasteurisasi Ulang' + (i > 1 ? ' #' + i : '');
+                i === 0 ? 'Hasil Verifikasi' : 'Pasteurisasi Ulang' + (i > 1 ? ' #' + i : '');
         });
     }
 

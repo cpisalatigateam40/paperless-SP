@@ -95,8 +95,8 @@
     {{-- Judul --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center">
-            <i class="fas fa-flask text-primary me-2"></i>
-            <h6 class="mb-0 run-title">B. Hasil Verifikasi</h6>
+            <i class="fas fa-flask text-primary mr-2"></i>
+            <h6 class="mb-0 run-title">Hasil Verifikasi</h6>
         </div>
         @if($ri !== 0)
         <button type="button" class="btn btn-outline-danger btn-sm btn-remove-run">
@@ -174,7 +174,7 @@
                 @foreach($steps as $order => $name)
                 @php $ss = $byOrder->get($order)?->standardStep; @endphp
                 <tr class="step-row" data-order="{{ $order }}">
-                    <td class="text-start">
+                    <td class="text-start" style="text-align: left !important;">
                         <span class="step-no">{{ $order }}</span>{{ $name }}
                     </td>
                     <td class="set-time col-set">-</td>

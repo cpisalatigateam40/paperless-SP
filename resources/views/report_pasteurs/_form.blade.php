@@ -1,5 +1,6 @@
 @php
     $report ??= null;
+    $isAudit = (bool) ($report?->is_audit);
     $steps   = \App\Models\MasterPasteurStep::STEPS;
     $details = $report ? $report->details->values() : collect([null]);
 @endphp
@@ -71,7 +72,7 @@
 </div>
 
 <div class="d-flex align-items-center justify-content-between mb-2">
-    <h5 class="mb-0">A. Informasi Produk</h5>
+    <h5 class="mb-0">Informasi Produk</h5>
     <small class="text-muted"><i class="fas fa-circle text-danger me-1" style="font-size:.5rem"></i>Angka merah = di luar standar master</small>
 </div>
 
@@ -98,7 +99,7 @@
 
     <div class="card border shadow-sm mb-4 detail-item" data-autofill="{{ $detail ? 0 : 1 }}" data-next-run="{{ $ris->max() + 1 }}">
         <div class="card-header bg-light d-flex align-items-center">
-            <i class="fas fa-box-open text-primary me-2"></i>
+            <i class="fas fa-box-open text-primary mr-2"></i>
             <strong>Produk #{{ $di + 1 }}</strong>
         </div>
 
@@ -179,8 +180,12 @@
     <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-1"></i> Kembali
     </a>
-    <button type="submit" class="btn btn-success">
-        <i class="fas fa-save me-1"></i> Simpan
+    <button type="submit" class="btn {{ $isAudit ? 'btn-audit' : 'btn-success' }}">
+        @if($isAudit)
+            <i class="fas fa-user-shield me-1"></i> Update Data Audit
+        @else
+            <i class="fas fa-save me-1"></i> Simpan
+        @endif
     </button>
 </div>
 </div>
