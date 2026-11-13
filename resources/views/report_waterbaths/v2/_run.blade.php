@@ -149,8 +149,8 @@
             </table>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-3">
+        <div class="row g-3 mb-3 mt-3">
+            <div class="col-md-6">
                 <label class="form-label d-block">Sensori</label>
                 <div class="sensori-toggle" role="radiogroup" aria-label="Sensori">
                     <input type="radio" name="runs[{{ $i }}][sensor_ok]"

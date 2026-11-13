@@ -32,6 +32,27 @@
         position: sticky; bottom: 0; z-index: 5; background: #fff;
         border-top: 1px solid #e6e8f0; box-shadow: 0 -4px 12px rgba(0,0,0,.04);
     }
+
+    .pasteur-form .legend-out-std {
+        display: inline-block;
+        background: #fdecee;
+        color: #dc3545;
+        border: 1px solid #f5c2c7;
+        border-radius: 2rem;
+        padding: .25rem .75rem;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    .pasteur-form .table-steps { min-width: 860px; }
+
+    .pasteur-form .table-steps .col-set { width: 90px; }
+
+    .pasteur-form .table-steps .inp-act-time,
+    .pasteur-form .table-steps .inp-water,
+    .pasteur-form .table-steps .inp-pressure {
+        min-width: 100px;
+    }
 </style>
 @endonce
 
@@ -73,7 +94,10 @@
 
 <div class="d-flex align-items-center justify-content-between mb-2">
     <h5 class="mb-0">Informasi Produk</h5>
-    <small class="text-muted"><i class="fas fa-circle text-danger me-1" style="font-size:.5rem"></i>Angka merah = di luar standar master</small>
+    <span class="legend-out-std">
+        <i class="fas fa-circle me-1" style="font-size:.5rem"></i>
+        Angka merah = di luar standar master
+    </span>
 </div>
 
 <div id="detail-wrapper">

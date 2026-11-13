@@ -29,6 +29,7 @@ use App\Models\MasterWaterbathParameter;
 use App\Models\RunParameterWaterbath;
 use App\Models\RunWaterbath;
 use App\Exports\WaterbathWorkbookExport;
+use App\Models\RunStepWaterbath;
 
 class ReportWaterbathController extends Controller
 {
@@ -41,8 +42,7 @@ class ReportWaterbathController extends Controller
     {
         return [
             'area', 'details.product', 'pasteurisasi', 'coolingShocks', 'drippings',
-            // form v2
-            'product', 'batches', 'runs.parameters',
+            'product', 'batches', 'runs.parameters', 'runs.steps',
         ];
     }
     protected function auditSearchColumns(): array { return ['shift', 'created_by']; }
@@ -67,7 +67,7 @@ class ReportWaterbathController extends Controller
         return [
             'area', 'details.product', 'pasteurisasi', 'coolingShocks', 'drippings',
             // form v2
-            'product', 'batches', 'runs.parameters',
+            'product', 'batches', 'runs.parameters', 'runs.steps',
         ];
     }
 
@@ -111,6 +111,7 @@ class ReportWaterbathController extends Controller
             'product',
             'batches',
             'runs.parameters',
+            'runs.steps',
         ]);
         // Filter Area (khusus admin & superadmin)
         if (
@@ -219,110 +220,110 @@ class ReportWaterbathController extends Controller
         return view('report_waterbaths.index', compact('reports', 'areas'));
     }
 
-    public function create()
-    {
-        $products = Product::uniqueByName();
+    // public function create()
+    // {
+    //     $products = Product::uniqueByName();
 
-        // Sementara: Cikande 1 masih form lama sampai formatnya dibuat
-        if ($this->usesLegacyForm()) {
-            return view('report_waterbaths.create', compact('products'));
-        }
+    //     // Sementara: Cikande 1 masih form lama sampai formatnya dibuat
+    //     if ($this->usesLegacyForm()) {
+    //         return view('report_waterbaths.create', compact('products'));
+    //     }
 
-        return view('report_waterbaths.v2.create', compact('products'));
-    }
+    //     return view('report_waterbaths.v2.create', compact('products'));
+    // }
 
-    public function store(Request $request)
-    {
-        if ($this->usesLegacyForm()) {
-            return $this->storeLegacy($request);
-        }
+    // public function store(Request $request)
+    // {
+    //     if ($this->usesLegacyForm()) {
+    //         return $this->storeLegacy($request);
+    //     }
 
-        $isQc = auth()->user()->hasRole('QC Inspector');
+    //     $isQc = auth()->user()->hasRole('QC Inspector');
 
-        $data = $request->validate($this->rulesV2());
+    //     $data = $request->validate($this->rulesV2());
 
-        $shift = $isQc
-            ? session('shift_number') . '-' . session('shift_group')
-            : ($data['shift'] ?? 'NON-SHIFT');
+    //     $shift = $isQc
+    //         ? session('shift_number') . '-' . session('shift_group')
+    //         : ($data['shift'] ?? 'NON-SHIFT');
 
-        DB::transaction(function () use ($data, $shift) {
-            $report = ReportWaterbath::create([
-                'uuid'         => (string) Str::uuid(),
-                'area_uuid'    => Auth::user()->area_uuid,
-                'date'         => $data['date'],
-                'shift'        => $shift,
-                'form_version' => 2,
-                'product_uuid' => $data['product_uuid'],
-                'gramase'      => $this->num($data['gramase'] ?? null),
-                'created_by'   => Auth::user()->name,
-            ]);
+    //     DB::transaction(function () use ($data, $shift) {
+    //         $report = ReportWaterbath::create([
+    //             'uuid'         => (string) Str::uuid(),
+    //             'area_uuid'    => Auth::user()->area_uuid,
+    //             'date'         => $data['date'],
+    //             'shift'        => $shift,
+    //             'form_version' => 2,
+    //             'product_uuid' => $data['product_uuid'],
+    //             'gramase'      => $this->num($data['gramase'] ?? null),
+    //             'created_by'   => Auth::user()->name,
+    //         ]);
 
-            if (filled($data['batch_code'] ?? null)) {
-                BatchWaterbath::create([
-                    'uuid'        => (string) Str::uuid(),
-                    'report_uuid' => $report->uuid,
-                    'batch_code'  => $data['batch_code'],
-                ]);
-            }
+    //         if (filled($data['batch_code'] ?? null)) {
+    //             BatchWaterbath::create([
+    //                 'uuid'        => (string) Str::uuid(),
+    //                 'report_uuid' => $report->uuid,
+    //                 'batch_code'  => $data['batch_code'],
+    //             ]);
+    //         }
 
-            // Standar diambil dari master di server (bukan dari hidden input form)
-            $master    = MasterWaterbath::findForProduct($data['product_uuid']);
-            $standards = $master ? $master->parameters->keyBy('parameter') : collect();
+    //         // Standar diambil dari master di server (bukan dari hidden input form)
+    //         $master    = MasterWaterbath::findForProduct($data['product_uuid']);
+    //         $standards = $master ? $master->parameters->keyBy('parameter') : collect();
 
-            $runNumber = 0;
+    //         $runNumber = 0;
 
-            foreach (array_values($data['runs']) as $idx => $r) {
-                // Blok pasteurisasi ulang yang dibiarkan kosong tidak disimpan
-                if ($idx > 0 && $this->runIsEmpty($r)) {
-                    continue;
-                }
+    //         foreach (array_values($data['runs']) as $idx => $r) {
+    //             // Blok pasteurisasi ulang yang dibiarkan kosong tidak disimpan
+    //             if ($idx > 0 && $this->runIsEmpty($r)) {
+    //                 continue;
+    //             }
 
-                $runNumber++;
+    //             $runNumber++;
 
-                $run = RunWaterbath::create([
-                    'uuid'             => (string) Str::uuid(),
-                    'report_uuid'      => $report->uuid,
-                    'run_number'       => $runNumber,
-                    'waterbath_number' => $r['waterbath_number'] ?? null,
-                    'initial_temp'     => $this->num($r['initial_temp'] ?? null),
-                    'initial_temp_min' => $master?->initial_temp_min,
-                    'initial_temp_max' => $master?->initial_temp_max,
-                    'sensor_ok'        => isset($r['sensor_ok']) ? (bool) $r['sensor_ok'] : null,
-                    'notes'            => $r['notes'] ?? null,
-                ]);
+    //             $run = RunWaterbath::create([
+    //                 'uuid'             => (string) Str::uuid(),
+    //                 'report_uuid'      => $report->uuid,
+    //                 'run_number'       => $runNumber,
+    //                 'waterbath_number' => $r['waterbath_number'] ?? null,
+    //                 'initial_temp'     => $this->num($r['initial_temp'] ?? null),
+    //                 'initial_temp_min' => $master?->initial_temp_min,
+    //                 'initial_temp_max' => $master?->initial_temp_max,
+    //                 'sensor_ok'        => isset($r['sensor_ok']) ? (bool) $r['sensor_ok'] : null,
+    //                 'notes'            => $r['notes'] ?? null,
+    //             ]);
 
-                foreach (array_keys(MasterWaterbathParameter::PARAMETERS) as $key) {
-                    $row      = $r['parameters'][$key] ?? [];
-                    $std      = $standards->get($key);
-                    $isDrying = $key === MasterWaterbathParameter::DRYING;
+    //             foreach (array_keys(MasterWaterbathParameter::PARAMETERS) as $key) {
+    //                 $row      = $r['parameters'][$key] ?? [];
+    //                 $std      = $standards->get($key);
+    //                 $isDrying = $key === MasterWaterbathParameter::DRYING;
 
-                    RunParameterWaterbath::create([
-                        'uuid'      => (string) Str::uuid(),
-                        'run_uuid'  => $run->uuid,
-                        'parameter' => $key,
+    //                 RunParameterWaterbath::create([
+    //                     'uuid'      => (string) Str::uuid(),
+    //                     'run_uuid'  => $run->uuid,
+    //                     'parameter' => $key,
 
-                        // snapshot standar
-                        'set_temp_min'      => $std?->set_temp_min,
-                        'set_temp_max'      => $std?->set_temp_max,
-                        'cold_zone_set_min' => $isDrying ? $std?->cold_zone_temp_min : null,
-                        'cold_zone_set_max' => $isDrying ? $std?->cold_zone_temp_max : null,
-                        'set_time'          => $std?->set_time,
-                        'std_ct_min'        => $std?->std_ct_min,
-                        'std_ct_max'        => $std?->std_ct_max,
+    //                     // snapshot standar
+    //                     'set_temp_min'      => $std?->set_temp_min,
+    //                     'set_temp_max'      => $std?->set_temp_max,
+    //                     'cold_zone_set_min' => $isDrying ? $std?->cold_zone_temp_min : null,
+    //                     'cold_zone_set_max' => $isDrying ? $std?->cold_zone_temp_max : null,
+    //                     'set_time'          => $std?->set_time,
+    //                     'std_ct_min'        => $std?->std_ct_min,
+    //                     'std_ct_max'        => $std?->std_ct_max,
 
-                        // hasil aktual
-                        'act_temp'      => $this->num($row['act_temp'] ?? null),
-                        'cold_zone_act' => $isDrying ? $this->num($row['cold_zone_act'] ?? null) : null,
-                        'act_time'      => $this->num($row['act_time'] ?? null),
-                        'act_ct'        => $this->num($row['act_ct'] ?? null),
-                    ]);
-                }
-            }
-        });
+    //                     // hasil aktual
+    //                     'act_temp'      => $this->num($row['act_temp'] ?? null),
+    //                     'cold_zone_act' => $isDrying ? $this->num($row['cold_zone_act'] ?? null) : null,
+    //                     'act_time'      => $this->num($row['act_time'] ?? null),
+    //                     'act_ct'        => $this->num($row['act_ct'] ?? null),
+    //                 ]);
+    //             }
+    //         }
+    //     });
 
-        return redirect()->route('report_waterbaths.index')
-            ->with('success', 'Report Waterbath berhasil disimpan');
-    }
+    //     return redirect()->route('report_waterbaths.index')
+    //         ->with('success', 'Report Waterbath berhasil disimpan');
+    // }
 
     /* ---------------- private helpers ---------------- */
 
@@ -336,28 +337,167 @@ class ReportWaterbathController extends Controller
         return Auth::user()->area?->area === 'Cikande 1';
     }
 
+    public function create()
+    {
+        return view('report_waterbaths.v2.create', [
+            'products'    => Product::uniqueByName(),
+            'formVersion' => $this->formVersionForUser(),
+        ]);
+    }
+
+    /** 3 = format Cikande 1 (tanpa master data), 2 = format master data (area lain) */
+    private function formVersionForUser(): int
+    {
+        $name = Area::where('uuid', Auth::user()->area_uuid)->value('name');
+
+        // TODO: lebih aman dibandingkan dengan uuid area (atau config) daripada nama
+        return str_contains(strtolower(preg_replace('/\s+/', ' ', trim((string) $name))), 'cikande 1') ? 3 : 2;
+    }
+
+    public function store(Request $request)
+    {
+        $version = $this->formVersionForUser();
+        $isQc    = auth()->user()->hasRole('QC Inspector');
+
+        $data = $request->validate($this->rulesFor($version));
+
+        $shift = $isQc
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($data['shift'] ?? 'NON-SHIFT');
+
+        DB::transaction(function () use ($data, $shift, $version) {
+            $report = ReportWaterbath::create([
+                'uuid'         => (string) Str::uuid(),
+                'area_uuid'    => Auth::user()->area_uuid,
+                'date'         => $data['date'],
+                'shift'        => $shift,
+                'form_version' => $version,
+                'product_uuid' => $data['product_uuid'],
+                'gramase'      => $this->num($data['gramase'] ?? null),
+                'created_by'   => Auth::user()->name,
+            ]);
+
+            if (filled($data['batch_code'] ?? null)) {
+                BatchWaterbath::create([
+                    'uuid'        => (string) Str::uuid(),
+                    'report_uuid' => $report->uuid,
+                    'batch_code'  => $data['batch_code'],
+                ]);
+            }
+
+            // Versi 2: snapshot standar dari master (server). Versi 3: tidak ada standar.
+            $std = $version < 3 ? $this->standardsFromMaster($data['product_uuid']) : null;
+
+            $runNumber = 0;
+
+            foreach (array_values($data['runs']) as $idx => $r) {
+                if ($idx > 0 && $this->runIsEmpty($r)) {
+                    continue;
+                }
+
+                $runNumber++;
+
+                $run = RunWaterbath::create([
+                    'uuid'             => (string) Str::uuid(),
+                    'report_uuid'      => $report->uuid,
+                    'run_number'       => $runNumber,
+                    'waterbath_number' => $r['waterbath_number'] ?? null,
+                    'initial_temp'     => $this->num($r['initial_temp'] ?? null),
+                    'initial_temp_min' => $std['initial_min'] ?? null,
+                    'initial_temp_max' => $std['initial_max'] ?? null,
+                    'sensor_ok'        => isset($r['sensor_ok']) ? (bool) $r['sensor_ok'] : null,
+                    'notes'            => $r['notes'] ?? null,
+                ]);
+
+                if ($version >= 3) {
+                    $this->saveRunSteps($run, $r['steps'] ?? []);
+                } else {
+                    $this->saveRunParameters($run, $r['parameters'] ?? [], $std['parameters']);
+                }
+            }
+        });
+
+        return redirect()->route('report_waterbaths.index')
+            ->with('success', 'Report Waterbath berhasil disimpan');
+    }
+
     private function rulesV2(): array
     {
-        $rules = [
+        return [
             'date'         => 'required|date',
             'shift'        => 'nullable|string|max:20',
             'product_uuid' => 'required|string',
             'gramase'      => 'nullable|numeric|min:0',
             'batch_code'   => 'nullable|string|max:50',
 
-            'runs'                         => 'required|array|min:1',
-            'runs.*.waterbath_number'      => 'nullable|string|max:20',
-            'runs.*.initial_temp'          => 'nullable|numeric',
-            'runs.*.sensor_ok'             => 'nullable|in:0,1',
-            'runs.*.notes'                 => 'nullable|string|max:2000',
+            'runs'                    => 'required|array|min:1',
+            'runs.*.uuid'             => 'nullable|string',
+            'runs.*.waterbath_number' => 'nullable|string|max:20',
+            'runs.*.initial_temp'     => 'nullable|numeric',
+            'runs.*.sensor_ok'        => 'nullable|in:0,1',
+            'runs.*.notes'            => 'nullable|string|max:2000',
 
             'runs.*.parameters.*.act_temp'      => 'nullable|numeric',
             'runs.*.parameters.*.cold_zone_act' => 'nullable|numeric',
             'runs.*.parameters.*.act_time'      => 'nullable|numeric|min:0',
             'runs.*.parameters.*.act_ct'        => 'nullable|numeric',
         ];
+    }
+
+    private function rulesFor(int $version): array
+    {
+        $rules = $this->rulesV2();
+
+        if ($version >= 3) {
+            // Cikande 1 tidak memakai kolom Act master data
+            foreach (['act_temp', 'cold_zone_act', 'act_time', 'act_ct'] as $k) {
+                unset($rules["runs.*.parameters.*.$k"]);
+            }
+
+            $rules += [
+                'runs.*.steps.*.start_time'                    => 'nullable|date_format:H:i',
+                'runs.*.steps.*.stop_time'                     => 'nullable|date_format:H:i',
+                'runs.*.steps.*.initial_water_temp'            => 'nullable|numeric',
+                'runs.*.steps.*.water_temp_after_input_panel'  => 'nullable|numeric',
+                'runs.*.steps.*.water_temp_after_input_thermo' => 'nullable|numeric',
+                'runs.*.steps.*.water_temp_final'              => 'nullable|numeric',
+                'runs.*.steps.*.product_temp_final'            => 'nullable|numeric',
+                'runs.*.steps.*.remark'                        => 'nullable|string|max:255',
+            ];
+        }
 
         return $rules;
+    }
+
+    /** Simpan tabel B format Cikande 1; kolom "Tidak untuk diisi" dipaksa null */
+    private function saveRunSteps(RunWaterbath $run, array $rows): void
+    {
+        $existing = $run->steps->keyBy('parameter');
+
+        foreach (array_keys(RunStepWaterbath::PARAMETERS) as $key) {
+            $row    = $rows[$key] ?? [];
+            $values = [];
+
+            foreach (array_keys(RunStepWaterbath::FIELDS) as $field) {
+                $v = RunStepWaterbath::allows($key, $field) ? ($row[$field] ?? null) : null;
+
+                $values[$field] = match (true) {
+                    in_array($field, ['start_time', 'stop_time'], true) => filled($v) ? $v : null,
+                    $field === 'remark'                                  => filled($v) ? trim($v) : null,
+                    default                                              => $this->num($v),
+                };
+            }
+
+            if ($step = $existing->get($key)) {
+                $step->update($values);
+            } else {
+                RunStepWaterbath::create($values + [
+                    'uuid'      => (string) Str::uuid(),
+                    'run_uuid'  => $run->uuid,
+                    'parameter' => $key,
+                ]);
+            }
+        }
     }
 
     private function runIsEmpty(array $run): bool
@@ -371,6 +511,14 @@ class ReportWaterbathController extends Controller
         foreach (($run['parameters'] ?? []) as $p) {
             foreach (['act_temp', 'cold_zone_act', 'act_time', 'act_ct'] as $f) {
                 if (filled($p[$f] ?? null)) {
+                    return false;
+                }
+            }
+        }
+
+        foreach (($run['steps'] ?? []) as $s) {
+            foreach (array_keys(RunStepWaterbath::FIELDS) as $f) {
+                if (filled($s[$f] ?? null)) {
                     return false;
                 }
             }
@@ -520,7 +668,7 @@ class ReportWaterbathController extends Controller
         $isV2   = (int) $report->form_version >= 2;
 
         $report->load($isV2
-            ? ['area', 'product', 'batches', 'runs.parameters']
+            ? ['area', 'product', 'batches', 'runs.parameters', 'runs.steps']
             : ['area', 'details.product', 'pasteurisasi', 'coolingShocks', 'drippings']
         );
 
@@ -655,7 +803,7 @@ class ReportWaterbathController extends Controller
 
         // Form baru (all area, berbasis master)
         if ((int) $report->form_version >= 2) {
-            $report->load(['product', 'batches', 'runs.parameters']);
+            $report->load(['product', 'batches', 'runs.parameters', 'runs.steps']);
 
             $products = Product::uniqueByName();
 
@@ -688,7 +836,9 @@ class ReportWaterbathController extends Controller
             return $this->updateLegacy($request, $uuid);
         }
 
-        $rules = $this->rulesV2();
+        $version = (int) $report->form_version; // 2 = master data, 3 = Cikande 1
+
+        $rules = $this->rulesFor($version);
         $rules['product_uuid'] = [
             'required', 'string',
             function ($attr, $value, $fail) {
@@ -699,13 +849,16 @@ class ReportWaterbathController extends Controller
         ];
         $data = $request->validate($rules);
 
-        $report->load(['product', 'runs.parameters']);
+        $report->load(['product', 'runs.parameters', 'runs.steps']);
 
         // produk dianggap berubah kalau namanya beda (uuid MIN() bisa bergeser walau produknya sama)
         $newName        = Product::where('uuid', $data['product_uuid'])->value('product_name');
         $productChanged = $newName !== $report->product?->product_name;
 
-        DB::transaction(function () use ($report, $data, $productChanged) {
+        // Hanya versi 2 yang punya standar (snapshot) dari master
+        $resnapshot = $productChanged && $version < 3;
+
+        DB::transaction(function () use ($report, $data, $productChanged, $resnapshot, $version) {
             $header = [
                 'date'    => $data['date'],
                 'gramase' => $this->num($data['gramase'] ?? null),
@@ -731,16 +884,20 @@ class ReportWaterbathController extends Controller
 
             $existing = $report->runs->keyBy('uuid');
 
-            // Produk ganti: standar dari master produk baru. Tidak ganti: pakai snapshot yang sudah ada.
-            $standards = $productChanged
-                ? $this->standardsFromMaster($data['product_uuid'])
-                : $this->standardsForReport($report);
+            // Versi 3: tidak ada standar.
+            // Versi 2: produk ganti -> standar dari master baru; tidak ganti -> snapshot yang sudah ada.
+            $standards = $version >= 3
+                ? null
+                : ($productChanged
+                    ? $this->standardsFromMaster($data['product_uuid'])
+                    : $this->standardsForReport($report));
 
             // 1) hapus blok yang dibuang user
             $posted = collect($data['runs'])->pluck('uuid')->filter()->all();
             $existing->reject(fn ($run, $uuid) => in_array($uuid, $posted, true))
                 ->each(function (RunWaterbath $run) {
                     $run->parameters()->delete();
+                    $run->steps()->delete();
                     $run->delete();
                 });
 
@@ -750,6 +907,7 @@ class ReportWaterbathController extends Controller
             foreach (array_values($data['runs']) as $r) {
                 $run = $existing->get($r['uuid'] ?? '');
 
+                // blok baru yang kosong tidak disimpan
                 if (!$run && $this->runIsEmpty($r)) {
                     continue;
                 }
@@ -765,7 +923,7 @@ class ReportWaterbathController extends Controller
                 ];
 
                 if ($run) {
-                    if ($productChanged) {
+                    if ($resnapshot) {
                         $attrs['initial_temp_min'] = $standards['initial_min'];
                         $attrs['initial_temp_max'] = $standards['initial_max'];
                     }
@@ -774,12 +932,16 @@ class ReportWaterbathController extends Controller
                     $run = RunWaterbath::create($attrs + [
                         'uuid'             => (string) Str::uuid(),
                         'report_uuid'      => $report->uuid,
-                        'initial_temp_min' => $standards['initial_min'],
-                        'initial_temp_max' => $standards['initial_max'],
+                        'initial_temp_min' => $standards['initial_min'] ?? null,
+                        'initial_temp_max' => $standards['initial_max'] ?? null,
                     ]);
                 }
 
-                $this->saveRunParameters($run, $r['parameters'] ?? [], $standards['parameters'], $productChanged);
+                if ($version >= 3) {
+                    $this->saveRunSteps($run, $r['steps'] ?? []);
+                } else {
+                    $this->saveRunParameters($run, $r['parameters'] ?? [], $standards['parameters'], $resnapshot);
+                }
             }
         });
 
@@ -995,6 +1157,7 @@ class ReportWaterbathController extends Controller
                 'product',
                 'batches',
                 'runs.parameters',
+                'runs.steps',
             ])
             ->where('area_uuid', auth()->user()->area_uuid)
             ->whereBetween('date', [$dateFrom->toDateString(), $dateTo->toDateString()])
@@ -1003,15 +1166,16 @@ class ReportWaterbathController extends Controller
             ->get();
 
         // Pisahkan per versi form: lama -> sheet "Waterbath", baru -> sheet "Waterbath (Master Data)"
-        $legacy = $reports->filter(fn ($r) => (int) $r->form_version < 2)->values();
-        $master = $reports->filter(fn ($r) => (int) $r->form_version >= 2)->values();
+        $legacy  = $reports->filter(fn ($r) => (int) $r->form_version < 2)->values();
+        $master  = $reports->filter(fn ($r) => (int) $r->form_version === 2)->values();
+        $cikande = $reports->filter(fn ($r) => (int) $r->form_version >= 3)->values();
 
         $filename = 'Waterbath_'
-            . $dateFrom->format('Ymd') . '_'
-            . $dateTo->format('Ymd') . '.xlsx';
+        . $dateFrom->format('Ymd') . '_'
+        . $dateTo->format('Ymd') . '.xlsx';
 
         return Excel::download(
-            new WaterbathWorkbookExport($legacy, $master, $periodLabel),
+            new WaterbathWorkbookExport($legacy, $master, $cikande, $periodLabel),
             $filename
         );
     }

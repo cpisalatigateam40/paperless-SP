@@ -57,4 +57,14 @@ class RunWaterbath extends Model
             $this->initial_temp, $this->initial_temp_min, $this->initial_temp_max
         );
     }
+
+    public function steps()
+    {
+        return $this->hasMany(RunStepWaterbath::class, 'run_uuid', 'uuid');
+    }
+
+    public function step(string $name): ?RunStepWaterbath
+    {
+        return $this->steps->firstWhere('parameter', $name);
+    }
 }

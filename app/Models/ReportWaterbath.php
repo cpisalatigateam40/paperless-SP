@@ -76,6 +76,7 @@ class ReportWaterbath extends Model
         ])->save();
 
         $this->loadMissing(['batches', 'runs.parameters']);
+        $this->loadMissing(['batches', 'runs.parameters', 'runs.steps']);
 
         foreach ($this->batches as $batch) {
             $newBatch = $batch->replicate();
@@ -95,6 +96,13 @@ class ReportWaterbath extends Model
                 $newParam->uuid     = (string) Str::uuid();
                 $newParam->run_uuid = $newRun->uuid;
                 $newParam->save();
+            }
+
+            foreach ($run->steps as $step) {
+                $newStep = $step->replicate();
+                $newStep->uuid     = (string) Str::uuid();
+                $newStep->run_uuid = $newRun->uuid;
+                $newStep->save();
             }
         }
     }
@@ -216,6 +224,7 @@ class ReportWaterbath extends Model
             $runUuids = RunWaterbath::where('report_uuid', $report->uuid)->pluck('uuid');
 
             RunParameterWaterbath::whereIn('run_uuid', $runUuids)->delete();
+            RunStepWaterbath::whereIn('run_uuid', $runUuids)->delete();
             RunWaterbath::where('report_uuid', $report->uuid)->delete();
             BatchWaterbath::where('report_uuid', $report->uuid)->delete();
         });

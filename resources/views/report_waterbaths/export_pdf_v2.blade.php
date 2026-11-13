@@ -41,6 +41,9 @@
     .red { color: #d00000; font-weight: bold; }
 
     .header { position: fixed; top: -60px; left: 0; width: 100%; }
+
+    .grid td.na { background: #d9d9d9; font-style: italic; font-size: 8px; text-align: center; }
+    .grid th.sm { font-size: 8.5px; }
     </style>
 </head>
 
@@ -49,6 +52,10 @@
     $val = fn ($v) => filled($v) ? $v : '-';
     // merah kalau di luar range (true = ok, false = di luar, null = tidak dinilai)
     $red = fn (?bool $ok) => $ok === false ? 'red' : '';
+
+    $isCikande  = (int) $report->form_version >= 3;
+    $stepParams = \App\Models\RunStepWaterbath::PARAMETERS;
+    $stepFields = \App\Models\RunStepWaterbath::FIELDS;
 @endphp
 
 <body>
@@ -108,32 +115,78 @@
     </table>
 
     {{-- B. Hasil Verifikasi + Pasteurisasi Ulang --}}
-    @foreach($report->runs as $run)
-        <div class="run">
-            <div class="section-title">
-                @if($run->run_number === 1)
-                    B. Hasil Verifikasi
-                @else
-                    Pasteurisasi Ulang{{ $run->run_number > 2 ? ' #' . ($run->run_number - 1) : '' }}
-                @endif
-            </div>
+{{-- B. Hasil Verifikasi + Pasteurisasi Ulang --}}
+@foreach($report->runs as $run)
+    <div class="run">
+        <div class="section-title">
+            @if($run->run_number === 1)
+                B. Hasil Verifikasi
+            @else
+                Pasteurisasi Ulang{{ $run->run_number > 2 ? ' #' . ($run->run_number - 1) : '' }}
+            @endif
+        </div>
 
-            <table class="info no-border">
-                <tr>
-                    <td class="lbl">Nomor Waterbath</td><td class="sep">:</td>
-                    <td>{{ $val($run->waterbath_number) }}</td>
-                </tr>
-                <tr>
-                    <td class="lbl">Initial Temperature</td><td class="sep">:</td>
-                    <td>
+        <table class="info no-border">
+            <tr>
+                <td class="lbl">Nomor Waterbath</td><td class="sep">:</td>
+                <td>{{ $val($run->waterbath_number) }}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Initial Temperature</td><td class="sep">:</td>
+                <td>
+                    @if($isCikande)
+                        {{ filled($run->initial_temp) ? $run->initial_temp . ' °C' : '-' }}
+                    @else
                         <span class="{{ $red($run->isInitialTempOk()) }}">
                             {{ filled($run->initial_temp) ? $run->initial_temp . ' °C' : '-' }}
                         </span>
                         <span class="small">(Std: {{ $run->initial_temp_range }} °C)</span>
-                    </td>
-                </tr>
-            </table>
+                    @endif
+                </td>
+            </tr>
+        </table>
 
+        @if($isCikande)
+            {{-- ===== Format Cikande 1 ===== --}}
+            <table class="grid" style="margin-top: 4px;">
+                <thead>
+                    <tr>
+                        <th class="sm" style="width: 11%;">Parameter</th>
+                        <th class="sm">Start<br>Process</th>
+                        <th class="sm">Stop<br>Process</th>
+                        <th class="sm">Suhu Awal<br>Air</th>
+                        <th class="sm">Suhu Air<br>Setelah Produk<br>Masuk (Panel)</th>
+                        <th class="sm">Suhu Air<br>Setelah Produk<br>Masuk (Thermo)</th>
+                        <th class="sm">Suhu Akhir<br>Air</th>
+                        <th class="sm">Suhu Akhir<br>Produk</th>
+                        <th class="sm" style="width: 14%;">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($stepParams as $key => $label)
+                    @php $s = $run->step($key); @endphp
+                    <tr>
+                        <td class="param">{{ $label }}</td>
+
+                        @foreach($stepFields as $field => $fLabel)
+                            @if(\App\Models\RunStepWaterbath::allows($key, $field))
+                                <td class="c">
+                                    @if(in_array($field, ['start_time', 'stop_time'], true))
+                                        {{ \App\Models\RunStepWaterbath::hm($s?->$field) ?? '' }}
+                                    @else
+                                        {{ $s?->$field ?? '' }}
+                                    @endif
+                                </td>
+                            @else
+                                <td class="na">(Tidak untuk diisi)</td>
+                            @endif
+                        @endforeach
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            {{-- ===== Format master data (all area) ===== --}}
             <table class="grid" style="margin-top: 4px;">
                 <thead>
                     <tr>
@@ -153,7 +206,6 @@
                         <td class="param">{{ $label }}</td>
 
                         @if($p)
-                            {{-- Set Temp --}}
                             <td class="c">
                                 @if($p->isDrying())
                                     Hot zone: {{ $p->set_temp_range }}<br>
@@ -163,7 +215,6 @@
                                 @endif
                             </td>
 
-                            {{-- Act Temp --}}
                             <td class="c">
                                 @if($p->isDrying())
                                     Hot zone: <span class="{{ $red($p->isActTempOk()) }}">{{ $val($p->act_temp) }}</span><br>
@@ -173,11 +224,9 @@
                                 @endif
                             </td>
 
-                            {{-- Time --}}
                             <td class="c">{{ $val($p->set_time) }}</td>
                             <td class="c"><span class="{{ $red($p->isActTimeOk()) }}">{{ $val($p->act_time) }}</span></td>
 
-                            {{-- CT Prod --}}
                             <td class="c">{{ $p->std_ct_range }}</td>
                             <td class="c"><span class="{{ $red($p->isActCtOk()) }}">{{ $val($p->act_ct) }}</span></td>
                         @else
@@ -187,16 +236,17 @@
                     @endforeach
                 </tbody>
             </table>
+        @endif
 
-            <div style="margin-top: 3px;">
-                Sensori:
-                @if($run->sensor_ok === null) -
-                @else {{ $run->sensor_ok ? 'Ok' : 'Tidak Ok' }}
-                @endif
-            </div>
-            <div>Notes: {{ $val($run->notes) }}</div>
+        <div style="margin-top: 3px;">
+            Sensori:
+            @if($run->sensor_ok === null) -
+            @else {{ $run->sensor_ok ? 'Ok' : 'Tidak Ok' }}
+            @endif
         </div>
-    @endforeach
+        <div>Notes: {{ $val($run->notes) }}</div>
+    </div>
+@endforeach
 
     {{-- C. Catatan & Dokumentasi --}}
     @php

@@ -8,7 +8,7 @@
         </div>
         <div class="card-body">
             <form action="{{ route('report_waterbaths.store') }}" method="POST">
-                @include('report_waterbaths.v2._form', ['report' => null])
+                @include('report_waterbaths.v2._form', ['report' => null, 'formVersion' => $formVersion])
             </form>
         </div>
     </div>

@@ -1,5 +1,8 @@
 @php
+    $isCikande  = (int) $report->form_version >= 3;
     $parameters = \App\Models\MasterWaterbathParameter::PARAMETERS;
+    $stepParams = \App\Models\RunStepWaterbath::PARAMETERS;
+    $stepFields = \App\Models\RunStepWaterbath::FIELDS;
 
     // class merah kalau di luar standar (true = ok, false = di luar, null = tidak dinilai)
     $bad = fn (?bool $ok) => $ok === false ? 'text-danger fw-bold bg-danger-subtle' : '';
@@ -30,64 +33,105 @@
         <div class="card-body p-3">
             <div class="mb-2">
                 <strong>Initial Temperature:</strong>
-                <span class="{{ $bad($run->isInitialTempOk()) }} px-1 rounded">{{ $val($run->initial_temp) }} °C</span>
-                <small class="text-muted">(Std: {{ $run->initial_temp_range }} °C)</small>
+                @if($isCikande)
+                    {{ filled($run->initial_temp) ? $run->initial_temp . ' °C' : '-' }}
+                @else
+                    <span class="{{ $bad($run->isInitialTempOk()) }} px-1 rounded">{{ $val($run->initial_temp) }} °C</span>
+                    <small class="text-muted">(Std: {{ $run->initial_temp_range }} °C)</small>
+                @endif
             </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered table-sm bg-white text-center align-middle mb-2">
-                    <thead class="table-light">
-                        <tr>
-                            <th rowspan="2" class="align-middle">Parameter</th>
-                            <th colspan="2">Temp (°C)</th>
-                            <th colspan="2">Time (menit)</th>
-                            <th colspan="2">CT Prod. (°C)</th>
-                        </tr>
-                        <tr>
-                            <th>Set</th><th>Act</th>
-                            <th>Set</th><th>Act</th>
-                            <th>Std</th><th>Act</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($parameters as $key => $label)
-                        @php $p = $run->parameter($key); @endphp
-                        <tr>
-                            <td class="text-start">{{ $label }}</td>
+                @if($isCikande)
+                    {{-- ===== Format Cikande 1 ===== --}}
+                    <table class="table table-bordered table-sm bg-white text-center align-middle mb-2" style="min-width: 900px;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Parameter</th>
+                                @foreach($stepFields as $field => $label)
+                                    <th>{{ $label }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($stepParams as $key => $label)
+                            @php $s = $run->step($key); @endphp
+                            <tr>
+                                <td class="text-start">{{ $label }}</td>
 
-                            @if($p)
-                                {{-- Temp --}}
-                                <td>
-                                    @if($p->isDrying())
-                                        Hot zone: {{ $p->set_temp_range }}<br>
-                                        Cold zone: {{ $p->cold_zone_set_range }}
+                                @foreach($stepFields as $field => $fLabel)
+                                    @if(\App\Models\RunStepWaterbath::allows($key, $field))
+                                        <td>
+                                            @if(in_array($field, ['start_time', 'stop_time'], true))
+                                                {{ \App\Models\RunStepWaterbath::hm($s?->$field) ?? '-' }}
+                                            @else
+                                                {{ $val($s?->$field) }}
+                                            @endif
+                                        </td>
                                     @else
-                                        {{ $p->set_temp_range }}
+                                        <td class="bg-light text-muted fst-italic"><small>(Tidak untuk diisi)</small></td>
                                     @endif
-                                </td>
-                                <td>
-                                    @if($p->isDrying())
-                                        <div class="{{ $bad($p->isActTempOk()) }} rounded">Hot zone: {{ $val($p->act_temp) }}</div>
-                                        <div class="{{ $bad($p->isColdZoneActOk()) }} rounded">Cold zone: {{ $val($p->cold_zone_act) }}</div>
-                                    @else
-                                        <span class="{{ $bad($p->isActTempOk()) }} px-1 rounded">{{ $val($p->act_temp) }}</span>
-                                    @endif
-                                </td>
+                                @endforeach
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    {{-- ===== Format master data (all area) ===== --}}
+                    <table class="table table-bordered table-sm bg-white text-center align-middle mb-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th rowspan="2" class="align-middle">Parameter</th>
+                                <th colspan="2">Temp (°C)</th>
+                                <th colspan="2">Time (menit)</th>
+                                <th colspan="2">CT Prod. (°C)</th>
+                            </tr>
+                            <tr>
+                                <th>Set</th><th>Act</th>
+                                <th>Set</th><th>Act</th>
+                                <th>Std</th><th>Act</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($parameters as $key => $label)
+                            @php $p = $run->parameter($key); @endphp
+                            <tr>
+                                <td class="text-start">{{ $label }}</td>
 
-                                {{-- Time --}}
-                                <td>{{ $val($p->set_time) }}</td>
-                                <td><span class="{{ $bad($p->isActTimeOk()) }} px-1 rounded">{{ $val($p->act_time) }}</span></td>
+                                @if($p)
+                                    {{-- Temp --}}
+                                    <td>
+                                        @if($p->isDrying())
+                                            Hot zone: {{ $p->set_temp_range }}<br>
+                                            Cold zone: {{ $p->cold_zone_set_range }}
+                                        @else
+                                            {{ $p->set_temp_range }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->isDrying())
+                                            <div class="{{ $bad($p->isActTempOk()) }} rounded">Hot zone: {{ $val($p->act_temp) }}</div>
+                                            <div class="{{ $bad($p->isColdZoneActOk()) }} rounded">Cold zone: {{ $val($p->cold_zone_act) }}</div>
+                                        @else
+                                            <span class="{{ $bad($p->isActTempOk()) }} px-1 rounded">{{ $val($p->act_temp) }}</span>
+                                        @endif
+                                    </td>
 
-                                {{-- CT Prod --}}
-                                <td>{{ $p->std_ct_range }}</td>
-                                <td><span class="{{ $bad($p->isActCtOk()) }} px-1 rounded">{{ $val($p->act_ct) }}</span></td>
-                            @else
-                                <td colspan="6" class="text-muted">-</td>
-                            @endif
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    {{-- Time --}}
+                                    <td>{{ $val($p->set_time) }}</td>
+                                    <td><span class="{{ $bad($p->isActTimeOk()) }} px-1 rounded">{{ $val($p->act_time) }}</span></td>
+
+                                    {{-- CT Prod --}}
+                                    <td>{{ $p->std_ct_range }}</td>
+                                    <td><span class="{{ $bad($p->isActCtOk()) }} px-1 rounded">{{ $val($p->act_ct) }}</span></td>
+                                @else
+                                    <td colspan="6" class="text-muted">-</td>
+                                @endif
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
             </div>
 
             <div class="mb-1">
@@ -107,5 +151,7 @@
         <div class="text-muted">Belum ada data verifikasi.</div>
     @endforelse
 
-    <small class="text-muted"><i class="fas fa-circle text-danger" style="font-size:.5rem"></i> Merah = di luar standar master</small>
+    @unless($isCikande)
+        <small class="text-muted"><i class="fas fa-circle text-danger" style="font-size:.5rem"></i> Merah = di luar standar master</small>
+    @endunless
 </div>

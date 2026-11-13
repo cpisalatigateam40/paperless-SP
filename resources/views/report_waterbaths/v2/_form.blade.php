@@ -49,6 +49,9 @@
         : ($runModels->isNotEmpty() ? $runModels->keys()->all() : [0]);
 
     $batchCode = old('batch_code', $isEdit ? $report->batches->first()?->batch_code : null);
+
+    $formVersion = $formVersion ?? ($report?->form_version ?? 2);
+    $runView     = $formVersion >= 3 ? 'report_waterbaths.v2._run_cikande' : 'report_waterbaths.v2._run';
 @endphp
 
 {{-- A. Informasi Produk --}}
@@ -105,21 +108,26 @@
     </div>
 </div>
 
+@if($formVersion < 3)
 <div id="master-alert" class="alert alert-warning d-none">
     Master waterbath untuk produk ini belum ada, jadi standar (Set / Std) tidak terisi otomatis.
 </div>
+@endif
 
 {{-- B. Hasil Verifikasi (+ Pasteurisasi Ulang) --}}
+@if($formVersion < 3)
 <div class="d-flex justify-content-between align-items-center mb-2">
     <h6 class="mb-0 text-muted">Hasil Verifikasi</h6>
     <small class="text-muted wb-legend"><span class="dot"></span>Angka merah = di luar standar master</small>
 </div>
+@endif
 <div id="runs"
+    data-master="{{ $formVersion >= 3 ? 0 : 1 }}"
     data-edit="{{ $isEdit ? 1 : 0 }}"
     data-next="{{ max($runIdx) + 1 }}"
     data-product="{{ old('product_uuid', $report?->product_uuid) }}">
     @foreach($runIdx as $i)
-        @include('report_waterbaths.v2._run', ['i' => $i, 'run' => $runModels->get($i)])
+        @include($runView, ['i' => $i, 'run' => $runModels->get($i)])
     @endforeach
 </div>
 
@@ -129,7 +137,7 @@
 
 {{-- Template (inert, tidak ikut ter-submit) --}}
 <template id="run-template">
-    @include('report_waterbaths.v2._run', ['i' => '__INDEX__', 'run' => null])
+    @include($runView, ['i' => '__INDEX__', 'run' => null])
 </template>
 
 <div>

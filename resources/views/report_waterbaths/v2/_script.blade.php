@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const runTpl   = document.getElementById('run-template').innerHTML;
     const byProductUrl = @json(route('report_waterbaths.master_standard', '__P__'));
 
+    const useMaster = runsEl.dataset.master !== '0';
+    const alertDefault = alertEl ? alertEl.textContent : '';
+
     let runCounter = parseInt(runsEl.dataset.next, 10);
     let master = null; // standar master produk terpilih (dipakai untuk blok baru)
 
@@ -101,9 +104,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return true;
     }
 
-    const alertDefault = alertEl.textContent;
-
     function loadMaster(productUuid, fillExisting) {
+        if (!useMaster) return;
         if (!productUuid) {
             master = null;
             alertEl.classList.add('d-none');

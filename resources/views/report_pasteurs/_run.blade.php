@@ -165,9 +165,9 @@
                     <th colspan="2">Pressure (Mpa)</th>
                 </tr>
                 <tr>
-                    <th class="text-muted">Set</th><th>Act</th>
-                    <th class="text-muted">Set</th><th>Act</th>
-                    <th class="text-muted">Set</th><th>Act</th>
+                    <th class="text-muted" style="width: 90px;">Set</th><th style="min-width: 110px;">Act</th>
+                    <th class="text-muted" style="width: 90px;">Set</th><th style="min-width: 110px;">Act</th>
+                    <th class="text-muted" style="width: 90px;">Set</th><th style="min-width: 110px;">Act</th>
                 </tr>
             </thead>
             <tbody>
@@ -211,8 +211,8 @@
     </div>
 
     {{-- Sensori & notes --}}
-    <div class="row g-3 mb-3">
-        <div class="col-md-3">
+    <div class="row g-3 mb-3 mt-3">
+        <div class="col-md-6">
             <label class="form-label d-block">Sensori</label>
             <div class="sensori-toggle" role="radiogroup" aria-label="Sensori">
                 <input type="radio" name="{{ $n }}[sensor_ok]" id="{{ $sid }}-ok" value="1"

@@ -33,7 +33,7 @@
     </tr>
     <tr>
         <td>Initial Temperature</td>
-        <td>: <span class="{{ $initRed ? 'red' : '' }}">{{ $MPS::fmt($run->initial_temp) ?? '-' }}°C</span></td>
+        <td>: <span class="{{ $initRed ? 'red' : '' }}">{{ $MPS::fmt($run->initial_temp) ?? '-' }}&deg;C</span></td>
     </tr>
 </table>
 
@@ -43,8 +43,8 @@
             <th style="width: 20%;">Parameter</th>
             <th>Set. Time<br>(minutes)</th>
             <th>Act. Time<br>(minutes)</th>
-            <th>Set. Water Temp.<br>(°C)</th>
-            <th>Act. Water Temp.<br>(°C)</th>
+            <th>Set. Water Temp.<br>(&deg;C)</th>
+            <th>Act. Water Temp.<br>(&deg;C)</th>
             <th>Set. Pressure<br>(Mpa)</th>
             <th>Act. Pressure<br>(Mpa)</th>
             <th>Suhu Pusat Produk</th>
