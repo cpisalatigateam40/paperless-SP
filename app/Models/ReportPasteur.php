@@ -69,18 +69,58 @@ class ReportPasteur extends Model implements Auditable
         return DB::transaction(function () {
             $clone = $this->copyHeaderToAudit();
 
-            $this->copyChildren($this, $clone, [
-                'details' => [
-                    'steps' => [
-                        'standardStep' => [],
-                        'drainageStep' => [],
-                        'finishStep'   => [],
-                    ],
-                ],
+            $this->loadMissing([
+                'details.runs.steps.standardStep',
+                'details.runs.steps.finishStep',
+                'details.steps.standardStep',
+                'details.steps.drainageStep',
+                'details.steps.finishStep',
             ]);
+
+            foreach ($this->details as $detail) {
+                $newDetail = $detail->replicate();
+                $newDetail->uuid        = (string) Str::uuid();
+                $newDetail->report_uuid = $clone->uuid;
+                $newDetail->save();
+
+                // Format baru: run beserta step-nya
+                foreach ($detail->runs as $run) {
+                    $newRun = $run->replicate();
+                    $newRun->uuid        = (string) Str::uuid();   // PasteurRun memakai ??=, jadi uuid wajib diset manual
+                    $newRun->detail_uuid = $newDetail->uuid;
+                    $newRun->save();
+
+                    foreach ($run->steps as $step) {
+                        $this->copyStepToAudit($step, $newDetail->uuid, $newRun->uuid);
+                    }
+                }
+
+                // Format lama: step tanpa run
+                foreach ($detail->steps->whereNull('run_uuid') as $step) {
+                    $this->copyStepToAudit($step, $newDetail->uuid, null);
+                }
+            }
 
             return $clone;
         });
+    }
+
+    private function copyStepToAudit(StepPasteur $step, string $detailUuid, ?string $runUuid): void
+    {
+        $newStep = $step->replicate();
+        $newStep->uuid        = (string) Str::uuid();
+        $newStep->detail_uuid = $detailUuid;
+        $newStep->run_uuid    = $runUuid;
+        $newStep->save();
+
+        foreach (['standardStep', 'drainageStep', 'finishStep'] as $rel) {
+            if ($child = $step->$rel) {
+                $copy = $child->replicate();
+                $copy->uuid      = (string) Str::uuid();
+                $copy->step_uuid = $newStep->uuid;
+                $copy->save();
+            }
+        }
     }
 
     // Relasi ke Area

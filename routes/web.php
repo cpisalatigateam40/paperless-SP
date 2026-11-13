@@ -14,11 +14,13 @@ use App\Http\Controllers\GmpController;
 use App\Http\Controllers\MetalDetectorController;
 use App\Http\Controllers\ReportBoilingTankController;
 use App\Http\Controllers\FragileItemController;
+use App\Http\Controllers\MasterWaterbathController;
 use App\Http\Controllers\ReportFragileItemController;
 use App\Http\Controllers\QcEquipmentController;
 use App\Http\Controllers\ReportQcEquipmentController;
 use App\Http\Controllers\ScaleController;
 use App\Http\Controllers\ReportScaleController;
+use App\Http\Controllers\MasterPasteurController;
 use App\Http\Controllers\ThermometerController;
 use App\Http\Controllers\RoomEquipmentController;
 use App\Http\Controllers\ReportReCleanlinessController;
@@ -232,6 +234,10 @@ Route::middleware(['auth'])->group(function () {
             // untuk ajax tambah detail berdasarkan produk jika nanti diperlukan
             Route::get('/{product_uuid}/add-detail', 'addDetail')->name('add-detail');
         });
+
+    Route::get('master_waterbaths/by-product/{productUuid}', [MasterWaterbathController::class, 'byProduct'])
+        ->name('master_waterbaths.by_product');
+    Route::resource('master_waterbaths', MasterWaterbathController::class);
 
     Route::prefix('master-boiling-tank-standard')
     ->name('master_boiling_tank_standards.')
@@ -1550,6 +1556,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('report-rtg-steamers/export-pdf-bulk', [ReportRtgSteamerController::class, 'exportPdfBulk'])
     ->name('report_rtg_steamers.export_pdf_bulk');
 
+    Route::get('report-pasteurs/master/{product_uuid}', [ReportPasteurController::class, 'masterByProduct'])
+    ->name('report_pasteurs.master');
     Route::prefix('report-pasteurs')
         ->name('report_pasteurs.')
         ->controller(ReportPasteurController::class)
@@ -1722,6 +1730,8 @@ Route::middleware(['auth'])->group(function () {
     });
     
 
+    Route::get('report_waterbaths/master/{productUuid}', [ReportWaterbathController::class, 'masterStandard'])
+    ->name('report_waterbaths.master_standard');
     Route::prefix('report-waterbaths')
         ->name('report_waterbaths.')
         ->controller(ReportWaterbathController::class)
@@ -1851,8 +1861,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('formulas.updateDetail');
 
     Route::get('/check-vars', function () {
-    dd(php_ini_loaded_file(), ini_get('max_input_vars'));
-});
+        dd(php_ini_loaded_file(), ini_get('max_input_vars'));
+    });
+
+    Route::get('master-pasteurs/by-product/{product_uuid}', [MasterPasteurController::class, 'byProduct'])
+        ->name('master_pasteurs.by_product');
+
+    Route::resource('master-pasteurs', MasterPasteurController::class)
+        ->parameters(['master-pasteurs' => 'master_pasteur'])
+        ->names('master_pasteurs')
+        ->except(['show']);
 
     });
 });

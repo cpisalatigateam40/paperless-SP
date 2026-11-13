@@ -261,150 +261,26 @@
                         </tr>
                         <tr class="collapse" id="detail-{{ $report->id }}">
                             <td colspan="7">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Produk</th>
-                                                <th>Gramase</th>
-                                                <th>Batch</th>
-                                                <th>Jumlah</th>
-                                                <th>Satuan</th>
-                                                <th>Pasteurisasi</th>
-                                                <th>Cooling Shock</th>
-                                                <th>Dripping</th>
-                                                <th>Catatan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php
-                                            $max = max(
-                                            $report->details->count(),
-                                            $report->pasteurisasi->count(),
-                                            $report->coolingShocks->count(),
-                                            $report->drippings->count()
-                                            );
-                                            @endphp
-
-                                            @for($i = 0; $i < $max; $i++) <tr>
-                                                {{-- Detail Produk --}}
-                                                <td>{{ $report->details[$i]->product->product_name ?? '-' }}</td>
-                                                <td>{{ !empty($report->details[$i]->gramase) 
-                                                        ? $report->details[$i]->gramase 
-                                                        : ($report->details[$i]->product->nett_weight ?? '-') }} g</td>
-                                                <td>{{ $report->details[$i]->batch_code ?? '-' }}</td>
-                                                <td>{{ $report->details[$i]->amount ?? '-' }}</td>
-                                                <td>{{ $report->details[$i]->unit ?? '-' }}</td>
-
-                                                {{-- Pasteurisasi --}}
-                                                <td>
-                                                    @if(isset($report->pasteurisasi[$i]))
-                                                    Suhu Awal Produk:
-                                                    {{ $report->pasteurisasi[$i]->initial_product_temp }}
-                                                    <br>
-                                                    Suhu Awal Air: {{ $report->pasteurisasi[$i]->initial_water_temp }}
-                                                    <br>
-                                                    Start Pasteurisasi:
-                                                    {{ $report->pasteurisasi[$i]->start_time_pasteur }}
-                                                    <br>
-                                                    Stop Pasteurisasi:
-                                                    {{ $report->pasteurisasi[$i]->stop_time_pasteur }}
-                                                    <br>
-                                                    Suhu air setelah produk dimasukkan panel:
-                                                    {{ $report->pasteurisasi[$i]->water_temp_after_input_panel }} <br>
-                                                    Suhu air setelah produk dimasukkan aktual:
-                                                    {{ $report->pasteurisasi[$i]->water_temp_after_input_actual }} <br>
-                                                    Suhu air setting:
-                                                    {{ $report->pasteurisasi[$i]->water_temp_setting }} <br>
-                                                    Suhu air aktual:
-                                                    {{ $report->pasteurisasi[$i]->water_temp_actual }} <br>
-                                                    Suhu akhir air:
-                                                    {{ $report->pasteurisasi[$i]->water_temp_final }} <br>
-                                                    Suhu akhir produk:
-                                                    {{ $report->pasteurisasi[$i]->product_temp_final }} <br>
-                                                    @endif
-                                                </td>
-
-                                                {{-- Cooling Shock --}}
-                                                <td>
-                                                    @if(isset($report->coolingShocks[$i]))
-                                                    Suhu Awal Air: {{ $report->coolingShocks[$i]->initial_water_temp }}
-                                                    <br>
-                                                    Start Pasteurisasi:
-                                                    {{ $report->coolingShocks[$i]->start_time_pasteur }}
-                                                    <br>
-                                                    Stop Pasteurisasi:
-                                                    {{ $report->coolingShocks[$i]->stop_time_pasteur }}
-                                                    <br>
-                                                    Suhu air setting:
-                                                    {{ $report->coolingShocks[$i]->water_temp_setting }}
-                                                    <br>
-                                                    Suhu air aktual: {{ $report->coolingShocks[$i]->water_temp_actual }}
-                                                    <br>
-                                                    Suhu akhir air: {{ $report->coolingShocks[$i]->water_temp_final }}
-                                                    <br>
-                                                    Suhu akhir produk:
-                                                    {{ $report->coolingShocks[$i]->product_temp_final }}
-                                                    <br>
-
-                                                    @endif
-                                                </td>
-
-                                                {{-- Dripping --}}
-                                                <td>
-                                                    @if(isset($report->drippings[$i]))
-                                                    Start Pasteurisasi: {{ $report->drippings[$i]->start_time_pasteur }}
-                                                    <br>
-                                                    Stop Pasteurisasi: {{ $report->drippings[$i]->stop_time_pasteur }}
-                                                    <br>
-                                                    Suhu Zona Panas: {{ $report->drippings[$i]->hot_zone_temperature }}
-                                                    <br>
-                                                    Suhu Zona Dingin:
-                                                    {{ $report->drippings[$i]->cold_zone_temperature }}
-                                                    <br>
-                                                    Suhu Akhir Produk: {{ $report->drippings[$i]->product_temp_final }}
-                                                    @endif
-                                                </td>
-
-                                                <td>{{ $report->details[$i]->note ?? '-' }}</td>
+                                @if($report->is_legacy_form)
+                                    @include('report_waterbaths._detail_legacy', ['report' => $report])
+                                @else
+                                    @include('report_waterbaths.v2._detail', ['report' => $report])
+                                @endif
+                            </td>
                         </tr>
-                        @endfor
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Belum ada laporan.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
-                @can('create report')
-                <div class="d-flex justify-content-end mt-2">
-                    <a href="{{ route('report_waterbaths.add_detail', $report->uuid) }}"
-                        class="btn btn-sm btn-secondary">
-                        + Tambah Detail
-                    </a>
-                </div>
-                @endcan
-            </div>
-            </td>
-            </tr>
-
-
-
-
-            @empty
-            <tr>
-                <td colspan="5" class="text-center">Belum ada data laporan</td>
-            </tr>
-            @endforelse
-            </tbody>
-                </table>
-
-                <div class="mt-3">
-                    {{ $reports->links('pagination::bootstrap-5') }}
-                </div>
             </div>
 
-
-
-        
-
-
-    </div>
-</div>
-</div>
+            <div class="mt-3">
+                {{ $reports->links('pagination::bootstrap-5') }}
+            </div>
+        </div>{{-- /card-body --}}
+    </div>{{-- /card --}}
+</div>{{-- /container-fluid --}}
 @endsection

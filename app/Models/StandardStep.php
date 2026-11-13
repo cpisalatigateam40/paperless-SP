@@ -21,6 +21,12 @@ class StandardStep extends Model implements Auditable
         'end_time',
         'water_temp',
         'pressure',
+        'set_time',
+        'set_water_temp_min',
+        'set_water_temp_max',
+        'set_pressure_min',
+        'set_pressure_max',
+        'act_time',
     ];
 
     protected $auditEvents = [

@@ -20,6 +20,7 @@ class StepPasteur extends Model implements Auditable
         'step_name',
         'step_order',
         'step_type',
+        'run_uuid'
     ];
 
     protected $auditEvents = [
@@ -50,5 +51,10 @@ class StepPasteur extends Model implements Auditable
     public function finishStep()
     {
         return $this->hasOne(FinishStep::class, 'step_uuid', 'uuid');
+    }
+
+    public function run()
+    {
+        return $this->belongsTo(PasteurRun::class, 'run_uuid', 'uuid');
     }
 }

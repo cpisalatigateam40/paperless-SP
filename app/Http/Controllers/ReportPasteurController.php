@@ -24,6 +24,10 @@ use App\Traits\HasBulkApproval;
 use App\Traits\HasBulkPdfExport;
 use App\Traits\HasSortableReport;
 use App\Http\Controllers\Traits\HasAuditController;
+use App\Models\MasterPasteur;
+use App\Models\MasterPasteurStep;
+use App\Models\PasteurRun;
+
 
 class ReportPasteurController extends Controller
 {
@@ -100,10 +104,13 @@ class ReportPasteurController extends Controller
     {
         $query = ReportPasteur::operasional()->with([
             'details.product',
+            'details.runs.steps.standardStep',
+            'details.runs.steps.finishStep',
+            // jalur lama
             'details.steps.standardStep',
             'details.steps.drainageStep',
             'details.steps.finishStep',
-            'area'
+            'area',
         ]);
 
         if (
@@ -171,6 +178,19 @@ class ReportPasteurController extends Controller
                 $q->orWhereHas('details.steps.finishStep', function ($fs) use ($search) {
                     $fs->where('product_core_temp', 'like', "%{$search}%")
                     ->orWhere('sortation', 'like', "%{$search}%");
+                });
+
+                // 🔹 RUN (format baru)
+                $q->orWhereHas('details.runs', function ($r) use ($search) {
+                    $r->where('retort_chamber_number', 'like', "%{$search}%")
+                    ->orWhere('trolley_count', 'like', "%{$search}%")
+                    ->orWhere('tray_count', 'like', "%{$search}%")
+                    ->orWhere('initial_temp', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%");
+                });
+
+                $q->orWhereHas('details.runs.steps.standardStep', function ($st) use ($search) {
+                    $st->where('act_time', 'like', "%{$search}%");
                 });
             });
         }
@@ -247,81 +267,165 @@ class ReportPasteurController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate($this->rules());
+
         $shift = auth()->user()->hasRole('QC Inspector')
-        ? session('shift_number') . '-' . session('shift_group')
-        : ($request->shift ?? 'NON-SHIFT');
+            ? session('shift_number') . '-' . session('shift_group')
+            : ($request->shift ?? 'NON-SHIFT');
 
-        // 1. Simpan Report
-        $report = ReportPasteur::create([
-            'area_uuid' => Auth::user()->area_uuid,
-            'date' => $request->date,
-            'shift' => $shift,
-            'created_by' => Auth::user()->name,
-            'problem' => $request->problem,
-            'corrective_action' => $request->corrective_action,
-        ]);
+        DB::transaction(function () use ($request, $shift) {
+            // 1. Report
+            $report = ReportPasteur::create([
+                'area_uuid'         => Auth::user()->area_uuid,
+                'date'              => $request->date,
+                'shift'             => $shift,
+                'created_by'        => Auth::user()->name,
+                'problem'           => $request->problem,
+                'corrective_action' => $request->corrective_action,
+            ]);
 
-        // 2. Simpan Detail
-        if ($request->has('details')) {
-            foreach ($request->details as $index => $detailData) {
-
-                $qcParafPath = null;
-                if (!empty($detailData['qc_paraf'])) {
-                    $qcParafPath = $this->saveSignature($detailData['qc_paraf'], "qc_{$index}");
-                }
-
-                $productionParafPath = null;
-                if (!empty($detailData['production_paraf'])) {
-                    $productionParafPath = $this->saveSignature($detailData['production_paraf'], "production_{$index}");
-                }
-
+            foreach ($request->input('details', []) as $d) {
+                // 2. Detail (tanpa paraf, trolley_count, product_temp)
                 $detail = DetailPasteur::create([
-                    'report_uuid' => $report->uuid,
-                    'product_uuid' => $detailData['product_uuid'] ?? null,
-                    'program_number' => $detailData['program_number'] ?? null,
-                    'product_code' => $detailData['product_code'] ?? null,
-                    'for_packaging_gr' => $detailData['for_packaging_gr'] ?? null,
-                    'trolley_count' => $detailData['trolley_count'] ?? null,
-                    'product_temp' => $detailData['product_temp'] ?? null,
-                    'qc_paraf' => $qcParafPath,
-                    'production_paraf' => $productionParafPath,
+                    'report_uuid'      => $report->uuid,
+                    'product_uuid'     => $d['product_uuid'],
+                    'product_code'     => $d['product_code'] ?? null,
+                    'program_number'   => $d['program_number'] ?? null,
+                    'for_packaging_gr' => $d['for_packaging_gr'] ?? null,
                 ]);
 
-                // 3. Simpan Step
-                if (isset($detailData['steps'])) {
-                    foreach ($detailData['steps'] as $stepData) {
-                        $step = StepPasteur::create([
-                            'detail_uuid' => $detail->uuid,
-                            'step_name' => $stepData['step_name'] ?? null,
-                            'step_order' => $stepData['step_order'] ?? null,
-                            'step_type' => $stepData['step_type'] ?? null,
-                        ]);
+                // 3. Run (attempt 1 = utama, 2+ = pasteurisasi ulang)
+                $master = $this->masterFor($d['product_uuid']);
 
-                        // 4. Simpan ke tabel sesuai tipe
-                        if (($stepData['step_type'] ?? '') === 'standard') {
-                            StandardStep::create(array_merge($stepData['data'] ?? [], [
-                                'step_uuid' => $step->uuid,
-                            ]));
-                        }
-
-                        if (($stepData['step_type'] ?? '') === 'drainage') {
-                            DrainageStep::create(array_merge($stepData['data'] ?? [], [
-                                'step_uuid' => $step->uuid,
-                            ]));
-                        }
-
-                        if (($stepData['step_type'] ?? '') === 'finish') {
-                            FinishStep::create(array_merge($stepData['data'] ?? [], [
-                                'step_uuid' => $step->uuid,
-                            ]));
-                        }
-                    }
+                foreach (array_values($d['runs']) as $r => $runData) {
+                    $this->saveRun($detail, $runData, $r + 1, $master);
                 }
             }
-        }
+        });
 
         return redirect()->route('report_pasteurs.index')
-            ->with('success', 'Report Pasteurisasi berhasil ditambahkan lengkap dengan detail & step');
+            ->with('success', 'Report Pasteurisasi berhasil ditambahkan');
+    }
+
+    private function saveRun(
+        DetailPasteur $detail,
+        array $data,
+        int $attempt,
+        ?MasterPasteur $master,
+        ?PasteurRun $run = null,
+        bool $refreshStd = false
+    ): PasteurRun {
+        $std      = $master?->steps->keyBy('step_order') ?? collect();
+        $snapshot = !$run || $refreshStd;   // standar hanya diambil saat run baru / produk berganti
+
+        $attrs = [
+            'attempt'               => $attempt,
+            'retort_chamber_number' => $data['retort_chamber_number'] ?? null,
+            'trolley_count'         => $data['trolley_count'] ?? null,
+            'tray_count'            => $data['tray_count'] ?? null,
+            'start_time'            => $data['start_time'] ?? null,
+            'end_time'              => $data['end_time'] ?? null,
+            'initial_temp'          => $data['initial_temp'] ?? null,
+            'sensor_ok'             => (isset($data['sensor_ok']) && $data['sensor_ok'] !== '')
+                ? (bool) $data['sensor_ok'] : null,
+            'notes'                 => $data['notes'] ?? null,
+        ];
+
+        if ($snapshot) {
+            $attrs['initial_temp_min'] = $master?->initial_temp_min;
+            $attrs['initial_temp_max'] = $master?->initial_temp_max;
+        }
+
+        if ($run) {
+            $run->update($attrs);
+        } else {
+            $run = PasteurRun::create($attrs + ['detail_uuid' => $detail->uuid]);
+        }
+
+        // Step 1-8
+        foreach (MasterPasteurStep::STEPS as $order => $name) {
+            $row = $data['steps'][$order] ?? [];
+
+            $step = StepPasteur::firstOrCreate(
+                ['run_uuid' => $run->uuid, 'step_order' => $order],
+                ['detail_uuid' => $detail->uuid, 'step_name' => $name, 'step_type' => 'standard']
+            );
+
+            $vals = [
+                'act_time'   => $row['act_time'] ?? null,
+                'water_temp' => $row['water_temp'] ?? null,
+                'pressure'   => $row['pressure'] ?? null,
+            ];
+
+            if ($snapshot) {
+                $s = $std[$order] ?? null;
+                $vals += [
+                    'set_time'           => $s?->set_time,
+                    'set_water_temp_min' => $s?->water_temp_min,
+                    'set_water_temp_max' => $s?->water_temp_max,
+                    'set_pressure_min'   => $s?->pressure_min,
+                    'set_pressure_max'   => $s?->pressure_max,
+                ];
+            }
+
+            StandardStep::updateOrCreate(['step_uuid' => $step->uuid], $vals);
+        }
+
+        // Finish
+        $finish = StepPasteur::firstOrCreate(
+            ['run_uuid' => $run->uuid, 'step_order' => count(MasterPasteurStep::STEPS) + 1],
+            ['detail_uuid' => $detail->uuid, 'step_name' => 'Finish', 'step_type' => 'finish']
+        );
+
+        FinishStep::updateOrCreate(
+            ['step_uuid' => $finish->uuid],
+            ['product_core_temp' => $data['product_core_temp'] ?? null]
+        );
+
+        return $run;
+    }
+
+    private array $masterCache = [];
+
+    private function masterFor(?string $productUuid): ?MasterPasteur
+    {
+        if (!$productUuid) return null;
+
+        return $this->masterCache[$productUuid]
+            ??= MasterPasteur::with('steps')->where('product_uuid', $productUuid)->first();
+    }
+
+    private function deleteRun(PasteurRun $run): void
+    {
+        $stepUuids = StepPasteur::where('run_uuid', $run->uuid)->pluck('uuid');
+
+        StandardStep::whereIn('step_uuid', $stepUuids)->delete();
+        FinishStep::whereIn('step_uuid', $stepUuids)->delete();
+        StepPasteur::where('run_uuid', $run->uuid)->delete();
+        $run->delete();
+    }
+
+    private function rules(bool $requireDetails = true): array
+    {
+        return [
+            'date'                                      => 'required|date',
+            'details'                                   => $requireDetails ? 'required|array|min:1' : 'nullable|array',
+            'details.*.uuid'                            => 'nullable|string',
+            'details.*.product_uuid'                    => 'required',
+            'details.*.runs'                            => 'required|array|min:1',
+            'details.*.runs.*.uuid'                     => 'nullable|string',
+            'details.*.runs.*.retort_chamber_number'    => 'nullable|string|max:20',
+            'details.*.runs.*.trolley_count'            => 'nullable|integer|min:0',
+            'details.*.runs.*.tray_count'               => 'nullable|integer|min:0',
+            'details.*.runs.*.start_time'               => 'nullable|date_format:H:i',
+            'details.*.runs.*.end_time'                 => 'nullable|date_format:H:i',
+            'details.*.runs.*.initial_temp'             => 'nullable|numeric',
+            'details.*.runs.*.sensor_ok'                => 'nullable|in:0,1',
+            'details.*.runs.*.product_core_temp'        => 'nullable|numeric',
+            'details.*.runs.*.steps.*.act_time'         => 'nullable|numeric|min:0',
+            'details.*.runs.*.steps.*.water_temp'       => 'nullable|numeric',
+            'details.*.runs.*.steps.*.pressure'         => 'nullable|numeric|min:0',
+        ];
     }
 
 
@@ -448,11 +552,14 @@ class ReportPasteurController extends Controller
     {
         // Ambil report beserta relasi
         $report = ReportPasteur::with([
+            'details.product',
+            'details.runs.steps.standardStep',
+            'details.runs.steps.finishStep',
+            // format lama
             'details.steps.standardStep',
             'details.steps.drainageStep',
             'details.steps.finishStep',
             'area',
-            'details.product'
         ])->where('uuid', $uuid)->firstOrFail();
 
         // Generate QR untuk created_by
@@ -479,12 +586,12 @@ class ReportPasteurController extends Controller
 
         // Kirim data ke view PDF
         $pdf = Pdf::loadView('report_pasteurs.pdf', [
-            'report' => $report,
-            'createdQr' => $createdQrBase64,
+            'report'     => $report,
+            'createdQr'  => $createdQrBase64,
             'approvedQr' => $approvedQrBase64,
-            'knownQr' => $knownQrBase64,
+            'knownQr'    => $knownQrBase64,
             'formNumber' => $formNumber,
-        ])->setPaper('a4', 'landscape');
+        ])->setPaper('a4', 'portrait');
 
         // Download PDF
         return $pdf->stream("Report_Pasteur_{$report->uuid}.pdf");
@@ -494,96 +601,73 @@ class ReportPasteurController extends Controller
     {
         $report = ReportPasteur::with([
             'details.product',
+            'details.runs.steps.standardStep',
+            'details.runs.steps.finishStep',
+            // untuk deteksi & tampilan format lama
             'details.steps.standardStep',
             'details.steps.drainageStep',
-            'details.steps.finishStep'
+            'details.steps.finishStep',
         ])->where('uuid', $uuid)->firstOrFail();
 
-        $areas = Area::all();
-        $products = Product::selectRaw('MIN(uuid) as uuid, product_name, MAX(shelf_life) as shelf_life, MAX(created_at) as created_at')
-        ->groupBy('product_name')
-        ->get();
+        $areas    = Area::all();
+        $products = Product::uniqueByName();
 
         return view('report_pasteurs.edit', compact('report', 'areas', 'products'));
     }
 
     public function update(Request $request, $uuid)
     {
-        $report = ReportPasteur::where('uuid', $uuid)->firstOrFail();
-        DB::transaction(function () use ($request, $report) {
+        $report = ReportPasteur::with(['details.runs', 'details.steps'])
+            ->where('uuid', $uuid)->firstOrFail();
 
-            // 🧾 Update header
+        // Laporan yang isinya hanya detail lama tidak punya input detail di form
+        $hasEditable = $report->details->contains(fn ($d) => !$d->isLegacy());
+        $request->validate($this->rules($hasEditable));
+
+        DB::transaction(function () use ($request, $report) {
             $report->update([
-                'date' => $request->date,
-                'shift' => $request->shift,
-                'problem' => $request->problem,
+                'date'              => $request->date,
+                'shift'             => $request->shift,
+                'problem'           => $request->problem,
                 'corrective_action' => $request->corrective_action,
             ]);
 
-            // 💣 Hapus detail lama (biar bersih)
-            DetailPasteur::where('report_uuid', $report->uuid)->delete();
+            foreach ($request->input('details', []) as $d) {
+                // Hanya detail milik laporan ini, dan bukan detail lama
+                $detail = $report->details->firstWhere('uuid', $d['uuid'] ?? null);
+                if (!$detail || $detail->isLegacy()) continue;
 
-            // 🔁 Insert ulang semua detail dan step
-            foreach ($request->details as $index => $detailData) {
+                $productChanged = $detail->product_uuid !== ($d['product_uuid'] ?? null);
 
-                $qcParafPath = null;
-                if (!empty($detailData['qc_paraf'])) {
-                    $qcParafPath = $this->saveSignature($detailData['qc_paraf'], "qc_{$index}");
-                }
-
-                $productionParafPath = null;
-                if (!empty($detailData['production_paraf'])) {
-                    $productionParafPath = $this->saveSignature($detailData['production_paraf'], "production_{$index}");
-                }
-
-                $detail = DetailPasteur::create([
-                    'report_uuid' => $report->uuid,
-                    'product_uuid' => $detailData['product_uuid'] ?? null,
-                    'program_number' => $detailData['program_number'] ?? null,
-                    'product_code' => $detailData['product_code'] ?? null,
-                    'for_packaging_gr' => $detailData['for_packaging_gr'] ?? null,
-                    'trolley_count' => $detailData['trolley_count'] ?? null,
-                    'product_temp' => $detailData['product_temp'] ?? null,
-                    'qc_paraf' => $qcParafPath,
-                    'production_paraf' => $productionParafPath,
+                // Paraf, trolley_count, product_temp sengaja tidak disentuh
+                $detail->update([
+                    'product_uuid'     => $d['product_uuid'],
+                    'product_code'     => $d['product_code'] ?? null,
+                    'program_number'   => $d['program_number'] ?? null,
+                    'for_packaging_gr' => $d['for_packaging_gr'] ?? null,
                 ]);
 
-                if (isset($detailData['steps'])) {
-                    foreach ($detailData['steps'] as $stepData) {
-                        $step = StepPasteur::create([
-                            'detail_uuid' => $detail->uuid,
-                            'step_name' => $stepData['step_name'] ?? null,
-                            'step_order' => $stepData['step_order'] ?? null,
-                            'step_type' => $stepData['step_type'] ?? null,
-                        ]);
+                $master   = $this->masterFor($d['product_uuid']);
+                $runsIn   = array_values($d['runs'] ?? []);
+                $keepRuns = collect($runsIn)->pluck('uuid')->filter()->all();
 
-                        if (($stepData['step_type'] ?? '') === 'standard') {
-                            StandardStep::create(array_merge($stepData['data'] ?? [], [
-                                'step_uuid' => $step->uuid,
-                            ]));
-                        }
+                // Hapus run yang dibuang user, SEBELUM renumber attempt (unique detail_uuid+attempt)
+                $detail->runs
+                    ->whereNotIn('uuid', $keepRuns)
+                    ->each(fn ($r) => $this->deleteRun($r));
 
-                        if (($stepData['step_type'] ?? '') === 'drainage') {
-                            DrainageStep::create(array_merge($stepData['data'] ?? [], [
-                                'step_uuid' => $step->uuid,
-                            ]));
-                        }
-
-                        if (($stepData['step_type'] ?? '') === 'finish') {
-                            FinishStep::create(array_merge($stepData['data'] ?? [], [
-                                'step_uuid' => $step->uuid,
-                            ]));
-                        }
-                    }
+                foreach ($runsIn as $i => $runData) {
+                    $run = $detail->runs->firstWhere('uuid', $runData['uuid'] ?? null);
+                    $this->saveRun($detail, $runData, $i + 1, $master, $run, $productChanged);
                 }
             }
         });
 
         return redirect()
-        ->route($report->is_audit ? 'report_pasteurs.audit' : 'report_pasteurs.index')
-        ->with('success', $report->is_audit
-            ? 'Data audit berhasil diperbarui.'
-            : 'Data berhasil diperbarui.');
+            ->route($report->is_audit ? 'report_pasteurs.audit' : 'report_pasteurs.index')
+            ->with('success', $report->is_audit
+                ? 'Data audit berhasil diperbarui.'
+                : 'Data berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)
@@ -608,6 +692,9 @@ class ReportPasteurController extends Controller
         $reports = ReportPasteur::operasional()
             ->with([
                 'details.product',
+                'details.runs.steps.standardStep',
+                'details.runs.steps.finishStep',
+                // format lama
                 'details.steps.standardStep',
                 'details.steps.drainageStep',
                 'details.steps.finishStep',
@@ -623,5 +710,30 @@ class ReportPasteurController extends Controller
             . $dateTo->format('Ymd') . '.xlsx';
     
         return Excel::download(new PasteurExport($reports, $periodLabel), $filename);
+    }
+
+    public function masterByProduct(string $productUuid)
+    {
+        $gramase = Product::where('uuid', $productUuid)->value('nett_weight');
+
+        $master = MasterPasteur::with('steps')->where('product_uuid', $productUuid)->first();
+
+        if (!$master) {
+            return response()->json(['found' => false, 'gramase' => $gramase]);
+        }
+
+        return response()->json([
+            'found'            => true,
+            'gramase'          => $gramase,
+            'initial_temp_min' => $master->initial_temp_min,
+            'initial_temp_max' => $master->initial_temp_max,
+            'steps'            => $master->steps->keyBy('step_order')->map(fn ($s) => [
+                'set_time'       => $s->set_time,
+                'water_temp_min' => $s->water_temp_min,
+                'water_temp_max' => $s->water_temp_max,
+                'pressure_min'   => $s->pressure_min,
+                'pressure_max'   => $s->pressure_max,
+            ]),
+        ]);
     }
 }
