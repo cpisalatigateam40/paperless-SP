@@ -80,7 +80,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     set_temp_max:      p.set_temp_max,
                     cold_zone_set_min: p.cold_zone_temp_min,
                     cold_zone_set_max: p.cold_zone_temp_max,
-                    set_time:          p.set_time,
+                    set_time_min:      p.set_time_min,
+                    set_time_max:      p.set_time_max,
                     std_ct_min:        p.std_ct_min,
                     std_ct_max:        p.std_ct_max,
                 });

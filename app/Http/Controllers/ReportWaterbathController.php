@@ -1050,7 +1050,7 @@ class ReportWaterbathController extends Controller
         $existing = $run->parameters->keyBy('parameter');
         $empty    = array_fill_keys([
             'set_temp_min', 'set_temp_max', 'cold_zone_set_min', 'cold_zone_set_max',
-            'set_time', 'std_ct_min', 'std_ct_max',
+            'set_time_min', 'set_time_max', 'std_ct_min', 'std_ct_max',
         ], null);
 
         foreach (array_keys(MasterWaterbathParameter::PARAMETERS) as $key) {
@@ -1088,12 +1088,12 @@ class ReportWaterbathController extends Controller
         $hasSnapshot = $first && (
             $first->initial_temp_min !== null
             || $first->parameters->contains(fn ($p) => $p->set_temp_min !== null
-                || $p->set_time !== null || $p->std_ct_min !== null)
+                || $p->set_time_min !== null || $p->std_ct_min !== null)
         );
-
+    
         if ($hasSnapshot) {
             $snap = ['set_temp_min', 'set_temp_max', 'cold_zone_set_min', 'cold_zone_set_max',
-                    'set_time', 'std_ct_min', 'std_ct_max'];
+         'set_time_min', 'set_time_max', 'std_ct_min', 'std_ct_max'];
 
             return [
                 'initial_min' => $first->initial_temp_min,
@@ -1120,7 +1120,8 @@ class ReportWaterbathController extends Controller
                 'set_temp_max'      => $p->set_temp_max,
                 'cold_zone_set_min' => $p->parameter === MasterWaterbathParameter::DRYING ? $p->cold_zone_temp_min : null,
                 'cold_zone_set_max' => $p->parameter === MasterWaterbathParameter::DRYING ? $p->cold_zone_temp_max : null,
-                'set_time'          => $p->set_time,
+                'set_time_min' => $p->set_time_min,
+                'set_time_max' => $p->set_time_max,
                 'std_ct_min'        => $p->std_ct_min,
                 'std_ct_max'        => $p->std_ct_max,
             ])->all(),

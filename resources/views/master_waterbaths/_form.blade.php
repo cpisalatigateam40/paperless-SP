@@ -10,6 +10,21 @@
 </div>
 @endif
 
+@php
+    // Pembuat input angka 2 desimal untuk tabel standar.
+    // $min0 = true -> tidak boleh negatif (dipakai untuk Set Time).
+    $in = function (string $key, string $field, string $placeholder, bool $min0 = false) use ($values) {
+        $row = $values[$key] ?? null;
+        $val = old("parameters.$key.$field", $row?->$field);
+
+        return '<input type="number" step="0.01"' . ($min0 ? ' min="0"' : '')
+            . ' class="form-control form-control-sm"'
+            . ' name="parameters[' . $key . '][' . $field . ']"'
+            . ' placeholder="' . e($placeholder) . '"'
+            . ' value="' . e($val) . '">';
+    };
+@endphp
+
 <div class="row mb-4">
     <div class="col-md-6">
         <label>Produk</label>
@@ -45,7 +60,7 @@
     <div>
         <strong>Catatan pengisian parameter:</strong>
         <ul class="mb-0 mt-1">
-            <li>Kolom <strong>Min</strong> dan <strong>Max</strong> dipakai untuk parameter yang punya rentang nilai (misal suhu 55–60°C).</li>
+            <li>Kolom <strong>Min</strong> dan <strong>Max</strong> dipakai untuk parameter yang punya rentang nilai (misal suhu 55–60°C, waktu 25–30 menit).</li>
             <li>Kalau nilainya <strong>tidak berupa range</strong> (cuma satu angka pasti), isi kolom <strong>Min</strong> saja dan biarkan <strong>Max</strong> kosong.</li>
             <li>Kolom yang dikosongi otomatis tidak ditampilkan sebagai range di form laporan.</li>
             <li>Untuk <strong>Drying</strong>, Set Temp diisi per zona (Hot zone dan Cold zone).</li>
@@ -60,97 +75,50 @@
             <tr>
                 <th rowspan="2" class="align-middle">Parameter</th>
                 <th colspan="2">Set Temp (°C)</th>
-                <th rowspan="2" class="align-middle">Set Time<br>(menit)</th>
+                <th colspan="2">Set Time (menit)</th>
                 <th colspan="2">Std CT Prod. (°C)</th>
             </tr>
             <tr>
-                <th>Min</th>
-                <th>Max</th>
-                <th>Min</th>
-                <th>Max</th>
+                <th>Min</th><th>Max</th>
+                <th>Min</th><th>Max</th>
+                <th>Min</th><th>Max</th>
             </tr>
         </thead>
         <tbody>
             @foreach($parameters as $key => $label)
-            @php $v = $values[$key] ?? null; @endphp
 
             @if($key === 'drying')
             {{-- Drying: Hot zone --}}
             <tr>
                 <td>{{ $label }} <small class="text-muted">(Hot zone)</small></td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][set_temp_min]" placeholder="Mis. 60"
-                        value="{{ old("parameters.$key.set_temp_min", $v?->set_temp_min) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][set_temp_max]" placeholder="Opsional"
-                        value="{{ old("parameters.$key.set_temp_max", $v?->set_temp_max) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][set_time]" placeholder="Mis. 5"
-                        value="{{ old("parameters.$key.set_time", $v?->set_time) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][std_ct_min]" placeholder="Mis. 20"
-                        value="{{ old("parameters.$key.std_ct_min", $v?->std_ct_min) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][std_ct_max]" placeholder="Opsional"
-                        value="{{ old("parameters.$key.std_ct_max", $v?->std_ct_max) }}">
-                </td>
+                <td>{!! $in($key, 'set_temp_min', 'Mis. 60') !!}</td>
+                <td>{!! $in($key, 'set_temp_max', 'Opsional') !!}</td>
+                <td>{!! $in($key, 'set_time_min', 'Mis. 30', true) !!}</td>
+                <td>{!! $in($key, 'set_time_max', 'Opsional', true) !!}</td>
+                <td>{!! $in($key, 'std_ct_min', 'Mis. 20') !!}</td>
+                <td>{!! $in($key, 'std_ct_max', 'Opsional') !!}</td>
             </tr>
             {{-- Drying: Cold zone --}}
             <tr>
                 <td>{{ $label }} <small class="text-muted">(Cold zone)</small></td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][cold_zone_temp_min]" placeholder="Mis. 30"
-                        value="{{ old("parameters.$key.cold_zone_temp_min", $v?->cold_zone_temp_min) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][cold_zone_temp_max]" placeholder="Opsional"
-                        value="{{ old("parameters.$key.cold_zone_temp_max", $v?->cold_zone_temp_max) }}">
-                </td>
-                <td colspan="3" class="bg-light text-muted text-center">
+                <td>{!! $in($key, 'cold_zone_temp_min', 'Mis. 30') !!}</td>
+                <td>{!! $in($key, 'cold_zone_temp_max', 'Opsional') !!}</td>
+                <td colspan="4" class="bg-light text-muted text-center">
                     <small>Set Time &amp; Std CT mengikuti baris Hot zone</small>
                 </td>
             </tr>
             @else
             <tr>
                 <td>{{ $label }}</td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][set_temp_min]" placeholder="Mis. 90"
-                        value="{{ old("parameters.$key.set_temp_min", $v?->set_temp_min) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][set_temp_max]" placeholder="Opsional"
-                        value="{{ old("parameters.$key.set_temp_max", $v?->set_temp_max) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][set_time]" placeholder="Mis. 30"
-                        value="{{ old("parameters.$key.set_time", $v?->set_time) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][std_ct_min]" placeholder="Mis. 72"
-                        value="{{ old("parameters.$key.std_ct_min", $v?->std_ct_min) }}">
-                </td>
-                <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm"
-                        name="parameters[{{ $key }}][std_ct_max]" placeholder="Opsional"
-                        value="{{ old("parameters.$key.std_ct_max", $v?->std_ct_max) }}">
-                </td>
+                <td>{!! $in($key, 'set_temp_min', 'Mis. 90') !!}</td>
+                <td>{!! $in($key, 'set_temp_max', 'Opsional') !!}</td>
+                <td>{!! $in($key, 'set_time_min', 'Mis. 30', true) !!}</td>
+                <td>{!! $in($key, 'set_time_max', 'Opsional', true) !!}</td>
+                <td>{!! $in($key, 'std_ct_min', 'Mis. 72') !!}</td>
+                <td>{!! $in($key, 'std_ct_max', 'Opsional') !!}</td>
             </tr>
             @endif
+
             @endforeach
         </tbody>
     </table>

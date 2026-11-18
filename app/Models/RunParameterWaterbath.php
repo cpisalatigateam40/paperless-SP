@@ -14,7 +14,7 @@ class RunParameterWaterbath extends Model
         'uuid', 'run_uuid', 'parameter',
         'set_temp_min', 'set_temp_max',
         'cold_zone_set_min', 'cold_zone_set_max',
-        'set_time', 'std_ct_min', 'std_ct_max',
+        'set_time_min', 'set_time_max', 'std_ct_min', 'std_ct_max',
         'act_temp', 'cold_zone_act', 'act_time', 'act_ct',
     ];
 
@@ -23,7 +23,8 @@ class RunParameterWaterbath extends Model
         'set_temp_max'      => 'decimal:2',
         'cold_zone_set_min' => 'decimal:2',
         'cold_zone_set_max' => 'decimal:2',
-        'set_time'          => 'decimal:2',
+        'set_time_min'      => 'decimal:2',
+        'set_time_max'      => 'decimal:2',
         'std_ct_min'        => 'decimal:2',
         'std_ct_max'        => 'decimal:2',
         'act_temp'          => 'decimal:2',
@@ -80,6 +81,11 @@ class RunParameterWaterbath extends Model
 
     public function isActTimeOk(): ?bool
     {
-        return MasterWaterbathParameter::inRange($this->act_time, $this->set_time, null);
+        return MasterWaterbathParameter::inRange($this->act_time, $this->set_time_min, $this->set_time_max);
+    }
+
+    public function getSetTimeRangeAttribute(): string
+    {
+        return MasterWaterbathParameter::formatRange($this->set_time_min, $this->set_time_max);
     }
 }

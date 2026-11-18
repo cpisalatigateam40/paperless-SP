@@ -122,7 +122,8 @@ class MasterWaterbathController extends Controller
             'parameters'                         => 'required|array',
             'parameters.*.set_temp_min'          => 'nullable|numeric|required_with:parameters.*.set_temp_max',
             'parameters.*.set_temp_max'          => 'nullable|numeric|gte:parameters.*.set_temp_min',
-            'parameters.*.set_time'              => 'nullable|numeric|min:0',
+            'parameters.*.set_time_min' => 'nullable|numeric|min:0|required_with:parameters.*.set_time_max',
+'parameters.*.set_time_max' => 'nullable|numeric|min:0|gte:parameters.*.set_time_min',
             'parameters.*.std_ct_min'            => 'nullable|numeric|required_with:parameters.*.std_ct_max',
             'parameters.*.std_ct_max'            => 'nullable|numeric|gte:parameters.*.std_ct_min',
 
@@ -155,7 +156,7 @@ class MasterWaterbathController extends Controller
             $isDrying = $param === MasterWaterbathParameter::DRYING;
 
             $values = Arr::only($row, [
-                'set_temp_min', 'set_temp_max', 'set_time', 'std_ct_min', 'std_ct_max',
+                'set_temp_min', 'set_temp_max', 'set_time_min', 'set_time_max', 'std_ct_min', 'std_ct_max',
             ]);
 
             // Cold zone hanya untuk drying; selain itu dipaksa null

@@ -224,7 +224,7 @@
                                 @endif
                             </td>
 
-                            <td class="c">{{ $val($p->set_time) }}</td>
+                            <td class="c">{{ $p->set_time_range }}</td>
                             <td class="c"><span class="{{ $red($p->isActTimeOk()) }}">{{ $val($p->act_time) }}</span></td>
 
                             <td class="c">{{ $p->std_ct_range }}</td>

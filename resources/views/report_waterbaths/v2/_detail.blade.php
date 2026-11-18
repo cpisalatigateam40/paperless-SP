@@ -118,7 +118,7 @@
                                     </td>
 
                                     {{-- Time --}}
-                                    <td>{{ $val($p->set_time) }}</td>
+                                    <td>{{ $p->set_time_range }}</td>
                                     <td><span class="{{ $bad($p->isActTimeOk()) }} px-1 rounded">{{ $val($p->act_time) }}</span></td>
 
                                     {{-- CT Prod --}}

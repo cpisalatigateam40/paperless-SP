@@ -16,7 +16,7 @@
 @php
     // $i = index array (atau '__INDEX__' untuk template JS), $run = RunWaterbath|null
     $parameters = \App\Models\MasterWaterbathParameter::PARAMETERS;
-    $snapFields = ['set_temp_min', 'set_temp_max', 'set_time', 'std_ct_min', 'std_ct_max'];
+    $snapFields = ['set_temp_min', 'set_temp_max', 'set_time_min', 'set_time_max', 'std_ct_min', 'std_ct_max'];
     $sensor     = (int) old("runs.$i.sensor_ok", $run?->sensor_ok ?? true); // default Ok
 
     // Input kolom Act. data-min / data-max = nama field snapshot standarnya (untuk cek merah)
@@ -137,8 +137,8 @@
                         </td>
 
                         {{-- Time --}}
-                        <td class="wb-set"><span class="rng-text" data-min="set_time">-</span></td>
-                        <td>{!! $act($key, 'act_time', 'set_time', null, 'Mis. 30') !!}</td>
+                        <td class="wb-set"><span class="rng-text" data-min="set_time_min" data-max="set_time_max">-</span></td>
+                        <td>{!! $act($key, 'act_time', 'set_time_min', 'set_time_max', 'Mis. 30') !!}</td>
 
                         {{-- CT Prod --}}
                         <td class="wb-set"><span class="rng-text" data-min="std_ct_min" data-max="std_ct_max">-</span></td>

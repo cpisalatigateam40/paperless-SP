@@ -33,7 +33,7 @@
                             <td>{{ $master->product->product_name ?? '-' }}</td>
                             <td class="text-center">{{ $master->initial_temp_label }}</td>
                             <td class="text-center">
-                                {{ $master->parameters->whereNotNull('set_time')->count() }} / {{ count(\App\Models\MasterWaterbathParameter::PARAMETERS) }}
+                                {{ $master->parameters->whereNotNull('set_time_min')->count() }} / {{ count(\App\Models\MasterWaterbathParameter::PARAMETERS) }}
                             </td>
                             <td class="text-center">
                                 <div class="d-flex" style="gap: .4rem;">
@@ -86,7 +86,7 @@
                                                                 {{ $p?->set_temp_range ?? '-' }}
                                                             @endif
                                                         </td>
-                                                        <td class="text-center">{{ \App\Models\MasterWaterbathParameter::fmt($p?->set_time) ?? '-' }}</td>
+                                                        <td class="text-center">{{ $p?->set_time_range ?? '-' }}</td>
                                                         <td class="text-center">{{ $p?->std_ct_range ?? '-' }}</td>
                                                     </tr>
                                                 @endforeach
