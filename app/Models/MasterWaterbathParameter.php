@@ -33,7 +33,8 @@ class MasterWaterbathParameter extends Model
         'set_temp_max',
         'cold_zone_temp_min',
         'cold_zone_temp_max',
-        'set_time',
+        'set_time_min',
+        'set_time_max',
         'std_ct_min',
         'std_ct_max',
     ];
@@ -43,7 +44,8 @@ class MasterWaterbathParameter extends Model
         'set_temp_max'       => 'decimal:2',
         'cold_zone_temp_min' => 'decimal:2',
         'cold_zone_temp_max' => 'decimal:2',
-        'set_time'           => 'decimal:2',
+        'set_time_min'       => 'decimal:2',
+        'set_time_max'       => 'decimal:2',
         'std_ct_min'         => 'decimal:2',
         'std_ct_max'         => 'decimal:2',
     ];
@@ -131,5 +133,10 @@ class MasterWaterbathParameter extends Model
     public static function fmt($value): ?string
     {
         return is_numeric($value) ? number_format((float) $value, 2, '.', '') : null;
+    }
+
+    public function getSetTimeRangeAttribute(): string
+    {
+        return self::formatRange($this->set_time_min, $this->set_time_max);
     }
 }

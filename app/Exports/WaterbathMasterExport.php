@@ -66,7 +66,7 @@ class WaterbathMasterExport implements WithEvents, WithTitle
                     fn ($c) => $p($c)?->isActTempOk(), true);
             }
 
-            $add($g, "Set Time\n(menit)", fn ($c) => $p($c)?->set_time, null, true);
+            $add($g, "Set Time\n(menit)", fn ($c) => $p($c)?->set_time_range ?? '-');
             $add($g, "Act Time\n(menit)", fn ($c) => $p($c)?->act_time,
                 fn ($c) => $p($c)?->isActTimeOk(), true);
             $add($g, "Std CT Prod.\n(°C)", fn ($c) => $p($c)?->std_ct_range ?? '-');

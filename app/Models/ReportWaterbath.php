@@ -170,7 +170,7 @@ class ReportWaterbath extends Model
             'runs.parameters' => [
                 'act_temp'      => $rangeRule('act_temp', 'set_temp_min', 'set_temp_max'),
                 'cold_zone_act' => $rangeRule('cold_zone_act', 'cold_zone_set_min', 'cold_zone_set_max'),
-                'act_time'      => $rangeRule('act_time', 'set_time'),
+                'act_time' => $rangeRule('act_time', 'set_time_min', 'set_time_max'),
                 'act_ct'        => $rangeRule('act_ct', 'std_ct_min', 'std_ct_max'),
             ],
 
