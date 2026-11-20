@@ -194,7 +194,10 @@
 
                                 @php
                                     $user = auth()->user();
-                                    $canEdit = $user->hasRole(['admin', 'SPV QC']) || $report->created_at->gt(now()->subHours(8));
+                                    $canEdit = !$user->hasRole('viewer') && (
+                                        $user->hasRole(['admin', 'SPV QC']) ||
+                                        $report->created_at->gt(now()->subHours(8))
+                                    );
                                 @endphp
 
                                 @if($canEdit)
