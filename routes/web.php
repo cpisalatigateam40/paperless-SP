@@ -89,6 +89,7 @@ use App\Http\Controllers\ReportAuditPackingPrimerController;
 use App\Http\Controllers\MasterBoilingTankStandardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TraceabilityController;
+use App\Http\Controllers\ReportMdRejectController;
 
 
 Route::get('/', function () {
@@ -1873,4 +1874,19 @@ Route::middleware(['auth'])->group(function () {
         ->except(['show']);
 
     });
+
+    Route::get('report-md-rejects/audit-data', [ReportMdRejectController::class, 'auditData'])
+        ->name('report-md-rejects.audit-data');
+    Route::post('report-md-rejects/copy-to-audit/{uuid}', [ReportMdRejectController::class, 'copyToAudit'])
+        ->name('report-md-rejects.copy-to-audit');
+
+    Route::post('report-md-rejects/{uuid}/known', [ReportMdRejectController::class, 'known'])
+        ->name('report-md-rejects.known');
+    Route::post('report-md-rejects/{uuid}/approve', [ReportMdRejectController::class, 'approve'])
+        ->name('report-md-rejects.approve');
+    Route::get('report-md-rejects/{uuid}/export-pdf', [ReportMdRejectController::class, 'exportPdf'])
+    ->name('report-md-rejects.export-pdf');
+
+    Route::resource('report-md-rejects', ReportMdRejectController::class)
+        ->parameters(['report-md-rejects' => 'uuid']);
 });

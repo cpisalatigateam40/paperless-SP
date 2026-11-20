@@ -75,7 +75,8 @@ $isNonProses = Request::is([
 ]);
 $isKetidaksesuaian = Request::is([
 'report-production-nonconformities*',
-'report-foreign-objects*'
+'report-foreign-objects*',
+'report-md-rejects*'
 ]);
 $isAudit = Request::is([
 'report-audit-packing-primers*'
@@ -539,6 +540,11 @@ body.audit-mode-page .table-bordered th {
                 <a class="collapse-item {{ Request::is('report-foreign-objects*') ? 'active' : '' }}"
                     href="{{ $reportLink('report-foreign-objects.index') }}">
                     Pemeriksaan Kontaminasi Benda Asing
+                </a>
+
+                <a class="collapse-item {{ Request::is('report-md-rejects*') ? 'active' : '' }}"
+                    href="{{ $reportLink('report-md-rejects.index') }}">
+                    Pemeriksaan Produk Reject Metal Detector
                 </a>
             </div>
         </div>

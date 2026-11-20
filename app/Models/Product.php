@@ -198,6 +198,11 @@ class Product extends Model
         return $this->hasOne(MasterWaterbath::class, 'product_uuid', 'uuid');
     }
 
+    public function mdRejectDetails()
+    {
+        return $this->hasMany(ReportMdRejectDetail::class, 'product_uuid', 'uuid');
+    }
+
 
 
 
