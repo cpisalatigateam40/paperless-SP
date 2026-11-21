@@ -20,13 +20,14 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const form    = document.getElementById('md-reject-form');
-    const wrap    = document.getElementById('detail-rows');
-    const hint    = document.getElementById('empty-hint');
-    const addBot  = document.getElementById('add-bottom');
-    const tpl     = document.getElementById('detail-template').innerHTML;
-    const initial = @json($rows);
-    const isEdit  = @json($isEdit);
+    const form      = document.getElementById('md-reject-form');
+    const wrap      = document.getElementById('detail-rows');
+    const hint      = document.getElementById('empty-hint');
+    const addBot    = document.getElementById('add-bottom');
+    const toggleAll = document.getElementById('btn-toggle-all');
+    const tpl       = document.getElementById('detail-template').innerHTML;
+    const initial   = @json($rows);
+    const isEdit    = @json($isEdit);
     let idx = 0;
 
     const nowHi = () => new Date().toTimeString().slice(0, 5);
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         $s.on('change', () => summary(row));
     }
 
-    /* ---------- Ringkasan di header kartu ---------- */
+    /* ---------- Ringkasan + badge di header kartu ---------- */
     function summary(row) {
         const sel  = row.querySelector('[data-f="product"]');
         const name = sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : 'Produk belum dipilih';
@@ -55,6 +56,18 @@ document.addEventListener('DOMContentLoaded', function () {
         row.querySelector('[data-s="sub"]').textContent =
             [time && 'Jam ' + time, code && 'Kode ' + code, qty !== '' && qty + ' pcs reject']
                 .filter(Boolean).join('  ·  ') || '-';
+
+        // Disposisi -> badge + warna aksen kartu
+        const disp  = row.querySelector('input[name$="[disposition]"]:checked');
+        const dBadge = row.querySelector('[data-s="disp"]');
+        row.dataset.disp = disp ? disp.value : '';
+        dBadge.textContent = disp ? disp.dataset.label : '';
+        dBadge.className = 'mdr-badge ' + (disp ? 'b-' + disp.value : 'd-none');
+        dBadge.setAttribute('data-s', 'disp');
+
+        // Kontaminasi ditemukan -> badge merah
+        const ct = row.querySelector('input[name$="[contamination_found]"]:checked');
+        row.querySelector('[data-s="contam"]').classList.toggle('d-none', !(ct && ct.value === '1'));
     }
 
     /* ---------- Total di bar bawah ---------- */
@@ -66,12 +79,20 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('total-reject').textContent = sum;
     }
 
+    function updateToggleLabel() {
+        const rows = wrap.querySelectorAll('.detail-row');
+        const allCollapsed = rows.length > 0 && [...rows].every(r => r.classList.contains('is-collapsed'));
+        toggleAll.textContent = allCollapsed ? 'Buka semua' : 'Lipat semua';
+    }
+
     function renumber() {
         const rows = wrap.querySelectorAll('.detail-row');
         rows.forEach((el, n) => el.querySelector('.row-no').textContent = n + 1);
         hint.classList.toggle('d-none', rows.length > 0);
         addBot.classList.toggle('d-none', rows.length === 0);
+        toggleAll.classList.toggle('d-none', rows.length < 2);
         totals();
+        updateToggleLabel();
     }
 
     /* ---------- Input "Lainnya" ---------- */
@@ -132,6 +153,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    toggleAll.addEventListener('click', function () {
+        const rows = wrap.querySelectorAll('.detail-row');
+        const collapse = ![...rows].every(r => r.classList.contains('is-collapsed'));
+        rows.forEach(r => r.classList.toggle('is-collapsed', collapse));
+        updateToggleLabel();
+    });
+
     wrap.addEventListener('click', function (e) {
         const rm = e.target.closest('.btn-remove-row');
         if (rm) {
@@ -144,7 +172,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         const head = e.target.closest('.mdr-card-head');
-        if (head) head.closest('.detail-row').classList.toggle('is-collapsed');
+        if (head) {
+            head.closest('.detail-row').classList.toggle('is-collapsed');
+            updateToggleLabel();
+        }
     });
 
     wrap.addEventListener('input', function (e) {
@@ -161,8 +192,9 @@ document.addEventListener('DOMContentLoaded', function () {
         summary(row);
     });
 
-    // Kartu terlipat yang punya field wajib kosong: buka otomatis
+    // Field wajib kosong: tandai merah + buka kartu yang terlipat
     form.addEventListener('invalid', function (e) {
+        form.classList.add('mdr-validated');
         const row = e.target.closest('.detail-row');
         if (row) row.classList.remove('is-collapsed');
     }, true);

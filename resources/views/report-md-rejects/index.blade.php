@@ -8,7 +8,7 @@
 
             <div class="op-toolbar d-flex flex-row flex-wrap align-items-center">
                 @hasanyrole('admin|superadmin')
-                <form method="GET" action="{{ route('report-md-rejects.index') }}" class="op-item op-form">
+                <form method="GET" action="{{ route('report_md_rejects.index') }}" class="op-item op-form">
                     <input type="hidden" name="search" value="{{ request('search') }}">
                     <select name="area" class="form-control form-control-sm" onchange="this.form.submit()">
                         <option value="">Semua Area</option>
@@ -21,25 +21,78 @@
                 </form>
                 @endhasanyrole
 
-                <form method="GET" action="{{ route('report-md-rejects.index') }}"
+                <form method="GET" action="{{ route('report_md_rejects.index') }}"
                     class="op-item op-form op-search d-flex flex-row flex-wrap align-items-center">
                     <input type="text" name="search" class="form-control form-control-sm op-search-input"
                         placeholder="Cari laporan..." value="{{ request('search') }}">
                     <button type="submit" class="btn btn-sm btn-outline-primary">Cari</button>
                     @if(request('search'))
-                        <a href="{{ route('report-md-rejects.index') }}" class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
+                        <a href="{{ route('report_md_rejects.index') }}" class="btn btn-sm btn-danger" title="Reset Filter">Reset</a>
                     @endif
                 </form>
+
+                {{-- Approve --}}
+                @role('Produksi')
+                <div class="op-item  ">
+                    <button type="button" class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal" data-bs-target="#modalBulkKnown">
+                        <i class="fas fa-check-double"></i> Approve (Produksi)
+                    </button>
+                </div>
+                @endrole
+
+                @role('SPV QC')
+                <div class="op-item  ">
+                    <button type="button" class="btn btn-success btn-sm"
+                        data-bs-toggle="modal" data-bs-target="#modalBulkApprove">
+                        <i class="fas fa-check-circle"></i> Approve (QC)
+                    </button>
+                </div>
+                @endrole
+
+                <div class="op-divider d-none d-lg-block  "></div>
+
+                {{-- Export --}}
+                <div class="op-item  ">
+                    <x-export-pdf-modal
+                        :route="route('report_md_rejects.export_pdf_bulk')"
+                        title="Product Reject MD"
+                        modal-id="modalExportPdfRejectMD"
+                        :shift-options="['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3']"
+                    />
+                </div>
+
+                <div class="op-item">
+                    <x-export-excel-modal
+                        :route="route('report_md_rejects.export')"
+                        title="Product Reject MD" />
+                </div>
+
+                @can('create report')
+                <div class="op-item">
+                    <x-import-button />
+                </div>
+                @endcan
+
+                
 
                 <div class="op-divider d-none d-lg-block"></div>
 
                 @can('create report')
                 <div class="op-item">
-                    <a href="{{ route('report-md-rejects.create') }}" class="btn btn-sm btn-primary">
+                    <a href="{{ route('report_md_rejects.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
                 </div>
                 @endcan
+
+                @hasanyrole('admin|superadmin|SPV QC')
+                <div class="op-item">
+                    <a href="{{ route('report_md_rejects.audit') }}" class="btn btn-sm btn-audit">
+                        <i class="fas fa-user-shield"></i> Audit
+                    </a>
+                </div>
+                @endhasanyrole
             </div>
         </div>
 
@@ -47,6 +100,8 @@
             @if(session('success'))
                 <div id="success-alert" class="alert alert-success">{{ session('success') }}</div>
             @endif
+
+            <x-import-alerts />
 
             @if ($errors->any())
                 <div id="error-alert" class="alert alert-danger">
@@ -57,6 +112,16 @@
                     </ul>
                 </div>
             @endif
+
+            <x-report-sort
+                :sort-options="[
+                    'latest' => 'Terbaru',
+                    'production_code' => 'Kode Produksi',
+                    'report_date' => 'Tanggal Laporan',
+                    'submitted_at' => 'Tanggal Submit',
+                ]"
+                :with-date-filter="true"
+            />
 
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -97,21 +162,22 @@
                                     @endphp
 
                                     @if($canEdit)
-                                        <a href="{{ route('report-md-rejects.edit', $report->uuid) }}"
+                                        <a href="{{ route('report_md_rejects.edit', $report->uuid) }}"
                                             class="btn btn-sm btn-warning" title="Edit Laporan">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     @endif -->
 
-                                    
-                                    <a href="{{ route('report-md-rejects.edit', $report->uuid) }}"
+                                    @can('edit report')
+                                    <a href="{{ route('report_md_rejects.edit', $report->uuid) }}"
                                         class="btn btn-sm btn-warning" title="Edit Laporan">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    @endcan
                                     
 
                                     @can('delete report')
-                                    <form action="{{ route('report-md-rejects.destroy', $report->uuid) }}"
+                                    <form action="{{ route('report_md_rejects.destroy', $report->uuid) }}"
                                         method="POST" onsubmit="return confirm('Yakin hapus?')">
                                         @csrf
                                         @method('DELETE')
@@ -124,7 +190,7 @@
                                     {{-- Known --}}
                                     @can('known report')
                                         @if(!$report->known_by)
-                                        <form action="{{ route('report-md-rejects.known', $report->uuid) }}" method="POST"
+                                        <form action="{{ route('report_md_rejects.known', $report->id) }}" method="POST"
                                             style="display:inline-block;" onsubmit="return confirm('Ketahui laporan ini?')">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-outline-success" title="Diketahui">
@@ -149,7 +215,7 @@
                                     {{-- Approve --}}
                                     @can('approve report')
                                         @if(!$report->approved_by)
-                                        <form action="{{ route('report-md-rejects.approve', $report->uuid) }}" method="POST"
+                                        <form action="{{ route('report_md_rejects.approve', $report->id) }}" method="POST"
                                             style="display:inline-block;" onsubmit="return confirm('Setujui laporan ini?')">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-success" title="Approve">
@@ -171,7 +237,7 @@
                                         @endif
                                     @endcan
 
-                                    <a href="{{ route('report-md-rejects.export-pdf', $report->uuid) }}"
+                                    <a href="{{ route('report_md_rejects.export-pdf', $report->uuid) }}"
                                         class="btn btn-secondary btn-sm" target="_blank" title="Cetak PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
@@ -198,6 +264,40 @@
         </div>
     </div>
 </div>
+
+{{-- Modals: di luar toolbar supaya tidak ikut layout flex --}}
+@role('Produksi')
+<x-bulk-approval-modal
+    prefix="known"
+    title="Produksi"
+    color="warning"
+    icon="fa-check-double"
+    action-route="report_md_rejects.bulk-known"
+    count-route="report_md_rejects.bulk-known-count"
+    label="Approve Semua"
+/>
+@endrole
+
+@role('SPV QC')
+<x-bulk-approval-modal
+    prefix="approve"
+    title="QC"
+    color="success"
+    icon="fa-check-circle"
+    action-route="report_md_rejects.bulk-approve"
+    count-route="report_md_rejects.bulk-approve-count"
+    label="Approve Semua"
+/>
+@endrole
+
+@can('create report')
+<x-import-modal
+    title="Import Reject Metal Detector"
+    subtitle="Satu file bisa berisi banyak laporan"
+    hint="Satu baris = satu produk reject. Kolom Verifikasi Alat diisi di baris pertama tiap laporan (Tanggal, Shift, Line yang sama). Isi beberapa penyebab dalam satu sel dengan titik koma; daftarnya ada di sheet Master Data. Timpa atau hapus baris contoh sebelum upload."
+    :route="route('report_md_rejects.import')"
+    :template-route="route('report_md_rejects.template')" />
+@endcan
 @endsection
 
 @section('script')

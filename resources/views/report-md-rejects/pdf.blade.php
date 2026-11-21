@@ -7,10 +7,9 @@
 
     $details = $report->details->count() ? $report->details->values() : collect([null]);  // minimal 1 baris kosong
 
-    // Mode ringkas supaya tetap 1 halaman
-    $n       = $details->count();
-    $compact = $n > 5;
-    $fs      = $compact ? ($n > 10 ? 5.5 : 6) : 7;
+    // Perkecil font bila produk banyak supaya tetap 1 halaman
+    $n  = $details->count();
+    $fs = $n > 14 ? 6 : ($n > 9 ? 6.5 : 7.5);
 @endphp
 <!DOCTYPE html>
 <html>
@@ -80,12 +79,13 @@
     }
     table.data th, table.data td {
         word-wrap: break-word;
-        padding: {{ $compact ? '1px 2px' : '2px 3px' }};
+        padding: 2px 3px;
     }
+    table.data td { vertical-align: middle; }
     table.data tr { page-break-inside: avoid; }
+    table.data .cause div { line-height: 1.3; }
 
-    .chk  { font-size: {{ $fs + 2 }}px; }
-    .line { line-height: {{ $compact ? '1.2' : '1.45' }}; }
+    .chk { font-size: 10px; }  /* dipakai tabel A */
 
     @page {
         margin-top: 80px;
@@ -183,14 +183,14 @@
             <tr>
                 <th style="width: 3.5%;">No</th>
                 <th style="width: 5.5%;">Jam</th>
-                <th style="width: 12%;">Nama Produk</th>
-                <th style="width: 9%;">Kode Produksi</th>
-                <th style="width: 7%;">Jml Reject<br>(pcs/pack)</th>
-                <th style="width: 10%;">Hasil Pengecekan Ulang</th>
-                <th style="width: 8%;">Kontaminasi Ditemukan</th>
-                <th style="width: 18%;">Dugaan Penyebab</th>
-                <th style="width: 14%;">Tindakan Perbaikan / Korektif</th>
-                <th style="width: 13%;">Disposisi Produk</th>
+                <th style="width: 14%;">Nama Produk</th>
+                <th style="width: 12%;">Kode Produksi</th>
+                <th style="width: 8%;">Jumlah Reject<br>(pcs/pack)</th>
+                <th style="width: 9%;">Hasil Pengecekan Ulang</th>
+                <th style="width: 8.5%;">Kontaminasi Ditemukan</th>
+                <th style="width: 17%;">Dugaan Penyebab</th>
+                <th style="width: 13%;">Tindakan Perbaikan / Korektif</th>
+                <th style="width: 9.5%;">Disposisi Produk</th>
             </tr>
         </thead>
         <tbody>
@@ -202,61 +202,17 @@
                     <td>{{ optional(optional($d)->product)->product_name }}</td>
                     <td class="text-center">{{ optional($d)->production_code }}</td>
                     <td class="text-center">{{ optional($d)->reject_qty }}</td>
-
-                    {{-- Hasil pengecekan ulang --}}
-                    <td class="line">
-                        @if($compact)
-                            {{ $d ? ($resultLabel[$d->recheck_result] ?? '-') : '' }}
-                        @else
-                            <span class="chk">{{ $cb(optional($d)->recheck_result === 'detected') }}</span> Terdeteksi<br>
-                            <span class="chk">{{ $cb(optional($d)->recheck_result === 'not_detected') }}</span> Tidak Terdeteksi
-                        @endif
+                    <td class="text-center">{{ $d ? ($resultLabel[$d->recheck_result] ?? '-') : '' }}</td>
+                    <td class="text-center">
+                        {{ $d ? (is_null($d->contamination_found) ? '-' : ($d->contamination_found ? 'Ada' : 'Tidak')) : '' }}
                     </td>
-
-                    {{-- Kontaminasi --}}
-                    <td class="line">
-                        @if($compact)
-                            {{ $d ? (is_null($d->contamination_found) ? '-' : ($d->contamination_found ? 'Ada' : 'Tidak')) : '' }}
-                        @else
-                            <span class="chk">{{ $cb($d && $d->contamination_found === true) }}</span> Ada<br>
-                            <span class="chk">{{ $cb($d && $d->contamination_found === false) }}</span> Tidak
-                        @endif
+                    <td class="cause">
+                        @foreach($picked as $key)
+                            <div>• {{ $key === 'other' ? 'Lainnya: ' . ($d->suspected_cause_other ?: '-') : ($causeLabels[$key] ?? $key) }}</div>
+                        @endforeach
                     </td>
-
-                    {{-- Dugaan penyebab --}}
-                    <td class="line">
-                        @if($compact)
-                            @forelse($picked as $key)
-                                <div>• {{ $key === 'other' ? 'Lainnya: ' . (optional($d)->suspected_cause_other ?: '-') : ($causeLabels[$key] ?? $key) }}</div>
-                            @empty
-                                {{ $d ? '-' : '' }}
-                            @endforelse
-                        @else
-                            @foreach($causeLabels as $key => $label)
-                                <div>
-                                    • <span class="chk">{{ $cb(in_array($key, $picked, true)) }}</span>
-                                    @if($key === 'other')
-                                        Lainnya: {{ ($d && in_array('other', $picked, true) && $d->suspected_cause_other) ? $d->suspected_cause_other : '..........' }}
-                                    @else
-                                        {{ $label }}
-                                    @endif
-                                </div>
-                            @endforeach
-                        @endif
-                    </td>
-
                     <td>{{ optional($d)->corrective_action }}</td>
-
-                    {{-- Disposisi --}}
-                    <td class="line">
-                        @if($compact)
-                            {{ $d ? ($dispLabels[$d->disposition] ?? '-') : '' }}
-                        @else
-                            @foreach($dispLabels as $key => $label)
-                                <div>• <span class="chk">{{ $cb(optional($d)->disposition === $key) }}</span> {{ $label }}</div>
-                            @endforeach
-                        @endif
-                    </td>
+                    <td class="text-center">{{ $d ? ($dispLabels[$d->disposition] ?? '-') : '' }}</td>
                 </tr>
             @endforeach
         </tbody>

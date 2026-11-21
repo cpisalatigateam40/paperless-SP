@@ -543,7 +543,7 @@ body.audit-mode-page .table-bordered th {
                 </a>
 
                 <a class="collapse-item {{ Request::is('report-md-rejects*') ? 'active' : '' }}"
-                    href="{{ $reportLink('report-md-rejects.index') }}">
+                    href="{{ $reportLink('report_md_rejects.index') }}">
                     Pemeriksaan Produk Reject Metal Detector
                 </a>
             </div>

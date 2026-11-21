@@ -1875,18 +1875,33 @@ Route::middleware(['auth'])->group(function () {
 
     });
 
-    Route::get('report-md-rejects/audit-data', [ReportMdRejectController::class, 'auditData'])
-        ->name('report-md-rejects.audit-data');
-    Route::post('report-md-rejects/copy-to-audit/{uuid}', [ReportMdRejectController::class, 'copyToAudit'])
-        ->name('report-md-rejects.copy-to-audit');
-
-    Route::post('report-md-rejects/{uuid}/known', [ReportMdRejectController::class, 'known'])
-        ->name('report-md-rejects.known');
-    Route::post('report-md-rejects/{uuid}/approve', [ReportMdRejectController::class, 'approve'])
-        ->name('report-md-rejects.approve');
-    Route::get('report-md-rejects/{uuid}/export-pdf', [ReportMdRejectController::class, 'exportPdf'])
-    ->name('report-md-rejects.export-pdf');
-
-    Route::resource('report-md-rejects', ReportMdRejectController::class)
-        ->parameters(['report-md-rejects' => 'uuid']);
+    Route::post('report_md_rejects/bulk-known', [ReportMdRejectController::class, 'bulkKnown'])->name('report_md_rejects.bulk-known');
+    Route::post('report_md_rejects/bulk-approve', [ReportMdRejectController::class, 'bulkApprove'])->name('report_md_rejects.bulk-approve');
+    Route::get('report_md_rejects/bulk-known-count', [ReportMdRejectController::class, 'bulkKnownCount'])->name('report_md_rejects.bulk-known-count');
+    Route::get('report_md_rejects/bulk-approve-count', [ReportMdRejectController::class, 'bulkApproveCount'])->name('report_md_rejects.bulk-approve-count');
+    Route::get('report_md_rejectss/export-pdf-bulk', [ReportMdRejectController::class, 'exportPdfBulk'])
+    ->name('report_md_rejects.export_pdf_bulk');
+    Route::get('report_md_rejects/template', [ReportMdRejectController::class, 'downloadTemplate'])
+    ->name('report_md_rejects.template');
+    Route::post('report_md_rejects/import', [ReportMdRejectController::class, 'importExcel'])
+        ->name('report_md_rejects.import');
+    Route::prefix('report-md-rejects')
+    ->name('report_md_rejects.')
+    ->controller(ReportMdRejectController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::post('/export-excel', 'exportExcel')->name('export');
+        Route::get('/audit-data', 'auditIndex')->name('audit');
+        Route::get('/copy-to-audit/{uuid}', 'copyToAudit')->name('copy-to-audit');
+        Route::post('/auto-audit/{uuid}', 'autoNormalizeAudit')->name('auto-audit');
+        Route::post('/bulk-auto-audit', 'bulkAutoNormalizeAudit')->name('bulk-auto-audit');
+        Route::delete('/{uuid}', 'destroy')->name('destroy');
+        Route::get('/{uuid}/edit', 'edit')->name('edit');
+        Route::put('/{uuid}', 'update')->name('update');
+        Route::post('/{id}/approve', 'approve')->name('approve');
+        Route::get('/{uuid}/export-pdf', 'exportPdf')->name('export-pdf');
+        Route::post('/{id}/known', 'known')->name('known');
+    });
 });
