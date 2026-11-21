@@ -220,7 +220,7 @@
                                     $user = auth()->user();
                                     $canEdit = !$user->hasRole('viewer') && (
                                         $user->hasRole(['admin', 'SPV QC']) ||
-                                        $report->created_at->gt(now()->subHours(2))
+                                        $r->created_at->gt(now()->subHours(2))
                                     );
                                 @endphp
 
