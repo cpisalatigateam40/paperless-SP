@@ -161,7 +161,10 @@
 
     <div class="tab-content p-3 border border-top-0 bg-white">
         <div class="tab-pane fade show active" id="roomTab">
-            <div class="d-flex justify-content-end mb-3">
+            <div class="d-flex justify-content-end align-items-center mb-3">
+                <button type="button" class="btn btn-outline-primary btn-sm mr-2 me-2" id="selectAllRooms" title="Tambahkan semua ruangan sekaligus">
+                    <i class="fas fa-check-double"></i> Pilih Semua Ruangan
+                </button>
                 <button type="button" class="btn btn-outline-secondary btn-sm btn-toggle-all" data-type="room" title="Lipat semua">
                     <i class="fas fa-angle-double-up"></i>
                 </button>
@@ -342,6 +345,26 @@ function autoAddEquipments(roomUuid) {
             blk.dataset.auto = roomUuid;
             selectBlock(blk, 'equipment', e.uuid);
         });
+}
+
+// Tambahkan semua ruangan yang belum dipilih
+function addAllRooms() {
+    const wrap = document.getElementById(CFG.room.container);
+
+    MASTER.room.forEach(r => {
+        const picked = [...wrap.querySelectorAll('.block-picker')].map(s => s.value).filter(Boolean);
+        if (picked.includes(r.uuid)) return;
+
+        // pakai blok kosong yang ada, kalau tidak ada buat baru
+        const blk = [...wrap.querySelectorAll('.cleanliness-item')].find(i => !i.dataset.uuid)
+            || addBlock('room');
+        q(blk, '.block-picker').value = r.uuid;
+        selectBlock(blk, 'room', r.uuid);
+        autoAddEquipments(r.uuid);
+    });
+
+    refreshEquipmentPickers();
+    updateCounts();
 }
 
 // Hapus mesin otomatis dari ruangan itu, kecuali yang sudah mulai diisi
@@ -662,6 +685,7 @@ document.getElementById('cleanlinessForm').addEventListener('submit', function (
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addRoom').onclick = () => addBlock('room');
     document.getElementById('addEquipment').onclick = () => addBlock('equipment');
+    document.getElementById('selectAllRooms').onclick = addAllRooms;
     restoreAll();
 });
 
