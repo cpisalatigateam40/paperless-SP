@@ -52,6 +52,7 @@ return [
     // Verifikasi dan Penanganan Ketidaksesuaian
     'report_production_nonconformities' => 'Laporan Ketidaksesuaian Proses Produksi',
     'report_foreign_objects' => 'Pemeriksaan Kontaminasi Benda Asing',
+    'report-md-rejects' => 'Pemeriksaan Produk Reject Metal Detector',
 
     //audit
     'report_audit_packing_primers' => 'Checklist Audit Kepatuhan Proses Packing Primer'

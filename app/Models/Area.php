@@ -276,4 +276,9 @@ class Area extends Model
             'uuid'
         );
     }
+
+    public function mdRejects()
+    {
+        return $this->hasMany(ReportMdReject::class, 'area_uuid', 'uuid');
+    }
 }

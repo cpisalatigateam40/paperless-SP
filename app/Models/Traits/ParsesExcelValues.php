@@ -102,4 +102,11 @@ trait ParsesExcelValues
             throw new \RuntimeException("Nilai \"{$v}\" pada kolom {$label} tidak valid, gunakan OK atau Tidak OK.");
         }
     }
+
+    // "A; B, C" -> ['A', 'B', 'C']
+    private static function splitList($v): array
+    {
+        $parts = preg_split('/\s*[;,\n|]\s*/', trim((string) $v)) ?: [];
+        return array_values(array_filter(array_map('trim', $parts), fn ($p) => $p !== ''));
+    }
 }
